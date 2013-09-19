@@ -96,6 +96,7 @@ doc/version.texi -text
 extras/CBL_OC_DUMP.cob -text
 extras/Makefile.am -text
 extras/Makefile.in -text
+extras/README -text
 /install-sh -text
 lib/ChangeLog -text
 lib/Makefile.am -text
