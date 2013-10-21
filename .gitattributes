@@ -86,10 +86,10 @@ doc/cbmnem.tex -text
 doc/cbrese.tex -text
 doc/cbsyst.tex -text
 doc/cobcinfo.sh -text
+doc/gnucobol.info -text
+doc/gnucobol.pdf -text
+doc/gnucobol.texi -text
 doc/mdate-sh -text
-doc/opencobol.info -text
-doc/opencobol.pdf -text
-doc/opencobol.texi -text
 doc/stamp-vti -text
 doc/texinfo.tex -text
 doc/version.texi -text
@@ -97,6 +97,7 @@ extras/CBL_OC_DUMP.cob -text
 extras/Makefile.am -text
 extras/Makefile.in -text
 extras/README -text
+/gnu-cobol.spec -text
 /install-sh -text
 lib/ChangeLog -text
 lib/Makefile.am -text
@@ -137,7 +138,6 @@ m4/po.m4 -text
 m4/progtest.m4 -text
 /missing -text
 /mkinstalldirs -text
-/open-cobol.spec -text
 po/ChangeLog -text
 po/LINGUAS -text
 po/Makefile.in.in -text
@@ -150,10 +150,10 @@ po/en@boldquot.header -text
 po/en@quot.header -text
 po/es.gmo -text
 po/es.po -text
+po/gnu-cobol.pot -text
 po/insert-header.sin -text
 po/ja.gmo -text
 po/ja.po -text
-po/open-cobol.pot -text
 po/quot.sed -text
 po/remove-potcdate.sin -text
 po/stamp-po -text
