@@ -61,11 +61,7 @@ tests/cobol85/copy
 tests/cobol85/copyalt
 tests/cobol85/newcob.val
 tests/cobol85/summary.log
-tests/data-rep.dir
-tests/data-rep.log
-tests/run.dir
-tests/run.log
-tests/syntax.dir
-tests/syntax.log
+tests/testsuite.dir
+tests/testsuite.log
 tests/testsuite.src/Makefile
 tests/testsuite.src/atlocal
