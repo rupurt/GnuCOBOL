@@ -146,8 +146,14 @@ po/POTFILES.in -text
 po/Rules-quot -text
 po/boldquot.sed -text
 po/en.translate -text
+po/en@boldquot.gmo -text
 po/en@boldquot.header -text
+po/en@boldquot.insert-header -text
+po/en@boldquot.po -text
+po/en@quot.gmo -text
 po/en@quot.header -text
+po/en@quot.insert-header -text
+po/en@quot.po -text
 po/es.gmo -text
 po/es.po -text
 po/gnu-cobol.pot -text

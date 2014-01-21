@@ -1,9 +1,11 @@
 /.deps
 /Makefile
 /atlocal
+/autom4te.cache
 bin/.deps
 bin/Makefile
 bin/atlocal
+bin/cob-config
 bin/cobcrun
 /cob-config
 cobc/.deps
@@ -23,6 +25,16 @@ copy/atlocal
 doc/.deps
 doc/Makefile
 doc/atlocal
+doc/gnucobol.aux
+doc/gnucobol.cp
+doc/gnucobol.fn
+doc/gnucobol.ky
+doc/gnucobol.log
+doc/gnucobol.pg
+doc/gnucobol.toc
+doc/gnucobol.tp
+doc/gnucobol.vr
+extras/Makefile
 lib/.deps
 lib/Makefile
 lib/atlocal
@@ -33,6 +45,7 @@ libcob/atlocal
 m4/.deps
 m4/Makefile
 m4/atlocal
+po/*.po~
 po/.deps
 po/Makefile
 po/Makefile.in
