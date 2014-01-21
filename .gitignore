@@ -51,6 +51,7 @@ po/Makefile
 po/Makefile.in
 po/POTFILES
 po/atlocal
+po/remove-potcdate.sed
 /stamp-h1
 tests/.deps
 tests/Makefile
