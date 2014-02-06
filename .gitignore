@@ -35,6 +35,7 @@ doc/gnucobol.toc
 doc/gnucobol.tp
 doc/gnucobol.vr
 extras/Makefile
+/gnu-cobol-*
 lib/.deps
 lib/Makefile
 lib/atlocal
