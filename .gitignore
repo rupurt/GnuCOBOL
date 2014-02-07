@@ -8,6 +8,9 @@ bin/atlocal
 bin/cob-config
 bin/cobcrun
 /cob-config
+cobc/*.dot
+cobc/*.output
+cobc/*.vcg
 cobc/.deps
 cobc/Makefile
 cobc/atlocal
