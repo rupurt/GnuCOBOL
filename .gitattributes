@@ -23,8 +23,6 @@ cobc/Makefile.am -text
 cobc/Makefile.in -text
 cobc/cobc.c -text
 cobc/cobc.h -text
-cobc/cobgetopt.c -text
-cobc/cobgetopt.h -text
 cobc/codegen.c -text
 cobc/codeoptim.c -text
 cobc/codeoptim.def -text
@@ -101,6 +99,9 @@ extras/README -text
 /install-sh -text
 lib/ChangeLog -text
 lib/Makefile.am -text
+lib/Makefile.in -text
+lib/cobgetopt.c -text
+lib/cobgetopt.h -text
 lib/dummymac.c -text
 lib/gettext.h -text
 /libcob.h -text
