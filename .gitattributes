@@ -100,8 +100,6 @@ extras/README -text
 lib/ChangeLog -text
 lib/Makefile.am -text
 lib/Makefile.in -text
-lib/cobgetopt.c -text
-lib/cobgetopt.h -text
 lib/dummymac.c -text
 lib/gettext.h -text
 /libcob.h -text
@@ -109,6 +107,8 @@ libcob/ChangeLog -text
 libcob/Makefile.am -text
 libcob/Makefile.in -text
 libcob/call.c -text
+libcob/cobgetopt.c -text
+libcob/cobgetopt.h -text
 libcob/coblocal.h -text
 libcob/common.c -text
 libcob/common.h -text
