@@ -2,6 +2,7 @@
 /Makefile
 /atlocal
 /autom4te.cache
+bin/*.exe
 bin/.deps
 bin/Makefile
 bin/atlocal
@@ -9,6 +10,7 @@ bin/cob-config
 bin/cobcrun
 /cob-config
 cobc/*.dot
+cobc/*.exe
 cobc/*.output
 cobc/*.vcg
 cobc/.deps
@@ -37,6 +39,7 @@ doc/gnucobol.pg
 doc/gnucobol.toc
 doc/gnucobol.tp
 doc/gnucobol.vr
+extras/*.dll
 extras/Makefile
 /gnu-cobol-*
 lib/.deps
