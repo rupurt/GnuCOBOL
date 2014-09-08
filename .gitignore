@@ -10,6 +10,7 @@ bin/cob-config
 bin/cobcrun
 build_windows/*.7z
 build_windows/*.bak
+build_windows/*.h
 build_windows/*.ncb
 build_windows/*.sdf
 build_windows/*.suo
@@ -19,12 +20,13 @@ build_windows/dist
 build_windows/ia64
 build_windows/vc10/*.bak
 build_windows/vc10/*.ncb
+build_windows/vc10/*.opensdf
 build_windows/vc10/*.sdf
 build_windows/vc10/*.suo
 build_windows/vc10/*.user
 build_windows/vc10/Win32
-build_windows/vc10/dist
 build_windows/vc10/ia64
+build_windows/vc10/ipch
 build_windows/vc10/x64
 build_windows/vc11/*.bak
 build_windows/vc11/*.ncb
