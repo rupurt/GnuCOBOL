@@ -17,6 +17,7 @@ bin/ChangeLog -text
 bin/Makefile.am -text
 bin/Makefile.in -text
 bin/cob-config.in -text
+bin/cobcrun.1 -text
 bin/cobcrun.c -text
 build_windows/README -text
 build_windows/config.h.bdb.win -text
@@ -98,6 +99,7 @@ build_windows/version_libcob.rc -text
 cobc/ChangeLog -text
 cobc/Makefile.am -text
 cobc/Makefile.in -text
+cobc/cobc.1 -text
 cobc/cobc.c -text
 cobc/cobc.h -text
 cobc/codegen.c -text
