@@ -134,6 +134,7 @@ cobc/warning.def -text
 config/ChangeLog -text
 config/Makefile.am -text
 config/Makefile.in -text
+config/acu.conf -text
 config/bs2000.conf -text
 config/cobol2002.conf -text
 config/cobol85.conf -text
