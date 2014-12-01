@@ -298,6 +298,7 @@ tests/testsuite.src/syn_multiply.at -text
 tests/testsuite.src/syn_occurs.at -text
 tests/testsuite.src/syn_redefines.at -text
 tests/testsuite.src/syn_reportwriter.at -text
+tests/testsuite.src/syn_screen.at -text
 tests/testsuite.src/syn_set.at -text
 tests/testsuite.src/syn_subscripts.at -text
 tests/testsuite.src/syn_value.at -text

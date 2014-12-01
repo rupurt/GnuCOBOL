@@ -85,12 +85,16 @@ cobc/.deps
 cobc/Makefile
 cobc/atlocal
 cobc/cobc
+/conf*.dir
+/conf*.file
+/confdefs.h
 /config.h
 /config.log
 /config.status
 config/.deps
 config/Makefile
 config/atlocal
+/conftest*
 copy/.deps
 copy/Makefile
 copy/atlocal
