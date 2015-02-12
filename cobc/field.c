@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
+   Copyright (C) 2013-2015 Ron Norman
 
    This file is part of GNU Cobol.
 
@@ -351,6 +352,18 @@ check_picture_item (cb_tree x, struct cb_field *f)
 		f->pic = CB_PICTURE (cb_build_picture (pic));
 		return 0;
 	}
+
+	if(f->storage == CB_STORAGE_REPORT) {
+		if (f->values) {
+			sprintf (pic, "X(%d)", (int)CB_LITERAL(CB_VALUE(f->values))->size);
+		} else {
+			f->flag_no_field = 1;
+			strcpy (pic, "X(1)");
+		}
+		f->pic = CB_PICTURE (cb_build_picture (pic));
+		return 0;
+	}
+
 	if (f->flag_item_78) {
 		if (!f->values || CB_VALUE(f->values) == cb_error_node) {
 			level_require_error (x, "VALUE");
@@ -1087,12 +1100,12 @@ static int
 compute_size (struct cb_field *f)
 {
 	struct cb_field	*c;
-	int		size;
-	cob_u64_t	size_check;
+	int		size = 0;
+	cob_u64_t	size_check = 0;
 	int		align_size;
 	int		pad;
 
-	int maxsz;
+	int		maxsz;
 	struct cb_field *c0;
 
 	if (f->level == 66) {
@@ -1107,6 +1120,10 @@ compute_size (struct cb_field *f)
 	}
 
 	if (f->children) {
+		if(f->storage == CB_STORAGE_REPORT
+		&& (f->report_flag && COB_REPORT_LINE) )
+			f->offset = 0;
+
 		/* Groups */
 		if (f->flag_synchronized && warningopt) {
 			cb_warning_x (CB_TREE(f), _("Ignoring SYNCHRONIZED for group item '%s'"),
@@ -1144,6 +1161,12 @@ compute_size (struct cb_field *f)
 			} else {
 				c->offset = f->offset + (int) size_check;
 				size_check += compute_size (c) * c->occurs_max;
+
+				if(c->storage == CB_STORAGE_REPORT
+				&& !(c->report_flag & COB_REPORT_COLUMN_PLUS)
+				&& c->report_column > 0) {	/* offset based on COLUMN value */
+					c->offset = c->report_column - 1;
+				}
 
 				/* Word alignment */
 				if (c->flag_synchronized &&
@@ -1191,6 +1214,12 @@ compute_size (struct cb_field *f)
 					}
 				}
 			}
+
+			if(c->sister == NULL
+			&& c->storage == CB_STORAGE_REPORT) {	/* To set parent size */
+				if((c->offset + c->size) > size_check)
+					size_check = (c->offset + c->size);
+			}
 		}
 		if (f->occurs_max > 1 && (size_check % occur_align_size) != 0) {
 			pad = occur_align_size - (size_check % occur_align_size);
@@ -1206,6 +1235,12 @@ compute_size (struct cb_field *f)
 		f->size = (int) size_check;
 	} else {
 		/* Elementary item */
+		if(f->storage == CB_STORAGE_REPORT
+		&& !(f->report_flag & COB_REPORT_COLUMN_PLUS)
+		&& f->report_column > 0) {		/* offset based on COLUMN value */
+				f->offset = f->report_column - 1;	
+		}
+
 		switch (f->usage) {
 		case CB_USAGE_COMP_X:
 			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC) {

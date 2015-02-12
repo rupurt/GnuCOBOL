@@ -71,6 +71,14 @@ cob_gen_optim (const enum cb_optim val)
 		output_storage ("}");
 		return;
 
+	case COB_SET_REPORT:
+		output_storage ("static void COB_NOINLINE");
+		output_storage ("cob_set_report (cob_report *r, cob_file *pfile)");
+		output_storage ("{");
+		output_storage ("	r->report_file = pfile;");
+		output_storage ("}");
+		return;
+
 	case COB_POINTER_MANIP:
 		output_storage ("static void COB_NOINLINE");
 		output_storage ("cob_pointer_manip (cob_field *f1, cob_field *f2, const unsigned int addsub)");

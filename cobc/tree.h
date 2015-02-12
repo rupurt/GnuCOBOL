@@ -37,6 +37,13 @@
 #define CB_PREFIX_LABEL		"l_"	/* Label */
 #define CB_PREFIX_SEQUENCE	"s_"	/* Collating sequence */
 #define CB_PREFIX_STRING	"st_"	/* String */
+#define CB_PREFIX_REPORT	"r_"	/* Report (cob_report) */
+#define CB_PREFIX_REPORT_LINE	"rl_"	/* Report line (cob_report_line) */
+#define CB_PREFIX_REPORT_FIELD	"rf_"	/* Report field (cob_report_field) */
+#define CB_PREFIX_REPORT_SUM	"rs_"	/* Report SUM (cob_report_sum) */
+#define CB_PREFIX_REPORT_CONTROL "rc_"	/* Report CONTROL (cob_report_control) */
+#define CB_PREFIX_REPORT_REF	"rr_"	/* Report CONTROL reference (cob_report_control_ref) */
+#define CB_PREFIX_REPORT_SUM_CTR "rsc_"	/* Report SUM COUNTER */
 
 #define CB_PROGRAM_TYPE		0
 #define CB_FUNCTION_TYPE	1
@@ -98,7 +105,8 @@ enum cb_tag {
 	CB_TAG_LIST,		/* 32 List */
 	CB_TAG_DIRECT,		/* 33 Code output or comment */
 	CB_TAG_DEBUG,		/* 34 Debug item set */
-	CB_TAG_DEBUG_CALL	/* 35 Debug callback */
+	CB_TAG_DEBUG_CALL,	/* 35 Debug callback */
+	CB_TAG_REPORT_LINE  /* 36 Report line description */
 };
 
 /* Alphabet type */
@@ -636,6 +644,7 @@ struct cb_field {
 	struct cb_picture	*pic;		/* PICTURE */
 	struct cb_field		*vsize;		/* Variable size cache */
 	struct cb_label		*debug_section;	/* DEBUG section */
+	struct cb_report	*report;	/* RD section report name */
 
 	cb_tree			screen_line;	/* LINE */
 	cb_tree			screen_column;	/* COLUMN */
@@ -644,6 +653,14 @@ struct cb_field {
 	cb_tree			screen_foreg;	/* FOREGROUND */
 	cb_tree			screen_backg;	/* BACKGROUND */
 	cb_tree			screen_prompt;	/* PROMPT */
+	cb_tree			report_source;	/* SOURCE field */
+	cb_tree			report_from;	/* SOURCE field subscripted; so MOVE to report_source */
+	cb_tree			report_sum_counter;/* SUM counter */
+	cb_tree			report_sum_list;/* SUM field(s) */
+	cb_tree			report_sum_upon;/* SUM ... UPON detailname */
+	cb_tree			report_reset;	/* RESET ON field */
+	cb_tree			report_control;	/* CONTROL identifier */
+	cb_tree			report_when;	/* PRESENT WHEN condition */
 
 	int			id;		/* Field id */
 	int			size;		/* Field size */
@@ -659,7 +676,12 @@ struct cb_field {
 	int			nkeys;		/* Number of keys */
 	int			param_num;	/* CHAINING param number */
 	int			screen_flag;	/* Flags used in SCREEN SECTION */
+	int			report_flag;	/* Flags used in REPORT SECTION */
+	int			report_line;	/* LINE */
+	int			report_column;	/* COLUMN */
+	int			report_decl_id;	/* Label id of USE FOR REPORTING */
 	int			step_count;	/* STEP in REPORT */
+	int			next_group_line;/* NEXT GROUP [PLUS] line# */
 	unsigned int		vaddr;		/* Variable address cache */
 	cob_u32_t		special_index;	/* Special field */
 
@@ -1187,6 +1209,13 @@ struct cb_report {
 	cb_tree			page_counter;	/* PAGE-COUNTER */
 	cb_tree			code_clause;	/* CODE */
 	cb_tree			controls;	/* CONTROLS */
+	cb_tree			t_lines;	/* PAGE LIMIT LINES */
+	cb_tree			t_columns;	/* PAGE LIMIT COLUMNS */
+	cb_tree			t_heading;	/* HEADING */
+	cb_tree			t_first_detail;	/* FIRST DE */
+	cb_tree			t_last_control;	/* LAST CH */
+	cb_tree			t_last_detail;	/* LAST DE */
+	cb_tree			t_footing;	/* FOOTING */
 	int			lines;		/* PAGE LIMIT LINES */
 	int			columns;	/* PAGE LIMIT COLUMNS */
 	int			heading;	/* HEADING */
@@ -1194,6 +1223,17 @@ struct cb_report {
 	int			last_control;	/* LAST CH */
 	int			last_detail;	/* LAST DE */
 	int			footing;	/* FOOTING */
+	struct cb_field		*records;	/* First record definition of report */
+	int			num_lines;	/* Number of Lines defined */
+	struct cb_field		**line_ids;	/* array of LINE definitions */
+	int			num_sums;	/* Number of SUM counters defined */
+	struct cb_field		**sums;		/* Array of SUM fields */
+	int			rcsz;		/* Longest record */
+	int			id;		/* unique id for this report */
+	unsigned int		control_final:1;/* CONTROL FINAL declared */
+	unsigned int		global:1;	/* IS GLOBAL declared */
+	unsigned int		has_declarative:1;/* Has Declaratives Code to be executed */
+	unsigned int		has_detail:1;	/* Has DETAIL line */
 };
 
 #define CB_REPORT(x)	(CB_TREE_CAST (CB_TAG_REPORT, struct cb_report, x))
@@ -1289,6 +1329,7 @@ struct cb_program {
 	unsigned int	flag_gen_debug		: 1;	/* DEBUGGING MODE */
 
 	unsigned int	flag_save_exception	: 1;	/* Save execption code */
+	unsigned int	flag_report		: 1;	/* Have REPORT SECTION */
 };
 
 
@@ -1458,7 +1499,10 @@ extern cb_tree			cb_list_append (cb_tree, cb_tree);
 extern cb_tree			cb_list_reverse (cb_tree);
 extern int			cb_list_length (cb_tree);
 
-extern struct cb_report		*build_report (cb_tree);
+extern struct cb_report	*build_report (cb_tree);
+extern void				finalize_report (struct cb_report *, struct cb_field *);
+extern void 			build_sum_counter(struct cb_report *r, struct cb_field *f);
+extern struct cb_field *get_sum_data_field(struct cb_report *r, struct cb_field *f);
 
 extern void			cb_add_common_prog (struct cb_program *);
 extern void			cb_insert_common_prog (struct cb_program *,

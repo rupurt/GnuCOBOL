@@ -1,3 +1,8 @@
+2015-02-12  Ron Norman
+
+	* Merged Report Writer code into 2.0 code base to create a new 2.0
+	  with all collective features
+
 2015-01-31  Edward Hart <edward.dan.hart@gmail.com>
 
 	* tree.c : updated valid_time_format and valid_datetime_format to pass
@@ -8,6 +13,26 @@
 	* cobc/parser.y : fixed segfault with STOP "literal" with the
 	  ACCEPT OMITTED feature of waiting for a return attempting
 	  to generate code with a null pointer
+
+2015-01-04 Ron Norman (rjn@inglenet.com)
+	* Fix for codeoptim.c for cob_add_packed_int to use %% instead of %
+	  due to processing by sprintf on certain platforms the % was getting
+	  droppped.
+
+2014-12-15  Ron Norman (rjn@inglenet.com)
+	* Fix for codeoptim.c and typeck.c to correctly handle SET pointer UP/DOWN
+	  on none x86 platforms
+
+2014-12-11  Ron Norman (rjn@inglenet.com)
+	* Fixes so WARNING is given if no DETAIL lines in a report
+
+2014-06-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net> 
+
+	* parser.* : fixing Bug #79 by defining PLUS_KEYWORD: PLUS|+
+
+2014-06-14  Ron Norman (rjn@inglenet.com)
+
+	* Fixes for LINE|COL 0 to get error message
 
 2014-12-02  Sergey Kashyrin <ska@kiska.net>
 
@@ -176,6 +201,10 @@
 
 	* codegen.c : Fixing Bug #55
 		UDF with no parameters do not compile
+
+2013-11-20  Ron Norman
+
+	* Report Writer module
 
 2012-05-09  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

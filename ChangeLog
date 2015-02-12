@@ -1,3 +1,8 @@
+2015-02-12  Ron Norman
+
+	* Merged Report Writer code into 2.0 code base to create a new 2.0
+	  with all collective features
+
 2014-12-04  Edward Hart <edward-h@users.sf.net>
 
 	* configure.ac : #44 Disable optimisation with --enable-debug

@@ -14,21 +14,17 @@
 ## 
 ## You should have received a copy of the GNU General Public License
 ## along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
-
+ 
 ### GNU Cobol Test Suite
-
+ 
 ### ISO+IEC+1989-2002 REPORT WRITER module
-
 
 AT_SETUP([REPORT BUG1])
 AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
-
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       *>****************************************************************
       *> 11NOV2013 BUG 001 - RWCS Presents RF before it presents the  **
       *>                     last PF                                  **
@@ -82,10 +78,10 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -101,7 +97,6 @@ DE
 
 PF
 
-
 PH
 
 
@@ -114,7 +109,6 @@ DE
 
 PF
 
-
 RF
 ])
 
@@ -122,15 +116,13 @@ AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([REPORT COL PLUS])
 AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
-
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       *>****************************************************************
       *> 11NOV2013 BUG 002 - RWCS Treats "COL PLUS n" the same as     **
       *>                     "COL n".                                 **
@@ -168,10 +160,10 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -188,23 +180,19 @@ AT_DATA([reference], [
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([REPORT BUG3])
 AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
-
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       *>****************************************************************
       *> 11NOV2013 BUG 003 - RWCS causes "Abort trap 6" if an attempt **
       *>                     is made to overwrite previous field on   **
@@ -242,10 +230,10 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -253,9 +241,7 @@ AT_CAPTURE_FILE(./report.txt)
 AT_DATA([reference], [
 
 
-123456789ABCD
-
-
+123456789ABCD4567890
 
 
 
@@ -270,15 +256,13 @@ AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([EMPTY REPORT])
 AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
-
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       *>****************************************************************
       *> 11NOV2013 BUG 004 - RWCS INITIATE TERMINATE W/O GENERATE     **
       *>                     IS NOT SUPPOSED TO PRODUCE ANY OUTPUT    **
@@ -328,10 +312,10 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -342,11 +326,145 @@ AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
-AT_SETUP([Customer Report])
+
+AT_SETUP([PAGE LIMIT REPORT])
 AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+       SELECT report-file ASSIGN EXTERNAL PRINTOUT
+            ORGANIZATION LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  report-file REPORT rp.
+
+       WORKING-STORAGE SECTION.
+       01  foo  PIC X(20).
+       01  hedpos PIC 99 VALUE 10.
+
+       REPORT SECTION.
+       RD  rp PAGE LIMIT 3.
+
+       01  rp-detail TYPE DE.
+         02  LINE +1.
+         03     COL 1; SOURCE foo, PIC X(30).
+         03     COL +1             PIC X(6) VALUE "<--->".
+
+       PROCEDURE DIVISION.
+           OPEN OUTPUT report-file.
+           INITIATE rp.
+
+           MOVE "hello" TO foo.
+            GENERATE rp-detail.
+
+           MOVE "goodbye" TO foo.
+            GENERATE rp-detail.
+
+           TERMINATE rp.
+             CLOSE report-file.
+           STOP RUN.
+           END PROGRAM prog.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([export DD_PRINTOUT=./report.txt
+./prog], [0], [], [])
+
+
+AT_CAPTURE_FILE(./report.txt)
+
+AT_DATA([reference], [hello                          <--->
+goodbye                        <--->
+
+])
+
+AT_CHECK([diff reference report.txt], [0])
+
+AT_CLEANUP
+
+
+AT_SETUP([PAGE LIMIT REPORT 2])
+AT_KEYWORDS([report])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+       SELECT report-file ASSIGN EXTERNAL PRINTOUT
+            ORGANIZATION LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  report-file REPORT rp.
+
+       WORKING-STORAGE SECTION.
+       01  foo  PIC X(20).
+
+       REPORT SECTION.
+       RD  rp PAGE LIMIT 3 LINES.
+
+       01  rp-detail TYPE DE.
+         02  LINE +1.
+         03            SOURCE foo, PIC X(30).
+         03     COL +1             PIC X(6) VALUE "<--->".
+
+       PROCEDURE DIVISION.
+           OPEN OUTPUT report-file.
+           INITIATE rp.
+
+           MOVE "hello" TO foo.
+           GENERATE rp-detail.
+
+           MOVE "world" TO foo.
+           GENERATE rp-detail.
+
+           MOVE "from" TO foo.
+           GENERATE rp-detail.
+
+           MOVE "REPORT WRITER" TO foo.
+           GENERATE rp-detail.
+
+           MOVE "goodbye" TO foo.
+           GENERATE rp-detail.
+
+           TERMINATE rp
+           CLOSE report-file.
+
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([export DD_PRINTOUT=./report.txt
+./prog], [0], [], [])
+
+
+AT_CAPTURE_FILE(./report.txt)
+
+AT_DATA([reference], [hello                          <--->
+world                          <--->
+from                           <--->
+REPORT WRITER                  <--->
+goodbye                        <--->
+
+])
+
+AT_CHECK([diff reference report.txt], [0])
+
+AT_CLEANUP
+
+
+AT_SETUP([Customer Report])
+AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 0152 J. LANGDON       64025 00945
@@ -407,7 +525,7 @@ AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       
       * ************************************************************* *
       * REPORT WRITER EXAMPLE #1.                                     *
@@ -429,11 +547,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  TRANSACTION-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS TRANSACTION-RECORD.
+       FD  TRANSACTION-DATA.
       
        01  TRANSACTION-RECORD.
            03  TR-CUSTOMER-NUMBER      PIC 9(04).
@@ -449,7 +563,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(47).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS CUSTOMER-REPORT.
       
        WORKING-STORAGE SECTION.
@@ -520,15 +633,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 26: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 28: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 29: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 45: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -591,7 +700,6 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST
   7545   M. LARSON             8       80123        $5.60
   7545   M. LARSON             8       82462       $20.15
   7545   M. LARSON             9       91520       $18.15
-
 
 
 
@@ -665,19 +773,15 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Charge Report])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 0152 J. LANGDON       64025 00945
@@ -738,7 +842,7 @@ AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       * ************************************************************* *
       * REPORT WRITER EXAMPLE #2.                                     *
       * ************************************************************* *
@@ -759,11 +863,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  TRANSACTION-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS TRANSACTION-RECORD.
+       FD  TRANSACTION-DATA.
       
        01  TRANSACTION-RECORD.
            03  TR-CUSTOMER-NUMBER      PIC 9(04).
@@ -779,7 +879,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(47).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS CUSTOMER-REPORT.
       
        WORKING-STORAGE SECTION.
@@ -889,15 +988,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 25: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 27: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 28: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 44: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -960,7 +1055,6 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
   6213   Z. HAMPTON            1       15792       $64.25         05%          $3.21         $61.04
   6213   Z. HAMPTON            1       19975       $98.75         05%          $4.94         $93.81
-
 
 
 
@@ -1034,19 +1128,15 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Charge Report 2])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 0152 J. LANGDON       64025 00945
@@ -1107,7 +1197,7 @@ AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       * ************************************************************* *
       * REPORT WRITER EXAMPLE #3.                                     *
       * ************************************************************* *
@@ -1128,11 +1218,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  TRANSACTION-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS TRANSACTION-RECORD.
+       FD  TRANSACTION-DATA.
       
        01  TRANSACTION-RECORD.
            03  TR-CUSTOMER-NUMBER      PIC 9(04).
@@ -1148,7 +1234,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(47).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS CUSTOMER-REPORT.
       
        WORKING-STORAGE SECTION.
@@ -1275,15 +1360,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 25: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 27: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 28: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 44: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -1346,7 +1427,6 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
   6213   Z. HAMPTON            1       15792       $64.25         05%          $3.21         $61.04
                                1       19975       $98.75         05%          $4.94         $93.81
-
 
 
 
@@ -1420,19 +1500,15 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Charge Report 3])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 0152 J. LANGDON       64025 00945
@@ -1493,7 +1569,7 @@ AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       * ************************************************************* *
       * * MODIFICATIONS:                                              *
       * * ADDED GROUP ITEM TO INPUT RECORD DEFINITION AND CHANGED     * 20110227
@@ -1521,11 +1597,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  TRANSACTION-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS TRANSACTION-RECORD.
+       FD  TRANSACTION-DATA.
       
        01  TRANSACTION-RECORD.
            03  TR-CUSTOMER.                                             20110227
@@ -1542,7 +1614,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(47).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS CUSTOMER-REPORT.
       
        WORKING-STORAGE SECTION.
@@ -1656,15 +1727,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 32: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 34: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 35: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 52: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -1735,19 +1802,15 @@ CUST. NO.     CUST. NAME                          ITEM COST                DISCT
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Charge Report 4])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[05 A 007328
 05 A 090620
@@ -1853,7 +1916,7 @@ AT_DATA([inp_data],[05 A 007328
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       
       * ************************************************************* *
       * REPORT WRITER EXAMPLE #5.                                     *
@@ -1875,11 +1938,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  SALES-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS SALES-RECORD.
+       FD  SALES-DATA.
       
        01  SALES-RECORD.
            03  SR-SALESMAN-NUMBER      PIC 9(02).
@@ -1890,7 +1949,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(69).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS DISTRICT-SALES-REPORT.
       
        WORKING-STORAGE SECTION.
@@ -1974,10 +2032,10 @@ AT_DATA([prog.cob], [
        DECLARATIVES.
        USE-SALESMAN-TOTAL SECTION. USE BEFORE REPORTING SALESMAN-TOTAL.
        USE-SALESMAN-TOTAL-PROC.
-           SET COMMISSION-IX TO +1.
+           SET COMMISSION-IX TO 1.
            SEARCH COMMISSION-ENTRY
                AT END
-                   MOVE +0.00 TO WS-COMMISSION
+                   MOVE 0.00 TO WS-COMMISSION
                WHEN CE-DISTRICT (COMMISSION-IX) = SR-DISTRICT-CODE
                    COMPUTE WS-COMMISSION ROUNDED =
                        CE-RATE (COMMISSION-IX) * ST-SALES-AMT.
@@ -2022,18 +2080,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 26: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 28: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 29: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 40: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: In section 'USE-SALESMAN-TOTAL':
-prog.cob: In paragraph 'USE-SALESMAN-TOTAL-PROC':
-prog.cob: 127: Warning: Ignoring sign
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -2096,7 +2147,6 @@ AT_DATA([reference], [                          D I S T R I C T   S A L E S   R 
                    20     $981.23       $98.12
                    21     $773.46       $77.35
                    22     $259.53       $25.95
-
 
 
 
@@ -2170,19 +2220,15 @@ AT_DATA([reference], [                          D I S T R I C T   S A L E S   R 
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Payroll Report])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 00075 021042
 01 6622 M GAVIN SHAFER         19740215 026000 01521 03362 00175 020942
@@ -2284,7 +2330,7 @@ AT_DATA([inp_data],[01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 0
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
       * ************************************************************* *
       * * MODIFICATIONS:                                              *
       * * CORRECT PARAGRAPH NAME AND GO TO CODING ERRORS.             * 
@@ -2310,11 +2356,7 @@ AT_DATA([prog.cob], [
        DATA DIVISION.
        FILE SECTION.
       
-       FD  PAYROLL-REGISTER-DATA
-           LABEL RECORDS ARE OMITTED
-           BLOCK CONTAINS 0 RECORDS
-           RECORD CONTAINS 80 CHARACTERS
-           DATA RECORD IS PAYROLL-REGISTER-RECORD.
+       FD  PAYROLL-REGISTER-DATA.
       
        01  PAYROLL-REGISTER-RECORD.
            03  PRR-DEPARTMENT-NUMBER   PIC 9(02).
@@ -2344,7 +2386,6 @@ AT_DATA([prog.cob], [
            03  FILLER                  PIC X(09).
       
        FD  REPORT-FILE
-           LABEL RECORDS ARE OMITTED
            REPORT IS QUARTERLY-PAY-REGISTER.
       
        WORKING-STORAGE SECTION.
@@ -2747,15 +2788,11 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 30: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 32: Warning: RECORD clause ignored for LINE SEQUENTIAL
-prog.cob: 33: Warning: DATA RECORDS is obsolete in Micro Focus COBOL
-prog.cob: 63: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_DATAIN=./inp_data
 export DD_SYSPRINT=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -2826,7 +2863,6 @@ DEPARTMENT NUMBER:  25 MAINTENANCE
 
 
 
-
                                       C e n t u r y   M e d i c a l   C e n t e r
                                   Q u a r t e r l y   P a y r o l l   R e g i s t e r                         PAGE     2
 
@@ -2854,11 +2890,9 @@ AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
-AT_SETUP([STUDENT REPORT])
-AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
+AT_SETUP([STUDENT REPORT; Test INITIAL])
+AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[00123Dorken, Keith       CS 08
 00124Allinson, Sandy     MA 08
@@ -2874,7 +2908,7 @@ AT_DATA([inp_data],[00123Dorken, Keith       CS 08
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog INITIAL.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        INPUT-OUTPUT SECTION.
@@ -2886,8 +2920,7 @@ AT_DATA([prog.cob], [
 
        DATA DIVISION.
        FILE SECTION.
-       FD   INPUT-FILE
-            RECORD CONTAINS 30 CHARACTERS.
+       FD   INPUT-FILE.
        01   INPUT-REC.
                05  STUDENT-ID               PIC  9(5).
                05  STUDENT-NAME             PIC  X(20).
@@ -2908,6 +2941,7 @@ AT_DATA([prog.cob], [
             05  COLUMN-40     PIC XXX.
             05  FILLER        PIC X(4) VALUE SPACES.
             05  COLUMN-46     PIC Z99.9.
+            05  LAST-CHAR     PIC X.
 
        REPORT SECTION.
        RD   STUDENT-REPORT
@@ -2949,16 +2983,20 @@ AT_DATA([prog.cob], [
 
        PROCEDURE DIVISION.
        A000-MAINLINE.
-           DISPLAY "Report Test 1" UPON CONSOLE.
            OPEN  INPUT  INPUT-FILE
                  OUTPUT PRINT-FILE
-           MOVE SPACES TO REPORT-DUMMY.
-           MOVE 5 TO COLUMN-4.
+           MOVE SPACES  TO REPORT-DUMMY.
+           DISPLAY "*** Report Test 1 ***" UPON CONSOLE.
+           MOVE SPACES  TO REPORT-DUMMY.
+           MOVE 5       TO COLUMN-4.
            MOVE "Hello" TO COLUMN-15.
-           MOVE "Bye" TO COLUMN-40.
-           MOVE 75 TO COLUMN-46.
-           MOVE REPORT-DUMMY (2:47) TO REPORT-DUMMY.
-           DISPLAY "'" REPORT-DUMMY "'" UPON CONSOLE.
+           MOVE "Bye"   TO COLUMN-40.
+           MOVE 75.0    TO COLUMN-46.
+           MOVE "*"     TO LAST-CHAR
+      *  Test that overlapping move does not mangle data
+           MOVE REPORT-DUMMY (2:50) TO REPORT-DUMMY.
+           MOVE "*"     TO LAST-CHAR
+           DISPLAY REPORT-DUMMY UPON CONSOLE.
            PERFORM DO-INIT.
            READ INPUT-FILE
                AT END
@@ -2982,13 +3020,12 @@ AT_DATA([prog.cob], [
            TERMINATE STUDENT-REPORT.
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 16: Warning: RECORD clause ignored for LINE SEQUENTIAL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_STUDENT=./inp_data
 export DD_REPORT1=./report.txt
-./prog], [0], [Report Test 1
-'  000005     Hello                    Bye     7    '
+./prog], [0], [*** Report Test 1 ***
+  000005     Hello                    Bye     75.0 *
 ], [])
 
 
@@ -3044,19 +3081,15 @@ AT_DATA([reference], [
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
-AT_SETUP([ORDER REPORT])
-AT_KEYWORDS([report])
 
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
+AT_SETUP([ORDER REPORT; Test substring])
+AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[10001090001012010590416      $
 10001090002013016950416      $
@@ -3153,7 +3186,7 @@ AT_DATA([inp_data],[10001090001012010590416      $
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        INPUT-OUTPUT SECTION.
@@ -3165,8 +3198,7 @@ AT_DATA([prog.cob], [
 
        DATA DIVISION.
        FILE SECTION.
-       FD  CUST-ORDER-FILE
-            RECORD CONTAINS 30 CHARACTERS.
+       FD  CUST-ORDER-FILE.
        01  CUST-ORDER-REC.
            05  CUST-NUM      PIC 9(5).
            05  ITEM-NUM      PIC 9(6).
@@ -3183,11 +3215,12 @@ AT_DATA([prog.cob], [
            05  ARE-THERE-MORE-RECORDS     PIC XXX   VALUE 'YES'.
                88  THERE-ARE-NO-MORE-RECORDS        VALUE 'NO '.
        01    CONSTANTS.
-           05  SALES-TAX     PIC 9V99        VALUE 0.05.
+           05  SALES-TAX     PIC 9V99       VALUE 0.05.
        01      WORK-AREAS.
-           05  AMT-TAX       PIC 9999V99      VALUE 0.
-           05  AMT-ORDER     PIC 9(5)V99      VALUE 0.
-           05  TOT-ORDER     PIC 9(6)V99      VALUE 0.
+           05  AMT-TAX       PIC 9999V99    VALUE 0.
+           05  AMT-ORDER     PIC 9(5)V99    VALUE 0.
+           05  TOT-ORDER     PIC 9(6)V99    VALUE 0.
+           05  CURRENT-TIME  PIC 9(8)       VALUE 14301275.
        
        REPORT SECTION.
        RD    ORDER-REPORT
@@ -3200,7 +3233,13 @@ AT_DATA([prog.cob], [
                                   VALUE 'CUSTOMER ORDER REPORT'.
        01  TYPE PAGE HEADING.
            05  LINE 2.
-               10  COLUMN  94   PIC X(5) VALUE 'PAGE'.
+               10  COLUMN  10   PIC X(8) VALUE " Time:".
+               10  COLUMN  20   PIC 99  SOURCE CURRENT-TIME(1:2).
+               10               PIC X VALUE ':'.
+               10               PIC 99  SOURCE CURRENT-TIME (3:2).
+               10               PIC X VALUE ':'.
+               10               PIC 99  SOURCE CURRENT-TIME (5:2).
+               10  COLUMN  94   PIC X(5) VALUE 'Page'.
                10  COLUMN 106    PIC ZZ9
                       SOURCE PAGE-COUNTER.
            05  LINE 4.
@@ -3248,7 +3287,9 @@ AT_DATA([prog.cob], [
 
        PROCEDURE DIVISION.
        A000-MAINLINE.
-           DISPLAY "Report test 2" UPON CONSOLE.
+      *    ACCEPT CURRENT-TIME FROM TIME.
+      * Use hard coded time value so test is repeatable
+           DISPLAY "Report test 2 at " CURRENT-TIME UPON CONSOLE.
            OPEN INPUT  CUST-ORDER-FILE
                 OUTPUT CUST-PRINT-FILE.
            INITIATE ORDER-REPORT.
@@ -3272,12 +3313,11 @@ AT_DATA([prog.cob], [
                     MOVE 'NO' TO ARE-THERE-MORE-RECORDS.
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [prog.cob: 16: Warning: RECORD clause ignored for LINE SEQUENTIAL
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_CUSTORD=./inp_data
 export DD_REPORT2=./report.txt
-./prog], [0], [Report test 2
+./prog], [0], [Report test 2 at 14301275
 Report test 2 completed
 ], [])
 
@@ -3285,7 +3325,7 @@ Report test 2 completed
 AT_CAPTURE_FILE(./report.txt)
 
 AT_DATA([reference], [                                           CUSTOMER ORDER REPORT
-                                                                                             PAGE          1
+          Time:    14:30:12                                                                  Page          1
 
           CUST NUM       PART         # ITEMS    PRICE           QUANTITY        TAX      SHIPPING         TOTAL
 
@@ -3340,7 +3380,7 @@ AT_DATA([reference], [                                           CUSTOMER ORDER 
            10007        090012          032      10.59            338.88          16.94      4.17          359.99
            10007        090013          032      10.59            338.88          16.94      4.17          359.99
 
-                                                                                             PAGE          2
+          Time:    14:30:12                                                                  Page          2
 
           CUST NUM       PART         # ITEMS    PRICE           QUANTITY        TAX      SHIPPING         TOTAL
 
@@ -3394,19 +3434,15 @@ AT_DATA([reference], [                                           CUSTOMER ORDER 
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Control Break Report])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[Norman, Ronald J    25CS Malcolm, Mike        Waterloo
 Dorken, Keith A     35CS Malcolm, Mike        Waterloo
@@ -3420,7 +3456,7 @@ Norman, Becky       27EC DiMetri, Donna       Toronto
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        INPUT-OUTPUT SECTION.
@@ -3487,7 +3523,7 @@ AT_DATA([prog.cob], [
                 10  COLUMN 26    PIC 99    SOURCE COURSE-PTS.
                 10  COLUMN 34    PIC X(15) SOURCE CAMPUS.
                 10  COLUMN 60    PIC X(20) SOURCE ADVISOR 
-                                 GROUP INDICATE.
+                                       GROUP INDICATE.
 
        01    TYPE IS CONTROL FOOTING ADVISOR.
            05     LINE PLUS 2.
@@ -3533,11 +3569,11 @@ AT_DATA([prog.cob], [
                     MOVE 'NO ' TO ARE-THERE-MORE-RECORDS.
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_STUDREC=./inp_data
 export DD_REPORT3=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3642,19 +3678,15 @@ AT_DATA([reference], [                                                          
 
 
 
-
-
 ])
 
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
 
+
 AT_SETUP([Inventory Report])
 AT_KEYWORDS([report])
-
-#REPORT WRITER tests currently skipped
-AT_SKIP_IF(true)
 
 AT_DATA([inp_data],[01Data Processing   02000500012388
 02Cow Milking       02000600054398
@@ -3664,7 +3696,7 @@ AT_DATA([inp_data],[01Data Processing   02000500012388
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.      prog.
+       PROGRAM-ID. prog.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        INPUT-OUTPUT SECTION.
@@ -3672,7 +3704,7 @@ AT_DATA([prog.cob], [
            SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
                           ORGANIZATION IS LINE SEQUENTIAL. 
            SELECT REPORT-FILE ASSIGN TO EXTERNAL
-                          LINE ADVANCING REPORT4.
+                              LINE ADVANCING REPORT4.
 
        DATA DIVISION.
        FILE SECTION.
@@ -3750,11 +3782,11 @@ AT_DATA([prog.cob], [
        
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob],  [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_INVFILE=./inp_data
 export DD_REPORT4=./report.txt
-./prog], [0], , [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3789,7 +3821,6 @@ AT_DATA([reference], [
 
 
 
-
                                                           5,439.80
 
                                                                                     .00
@@ -3804,7 +3835,6 @@ AT_DATA([reference], [
                         00060            5,439.70
 
                                                          10,879.40
-
 
 
 
@@ -3836,6 +3866,133 @@ AT_DATA([reference], [
 
 
 
+])
+
+AT_CHECK([diff reference report.txt], [0])
+
+AT_CLEANUP
+
+
+AT_SETUP([Dup Detail Line])
+AT_KEYWORDS([report])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT REPORT-FILE
+           LINE SEQUENTIAL 
+           ASSIGN TO EXTERNAL DUPDTL.
+       DATA DIVISION.
+       FILE SECTION.
+       FD REPORT-FILE
+           REPORT IS MYREPORT.
+       WORKING-STORAGE SECTION.
+       01 SAVE-ITEM PIC  X.
+       
+       REPORT SECTION.
+       RD MYREPORT
+           CONTROLS ARE SAVE-ITEM
+           PAGE LIMIT IS 15 LINES
+           FIRST DETAIL 1
+           LAST DETAIL 12.
+       
+       01 TYPE IS CONTROL HEADING SAVE-ITEM.
+          05 LINE NUMBER IS 1.
+            10 COLUMN 1 PIC X(20) VALUE "HEADING SAVE-ITEM".
+       
+       01 DETAIL-LINE TYPE IS DETAIL.
+          05 LINE NUMBER PLUS 1.
+            10 COLUMN 1 PIC X SOURCE SAVE-ITEM.
+            10 COLUMN 10 PIC X(15) VALUE "1st Detail".
+       
+       01 SND-DETAIL-LINE TYPE IS DETAIL.
+          05 LINE NUMBER PLUS 1.
+            10 COLUMN 1 PIC X SOURCE SAVE-ITEM.
+            10 COLUMN 10 PIC X(15) VALUE "2nd Detail".
+       
+       01 TRD-DETAIL-LINE TYPE IS DETAIL.
+          05 LINE NUMBER PLUS 1.
+            10 COLUMN 1 PIC X SOURCE SAVE-ITEM.
+            10 COLUMN 10 PIC X(15) VALUE "3rd Detail 1".
+          05 LINE NUMBER PLUS 1.
+            10 COLUMN 1 PIC X SOURCE SAVE-ITEM.
+            10 COLUMN 10 PIC X(15) VALUE "3rd Detail 2".
+
+       01 TYPE IS CONTROL FOOTING SAVE-ITEM.
+          03  LINE NUMBER IS PLUS 1.
+           05 COLUMN 07    PIC X(27)  VALUE "FOOTING SAVE-ITEM".
+       
+       PROCEDURE DIVISION.
+           OPEN OUTPUT REPORT-FILE.
+           INITIATE MYREPORT.
+           MOVE "A" TO SAVE-ITEM.
+           GENERATE DETAIL-LINE.
+           MOVE "B" TO SAVE-ITEM.
+           GENERATE DETAIL-LINE.
+           GENERATE SND-DETAIL-LINE.
+           GENERATE TRD-DETAIL-LINE.
+           MOVE "C" TO SAVE-ITEM.
+           GENERATE TRD-DETAIL-LINE.
+           TERMINATE MYREPORT.
+           CLOSE REPORT-FILE.
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([export DD_DUPDTL=./report.txt
+./prog], [0], [], [])
+
+
+AT_CAPTURE_FILE(./report.txt)
+
+AT_DATA([reference], [HEADING SAVE-ITEM
+A        1st Detail
+      FOOTING SAVE-ITEM
+
+
+
+
+
+
+
+
+
+
+
+
+HEADING SAVE-ITEM
+B        1st Detail
+B        2nd Detail
+B        3rd Detail 1
+B        3rd Detail 2
+      FOOTING SAVE-ITEM
+
+
+
+
+
+
+
+
+
+HEADING SAVE-ITEM
+C        3rd Detail 1
+C        3rd Detail 2
+      FOOTING SAVE-ITEM
+
+
+
+
+
+
+
+
+
 
 
 ])
@@ -3843,3 +4000,77 @@ AT_DATA([reference], [
 AT_CHECK([diff reference report.txt], [0])
 
 AT_CLEANUP
+
+
+AT_SETUP([OCCURS Test])
+AT_KEYWORDS([report])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+            SELECT rp-file ASSIGN EXTERNAL PRINTOUT
+            ORGANIZATION LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  rp-file REPORT rp.
+
+       REPORT SECTION.
+       RD  rp.
+
+       01  rp-detail TYPE DETAIL, LINE + 1.
+            03  nums  COLUMN 1, PIC 999 OCCURS 3 TIMES.
+            03  mark  COLUMN +2 PIC X(6).
+
+       01  rp-dtl2 TYPE DETAIL, LINE + 1.
+            03  grps  COLUMN 1 OCCURS 3 TIMES.
+               05  tag1      PIC X(5).
+               05  FILLER    PIC X.
+               05  tag2      PIC X(5).
+               05  FILLER    PIC XX.
+      *        05  FILLER    OCCURS 2 TIMES.
+      *            10  tag3  PIC X(2).
+
+       PROCEDURE DIVISION.
+           OPEN OUTPUT rp-file
+           INITIATE rp
+
+           MOVE 100 TO NUMS (1), NUMS (2), NUMS (3)
+           MOVE "<-->" TO MARK.
+           GENERATE rp-detail
+
+           MOVE ALL '*' TO grps(1), grps(2), grps(3)
+           MOVE "Tag1" to tag1 (1), tag1 (2), tag1 (3)
+           MOVE "Tag2" to tag2 (1), tag2 (2), tag2 (3)
+      *    MOVE "Ab"   TO tag3(1,1) tag3(1,2)
+      *    MOVE "De"   TO tag3(2,1) tag3(2,2)
+      *    MOVE "Hi"   TO tag3(3,1) tag3(3,2)
+           GENERATE rp-dtl2
+
+           TERMINATE rp  
+           CLOSE rp-file
+
+           STOP RUN .
+           END PROGRAM prog.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([export DD_PRINTOUT=./report.txt
+./prog], [0], [], [])
+
+
+AT_CAPTURE_FILE(./report.txt)
+
+AT_DATA([reference], [100100100  <-->
+Tag1 *Tag2 **Tag1 *Tag2 **Tag1 *Tag2 **
+])
+
+AT_CHECK([diff reference report.txt], [0])
+
+AT_CLEANUP
+
