@@ -148,6 +148,9 @@
 				RelativePath="..\..\libcob\numeric.c">
 			</File>
 			<File
+				RelativePath="..\..\libcob\reportio.c">
+			</File>
+			<File
 				RelativePath="..\..\libcob\screenio.c">
 			</File>
 			<File
