@@ -195,6 +195,7 @@ libcob/fileio.c -text
 libcob/intrinsic.c -text
 libcob/move.c -text
 libcob/numeric.c -text
+libcob/reportio.c -text
 libcob/screenio.c -text
 libcob/strings.c -text
 libcob/system.def -text
