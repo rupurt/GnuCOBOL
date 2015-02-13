@@ -1528,6 +1528,8 @@ struct cb_literal	*build_literal (enum cb_category,
 extern cb_tree	cb_build_system_name (const enum cb_system_name_category,
 				      const int);
 
+extern cb_tree cb_field_dup(struct cb_field *f, struct cb_reference *ref);
+
 /* parser.y */
 extern cb_tree		cobc_printer_node;
 extern int		non_const_word;
@@ -1757,6 +1759,11 @@ extern void		cb_emit_write (cb_tree, cb_tree, cb_tree, cb_tree);
 extern cb_tree		cb_build_write_advancing_lines (cb_tree, cb_tree);
 extern cb_tree		cb_build_write_advancing_mnemonic (cb_tree, cb_tree);
 extern cb_tree		cb_build_write_advancing_page (cb_tree);
+extern cb_tree		cb_check_sum_field (cb_tree x);
+extern void			cb_emit_initiate (cb_tree rep);
+extern void			cb_emit_terminate (cb_tree rep);
+extern void			cb_emit_generate (cb_tree rep);
+extern void			cb_emit_suppress (struct cb_field *f);
 
 DECLNORET extern void	cobc_tree_cast_error (const cb_tree, const char *,
 					      const int,
