@@ -930,7 +930,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 		fperms = _S_IREAD | _S_IWRITE ;
 #else
-		fperms = 0777;
+		fperms = 0666;
 #endif
 		break;
 	case COB_OPEN_I_O:
@@ -939,7 +939,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 			fperms = _S_IREAD | _S_IWRITE ;
 #else
-			fperms = 0777;
+			fperms = 0666;
 #endif
 		} else {
 			fdmode |= O_RDWR;
@@ -950,7 +950,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 		fperms = _S_IREAD | _S_IWRITE ;
 #else
-		fperms = 0777;
+		fperms = 0666;
 #endif
 		break;
 	}
