@@ -2361,7 +2361,8 @@ build_sum_counter(struct cb_report *r, struct cb_field *f)
 void
 finalize_report (struct cb_report *r, struct cb_field *records)
 {
-	struct cb_field		*p;
+	struct cb_field		*p,*ff;
+	struct cb_file		*f;
 	if(report_checked != r) {
 		report_checked = r;
 		if(r->lines > 9999)
@@ -2456,13 +2457,21 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 		if(p->level == 1
 		&& p->report != NULL
 		&& p->report->file != NULL) {
-			if(p->report->file->record_min < r->rcsz)
-				p->report->file->record_min = r->rcsz;
-			if(p->report->file->record_max < p->size)
-				p->report->file->record_max = r->rcsz;
-			if(p->report->file->record != NULL) {
-				if(p->report->file->record->size < r->rcsz)
-					p->report->file->record->size = r->rcsz;
+			f = p->report->file;
+			f->flag_report = 1;
+			for (ff = records; ff; ff = ff->sister) {
+				if (f->record_max > 0
+				&&  ff->size > f->record_max) {
+					f->record_max = ff->size;
+				}
+			}
+			if(f->record_min < r->rcsz)
+				f->record_min = r->rcsz;
+			if(f->record_max < p->size)
+				f->record_max = r->rcsz;
+			if(f->record != NULL) {
+				if(f->record->size < r->rcsz)
+					f->record->size = r->rcsz;
 			}
 		}
 	}
@@ -2591,10 +2600,12 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	}
 
 	/* Check the record size if it is limited */
-	for (p = records; p; p = p->sister) {
-		if (f->record_max > 0
-		&&  p->size > f->record_max) {
-			f->record_max = p->size;
+	if(f->flag_report) {
+		for (p = records; p; p = p->sister) {
+			if (f->record_max > 0
+			&&  p->size > f->record_max) {
+				f->record_max = p->size;
+			}
 		}
 	}
 	for (p = records; p; p = p->sister) {
