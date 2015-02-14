@@ -119,41 +119,41 @@ struct cob_external {
 /* Local variables */
 
 static int			cob_initialized = 0;
-static int			cob_argc;
-static char			**cob_argv;
-static struct cob_alloc_cache	*cob_alloc_base;
-static const char		*cob_last_sfile;
+static int			cob_argc = 0;
+static char			**cob_argv = NULL;
+static struct cob_alloc_cache	*cob_alloc_base = NULL;
+static const char		*cob_last_sfile = NULL;
 
-static cob_global		*cobglobptr;
-static runtime_env		*runtimeptr;
+static cob_global		*cobglobptr = NULL;
+static runtime_env		*runtimeptr = NULL;
 
-static char			*runtime_err_str;
+static char			*runtime_err_str = NULL;
 
 static const cob_field_attr	const_alpha_attr =
 				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
-static char			*cob_local_env;
-static char			*cob_user_name;
-static int			current_arg;
-static unsigned char		*commlnptr;
-static size_t			commlncnt;
-static size_t			cob_local_env_size;
+static char			*cob_local_env = NULL;
+static char			*cob_user_name = NULL;
+static int			current_arg = NULL;
+static unsigned char		*commlnptr = NULL;
+static size_t			commlncnt = 0;
+static size_t			cob_local_env_size = 0;
 
-static struct cob_external	*basext;
+static struct cob_external	*basext = NULL;
 
-static size_t			sort_nkeys;
-static cob_file_key		*sort_keys;
-static const unsigned char	*sort_collate;
+static size_t			sort_nkeys = 0;
+static cob_file_key		*sort_keys = NULL;
+static const unsigned char	*sort_collate = NULL;
 
-static const char		*cob_current_program_id;
-static const char		*cob_current_section;
-static const char		*cob_current_paragraph;
-static const char		*cob_source_file;
-static const char		*cob_source_statement;
-static const char		*cob_trace_env;
-static FILE			*cob_trace_file;
-static unsigned int		cob_source_line;
-static unsigned int		cob_line_trace;
+static const char		*cob_current_program_id = NULL;
+static const char		*cob_current_section = NULL;
+static const char		*cob_current_paragraph = NULL;
+static const char		*cob_source_file = NULL;
+static const char		*cob_source_statement = NULL;
+static const char		*cob_trace_env = NULL;
+static FILE			*cob_trace_file = NULL;
+static unsigned int		cob_source_line = 0;
+static unsigned int		cob_line_trace = 0;
 
 static char				*strbuff = NULL;
 
@@ -3911,7 +3911,9 @@ cob_strjoin(char** strarray, int size, char* separator) {
 	return result;
 }
 
-char* cob_save_env_value(char* env_var, char* env_val) {
+char* 
+cob_save_env_value(char* env_var, char* env_val)
+{
 	if (!env_val) return NULL;
 
 	if (env_var) cob_free(env_var);
@@ -3921,8 +3923,9 @@ char* cob_save_env_value(char* env_var, char* env_val) {
 	return env_var;
 }
 
-static void var_print(const char *msg, const char *val, const char *default_val,
-		const unsigned int format) {
+static void 
+var_print(const char *msg, const char *val, const char *default_val, const unsigned int format) 
+{
 	char	*p;
 	char	*token;
 	size_t	n;
@@ -3996,7 +3999,8 @@ static void var_print(const char *msg, const char *val, const char *default_val,
 
 
 void
-print_runtime_env(void) {
+print_runtime_env(void) 
+{
 	char* no_default;
 	char* not_set;
 	char* intstring;
@@ -4139,7 +4143,8 @@ print_runtime_env(void) {
 }
 
 void
-print_version(void) {
+print_version(void) 
+{
 	char* cobc_buffer;
 	char month[32];
 	int day, year;
@@ -4175,7 +4180,8 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 }
 
 void
-print_info(void) {
+print_info(void) 
+{
 	char	buff[16];
 	char	*s;
 
