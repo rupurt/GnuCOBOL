@@ -64,6 +64,7 @@ AH_TEMPLATE([WITH_SEQRA_EXTFH], [Compile with an external SEQ/RAN handler])
 AH_TEMPLATE([WITH_CISAM], [Use CISAM as ISAM handler])
 AH_TEMPLATE([WITH_DISAM], [Use DISAM as ISAM handler])
 AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as ISAM handler])
+AH_TEMPLATE([COB_DEBUG_LOG], [Enable internal logging (Developers only!)])
 AH_TEMPLATE([COB_EXPERIMENTAL], [Enable experimental code (Developers only!)])
 AH_TEMPLATE([COB_PARAM_CHECK], [Enable CALL parameter checking])
 AH_TEMPLATE([COB_EXPORT_DYN], [Compile/link option for exporting symbols])
@@ -342,6 +343,14 @@ AC_ARG_ENABLE([debug],
   [  --enable-debug          (GNU Cobol) Enable -g C compiler debug option],
   [],
   [enable_debug=no])
+
+AC_ARG_ENABLE([debuglog],
+  [  --enable-debuglog      (GNU Cobol) Enable internal logging (Developers only!)],
+  [ if test "$enable_debuglog" = "yes"
+    then
+	AC_DEFINE([COB_DEBUG_LOG], [1])
+    fi ],
+  [])
 
 AC_ARG_ENABLE([experimental],
   [  --enable-experimental   (GNU Cobol) Enable experimental code (Developers only!)],
@@ -1219,6 +1228,10 @@ case "$USE_NCURSES" in
     AC_MSG_NOTICE([ Use ncurses/pdcurses/curses for screen I/O:  ${USE_NCURSES}])
 	;;
 esac
+if test "$with_debug_log" = "yes"
+then
+  AC_MSG_NOTICE([ Enabled Compiler Developer logger            yes])
+fi
 if test "$with_seqra_extfh" = "yes"
 then
   AC_MSG_NOTICE([ Use external SEQ/RAN file handler            yes])
