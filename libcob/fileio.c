@@ -244,7 +244,7 @@ static char*		cob_ls_fixed_env;
 static unsigned int	cob_do_sync;
 static char*		cob_do_sync_env;
 static size_t		cob_vsq_len;
-static unsigned int	cob_varseq_type;
+static size_t 		cob_varseq_type;
 static char*		cob_varseq_type_env;
 
 static size_t		cob_sort_memory;

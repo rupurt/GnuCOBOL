@@ -1579,9 +1579,9 @@ cobc_var_print (const char *msg, const char *val, const unsigned int env)
 {
 	char	*p;
 	char	*token;
-	size_t	n;
-	size_t	lablen;
-	size_t	toklen;
+	int	n;
+	int	lablen;
+	int	toklen;
 
 	if (!env) {
 		printf ("%-*.*s : ", CB_IMSG_SIZE, CB_IMSG_SIZE, msg);

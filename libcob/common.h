@@ -1462,20 +1462,20 @@ COB_EXPIMP void			cob_ready_trace		(void);
 COB_EXPIMP void			cob_reset_trace		(void);
 
 /* COB_DEBUG_LOG Macros and routines found in common.c */
-COB_EXPIMP int cob_debug_open( char *cob_debug_env );
+COB_EXPIMP int cob_debug_open( const char *cob_debug_env );
 #if defined(COB_DEBUG_LOG)
 COB_EXPIMP int cob_debug_logit( int level, char *module);
-COB_EXPIMP int cob_debug_logger( char *fmt, ... );
+COB_EXPIMP int cob_debug_logger( const char *fmt, ... );
 COB_EXPIMP int cob_debug_dump( void *mem, int len);
-#define DEBUG_TRACE(module, arglist)		cob_debug_logit(3, module) ? 0 : cob_debug_logger arglist
-#define DEBUG_WARN(module, arglist)			cob_debug_logit(2, module) ? 0 : cob_debug_logger arglist
-#define DEBUG_LOG(module, arglist)			cob_debug_logit(0, module) ? 0 : cob_debug_logger arglist
-#define DEBUG_DUMP_TRACE(module, mem, len)	cob_debug_logit(3, module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_DUMP_WARN(module, mem, len)	cob_debug_logit(2, module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_DUMP(module, mem, len)		cob_debug_logit(0, module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_ISON_TRACE(module)			!cob_debug_logit(3, module)
-#define DEBUG_ISON_WARN(module)				!cob_debug_logit(2, module)
-#define DEBUG_ISON(module)					!cob_debug_logit(0, module)
+#define DEBUG_TRACE(module, arglist)		cob_debug_logit(3, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_WARN(module, arglist)		cob_debug_logit(2, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_LOG(module, arglist)		cob_debug_logit(0, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_DUMP_TRACE(module, mem, len)	cob_debug_logit(3, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_DUMP_WARN(module, mem, len)	cob_debug_logit(2, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_DUMP(module, mem, len)		cob_debug_logit(0, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_ISON_TRACE(module)		!cob_debug_logit(3, (char*)module)
+#define DEBUG_ISON_WARN(module)			!cob_debug_logit(2, (char*)module)
+#define DEBUG_ISON(module)			!cob_debug_logit(0, (char*)module)
 #else
 #define DEBUG_TRACE(module, arglist)
 #define DEBUG_WARN(module, arglist)
@@ -1483,9 +1483,9 @@ COB_EXPIMP int cob_debug_dump( void *mem, int len);
 #define DEBUG_DUMP_TRACE(module, mem, len)
 #define DEBUG_DUMP_WARN(module, mem, len)
 #define DEBUG_DUMP(module, mem, len)
-#define DEBUG_ISON_TRACE(module)			0
-#define DEBUG_ISON_WARN(module)				0
-#define DEBUG_ISON(module)					0
+#define DEBUG_ISON_TRACE(module)		0
+#define DEBUG_ISON_WARN(module)			0
+#define DEBUG_ISON(module)			0
 #endif
 
 /* Registration of external handlers */

@@ -368,6 +368,7 @@ cob_add_fields(cob_field *op1, cob_field *op2, cob_field *rslt)
 #endif
 }
 
+#if defined(COB_DEBUG_LOG) 
 static void
 dumpFlags(int flags, int ln, char *name)
 {
@@ -562,6 +563,7 @@ reportDump(const cob_report *r, const char *msg)
 	reportDumpLine(r,r->first_line,0);
 	DEBUG_LOG("rw",("\n"));
 }
+#endif
 
 /*
  * Verify that each LINE # is within PAGE LIMITS
@@ -811,10 +813,12 @@ report_line(cob_report *r, cob_report_line *l)
 			return;
 		}
 		if(l->suppress) {
+#if defined(COB_DEBUG_LOG) 
 			if(DEBUG_ISON("rw")) {
 				reportDumpOneLine(r,l,0,1);
 				DEBUG_LOG("rw",("   ^^^ Suppressed ^^^\n\n"));
 			}
+#endif
 			set_next_info(r,l);
 			return;
 		}
@@ -847,10 +851,12 @@ report_line(cob_report *r, cob_report_line *l)
 			}
 		}
 	}
+#if defined(COB_DEBUG_LOG) 
 	if(DEBUG_ISON("rw")) {
 		reportDumpOneLine(r,l,0,1);
 		DEBUG_LOG("rw",("\n"));
 	}
+#endif
 	if(rec) {
 		opt = COB_WRITE_BEFORE | COB_WRITE_LINES | 1;
 		cob_write(f, f->record, opt, NULL, 0);
@@ -926,7 +932,9 @@ report_line_type(cob_report *r, cob_report_line *l, int type)
 				if(curseq > 0 
 				&& sisseq > 0
 				&& sisseq > curseq) {
+#if defined(COB_DEBUG_LOG) 
 					reportDumpOneLine(r,l->sister,0,1);
+#endif
 					return 1;
 				}
 			}
