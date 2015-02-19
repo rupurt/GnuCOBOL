@@ -1,3 +1,7 @@
+2015-02-18  Ron Norman
+	* common.c cob_debug_logger: if fmt starts with '~' then force print of line#
+	* reportio.c : Fix spacing problems related to CONTROL FOOTING
+
 2015-02-16  Ron Norman
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 

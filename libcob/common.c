@@ -4684,6 +4684,10 @@ cob_debug_logger(char *fmt, ...)
 			fprintf(cob_debug_file,"%-3s:",cob_debug_mod);
 		if(cob_source_file)
 			fprintf(cob_debug_file," %s :",cob_source_file);
+		if(*fmt == '~') {			/* Force line# out again to log file */
+			fmt++;
+			cob_debug_prv_line = -1;
+		}
 		if(cob_source_line && cob_source_line != cob_debug_prv_line) {
 			fprintf(cob_debug_file,"%5d : ",cob_source_line);
 			cob_debug_prv_line = cob_source_line;

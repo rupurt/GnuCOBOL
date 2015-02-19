@@ -3235,10 +3235,10 @@ AT_DATA([prog.cob], [
            05  LINE 2.
                10  COLUMN  10   PIC X(8) VALUE " Time:".
                10  COLUMN  20   PIC 99  SOURCE CURRENT-TIME(1:2).
-               10               PIC X VALUE ':'.
-               10               PIC 99  SOURCE CURRENT-TIME (3:2).
-               10               PIC X VALUE ':'.
-               10               PIC 99  SOURCE CURRENT-TIME (5:2).
+               10  COLUMN  22   PIC X VALUE ':'.
+               10  COLUMN  23   PIC 99  SOURCE CURRENT-TIME (3:2).
+               10  COLUMN  25   PIC X VALUE ':'.
+               10  COLUMN  26   PIC 99  SOURCE CURRENT-TIME (5:2).
                10  COLUMN  94   PIC X(5) VALUE 'Page'.
                10  COLUMN 106    PIC ZZ9
                       SOURCE PAGE-COUNTER.
@@ -3760,6 +3760,12 @@ AT_DATA([prog.cob], [
            LINE PLUS 2.
            05 FINAL-TOTAL COLUMN 95 PIC ZZZ,ZZZ,ZZZ.99 SUM DEPT-TOTAL.
 
+       01  TYPE IS PAGE FOOTING LINE 24.
+           05  COLUMN 30      PIC X(30) VALUE "-+* End of Page *+-".
+           05  COLUMN 55      PIC X(12) VALUE "************".
+           05  COLUMN 75      PIC X(13) VALUE "*************".
+           05  COLUMN 95      PIC X(14) VALUE "**************".
+
        PROCEDURE DIVISION.
        A000-MAINLINE.
            OPEN INPUT INV-FILE
@@ -3797,40 +3803,39 @@ AT_DATA([reference], [
 
  DEPARTMENT #:            01  DEPARTMENT NAME:   Data Processing
 
+
+
          02             00050            1,238.80
 
-
                                                           1,238.80
-
-                                                                                    .00
 
                                                                                1,238.80
 
  DEPARTMENT #:            02  DEPARTMENT NAME:   Cow Milking
 
+
+
+
+
+
+
+
+                             -+* End of Page *+-      ************        *************       **************
+
+
+
+
          02             00060            5,439.80
 
-
-
-
-
-
-
-
-
-
-
-
                                                           5,439.80
-
-                                                                                    .00
 
                                                                                5,439.80
 
  DEPARTMENT #:            03  DEPARTMENT NAME:   Grass Cutting
 
-         03             00060            5,439.70
 
+
+         03             00060            5,439.70
 
                         00060            5,439.70
 
@@ -3840,8 +3845,10 @@ AT_DATA([reference], [
 
 
 
+                             -+* End of Page *+-      ************        *************       **************
 
-                                                                                    .00
+
+
 
                                                                               10,879.40
 
@@ -3862,10 +3869,7 @@ AT_DATA([reference], [
 
 
 
-
-
-
-
+                             -+* End of Page *+-      ************        *************       **************
 ])
 
 AT_CHECK([diff reference report.txt], [0])
