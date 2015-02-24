@@ -5545,6 +5545,8 @@ output_file_initialization (struct cb_file *f)
 	struct cb_alt_key	*l;
 	int			nkeys;
 	int			features;
+	int			i_keycomp;
+	struct cb_key_component *key_component;
 
 	nkeys = 1;
 	if (f->flag_external) {
@@ -5581,8 +5583,20 @@ output_file_initialization (struct cb_file *f)
 		output_param (f->key, -1);
 		output (";\n");
 		output_prefix ();
-		output ("%s%s->flag = 0;\n", CB_PREFIX_KEYS, f->cname);
+		output ("%s%s->tf_duplicates = 0;\n", CB_PREFIX_KEYS, f->cname);
 		output_prefix ();
+		if (f->component_list != NULL) {
+			for (key_component = f->component_list, i_keycomp = 0;
+				key_component != NULL;
+				key_component = key_component->next, ++i_keycomp) {
+					output_prefix ();
+					output ("(%s%s + %d)->component[%d] = ", CB_PREFIX_KEYS, f->cname, 0, i_keycomp);
+					output_param (key_component->component, -1);
+					output (";\n");
+			}
+			output_prefix ();
+			output ("(%s%s + %d)->count_components = %d;\n", CB_PREFIX_KEYS, f->cname, 0, i_keycomp);
+		}
 		if (f->key) {
 			output ("%s%s->offset = %d;\n", CB_PREFIX_KEYS, f->cname,
 				cb_code_field (f->key)->offset);
@@ -5596,11 +5610,29 @@ output_file_initialization (struct cb_file *f)
 			output_param (l->key, -1);
 			output (";\n");
 			output_prefix ();
-			output ("(%s%s + %d)->flag = %d;\n", CB_PREFIX_KEYS,
+			output ("(%s%s + %d)->tf_duplicates = %d;\n", CB_PREFIX_KEYS,
 				f->cname, nkeys, l->duplicates);
+			output_prefix ();
+			output ("(%s%s + %d)->tf_suppress = %d;\n", CB_PREFIX_KEYS,
+				f->cname, nkeys, l->tf_suppress);
+			output_prefix ();
+			output ("(%s%s + %d)->char_suppress = %d;\n", CB_PREFIX_KEYS, f->cname,
+				nkeys, l->char_suppress);
 			output_prefix ();
 			output ("(%s%s + %d)->offset = %d;\n", CB_PREFIX_KEYS,
 				f->cname, nkeys, cb_code_field (l->key)->offset);
+			if (l->component_list != NULL) {
+				for (key_component = l->component_list, i_keycomp = 0;
+					key_component != NULL;
+					key_component = key_component->next, ++i_keycomp) {
+						output_prefix ();
+						output ("(%s%s + %d)->component[%d] = ", CB_PREFIX_KEYS, f->cname, nkeys, i_keycomp);
+						output_param (key_component->component, -1);
+						output (";\n");
+				}
+				output_prefix ();
+				output ("(%s%s + %d)->count_components = %d;\n", CB_PREFIX_KEYS, f->cname, nkeys, i_keycomp);
+			}
 			nkeys++;
 		}
 	}

@@ -1,3 +1,9 @@
+2015-02-23  Ron Norman
+	* Implemented INDEXED file support for sparse and split keys
+	  Most of the compiler code was borrowed from the fileio-rewrite
+	  fileio.c was updated to handle sparse and split keys
+	  This was tested with D-ISAM and VB-ISAM 2.0
+
 2015-02-16  Ron Norman
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 

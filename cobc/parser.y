@@ -149,6 +149,7 @@ static struct cb_field		*description_field;
 static struct cb_file		*current_file;
 static struct cb_report		*current_report;
 static struct cb_report		*report_instance;
+static struct cb_key_component	*key_component_list;
 
 static struct cb_file		*linage_file;
 static cb_tree			next_label_list;
@@ -253,7 +254,7 @@ void printBits(unsigned int num){
 	int i=0;
 
 	for(;i<size*8;++i){
-		// print last bit and shift left.
+		/* print last bit and shift left. */
 		fprintf(stderr, "%u ",num&maxPow ? 1 : 0);
 		num = num<<1;
 	}
@@ -2728,14 +2729,21 @@ access_mode:
 /* ALTERNATIVE RECORD KEY clause */
 
 alternative_record_key_clause:
-  ALTERNATE _record _key _is opt_splitk flag_duplicates suppress_clause
+  ALTERNATE rel_record _key _is reference flag_duplicates suppress_clause
   {
 	struct cb_alt_key *p;
 	struct cb_alt_key *l;
 
 	p = cobc_parse_malloc (sizeof (struct cb_alt_key));
 	p->key = $5;
+	p->component_list = NULL;
 	p->duplicates = CB_INTEGER ($6)->val;
+	if (CB_INTEGER ($7)->val == -1) {
+		p->tf_suppress = 0;
+	} else {
+		p->tf_suppress = 1;
+		p->char_suppress = CB_INTEGER ($7)->val;
+	}
 	p->next = NULL;
 
 	/* Add to the end of list */
@@ -2749,19 +2757,55 @@ alternative_record_key_clause:
 		l->next = p;
 	}
   }
+|
+  ALTERNATE rel_record _key _is reference _source_is split_key_list flag_duplicates suppress_clause
+  {
+	struct cb_alt_key *p;
+	struct cb_alt_key *l;
+	cb_tree composite_key;
+
+	p = cobc_parse_malloc (sizeof (struct cb_alt_key));
+	/* generate field (in w-s) for composite-key */
+	composite_key = cb_build_field($5);
+	if (composite_key == cb_error_node) {
+		YYERROR;
+	} else {
+		composite_key->category = CB_CATEGORY_ALPHANUMERIC; 
+		((struct cb_field *)composite_key)->count = 1;
+		p->key = cb_build_field_reference((struct cb_field *)composite_key, NULL);
+		p->component_list = key_component_list;
+		p->duplicates = CB_INTEGER ($8)->val;
+		if (CB_INTEGER ($9)->val == -1) {
+			p->tf_suppress = 0;
+		} else {
+			p->tf_suppress = 1;
+			p->char_suppress = CB_INTEGER ($9)->val;
+ 		}
+		p->next = NULL;
+
+		/* add to the end of list */
+		if (current_file->alt_key_list == NULL) {
+			current_file->alt_key_list = p;
+		} else {
+			l = current_file->alt_key_list;
+			for (; l->next; l = l->next);
+			l->next = p;
+		}
+	}
+  }
 ;
 
 suppress_clause:
-  /* empty */                   { }
+  /* empty */                   { $$ = cb_int (-1); }
 |
-  SUPPRESS WHEN ALL basic_value
+  SUPPRESS WHEN ALL literal
   {
-	PENDING ("SUPPRESS WHEN ALL");
+	$$ = cb_int (literal_value ($4));
   }
 |
   SUPPRESS WHEN space_or_zero
   {
-	PENDING ("SUPPRESS WHEN SPACE/ZERO");
+	$$ = cb_int (literal_value ($3));
   }
 ;
 
@@ -2889,17 +2933,59 @@ record_delimiter_clause:
 /* RECORD KEY clause */
 
 record_key_clause:
-  RECORD _key _is opt_splitk
+  RECORD _key _is reference
   {
 	check_repeated ("RECORD KEY", SYN_CLAUSE_9);
 	current_file->key = $4;
   }
+| RECORD _key _is reference _source_is split_key_list
+  {
+	cb_tree composite_key;
+
+	check_repeated ("RECORD KEY", SYN_CLAUSE_9);
+	current_file->key = $4;
+
+	/* generate field (in w-s) for composite-key */
+	composite_key = cb_build_field($4);
+	if (composite_key == cb_error_node) {
+		YYERROR;
+	} else {
+		composite_key->category = CB_CATEGORY_ALPHANUMERIC; 
+		((struct cb_field *)composite_key)->count = 1;
+		current_file->key = cb_build_field_reference((struct cb_field *)composite_key, NULL);
+		current_file->component_list = key_component_list;
+	}
+  }
 ;
 
-opt_splitk:
-  reference				{ $$ = $1; }
-| reference TOK_EQUAL reference_list	{ PENDING ("SPLIT KEYS"); }
-| reference SOURCE _is reference_list	{ PENDING ("SPLIT KEYS"); }
+_source_is:
+  TOK_EQUAL
+| SOURCE _is
+;
+
+split_key_list:
+  {
+    key_component_list = NULL;
+  }
+  split_key
+| split_key_list split_key
+;
+
+
+split_key:
+  reference
+  {
+    struct cb_key_component *c;
+    struct cb_key_component *comp = cobc_malloc(sizeof(struct cb_key_component));
+    comp->next = NULL;
+    comp->component = $1;
+    if (key_component_list == NULL) {
+       key_component_list = comp;
+    } else {
+       for (c = key_component_list; c->next != NULL; c = c->next);
+       c->next = comp;
+    }
+  }
 ;
 
 /* RELATIVE KEY clause */
@@ -10996,7 +11082,6 @@ _characters:	| CHARACTERS ;
 _contains:	| CONTAINS ;
 _data:		| DATA ;
 _file:		| TOK_FILE ;
-_final:		| FINAL ;
 _for:		| FOR ;
 _from:		| FROM ;
 _in:		| IN ;
@@ -11036,6 +11121,7 @@ _to_using:	| TO | USING;
 _when:		| WHEN ;
 _when_set_to:	| WHEN SET TO ;
 _with:		| WITH ;
+rel_record:	| RECORD ;
 
 /* Mandatory selection */
 

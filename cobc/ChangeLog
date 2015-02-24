@@ -1,3 +1,7 @@
+2015-02-23  Ron Norman
+	* Implemented INDEXED file support for sparse and split keys
+	  Most of the compiler code was borrowed from the fileio-rewrite
+
 2015-02-13  Ron Norman
 
 	* Fix to tree.c to only adjust up file record_max for REPORT files

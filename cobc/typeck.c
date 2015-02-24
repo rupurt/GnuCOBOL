@@ -821,47 +821,6 @@ cb_check_lit_subs (struct cb_reference *r, const int numsubs,
 	return;
 }
 
-static int
-cb_field_size (const cb_tree x)
-{
-	struct cb_reference	*r;
-	struct cb_field		*f;
-
-	switch (CB_TREE_TAG (x)) {
-	case CB_TAG_LITERAL:
-		return CB_LITERAL (x)->size;
-	case CB_TAG_FIELD:
-		return CB_FIELD (x)->size;
-	case CB_TAG_REFERENCE:
-		r = CB_REFERENCE (x);
-		f = CB_FIELD (r->value);
-
-		if (r->length) {
-			if (CB_LITERAL_P (r->length)) {
-				return cb_get_int (r->length);
-			} else {
-				return -1;
-			}
-		} else if (r->offset) {
-			if (CB_LITERAL_P (r->offset)) {
-				return f->size - cb_get_int (r->offset) + 1;
-			} else {
-				return -1;
-			}
-		} else {
-			return f->size;
-		}
-	default:
-		cobc_abort_pr (_("Unexpected tree tag %d"), (int)CB_TREE_TAG (x));
-		/* Use dumb variant */
-		COBC_DUMB_ABORT ();
-	}
-	/* NOT REACHED */
-#ifndef _MSC_VER
-	return 0;
-#endif
-}
-
 /* List system routines */
 
 void
@@ -8188,6 +8147,20 @@ check_valid_key (const struct cb_file *cbf, const struct cb_field *f)
 				    _("Invalid key item"));
 			return 1;
 		}
+		return 0;
+	}
+
+	/*
+	 *  Pass if field f refs a declared key for target file.
+ 	 *  This will pass split-keys which are virtual record fields.
+         */
+	for (cbak = cbf->alt_key_list; cbak; cbak = cbak->next) {
+		if (CB_FIELD_PTR (cbak->key) == f) {
+			return 0;
+		}
+	}
+	if(cbf->component_list != NULL
+	&& CB_FIELD_PTR (cbf->key) == f) {
 		return 0;
 	}
 

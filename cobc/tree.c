@@ -2167,6 +2167,46 @@ cb_field_add (struct cb_field *f, struct cb_field *p)
 	return f;
 }
 
+int
+cb_field_size (const cb_tree x)
+{
+	struct cb_reference	*r;
+	struct cb_field		*f;
+
+	switch (CB_TREE_TAG (x)) {
+	case CB_TAG_LITERAL:
+		return CB_LITERAL (x)->size;
+	case CB_TAG_FIELD:
+		return CB_FIELD (x)->size;
+	case CB_TAG_REFERENCE:
+		r = CB_REFERENCE (x);
+		f = CB_FIELD (r->value);
+
+		if (r->length) {
+			if (CB_LITERAL_P (r->length)) {
+				return cb_get_int (r->length);
+			} else {
+				return -1;
+			}
+		} else if (r->offset) {
+			if (CB_LITERAL_P (r->offset)) {
+				return f->size - cb_get_int (r->offset) + 1;
+			} else {
+				return -1;
+			}
+		} else {
+			return f->size;
+		}
+	default:
+		cobc_abort_pr (_("Unexpected tree tag %d"), (int)CB_TREE_TAG (x));
+		/* Use dumb variant */
+		COBC_DUMB_ABORT ();
+	}
+	/* NOT REACHED */
+	return 0;
+}
+
+
 struct cb_field *
 cb_field_founder (const struct cb_field *f)
 {
@@ -2557,6 +2597,10 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	struct cb_alt_key	*cbak;
 	cb_tree			l;
 	cb_tree			x;
+	int			cb;
+	char			pic[32]; 
+	struct cb_key_component	*key_component;
+	struct cb_field		*composite_key;
 
 	/* stdin/stderr and LINE ADVANCING are L/S */
 	if (f->special || f->flag_line_adv) {
@@ -2569,19 +2613,53 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 
 	if (f->key && f->organization == COB_ORG_INDEXED &&
 	    (l = cb_ref (f->key)) != cb_error_node) {
-		v = cb_field_founder (CB_FIELD_PTR (l));
-		for (p = records; p; p = p->sister) {
-			if (p == v) {
-				break;
+		if (f->component_list != NULL) {
+			/* compute composite key total length */
+			cb = 0;
+			for (key_component = f->component_list;
+			     key_component != NULL;
+			     key_component = key_component->next) {
+				/* resolution of references in key components must be done here */
+				cb += cb_field_size(cb_ref(key_component->component));
 			}
-		}
-		if (!p) {
-			cb_error (_("Invalid KEY item '%s'"),
-				  CB_FIELD_PTR (l)->name);
+			composite_key = (struct cb_field *)cb_ref(f->key);
+			memset (pic, 0, sizeof(pic));
+			sprintf (pic, "X(%d)", cb);
+			if (composite_key->pic != NULL) free(composite_key->pic);
+			composite_key->pic = CB_PICTURE (cb_build_picture (pic));
+			cb_validate_field (composite_key);
+		} else {
+			v = cb_field_founder (CB_FIELD_PTR (l));
+			for (p = records; p; p = p->sister) {
+				if (p == v) {
+					break;
+				}
+			}
+			if (!p) {
+				cb_error (_("Invalid KEY item '%s'"),
+					  CB_FIELD_PTR (l)->name);
+			}
 		}
 	}
 	if (f->alt_key_list) {
 		for (cbak = f->alt_key_list; cbak; cbak = cbak->next) {
+			if (cbak->component_list != NULL) {
+				/* compute composite key total length */
+				cb = 0;
+				for (key_component = cbak->component_list;
+				     key_component != NULL;
+				     key_component = key_component->next) {
+					/* resolution of references in key components must be done here */
+					cb += cb_field_size(cb_ref(key_component->component));
+				}
+				composite_key = (struct cb_field *)cb_ref(cbak->key);
+				memset (pic, 0, sizeof(pic));
+				sprintf (pic, "X(%d)", cb);
+				if (composite_key->pic != NULL) free(composite_key->pic);
+				composite_key->pic = CB_PICTURE (cb_build_picture (pic));
+				cb_validate_field (composite_key);
+				continue;
+			}
 			l = cb_ref (cbak->key);
 			if (l == cb_error_node) {
 				continue;

@@ -1,3 +1,8 @@
+2015-02-23  Ron Norman
+	* Implemented INDEXED file support for sparse and split keys
+	  fileio.c was updated to handle sparse and split keys
+	  This was tested with D-ISAM and VB-ISAM 2.0
+
 2015-02-18  Ron Norman
 	* common.c cob_debug_logger: if fmt starts with '~' then force print of line#
 	* reportio.c : Fix spacing problems related to CONTROL FOOTING
