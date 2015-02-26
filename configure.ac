@@ -65,6 +65,7 @@ AH_TEMPLATE([WITH_CISAM], [Use CISAM as ISAM handler])
 AH_TEMPLATE([WITH_DISAM], [Use DISAM as ISAM handler])
 AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as ISAM handler])
 AH_TEMPLATE([COB_DEBUG_LOG], [Enable internal logging (Developers only!)])
+AH_TEMPLATE([COB_BDB_BAD_DUPNO], [Retain incorrect duplicate sequence for compatibility on little endian!])
 AH_TEMPLATE([COB_EXPERIMENTAL], [Enable experimental code (Developers only!)])
 AH_TEMPLATE([COB_PARAM_CHECK], [Enable CALL parameter checking])
 AH_TEMPLATE([COB_EXPORT_DYN], [Compile/link option for exporting symbols])
@@ -349,6 +350,14 @@ AC_ARG_ENABLE([debuglog],
   [ if test "$enable_debuglog" = "yes"
     then
 	AC_DEFINE([COB_DEBUG_LOG], [1])
+    fi ],
+  [])
+
+AC_ARG_ENABLE([bdbdupno],
+  [  --enable-bdbdupno      (GNU Cobol) Retain old BDB duplicate sequence (Incorrect on little-endian!)],
+  [ if test "$enable_bdbdupno" = "yes"
+    then
+	AC_DEFINE([COB_BDB_BAD_DUPNO], [1])
     fi ],
   [])
 

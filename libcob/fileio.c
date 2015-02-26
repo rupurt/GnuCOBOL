@@ -297,6 +297,35 @@ indexed_keycmp(struct keydesc *k1, struct keydesc *k2)
 	return 0;
 }
 
+/* Return index number for given key */
+static int
+indexed_findkey(cob_file *f, cob_field *kf, int *klen)
+{
+	int 	k,part;
+	*klen = 0;
+	for (k = 0; k < f->nkeys; ++k) {
+		if (f->keys[k].field
+		&&  f->keys[k].count_components <= 1
+		&&  f->keys[k].field->data == kf->data) {
+			*klen = f->keys[k].field->size;
+			return k;
+		}
+	}
+	for (k = 0; k < f->nkeys; ++k) {
+		if (f->keys[k].count_components > 1) {
+			if ((f->keys[k].field
+			&&  f->keys[k].field->data == kf->data
+			&&  f->keys[k].field->size == kf->size) 
+			||  (f->keys[k].component[0]->data == kf->data)) {
+				for(part=0; part < f->keys[k].count_components; part++)
+					*klen += f->keys[k].component[part]->size;
+				return k;
+			}
+		}
+	}
+	return -1;
+}
+
 #endif
 
 struct file_list {
@@ -546,13 +575,13 @@ extern int extfh_relative_delete	(cob_file *);
 
 #ifdef	WITH_DB
 
-static DB_ENV		*bdb_env;
-static char		*bdb_home;
-static char		*bdb_buff;
-static const char	**bdb_data_dir;
-static void		*record_lock_object;
-static size_t		rlo_size;
-static unsigned int	bdb_lock_id;
+static DB_ENV		*bdb_env = NULL;
+static char		*bdb_home = NULL;
+static char		*bdb_buff = NULL;
+static const char	**bdb_data_dir = NULL;
+static void		*record_lock_object = NULL;
+static size_t		rlo_size = 0;
+static unsigned int	bdb_lock_id = 0;
 
 #define DB_PUT(db,flags)	db->put (db, NULL, &p->key, &p->data, flags)
 #define DB_GET(db,flags)	db->get (db, NULL, &p->key, &p->data, flags)
@@ -561,6 +590,19 @@ static unsigned int	bdb_lock_id;
 #define DB_CLOSE(db)		db->close (db, 0)
 #define DB_SYNC(db)		db->sync (db, 0)
 #define	cob_dbtsize_t		u_int32_t
+
+#if	defined(WORDS_BIGENDIAN)
+/* Big Endian then leave 'int' alone */
+#define	COB_DUPSWAP(x)		((unsigned int)(x))
+
+#elif	defined(COB_BDB_BAD_DUPNO)
+/* Want to retain incorrect storing of Little Endian value backwards */
+#define	COB_DUPSWAP(x)		((unsigned int)(x))
+
+#else
+/* Little Endian so swap byte around to have dupno value stored in bigendian sequence */
+#define	COB_DUPSWAP(x)		(COB_BSWAP_32((unsigned int)(x)))
+#endif
 
 #define DBT_SET(key,fld)			\
 	key.data = fld->data;			\
@@ -575,6 +617,10 @@ struct indexed_file {
 	unsigned char	**last_readkey;	/* The last key read */
 	unsigned int	*last_dupno;	/* The last number of duplicates read */
 	int		*rewrite_sec_key;
+	int		maxkeylen;
+	int		primekeylen;
+	unsigned char	*savekey;	/* Work area for saving key value */
+	unsigned char	*suppkey;	/* Work area for saving key value */
 	DBT		key;
 	DBT		data;
 	DB_LOCK		bdb_file_lock;
@@ -585,6 +631,127 @@ struct indexed_file {
 	int		record_locked;
 	int		filenamelen;
 };
+
+static int
+bdb_findkey(cob_file *f, cob_field *kf, int *klen)
+{
+	int 	k,part;
+	*klen = 0;
+	for (k = 0; k < f->nkeys; ++k) {
+		if (f->keys[k].field
+		&&  f->keys[k].count_components <= 1
+		&&  f->keys[k].field->data == kf->data) {
+			*klen = f->keys[k].field->size;
+			return k;
+		}
+	}
+	for (k = 0; k < f->nkeys; ++k) {
+		if (f->keys[k].count_components > 1) {
+			if ((f->keys[k].field
+			&&  f->keys[k].field->data == kf->data
+			&&  f->keys[k].field->size == kf->size) 
+			||  (f->keys[k].component[0]->data == kf->data)) {
+				for(part=0; part < f->keys[k].count_components; part++)
+					*klen += f->keys[k].component[part]->size;
+				return k;
+			}
+		}
+	}
+	return -1;
+}
+
+/* Return total length of the key */
+static int				
+bdb_keylen(cob_file *f, int idx)
+{
+	int totlen, part;
+
+	if(idx < 0 || idx > f->nkeys)
+		return -1;
+	if (f->keys[idx].count_components > 1) {
+		totlen = 0;
+		for(part=0; part < f->keys[idx].count_components; part++)
+			totlen += f->keys[idx].component[part]->size;
+		return totlen;
+	}
+	return f->keys[idx].field->size;
+}
+
+/* Save key for given index from 'record' into 'keyarea' */
+static int				/* Return total length of the key */
+bdb_savekey(cob_file *f, unsigned char *keyarea, unsigned char *record, int idx)
+{
+	int totlen, part;
+
+	if (f->keys[idx].count_components > 1) {
+		totlen = 0;
+		for(part=0; part < f->keys[idx].count_components; part++) {
+			memcpy (keyarea + totlen, 
+				record  + (f->keys[idx].component[part]->data - f->record->data),
+				f->keys[idx].component[part]->size);
+			totlen += f->keys[idx].component[part]->size;
+		}
+		return totlen;
+	}
+	memcpy (keyarea, 
+		record  + (f->keys[idx].field->data - f->record->data),
+		f->keys[idx].field->size);
+	return f->keys[idx].field->size;
+}
+
+static void
+bdb_setkey(cob_file *f, int idx)
+{
+	struct indexed_file	*p;
+	int	len;
+	p = f->file;
+	len = bdb_savekey(f, p->savekey, f->record->data, idx);
+	p->key.data = p->savekey;
+	p->key.size = (cob_dbtsize_t) len;
+}
+
+/* Compare key for given index 'keyarea' to 'record' */
+static int				/* Return compare status */
+bdb_cmpkey(cob_file *f, unsigned char *keyarea, unsigned char *record, int idx)
+{
+	int sts, part, totlen;
+
+	if (f->keys[idx].count_components > 1) {
+		totlen = 0;
+		for(part=0; part < f->keys[idx].count_components; part++) {
+			sts = memcmp (	keyarea + totlen, 
+					record  + (f->keys[idx].component[part]->data - f->record->data),
+					f->keys[idx].component[part]->size);
+			if(sts != 0)
+				return sts;
+			totlen += f->keys[idx].component[part]->size;
+		}
+		return 0;
+	}
+	return memcmp (	keyarea, 
+			record  + (f->keys[idx].field->data - f->record->data),
+			f->keys[idx].field->size);
+}
+
+/* Is given key data all SUPPRESS char */
+static int				/* Return 1 if key has all SUPPRESS char */
+bdb_suppresskey(cob_file *f, int idx)
+{
+	unsigned char ch_sprs;
+	int 	i,len;
+	struct indexed_file	*p;
+
+	if (!f->keys[idx].tf_suppress) 
+		return 0;
+	ch_sprs = f->keys[idx].char_suppress & 0xFF;
+	p = f->file;
+	len = bdb_savekey(f, p->suppkey, f->record->data, idx);
+	for(i=0; i < len; i++) {
+		if(p->suppkey[i] != ch_sprs)
+			return 0;
+	}
+	return 1;
+}
 
 #endif	/* WITH_DB */
 
@@ -2420,17 +2587,17 @@ get_dupno (cob_file *f, const cob_u32_t i)
 
 	p = f->file;
 	dupno = 0;
-	DBT_SET (p->key, f->keys[i].field);
-	memcpy (p->temp_key, p->key.data, (size_t)p->key.size);
+	bdb_setkey(f, i);
+	memcpy (p->temp_key, p->key.data, (size_t)p->maxkeylen);
 	p->db[i]->cursor (p->db[i], NULL, &p->cursor[i], 0);
 	ret = DB_SEQ (p->cursor[i], DB_SET_RANGE);
 	while (ret == 0 && memcmp (p->key.data, p->temp_key, (size_t)p->key.size) == 0) {
-		memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size,
-			sizeof(unsigned int));
+		memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
 		ret = DB_SEQ (p->cursor[i], DB_NEXT);
 	}
 	p->cursor[i]->c_close (p->cursor[i]);
 	p->cursor[i] = NULL;
+	dupno = COB_DUPSWAP(dupno);
 	return ++dupno;
 }
 
@@ -2444,11 +2611,11 @@ check_alt_keys (cob_file *f, const int rewrite)
 	p = f->file;
 	for (i = 1; i < f->nkeys; ++i) {
 		if (!f->keys[i].tf_duplicates) {
-			DBT_SET (p->key, f->keys[i].field);
+			bdb_setkey(f, i);
 			ret = DB_GET (p->db[i], 0);
 			if (ret == 0) {
 				if (rewrite) {
-					if (memcmp (p->data.data, f->keys[0].field->data, f->keys[0].field->size)) {
+					if(bdb_cmpkey(f, p->data.data, f->record->data, 0)) {
 						return 1;
 					}
 				} else {
@@ -2464,7 +2631,7 @@ static int
 indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 {
 	struct indexed_file	*p;
-	cob_u32_t		i;
+	cob_u32_t		i,len;
 	unsigned int		dupno;
 	cob_u32_t		flags;
 	int			close_cursor;
@@ -2493,7 +2660,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 			}
 			return COB_STATUS_22_KEY_EXISTS;
 		}
-		DBT_SET (p->key, f->keys[0].field);
+		bdb_setkey(f, 0);
 	}
 
 	/* Write data */
@@ -2515,20 +2682,21 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 		if (rewrite && ! p->rewrite_sec_key[i]) {
 			continue;
 		}
+		if(bdb_suppresskey(f,i))
+			continue;
 		if (f->keys[i].tf_duplicates) {
 			flags =  0;
 			dupno = get_dupno(f, i);
-			memcpy (p->temp_key, f->keys[0].field->data,
-				   f->keys[0].field->size);
-			memcpy (p->temp_key + f->keys[0].field->size, &dupno,
-				   sizeof(unsigned int));
+			len = bdb_savekey(f, p->temp_key, f->record->data, 0);
+			dupno = COB_DUPSWAP (dupno);
+			memcpy (p->temp_key + p->primekeylen, &dupno, sizeof(unsigned int));
 			p->data.data = p->temp_key;
-			p->data.size = f->keys[0].field->size + sizeof(unsigned int);;
+			p->data.size = len + sizeof(unsigned int);;
 		} else {
 			flags = DB_NOOVERWRITE;
 		}
 
-		DBT_SET (p->key, f->keys[i].field);
+		bdb_setkey(f, i);
 		if (DB_PUT (p->db[i], flags) != 0) {
 			if (close_cursor) {
 				p->cursor[0]->c_close (p->cursor[0]);
@@ -2541,7 +2709,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 
 	if (opt & COB_WRITE_LOCK) {
 		if (bdb_env != NULL) {
-			DBT_SET (p->key, f->keys[0].field);
+			bdb_setkey(f, 0);
 			if (lock_record (f, p->key.data, p->key.size)) {
 				if (close_cursor) {
 					p->cursor[0]->c_close (p->cursor[0]);
@@ -2565,20 +2733,20 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 			const int read_opts, const int test_lock)
 {
 	struct indexed_file	*p;
-	int			ret;
+	int			ret,len,fullkeylen;
 	unsigned int		dupno;
 
 	dupno = 0;
+	ret = 0;
 	p = f->file;
 	/* Look up for the key */
-	for (p->key_index = 0; p->key_index < f->nkeys; p->key_index++) {
-		if (f->keys[p->key_index].field->data == key->data) {
-			break;
-		}
+	p->key_index = bdb_findkey(f, key, &fullkeylen);
+	if(p->key_index < 0) {
+		return COB_STATUS_23_KEY_NOT_EXISTS;
 	}
 
 	/* Search */
-	DBT_SET (p->key, key);
+	bdb_setkey(f, p->key_index);
 	/* The open cursor makes this function atomic */
 	if (p->key_index != 0) {
 		p->db[0]->cursor (p->db[0], NULL, &p->cursor[0], 0);
@@ -2594,7 +2762,7 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 	switch (cond) {
 	case COB_EQ:
 		if (ret == 0) {
-			ret = memcmp (p->key.data, key->data, key->size);
+			ret = bdb_cmpkey(f, p->key.data, f->record->data, p->key_index);
 		}
 		break;
 	case COB_LT:
@@ -2607,7 +2775,7 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 	case COB_LE:
 		if (ret != 0) {
 			ret = DB_SEQ (p->cursor[p->key_index], DB_LAST);
-		} else if (memcmp (p->key.data, key->data, key->size) != 0) {
+		} else if (bdb_cmpkey(f, p->key.data, f->record->data, p->key_index) != 0) {
 			ret = DB_SEQ (p->cursor[p->key_index], DB_PREV);
 		} else if (f->keys[p->key_index].tf_duplicates) {
 			ret = DB_SEQ (p->cursor[p->key_index], DB_NEXT_NODUP);
@@ -2619,7 +2787,7 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 		}
 		break;
 	case COB_GT:
-		while (ret == 0 && memcmp (p->key.data, key->data, key->size) == 0) {
+		while (ret == 0 && bdb_cmpkey(f, p->key.data, f->record->data, p->key_index) == 0) {
 			ret = DB_SEQ (p->cursor[p->key_index], DB_NEXT);
 		}
 		break;
@@ -2636,12 +2804,14 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 
 	if (ret == 0 && p->key_index > 0) {
 		/* Temporarily save alternate key */
-		memcpy (p->temp_key, p->key.data, f->keys[p->key_index].field->size);
+		len = p->key.size;
+		memcpy (p->temp_key, p->key.data, len);
 		if (f->keys[p->key_index].tf_duplicates) {
-			memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+			memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+			dupno = COB_DUPSWAP (dupno);
 		}
 		p->key.data = p->data.data;
-		p->key.size = f->keys[0].field->size;
+		p->key.size = p->primekeylen;
 		ret = DB_GET (p->db[0], 0);
 	}
 
@@ -2674,11 +2844,11 @@ indexed_start_internal (cob_file *f, const int cond, cob_field *key,
 
 	if (ret == 0) {
 		if (p->key_index == 0) {
-			memcpy (p->last_readkey[0], p->key.data, f->keys[0].field->size);
+			memcpy (p->last_readkey[0], p->key.data, p->primekeylen);
 		} else {
 			memcpy (p->last_readkey[p->key_index],
-				    p->temp_key, f->keys[p->key_index].field->size);
-			memcpy (p->last_readkey[p->key_index + f->nkeys], p->key.data, f->keys[0].field->size);
+				    p->temp_key, bdb_keylen(f,p->key_index));
+			memcpy (p->last_readkey[p->key_index + f->nkeys], p->key.data, p->primekeylen);
 			if (f->keys[p->key_index].tf_duplicates) {
 				p->last_dupno[p->key_index] = dupno;
 			}
@@ -2724,7 +2894,7 @@ indexed_delete_internal (cob_file *f, const int rewrite)
 	}
 	/* Find the primary key */
 	if (f->access_mode != COB_ACCESS_SEQUENTIAL) {
-		DBT_SET (p->key, f->keys[0].field);
+		bdb_setkey(f, 0);
 	}
 	ret = DB_SEQ (p->cursor[0], DB_SET);
 	if (ret != 0 && f->access_mode != COB_ACCESS_SEQUENTIAL) {
@@ -2751,11 +2921,11 @@ indexed_delete_internal (cob_file *f, const int rewrite)
 	/* Delete the secondary keys */
 	offset = (char *) p->data.data - (char *) f->record->data;
 	for (i = 1; i < f->nkeys; ++i) {
-		DBT_SET (p->key, f->keys[i].field);
+		bdb_setkey(f, i);
 		p->key.data = (char *)p->key.data + offset;
 		/* rewrite: no delete if secondary key is unchanged */
 		if (rewrite) {
-			p->rewrite_sec_key[i] = memcmp (p->key.data, f->keys[i].field->data, (size_t)p->key.size);
+			p->rewrite_sec_key[i] = bdb_cmpkey(f, p->key.data, f->record->data, i);
 			if (!p->rewrite_sec_key[i]) {
 				continue;
 			}
@@ -3222,12 +3392,14 @@ dobuild:
 	p->last_readkey = cob_malloc (sizeof (unsigned char *) * 2 * f->nkeys);
 	p->last_dupno = cob_malloc (sizeof (unsigned int) * f->nkeys);
 	p->rewrite_sec_key = cob_malloc (sizeof (int) * f->nkeys);
-	maxsize = 0;
-	for (i = 0; i < f->nkeys; ++i) {
-		if (f->keys[i].field->size > maxsize) {
-			maxsize = f->keys[i].field->size;
-		}
+	maxsize = p->primekeylen = bdb_keylen(f, 0);
+	for (i = 1; i < f->nkeys; ++i) {
+		j = bdb_keylen(f, i);
+		if( j > maxsize)
+			maxsize = j;
 	}
+	p->maxkeylen = maxsize;
+
 	for (i = 0; i < f->nkeys; ++i) {
 		/* File name */
 		runtime_buffer[COB_FILE_MAX] = 0;
@@ -3345,6 +3517,8 @@ dobuild:
 	}
 
 	p->temp_key = cob_malloc (maxsize + sizeof(unsigned int));
+	p->savekey  = cob_malloc (maxsize + sizeof(unsigned int));
+	p->suppkey  = cob_malloc (maxsize + sizeof(unsigned int));
 	f->file = p;
 	p->key_index = 0;
 	p->last_key = NULL;
@@ -3359,7 +3533,7 @@ dobuild:
 		bdb_env->lock_id (bdb_env, &p->bdb_lock_id);
 	}
 
-	DBT_SET (p->key, f->keys[0].field);
+	bdb_setkey(f, 0);
 	p->db[0]->cursor (p->db[0], NULL, &p->cursor[0], 0);
 	ret = DB_SEQ (p->cursor[0], DB_FIRST);
 	p->cursor[0]->c_close (p->cursor[0]);
@@ -3434,6 +3608,8 @@ indexed_close (cob_file *f, const int opt)
 		cob_free (p->last_key);
 	}
 	cob_free (p->temp_key);
+	cob_free (p->savekey);
+	cob_free (p->suppkey);
 	cob_free (p->db);
 	cob_free (p->last_readkey);
 	cob_free (p->last_dupno);
@@ -3471,7 +3647,7 @@ indexed_start (cob_file *f, const int cond, cob_field *key)
 	struct indexfile	*fh;
 	size_t			k;
 	int			mode;
-	int			klen;
+	int			klen,fullkeylen;
 	int			savecond;
 
 	fh = f->file;
@@ -3484,16 +3660,15 @@ indexed_start (cob_file *f, const int cond, cob_field *key)
 	if (f->flag_nonexistent) {
 		return COB_STATUS_23_KEY_NOT_EXISTS;
 	}
-	for (k = 0; k < f->nkeys; ++k) {
-		if (f->keys[k].field->data == key->data) {
-			break;
-		}
+	k = indexed_findkey(f, key, &fullkeylen);
+	if(k < 0) {
+		return COB_STATUS_23_KEY_NOT_EXISTS;
 	}
 	/* Use size of data field; This may indicate a partial key */
 	klen = key->size;
-	if (klen < 1 || klen > fh->key[k].k_leng) {
+	if (klen < 1 || klen > fullkeylen) {
 		/* Max key length for this index */
-		klen = fh->key[k].k_leng;
+		klen = fullkeylen;
 	}
 	mode = ISGTEQ;
 	fh->startiscur = 1;
@@ -3579,7 +3754,7 @@ indexed_read (cob_file *f, cob_field *key, const int read_opts)
 #elif	defined(WITH_ANY_ISAM)
 
 	struct indexfile	*fh;
-	size_t			k;
+	size_t			k,fullkeylen;
 	int			ret;
 	int			lmode;
 
@@ -3590,10 +3765,9 @@ indexed_read (cob_file *f, cob_field *key, const int read_opts)
 	if (f->flag_nonexistent) {
 		return COB_STATUS_23_KEY_NOT_EXISTS;
 	}
-	for (k = 0; k < f->nkeys; ++k) {
-		if (f->keys[k].field->data == key->data) {
-			break;
-		}
+	k = indexed_findkey(f, key, &fullkeylen);
+	if(k < 0) {
+		return COB_STATUS_23_KEY_NOT_EXISTS;
 	}
 	if (fh->curkey != (int)k) {
 		/* Switch to this index */
@@ -3963,8 +4137,6 @@ indexed_read_next (cob_file *f, const int read_opts)
 	dupno = 0;
 	file_changed = 0;
 	
-	dupno = 0;
-
 	bdb_opts = read_opts;
 	if (bdb_env != NULL) {
 		if (f->open_mode != COB_OPEN_I_O ||
@@ -4007,30 +4179,32 @@ indexed_read_next (cob_file *f, const int read_opts)
 			return COB_STATUS_10_END_OF_FILE;
 		}
 		/* Check if previously read data still exists */
-		p->key.size = (cob_dbtsize_t) f->keys[p->key_index].field->size;
+		p->key.size = (cob_dbtsize_t) bdb_keylen(f,p->key_index);
 		p->key.data = p->last_readkey[p->key_index];
 		ret = DB_SEQ (p->cursor[p->key_index], DB_SET);
 		if (!ret && p->key_index > 0) {
 			if (f->keys[p->key_index].tf_duplicates) {
-				memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+				memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+				dupno = COB_DUPSWAP (dupno);
 				while (ret == 0 &&
 				      memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0 &&
 				      dupno < p->last_dupno[p->key_index]) {
 					ret = DB_SEQ (p->cursor[p->key_index], DB_NEXT);
-					memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+					memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+					dupno = COB_DUPSWAP (dupno);
 				}
 				if (ret == 0 &&
 				   memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0 &&
 				   dupno == p->last_dupno[p->key_index]) {
-					ret = memcmp (p->last_readkey[p->key_index + f->nkeys], p->data.data, f->keys[0].field->size);
+					ret = memcmp (p->last_readkey[p->key_index + f->nkeys], p->data.data, p->primekeylen);
 				} else {
 					ret = 1;
 				}
 			} else {
-				ret = memcmp (p->last_readkey[p->key_index + f->nkeys], p->data.data, f->keys[0].field->size);
+				ret = memcmp (p->last_readkey[p->key_index + f->nkeys], p->data.data, p->primekeylen);
 			}
 			if (!ret) {
-				p->key.size = (cob_dbtsize_t) f->keys[0].field->size;
+				p->key.size = (cob_dbtsize_t) p->primekeylen;
 				p->key.data = p->last_readkey[p->key_index + f->nkeys];
 				ret = DB_GET (p->db[0], 0);
 			}
@@ -4067,7 +4241,7 @@ indexed_read_next (cob_file *f, const int read_opts)
 		if (nextprev == DB_FIRST || nextprev == DB_LAST) {
 			read_nextprev = 1;
 		} else {
-			p->key.size = (cob_dbtsize_t) f->keys[p->key_index].field->size;
+			p->key.size = (cob_dbtsize_t) bdb_keylen(f,p->key_index);
 			p->key.data = p->last_readkey[p->key_index];
 			ret = DB_SEQ (p->cursor[p->key_index], DB_SET_RANGE);
 			/* ret != 0 possible, records may be deleted since last read */
@@ -4087,12 +4261,14 @@ indexed_read_next (cob_file *f, const int read_opts)
 			} else {
 				if (memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0) {
 					if (p->key_index > 0 && f->keys[p->key_index].tf_duplicates) {
-						memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+						memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+						dupno = COB_DUPSWAP (dupno);
 						while (ret == 0 &&
 						memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0 &&
 						dupno < p->last_dupno[p->key_index]) {
 							ret = DB_SEQ (p->cursor[p->key_index], DB_NEXT);
-							memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+							memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+							dupno = COB_DUPSWAP (dupno);
 						}
 						if (ret != 0) {
 							if (nextprev == DB_PREV) {
@@ -4148,10 +4324,11 @@ indexed_read_next (cob_file *f, const int read_opts)
 			/* Temporarily save alternate key */
 			memcpy (p->temp_key, p->key.data, (size_t)p->key.size);
 			if (f->keys[p->key_index].tf_duplicates) {
-				memcpy (&dupno, (cob_u8_ptr)p->data.data + f->keys[0].field->size, sizeof(unsigned int));
+				memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof(unsigned int));
+				dupno = COB_DUPSWAP (dupno);
 			}
 			p->key.data = p->data.data;
-			p->key.size = f->keys[0].field->size;
+			p->key.size = p->primekeylen;
 			if (DB_GET (p->db[0], 0) != 0) {
 				p->cursor[p->key_index]->c_close (p->cursor[p->key_index]);
 				p->cursor[p->key_index] = NULL;
@@ -4190,8 +4367,8 @@ indexed_read_next (cob_file *f, const int read_opts)
 			memcpy (p->last_readkey[0], p->key.data, (size_t)p->key.size);
 		} else {
 			memcpy (p->last_readkey[p->key_index], p->temp_key,
-				    f->keys[p->key_index].field->size);
-			memcpy (p->last_readkey[p->key_index + f->nkeys], p->key.data, f->keys[0].field->size);
+				    bdb_keylen(f,p->key_index));
+			memcpy (p->last_readkey[p->key_index + f->nkeys], p->key.data, p->primekeylen);
 			if (f->keys[p->key_index].tf_duplicates) {
 				p->last_dupno[p->key_index] = dupno;
 			}
@@ -4271,9 +4448,9 @@ indexed_write (cob_file *f, const int opt)
 	}
 
 	/* Check record key */
-	DBT_SET (p->key, f->keys[0].field);
+	bdb_setkey(f, 0);
 	if (!p->last_key) {
-		p->last_key = cob_malloc ((size_t)p->key.size);
+		p->last_key = cob_malloc ((size_t)p->maxkeylen);
 	} else if (f->access_mode == COB_ACCESS_SEQUENTIAL &&
 		   memcmp (p->last_key, p->key.data, (size_t)p->key.size) > 0) {
 		return COB_STATUS_21_KEY_INVALID;
@@ -4495,7 +4672,7 @@ indexed_rewrite (cob_file *f, const int opt)
 	}
 
 	/* Write data */
-	DBT_SET (p->key, f->keys[0].field);
+	bdb_setkey(f, 0);
 	ret = indexed_write_internal (f, 1, opt);
 
 	p->cursor[0]->c_close (p->cursor[0]);
