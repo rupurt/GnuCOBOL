@@ -772,7 +772,6 @@ report_line(cob_report *r, cob_report_line *l)
 			do_page_footing(r);
 			do_page_heading(r);
 			DEBUG_LOG("rw",(" Line# %d of Page# %d; after foot/head\n",r->curr_line,r->curr_page));
-			bChkLinePlus = TRUE;	/* DBG */
 		} else
 		if( !(l->flags & COB_REPORT_LINE_PLUS)
 		&&   (l->flags & COB_REPORT_LINE)) {
