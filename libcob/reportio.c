@@ -425,11 +425,13 @@ reportDumpOneLine(const cob_report *r, cob_report_line *fl, int indent, int dump
 	if(fl->step_count)	DEBUG_LOG("rw",("Step %d ",fl->step_count));
 	if(fl->suppress)	DEBUG_LOG("rw",("Suppress Line "));
 	if(fl->next_group_line)	{
-		DEBUG_LOG("rw",("Next ",fl->next_group_line));
+		DEBUG_LOG("rw",("NEXT ",fl->next_group_line));
 		if(fl->report_flags & COB_REPORT_NEXT_GROUP_LINE)	DEBUG_LOG("rw",("GROUP LINE "));
 		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PLUS)	DEBUG_LOG("rw",("GROUP PLUS "));
 		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PAGE)	DEBUG_LOG("rw",("GROUP PAGE "));
 		DEBUG_LOG("rw",("%d ",fl->next_group_line));
+	} else {
+		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PAGE)	DEBUG_LOG("rw",("NEXT GROUP PAGE "));
 	}
 	if(fl->control) {
 		cob_field_to_string(fl->control, wrk, sizeof(wrk)-1);
@@ -752,6 +754,7 @@ report_line(cob_report *r, cob_report_line *l)
 		if(!r->next_just_set && r->next_line) {
 			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
 			DEBUG_LOG("rw",("Execute NEXT GROUP LINE %d\n",r->next_value));
+			r->next_line = FALSE;
 			if(r->curr_line > r->next_value) {
 				do_page_footing(r);
 				do_page_heading(r);
@@ -760,14 +763,16 @@ report_line(cob_report *r, cob_report_line *l)
 				cob_write(f, f->record, opt, NULL, 0);
 				r->curr_line++;
 			}
-			r->next_line = FALSE;
 			bChkLinePlus = TRUE;
 		} else
 		if(!r->next_just_set && r->next_page) {
+			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
 			DEBUG_LOG("rw",(" Execute NEXT GROUP PAGE\n"));
+			r->next_page = FALSE;
 			do_page_footing(r);
 			do_page_heading(r);
-			r->next_page = FALSE;
+			DEBUG_LOG("rw",(" Line# %d of Page# %d; after foot/head\n",r->curr_line,r->curr_page));
+			bChkLinePlus = TRUE;	/* DBG */
 		} else
 		if( !(l->flags & COB_REPORT_LINE_PLUS)
 		&&   (l->flags & COB_REPORT_LINE)) {
@@ -789,6 +794,7 @@ report_line(cob_report *r, cob_report_line *l)
 		} else {
 			bChkLinePlus = TRUE;
 		}
+
 		if(bChkLinePlus
 		&& (l->flags & COB_REPORT_LINE_PLUS)
 		&& l->line > 1) {
@@ -1094,7 +1100,7 @@ cob_report_initiate(cob_report *r)
 	r->next_value = 0;
 	r->next_line = 0;
 	r->next_line_plus = FALSE;
-	r->next_page = 0;
+	r->next_page = FALSE;
 	/*
 	 * Allocate temp area for each control field
 	 */
@@ -1309,6 +1315,7 @@ cob_report_generate(cob_report *r, cob_report_line *l, int ctl)
 		return 0;
 	}
 
+	r->foot_next_page = FALSE;
 	DEBUG_LOG("rw",("~  Enter %sGENERATE with ctl == %d\n",r->first_generate?"first ":"",ctl));
 	if(ctl > 0) {	 /* Continue Processing Footings from last point */
 		for(rc = r->controls; rc; rc = rc->next) {
@@ -1458,10 +1465,22 @@ PrintFooting:
 						zero_all_counters(r, COB_REPORT_CONTROL_FOOTING,pl);
 						clear_group_indicate(r->first_line);
 						r->next_just_set = FALSE;
+						if(r->next_page) {
+							r->foot_next_page = TRUE;
+							r->next_page = FALSE;
+						}
 					}
 				}
 				cob_move(rc->sf,rc->f);	/* Put new CONTROL value back */
 			}
+		}
+		if(r->foot_next_page) {
+			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
+			DEBUG_LOG("rw",(" Execute NEXT GROUP PAGE after footings\n"));
+			r->next_page = FALSE;
+			r->foot_next_page = FALSE;
+			do_page_footing(r);
+			do_page_heading(r);
 		}
 		/* 
 		 * Check for Control Headings
