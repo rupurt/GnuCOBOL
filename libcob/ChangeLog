@@ -1,17 +1,27 @@
+
+2015-02-26  Edward Hart <edward.dan.hart@gmail.com>
+
+	* screenio.c: fixed buffer overflow in screen section ACCEPT
+
+
 2015-02-26  Ron Norman
+
 	* fileio.c was updated to handle sparse and split keys for BDB
 	  This was tested with BDB, D-ISAM, VB-ISAM 2.0 and VB-ISAM 2.1.1
 
 2015-02-23  Ron Norman
+
 	* Implemented INDEXED file support for sparse and split keys
 	  fileio.c was updated to handle sparse and split keys
 	  This was tested with D-ISAM and VB-ISAM 2.0
 
 2015-02-18  Ron Norman
+
 	* common.c cob_debug_logger: if fmt starts with '~' then force print of line#
 	* reportio.c : Fix spacing problems related to CONTROL FOOTING
 
 2015-02-16  Ron Norman
+
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 
 	  Added DEBUG_xxx macros to common.h
