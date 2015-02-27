@@ -1,5 +1,6 @@
 /*
-   Copyright (C) 2013-2015 Ron Norman
+   Copyright (C) 2002,2003,2004,2005,2006,2007 Keisuke Nishida
+   Copyright (C) 2007-2012 Roger While
 
    This file is part of GNU Cobol.
 
@@ -17,1584 +18,1872 @@
    along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*************************************************************************
- * This module and Report Writer code added by Ron Norman, November 2013 *
- * including parts of sources found in 'cobc / *'                        *
- ************************************************************************/
+#ifndef COB_COMMON_H
+#define COB_COMMON_H
 
-#include "config.h"
+/* General type defines */
+#define	cob_c8_t		char
+#define	cob_s8_t		signed char
+#define	cob_u8_t		unsigned char
+#define	cob_s16_t		short
+#define	cob_u16_t		unsigned short
+#define	cob_s32_t		int
+#define	cob_u32_t		unsigned int
+#define	cob_sli_t		long int
+#define	cob_uli_t		unsigned long int
 
-#define _LFS64_LARGEFILE		1
-#define _LFS64_STDIO			1
-#define _FILE_OFFSET_BITS		64
-#define _LARGEFILE64_SOURCE		1
-#ifdef	_AIX
-#define _LARGE_FILES			1
-#endif	/* _AIX */
-#if defined(__hpux__) && !defined(__LP64__)
-#define _APP32_64BIT_OFF_T		1
+#if	defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__)
+
+#define	cob_s64_t		__int64
+#define	cob_u64_t		unsigned __int64
+
+#define	COB_S64_C(x)		x ## I64
+#define	COB_U64_C(x)		x ## UI64
+#define	CB_FMT_LLD		"%I64d"
+#define	CB_FMT_LLU		"%I64u"
+#define	CB_FMT_PLLD		"%+*.*I64d"
+#define	CB_FMT_PLLU		"%*.*I64u"
+#define	CB_FMT_LLD_F		"%I64dI64"
+#define	CB_FMT_LLU_F		"%I64uUI64"
+
+#else
+
+#define	cob_s64_t		long long
+#define	cob_u64_t		unsigned long long
+
+#define	COB_S64_C(x)		x ## LL
+#define	COB_U64_C(x)		x ## ULL
+#define	CB_FMT_LLD		"%lld"
+#define	CB_FMT_LLU		"%llu"
+#define	CB_FMT_PLLD		"%+*.*lld"
+#define	CB_FMT_PLLU		"%*.*llu"
+#define	CB_FMT_LLD_F		"%lldLL"
+#define	CB_FMT_LLU_F		"%lluULL"
+
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdarg.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#define	cob_c8_ptr		cob_c8_t *
+#define	cob_u8_ptr		cob_u8_t *
+#define	cob_s8_ptr		cob_s8_t *
+#define	cob_u16_ptr		cob_u16_t *
+#define	cob_s16_ptr		cob_s16_t *
+#define	cob_u32_ptr		cob_u32_t *
+#define	cob_s32_ptr		cob_s32_t *
+#define	cob_u64_ptr		cob_u64_t *
+#define	cob_s64_ptr		cob_s64_t *
 
-#ifdef	HAVE_UNISTD_H
-#include <unistd.h>
+#define	cob_void_ptr		void *
+#define	cob_field_ptr		cob_field *
+#define	cob_file_ptr		cob_file *
+#define	cob_module_ptr		cob_module *
+#define	cob_screen_ptr		cob_screen *
+#define	cob_file_key_ptr	cob_file_key *
+
+/* Byte swap functions */
+
+/*
+   The original idea for the byteswap routines was taken from GLib.
+   (Specifically glib/gtypes.h)
+   GLib is licensed under the GNU Lesser General Public License.
+*/
+
+/* Generic swapping functions */
+
+#undef	COB_BSWAP_16_CONSTANT
+#undef	COB_BSWAP_32_CONSTANT
+#undef	COB_BSWAP_64_CONSTANT
+#undef	COB_BSWAP_16
+#undef	COB_BSWAP_32
+#undef	COB_BSWAP_64
+
+#define COB_BSWAP_16_CONSTANT(val)	((cob_u16_t) (		\
+    (((cob_u16_t)(val) & (cob_u16_t) 0x00FFU) << 8) |		\
+    (((cob_u16_t)(val) & (cob_u16_t) 0xFF00U) >> 8)))
+
+#define COB_BSWAP_32_CONSTANT(val)	((cob_u32_t) (		\
+    (((cob_u32_t) (val) & (cob_u32_t) 0x000000FFU) << 24) |	\
+    (((cob_u32_t) (val) & (cob_u32_t) 0x0000FF00U) <<  8) |	\
+    (((cob_u32_t) (val) & (cob_u32_t) 0x00FF0000U) >>  8) |	\
+    (((cob_u32_t) (val) & (cob_u32_t) 0xFF000000U) >> 24)))
+
+#define COB_BSWAP_64_CONSTANT(val)	((cob_u64_t) (		\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x00000000000000FF)) << 56) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x000000000000FF00)) << 40) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x0000000000FF0000)) << 24) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x00000000FF000000)) <<  8) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x000000FF00000000)) >>  8) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x0000FF0000000000)) >> 24) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0x00FF000000000000)) >> 40) |	\
+    (((cob_u64_t) (val) &					\
+      (cob_u64_t) COB_U64_C(0xFF00000000000000)) >> 56)))
+
+/* Machine/OS specific overrides */
+
+#ifdef	__GNUC__
+
+#if	__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val) (__builtin_bswap32 (val))
+#define COB_BSWAP_64(val) (__builtin_bswap64 (val))
+
+#elif	defined(__i386__)
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val)					\
+       (__extension__						\
+	({ register cob_u32_t __v,				\
+	     __x = ((cob_u32_t) (val));				\
+	   if (__builtin_constant_p (__x))			\
+	     __v = COB_BSWAP_32_CONSTANT (__x);			\
+	   else							\
+	     __asm__ ("bswap %0"				\
+		      : "=r" (__v)				\
+		      : "0" (__x));				\
+	    __v; }))
+#define COB_BSWAP_64(val)					\
+       (__extension__						\
+	({ union { cob_u64_t __ll;				\
+		   cob_u32_t __l[2]; } __w, __r;		\
+	   __w.__ll = ((cob_u64_t) (val));			\
+	   if (__builtin_constant_p (__w.__ll))			\
+	     __r.__ll = COB_BSWAP_64_CONSTANT (__w.__ll);	\
+	   else							\
+	     {							\
+	       __r.__l[0] = COB_BSWAP_32 (__w.__l[1]);		\
+	       __r.__l[1] = COB_BSWAP_32 (__w.__l[0]);		\
+	     }							\
+	   __r.__ll; }))
+
+#elif defined (__ia64__)
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val)					\
+       (__extension__						\
+	 ({ register cob_u32_t __v,				\
+	      __x = ((cob_u32_t) (val));			\
+	    if (__builtin_constant_p (__x))			\
+	      __v = COB_BSWAP_32_CONSTANT (__x);		\
+	    else						\
+	     __asm__ __volatile__ ("shl %0 = %1, 32 ;;"		\
+				   "mux1 %0 = %0, @rev ;;"	\
+				    : "=r" (__v)		\
+				    : "r" (__x));		\
+	    __v; }))
+#define COB_BSWAP_64(val)					\
+       (__extension__						\
+	({ register cob_u64_t __v,				\
+	     __x = ((cob_u64_t) (val));				\
+	   if (__builtin_constant_p (__x))			\
+	     __v = COB_BSWAP_64_CONSTANT (__x);			\
+	   else							\
+	     __asm__ __volatile__ ("mux1 %0 = %1, @rev ;;"	\
+				   : "=r" (__v)			\
+				   : "r" (__x));		\
+	   __v; }))
+
+#elif defined (__x86_64__)
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val)					\
+      (__extension__						\
+	({ register cob_u32_t __v,				\
+	     __x = ((cob_u32_t) (val));				\
+	   if (__builtin_constant_p (__x))			\
+	     __v = COB_BSWAP_32_CONSTANT (__x);			\
+	   else							\
+	    __asm__ ("bswapl %0"				\
+		     : "=r" (__v)				\
+		     : "0" (__x));				\
+	   __v; }))
+#define COB_BSWAP_64(val)					\
+       (__extension__						\
+	({ register cob_u64_t __v,				\
+	     __x = ((cob_u64_t) (val));				\
+	   if (__builtin_constant_p (__x))			\
+	     __v = COB_BSWAP_64_CONSTANT (__x);			\
+	   else							\
+	     __asm__ ("bswapq %0"				\
+		      : "=r" (__v)				\
+		      : "0" (__x));				\
+	   __v; }))
+
+#else /* Generic gcc */
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val) (COB_BSWAP_32_CONSTANT (val))
+#define COB_BSWAP_64(val) (COB_BSWAP_64_CONSTANT (val))
+
 #endif
 
-#ifdef	HAVE_FCNTL_H
-#include <fcntl.h>
+#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
+
+#define COB_BSWAP_16(val) (_byteswap_ushort (val))
+#define COB_BSWAP_32(val) (_byteswap_ulong (val))
+#define COB_BSWAP_64(val) (_byteswap_uint64 (val))
+
+#else /* Generic */
+
+#define COB_BSWAP_16(val) (COB_BSWAP_16_CONSTANT (val))
+#define COB_BSWAP_32(val) (COB_BSWAP_32_CONSTANT (val))
+#define COB_BSWAP_64(val) (COB_BSWAP_64_CONSTANT (val))
+
 #endif
 
-#ifdef	_WIN32
+/* End byte swap functions */
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <direct.h>
+/* Compiler characteristics */
+
+#ifdef	_MSC_VER
+
+#ifndef	_CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE	1
+#endif
+#include <malloc.h>
 #include <io.h>
-#ifndef __WATCOMC__
-#define	fdcobsync	_commit
+#include <fcntl.h>
+
+/* Disable certain warnings */
+/* Deprecated functions */
+#pragma warning(disable: 4996)
+/* Function declarations without parameter list */
+#pragma warning(disable: 4255)
+
+#define strncasecmp		_strnicmp
+#define strcasecmp		_stricmp
+#define snprintf		_snprintf
+#define getpid			_getpid
+#define access			_access
+
+#define __attribute__(x)
+
+#ifdef	S_ISDIR
+#undef	S_ISDIR
+#endif
+#define S_ISDIR(x)		(((x) & _S_IFMT) == _S_IFDIR)
+
+#ifdef	S_ISREG
+#undef	S_ISREG
+#endif
+#define S_ISREG(x)		(((x) & _S_IFMT) == _S_IFREG)
+
+#ifndef	_M_IA64
+#ifdef	_WIN64
+#define	__x86_64__
 #else
-#define	fdcobsync	fsync
+#define	__i386__
 #endif
-#if !defined(__BORLANDC__) && !defined(__WATCOMC__)
-#define	getcwd		_getcwd
-#define	chdir		_chdir
-#define	mkdir		_mkdir
-#define	rmdir		_rmdir
-#define	open		_open
-#define	close		_close
-#define	unlink		_unlink
-#define	fdopen		_fdopen
-#define lseek		_lseeki64
 #endif
-#define off_t		cob_s64_t
 
-#elif	defined(HAVE_FDATASYNC)
-#define	fdcobsync	fdatasync
+#endif
+
+#ifdef __BORLANDC__
+#include <io.h>
+#define _timeb		timeb
+#define _ftime(a)	ftime(a)
+#define strncasecmp	strnicmp
+#define strcasecmp	stricmp
+#define _setmode	setmode
+#define _chdir		chdir
+#endif
+
+#include <setjmp.h>
+
+#if	(defined(_WIN32) || defined(__CYGWIN__)) && !defined(__clang__)
+#ifdef	COB_LIB_EXPIMP
+	#define COB_EXPIMP	__declspec(dllexport) extern
 #else
-#define	fdcobsync	fsync
-
+	#define COB_EXPIMP	__declspec(dllimport) extern
 #endif
-
-#ifndef	_O_TEMPORARY
-#define	_O_TEMPORARY	0
-#endif
-
-#ifndef	O_BINARY
-#define	O_BINARY	0
-#endif
-
-/* Force symbol exports */
-#define	COB_LIB_EXPIMP
-
-#include "libcob.h"
-#include "coblocal.h"
-
-#ifdef	WORDS_BIGENDIAN
-#define	COB_MAYSWAP_16(x)	((unsigned short)(x))
-#define	COB_MAYSWAP_32(x)	((unsigned int)(x))
 #else
-#define	COB_MAYSWAP_16(x)	(COB_BSWAP_16((unsigned short)(x)))
-#define	COB_MAYSWAP_32(x)	(COB_BSWAP_32((unsigned int)(x)))
+	#define COB_EXPIMP	extern
 #endif
 
-static	int	bDidReportInit = 0;
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#define ND1 COB_REPORT_HEADING|COB_REPORT_FOOTING|COB_REPORT_PAGE_HEADING|COB_REPORT_PAGE_FOOTING
-#define ND2 COB_REPORT_CONTROL_HEADING|COB_REPORT_CONTROL_HEADING_FINAL
-#define ND3 COB_REPORT_CONTROL_FOOTING|COB_REPORT_CONTROL_FOOTING_FINAL
-#define NOTDETAIL(f) ( f & (ND1|ND2|ND3))
-
-static int report_line_type(cob_report *r, cob_report_line *l, int type);
-
-static const cob_field_attr	const_alpha_attr =
-				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
-static const cob_field_attr	const_num_attr =
-				{COB_TYPE_NUMERIC, 0, 0, 0, NULL};
-/*
- * Move "String" to 'dst' field
- */
-static void
-cob_str_move (cob_field *dst, unsigned char *src, const int size)
-{
-	cob_field	temp;
-
-	temp.size = size;
-	temp.data = src;
-	temp.attr = &const_alpha_attr;
-	cob_move (&temp, dst);
-}
-
-/*
- * Initialize data field
- */
-static cob_field *
-cob_field_init (cob_field *f)
-{
-	cob_field	temp;
-
-	if(f == NULL)
-		return NULL;
-	temp.size = 1;
-	if(COB_FIELD_IS_NUMERIC(f)) {
-		temp.data = (unsigned char*)"0";	/* MOVE ZERO to field */
-		temp.attr = &const_num_attr;
-	} else {
-		temp.data = (unsigned char*)" ";	/* MOVE SPACES to field */
-		temp.attr = &const_alpha_attr;
-	}
-	cob_move (&temp, f);
-	return f;
-}
-
-
-/*
- * Make a new field the same format as that given
- */
-static cob_field *
-cob_field_dup (cob_field *f, int incr)
-{
-	cob_field	temp;
-	cob_field	*fld = calloc(1,sizeof(cob_field));
-
-	fld->size = f->size+incr;
-	fld->data = calloc(1,f->size+incr);
-	fld->attr = f->attr;
-
-	temp.size = 1;
-	if(COB_FIELD_IS_NUMERIC(f)) {
-		temp.data = (unsigned char*)"0";	/* MOVE ZERO to new field */
-		temp.attr = &const_num_attr;
-	} else {
-		temp.data = (unsigned char*)" ";	/* MOVE SPACES to new field */
-		temp.attr = &const_alpha_attr;
-	}
-	cob_move (&temp, fld);
-	return fld;
-}
-
-/*
- * Free a field created by cob_field_dup or cob_field_save
- */
-static void
-cob_field_free (cob_field *f)
-{
-	if(f == NULL)
-		return;
-	if(f->data)
-		free((void*)f->data);
-	free((void*)f);
-	return ;
-}
-
-/*
- * Clear the 'group_indicate' flag for all fields
- */
-static void
-clear_group_indicate(cob_report_line *l)
-{
-	cob_report_field *f;
-	for(f=l->fields; f; f=f->next) {
-		f->group_indicate = FALSE;
-	}
-	if(l->child)
-		clear_group_indicate(l->child);
-	if(l->sister)
-		clear_group_indicate(l->sister);
-}
-
-/*
- * Clear the 'suppress' flag for all fields
- */
-static void
-clear_suppress(cob_report_line *l)
-{
-	cob_report_field *f;
-	l->suppress = FALSE;
-	for(f=l->fields; f; f=f->next) {
-		f->suppress = FALSE;
-	}
-	if(l->child)
-		clear_suppress(l->child);
-	if(l->sister)
-		clear_suppress(l->sister);
-}
-
-/*
- * Return control field sequence value for given report line
- * else return -1
- */
-static int
-get_control_sequence(cob_report *r, cob_report_line *l)
-{
-	cob_report_control	*c;
-	cob_report_control_ref	*rr;
-	if(r->controls) {
-		for(c=r->controls; c; c = c->next) {
-			for(rr=c->control_ref; rr; rr=rr->next) {
-				if(rr->ref_line == l) {
-					return c->sequence;
-				}
-			}
-		}
-	}
-	return -1;
-}
-
-/*
- * If this line has NEXT GROUP .... then set info in report header
- */
-static void
-set_next_info(cob_report *r, cob_report_line *l)
-{
-	if(l->flags & COB_REPORT_NEXT_GROUP_LINE) {
-		r->next_value = l->next_group_line;
-		r->next_line = TRUE;
-		r->next_just_set = TRUE;
-		r->next_line_plus = FALSE;
-		DEBUG_LOG("rw",(" Save NEXT GROUP LINE %d\n",r->next_value));
-	}
-	if(l->flags & COB_REPORT_NEXT_GROUP_PLUS) {
-		r->next_value = l->next_group_line;
-		r->next_line = FALSE;
-		r->next_line_plus = TRUE;
-		r->next_just_set = TRUE;
-		DEBUG_LOG("rw",(" Save NEXT GROUP PLUS %d\n",r->next_value));
-	}
-	if(l->flags & COB_REPORT_NEXT_GROUP_PAGE) {
-		r->next_value = l->next_group_line;
-		r->next_line = FALSE;
-		r->next_page = TRUE;
-		r->next_just_set = TRUE;
-		DEBUG_LOG("rw",(" Save NEXT GROUP PAGE\n"));
-	}
-}
-
-static cob_report_line *
-get_print_line(cob_report_line *l)
-{
-	while(l
-	&& l->fields == NULL
-	&& l->child != NULL)
-		l = l->child;				/* Find line with data fields */
-	return l;
-}
-
-/*
- * Do any global initialization needed
- */
-static void
-reportInitialize()
-{
-	if(bDidReportInit)
-		return;
-	bDidReportInit = 1;
-}
-
-/*
- * Add Two Fields together giving Result
- */
-static void
-cob_add_fields(cob_field *op1, cob_field *op2, cob_field *rslt)
-{
-	cob_field_attr	attr1, attr2;
-	char		data1[30],data2[30];
-	cob_field	fld1,fld2;
-#ifdef COB_DEBUG_LOG
-	char		wrk[32];
+#if	defined(__370__) || defined(_MSC_VER) || defined(__DECC) || \
+	defined(__BORLANDC__) || defined(__WATCOMC__)
+	#define COB_INLINE	__inline
+#elif	defined(__INTEL_COMPILER)
+	/* icc */
+	#define COB_INLINE	inline
+#elif	defined(__GNUC__)
+	/* gcc */
+	#define COB_INLINE	__inline__
+#elif	defined(__STDC_VERSION__) && __STDC_VERSION__ > 199900L
+	/* C99 and C++ */
+	#define COB_INLINE	inline
+#elif	defined(COB_KEYWORD_INLINE)
+	#define COB_INLINE	COB_KEYWORD_INLINE
+#else
+	#define COB_INLINE
 #endif
 
-	/* Copy data to local PIC 9 DISPLAY fields */
-	/* As cob_add does not handle NUMERIC_EDITED very well */
-	fld1.size	= op1->size;
-	attr1		= *op1->attr;
-	fld1.attr	= &attr1;
-	attr1.type	= COB_TYPE_NUMERIC_DISPLAY;
-	fld1.data	= (unsigned char*)data1;
-	memset(data1,'0',fld1.size);
-	cob_move(op1, &fld1);
+/* Also OK for icc which defines __GNUC__ */
 
-#ifdef COB_DEBUG_LOG
-	if(DEBUG_ISON("rw")) {
-		cob_field_to_string(op1, wrk, sizeof(wrk)-1);
-		DEBUG_LOG("rw",("    Add '%s' ",wrk));
-	}
+#if	defined(__GNUC__) || (defined(__xlc__) && __IBMC__ >= 700)
+#define	COB_A_NORETURN	__attribute__((noreturn))
+#define	COB_A_FORMAT12	__attribute__((format(printf, 1, 2)))
+#define	COB_A_FORMAT23	__attribute__((format(printf, 2, 3)))
+#define	COB_A_FORMAT34	__attribute__((format(printf, 3, 4)))
+#else
+#define	COB_A_NORETURN
+#define	COB_A_FORMAT12
+#define	COB_A_FORMAT23
+#define	COB_A_FORMAT34
 #endif
 
-	fld2.size	= op2->size;
-	attr2		= *op2->attr;
-	fld2.attr	= &attr2;
-	attr2.type	= COB_TYPE_NUMERIC_DISPLAY;
-	fld2.data	= (unsigned char*)data2;
-	memset(data2,'0',fld2.size);
-	cob_move(op2, &fld2);
-
-#ifdef COB_DEBUG_LOG
-	if(DEBUG_ISON("rw")) {
-		cob_field_to_string(op2, wrk, sizeof(wrk)-1);
-		DEBUG_LOG("rw",("TO '%s' ",wrk));
-	}
+#ifdef	_MSC_VER
+#define	DECLNORET	__declspec(noreturn)
+#else
+#define	DECLNORET
 #endif
 
-	cob_add(&fld1,&fld2,0);
-
-	cob_move(&fld1, rslt);			/* Copy SUM back to result field */
-
-#ifdef COB_DEBUG_LOG
-	if(DEBUG_ISON("rw")) {
-		cob_field_to_string(&fld1, wrk, sizeof(wrk)-1);
-		DEBUG_LOG("rw",("GIVING '%s' ",wrk));
-		DEBUG_LOG("rw",("  PIC 9(%d)",rslt->attr->digits));
-		if(rslt->attr->scale > 0)
-			DEBUG_LOG("rw",("V9(%d)",rslt->attr->scale));
-		DEBUG_LOG("rw",("\n"));
-	}
-#endif
-}
-
-#if defined(COB_DEBUG_LOG) 
-static void
-dumpFlags(int flags, int ln, char *name)
-{
-	if(!DEBUG_ISON("rw"))
-		return;
-	if(name == NULL)
-		name = (char*)"";
-	if(flags & COB_REPORT_HEADING)		DEBUG_LOG("rw",("REPORT HEADING "));
-	if(flags & COB_REPORT_FOOTING)		DEBUG_LOG("rw",("REPORT FOOTING "));
-	if(flags & COB_REPORT_PAGE_HEADING)	DEBUG_LOG("rw",("PAGE HEADING "));
-	if(flags & COB_REPORT_PAGE_FOOTING)	DEBUG_LOG("rw",("PAGE FOOTING "));
-	if(flags & COB_REPORT_CONTROL_HEADING)	DEBUG_LOG("rw",("CONTROL HEADING %s ",name));
-	if(flags & COB_REPORT_CONTROL_HEADING_FINAL) DEBUG_LOG("rw",("CONTROL HEADING FINAL "));
-	if(flags & COB_REPORT_CONTROL_FOOTING)	DEBUG_LOG("rw",("CONTROL FOOTING %s ",name));
-	if(flags & COB_REPORT_CONTROL_FOOTING_FINAL) DEBUG_LOG("rw",("CONTROL FOOTING FINAL "));
-	if(flags & COB_REPORT_DETAIL)		DEBUG_LOG("rw",("DETAIL "));
-	if(flags & COB_REPORT_LINE_PLUS)	{if(ln > 0) DEBUG_LOG("rw",("LINE PLUS %d ",ln));}
-	else if(flags & COB_REPORT_LINE)	DEBUG_LOG("rw",("LINE %d ",ln));
-	if(flags & COB_REPORT_LINE_NEXT_PAGE)	DEBUG_LOG("rw",("LINE NEXT PAGE "));
-	if(flags & COB_REPORT_NEXT_PAGE)	DEBUG_LOG("rw",("NEXT PAGE "));
-	if(flags & COB_REPORT_GROUP_INDICATE)	DEBUG_LOG("rw",("GROUP INDICATE "));
-	if(flags & COB_REPORT_COLUMN_PLUS)	DEBUG_LOG("rw",("COLUMN PLUS "));
-	if(flags & COB_REPORT_RESET_FINAL)	DEBUG_LOG("rw",("RESET FINAL "));
-}
-
-static void
-reportDumpOneLine(const cob_report *r, cob_report_line *fl, int indent, int dumpdata)
-{
-	cob_report_field	*rf;
-	cob_report_control	*c;
-	cob_report_control_ref	*rr;
-	int		sequence = -1;
-	char	idnt[32], wrk[64];
-
-	if(!DEBUG_ISON("rw"))
-		return;
-	sprintf(idnt,"%.*s",indent>30?30:indent,"..................................");
-	DEBUG_LOG("rw",("%s ",idnt));
-	if(dumpdata) {
-		DEBUG_LOG("rw",("Line# %d of Page# %d; ",r->curr_line,r->curr_page));
-	}
-	if(r->controls) {
-		for(c=r->controls; c; c = c->next) {
-			for(rr=c->control_ref; rr; rr=rr->next) {
-				if(rr->ref_line == fl) {
-					strcpy(wrk,c->name);
-					sequence = c->sequence;
-					break;
-				}
-			}
-		}
-	}
-	dumpFlags(fl->report_flags,fl->line,wrk);
-	if(fl->step_count)	DEBUG_LOG("rw",("Step %d ",fl->step_count));
-	if(fl->suppress)	DEBUG_LOG("rw",("Suppress Line "));
-	if(fl->next_group_line)	{
-		DEBUG_LOG("rw",("NEXT ",fl->next_group_line));
-		if(fl->report_flags & COB_REPORT_NEXT_GROUP_LINE)	DEBUG_LOG("rw",("GROUP LINE "));
-		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PLUS)	DEBUG_LOG("rw",("GROUP PLUS "));
-		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PAGE)	DEBUG_LOG("rw",("GROUP PAGE "));
-		DEBUG_LOG("rw",("%d ",fl->next_group_line));
-	} else {
-		if(fl->report_flags & COB_REPORT_NEXT_GROUP_PAGE)	DEBUG_LOG("rw",("NEXT GROUP PAGE "));
-	}
-	if(fl->control) {
-		cob_field_to_string(fl->control, wrk, sizeof(wrk)-1);
-		if(wrk[0] >= ' ')
-			DEBUG_LOG("rw",("Line Control %d is '%s' ",sequence,wrk));
-	}
-	DEBUG_LOG("rw",("\n"));
-	if(!(fl->flags & COB_REPORT_DETAIL)) dumpdata = 1;
-	for(rf = fl->fields; rf; rf = rf->next) {
-		DEBUG_LOG("rw",("%s   Field ",idnt));
-		if(rf->line)		DEBUG_LOG("rw",("Line %2d ",rf->line));
-		if(rf->column)		DEBUG_LOG("rw",("Col %3d ",rf->column));
-		if(rf->step_count)	DEBUG_LOG("rw",("Step %d ",rf->step_count));
-		if(rf->next_group_line)	DEBUG_LOG("rw",("NextGrp %d ",rf->next_group_line));
-		if(dumpdata) {
-			if(rf->f) {
-				if(rf->litval) {
-					DEBUG_LOG("rw",("   \"%s\" ",rf->litval));
-				} else {
-					cob_field_to_string(rf->f, wrk, sizeof(wrk)-1);
-					DEBUG_LOG("rw",("   '%s' ",wrk));
-				}
-			}
-			if(rf->control) {
-				cob_field_to_string(rf->control, wrk, sizeof(wrk)-1);
-				if(wrk[0] >= ' ')
-					DEBUG_LOG("rw",("Control is '%s' ",wrk));
-			}
-			if(rf->source
-			&& cob_cmp(rf->f,rf->source) != 0) {
-				if(rf->source == r->page_counter) {
-					DEBUG_LOG("rw",("Source PAGE-COUNTER "));
-				} else if(rf->source == r->line_counter) {
-					DEBUG_LOG("rw",("Source LINE-COUNTER "));
-				}
-			} 
-			dumpFlags(rf->flags,rf->line,NULL);
-		}
-		if(rf->suppress)	DEBUG_LOG("rw",("Suppress "));
-		DEBUG_LOG("rw",("\n"));
-	}
-}
-
-/*
- * Dump REPORT line and walk down tree
- */
-static void
-reportDumpLine(const cob_report *r, cob_report_line *fl, int indent)
-{
-	if(!DEBUG_ISON("rw"))
-		return;
-	reportDumpOneLine(r,fl,indent,0);
-	if(fl->child)
-		reportDumpLine(r,fl->child,indent+2);
-	if(fl->sister)
-		reportDumpLine(r,fl->sister,indent);
-}
-
-/*
- * Dump entire REPORT definition tables
- */
-static void
-reportDump(const cob_report *r, const char *msg)
-{
-	cob_report_control *c;
-	char		wrk[80];
-
-	if(!DEBUG_ISON("rw"))
-		return;
-	DEBUG_LOG("rw",("Dump of Report '%s' for %s\n",r->report_name,msg));
-	if(r->report_file) {
-		DEBUG_LOG("rw",("Using File %s ",r->report_file->select_name));
-		if(r->report_file->assign
-		&& r->report_file->assign->data) {
-			DEBUG_LOG("rw",(" ASSIGNed to %s",r->report_file->assign->data));
-		}
-		DEBUG_LOG("rw",(" Rcsz min %d max %d ",r->report_file->record_min,r->report_file->record_max));
-#if 0
-		/* 
-		 * TODO: This needs more work. Cross check how fileio.c handles print files
-		 * and exactly what operations should be used
-		 */
-		if(r->report_file->flag_select_features & COB_SELECT_LINAGE) {
-			DEBUG_LOG("rw",("has LINAGE"));
-		} else {
-			/*
-			 * Create LINAGE clause fields for fileio.c so that
-			 * the output file looks more like what Micro Focus would create
-			 */
-			cob_linage      *lingptr;
-			if(r->report_file->linorkeyptr == NULL) {
-				r->report_file->linorkeyptr = calloc(1,sizeof(cob_linage));
-				lingptr = r->report_file->linorkeyptr;
-				lingptr->lin_top = r->def_heading;
-				lingptr->lin_bot = r->def_footing;
-				lingptr->linage = cob_field_dup(r->line_counter,0);
-				lingptr->linage_ctr = cob_field_dup(r->line_counter,0);
-				r->report_file->flag_select_features |= COB_SELECT_LINAGE;
-			}
-			DEBUG_LOG("rw",("had NO LINAGE!"));
-		}
-#endif
-		DEBUG_LOG("rw",("\n"));
-	}
-	DEBUG_LOG("rw",("\n"));
-	DEBUG_LOG("rw",("Default   Lines: %4d  Columns: %4d\n",r->def_lines,r->def_cols));
-	DEBUG_LOG("rw",("        Heading: %4d  Footing: %4d\n",r->def_heading,r->def_footing));
-	DEBUG_LOG("rw",("         Detail: %4d  Control: %4d  Last detail: %4d\n",r->def_first_detail,
-						r->def_last_control,r->def_last_detail));
-	if((r->curr_page+r->curr_status+r->curr_line+r->curr_cols) > 0) {
-		DEBUG_LOG("rw",("Current    Page: %4d   Status: %4d\n",r->curr_page,r->curr_status));
-		DEBUG_LOG("rw",("           Line: %4d   Column: %4d\n",r->curr_line,r->curr_cols));
-	}
-	DEBUG_LOG("rw",("\n"));
-	if(r->controls) {
-		for(c=r->controls; c; c = c->next) {
-			DEBUG_LOG("rw",(" Control %s ",c->name));
-			if(c->f) {
-				cob_field_to_string(c->f, wrk, sizeof(wrk)-1);
-				if(wrk[0] >= ' ')
-					DEBUG_LOG("rw",("has '%s' ",wrk));
-			}
-			if(c->val) {
-				cob_field_to_string(c->val, wrk, sizeof(wrk)-1);
-				if(wrk[0] >= ' ')
-					DEBUG_LOG("rw",("Value '%s' ",wrk));
-			}
-			DEBUG_LOG("rw",("\n"));
-		}
-	}
-	reportDumpLine(r,r->first_line,0);
-	DEBUG_LOG("rw",("\n"));
-}
+#if	defined(__GNUC__)
+#define	optim_memcpy(x,y,z)	__builtin_memcpy (x, y, z)
+#else
+#define	optim_memcpy(x,y,z)	memcpy (x, y, z)
 #endif
 
-/*
- * Verify that each LINE # is within PAGE LIMITS
- */
-static void
-limitCheckOneLine(cob_report *r, cob_report_line *fl)
-{
-	cob_report_field	*rf;
+#if	defined(__GNUC__) && (__GNUC__ >= 3)
+#define likely(x)	__builtin_expect((long int)!!(x), 1L)
+#define unlikely(x)	__builtin_expect((long int)!!(x), 0L)
+#define	COB_A_MALLOC	__attribute__((malloc))
+#define	COB_HAVE_STEXPR	1
 
-	if((fl->line > 0 && r->def_lines > 0 && fl->line > r->def_lines)) {
-		cob_runtime_error (_("ERROR INITIATE %s LINE %d exceeds PAGE LIMIT %d"),r->report_name,fl->line,r->def_lines);
-		DEBUG_LOG("rw",("PAGE LIMITs is incorrect; LINE %d > LIMIT %d\n",fl->line,r->def_lines));
-		cob_set_exception (COB_EC_REPORT_PAGE_LIMIT);
-		r->initiate_done = FALSE;
-		return;
-	}
-	if((fl->next_group_line > 0 && r->def_lines > 0 && fl->next_group_line > r->def_lines)) {
-		cob_runtime_error (_("ERROR INITIATE %s NEXT GROUP %d exceeds PAGE LIMIT"),r->report_name,fl->next_group_line);
-		DEBUG_LOG("rw",("PAGE LIMITs is incorrect; NEXT GROUP %d > LIMIT %d\n",fl->next_group_line,r->def_lines));
-		cob_set_exception (COB_EC_REPORT_PAGE_LIMIT);
-		r->initiate_done = FALSE;
-		return;
-	}
-	for(rf = fl->fields; rf; rf = rf->next) {
-		if((rf->line && rf->line > r->def_lines)) {
-			cob_runtime_error (_("ERROR INITIATE %s LINE %d exceeds PAGE LIMIT"),r->report_name,rf->line);
-			DEBUG_LOG("rw",("PAGE LIMITs is incorrect; LINE %d > LIMIT %d\n",rf->line,r->def_lines));
-			cob_set_exception (COB_EC_REPORT_PAGE_LIMIT);
-			r->initiate_done = FALSE;
-			return;
-		}
-		if((rf->next_group_line && rf->next_group_line > r->def_lines)) {
-			cob_runtime_error (_("ERROR INITIATE %s NEXT GROUP %d exceeds PAGE LIMIT"),r->report_name,rf->next_group_line);
-			DEBUG_LOG("rw",("PAGE LIMITs is incorrect; NEXT GROUP %d > LIMIT %d\n",rf->next_group_line,r->def_lines));
-			cob_set_exception (COB_EC_REPORT_PAGE_LIMIT);
-			r->initiate_done = FALSE;
-			return;
-		}
-	}
-}
-
-/*
- * Verify that LINE # is within PAGE LIMITS
- */
-static void
-limitCheckLine(cob_report *r, cob_report_line *fl)
-{
-	limitCheckOneLine(r,fl);
-	if(fl->child)
-		limitCheckLine(r,fl->child);
-	if(fl->sister)
-		limitCheckLine(r,fl->sister);
-}
-
-/*
- * Verify that all LINE # are within PAGE LIMITS
- */
-static void
-limitCheck(cob_report *r)
-{
-	limitCheckLine(r,r->first_line);
-}
-
-static void
-saveLineCounter(cob_report *r)
-{
-	int	ln = r->curr_line;
-	if(ln > r->def_lines)
-		ln = 0;
-	if(ln < 0)
-		ln = 0;
-
-	cob_set_int(r->page_counter,r->curr_page);
-	cob_set_int(r->line_counter,ln);
-}
-
-/*
- * Write the Page Footing
- */
-static void
-do_page_footing(cob_report *r)
-{
-	cob_file	*f = r->report_file;
-	char		*rec;
-
-	if(r->in_page_footing)
-		return;
-	rec = (char *)f->record->data;
-	r->in_page_footing = TRUE;
-	report_line_type(r,r->first_line,COB_REPORT_PAGE_FOOTING);
-	memset(rec,' ',f->record_max);
-	if(r->curr_line < r->def_lines) {
-		cob_write(f, f->record, COB_WRITE_BEFORE|COB_WRITE_LINES|(r->def_lines-r->curr_line), NULL, 0);
-		r->curr_line = r->def_lines;
-		r->incr_line = FALSE;
-	} else {
-		r->curr_line = 1;
-	}
-	saveLineCounter(r);
-	r->first_detail = TRUE;
-	r->in_page_footing = FALSE;
-}
-
-/*
- * Write the Page Heading
- */
-static void
-do_page_heading(cob_report *r)
-{
-	cob_file	*f = r->report_file;
-	char		*rec;
-	int		opt;
-
-	if(r->in_page_heading)
-		return;
-	opt = COB_WRITE_BEFORE | COB_WRITE_LINES | 1;
-	rec = (char *)f->record->data;
-	memset(rec,' ',f->record_max);
-	if(!r->in_page_heading
-	&& !r->first_generate
-	&& r->def_lines > 0 
-	&& r->def_heading > 0
-	&& r->curr_line <= r->def_lines
-	&& r->curr_line > r->def_heading) { 		/* Skip to end of page */
-		while(r->curr_line <= r->def_lines) {		
-			cob_write(f, f->record, opt, NULL, 0);
-			r->curr_line++;
-		}
-		if(r->curr_line > r->def_lines)		/* Reset line to 1 */
-			r->curr_line = 1;
-		saveLineCounter(r);
-	}
-	r->in_page_heading = TRUE;
-	if(!r->first_generate) {
-		r->curr_page++;
-	}
-	r->first_detail = FALSE;
-	while(r->curr_line < r->def_heading) {		/* Skip to Heading position on page */
-		cob_write(f, f->record, opt, NULL, 0);
-		r->curr_line++;
-		saveLineCounter(r);
-	}
-	report_line_type(r,r->first_line,COB_REPORT_PAGE_HEADING);
-	memset(rec,' ',f->record_max);
-	while(r->curr_line < r->def_first_detail) {
-		cob_write(f, f->record, opt, NULL, 0);
-		r->curr_line++;
-		saveLineCounter(r);
-	}
-	clear_group_indicate(r->first_line);
-	r->in_page_heading = FALSE;
-}
-
-/*
- * GENERATE one report-line
- */
-static void
-report_line(cob_report *r, cob_report_line *l)
-{
-	cob_report_field *rf;
-	cob_file	*f = r->report_file;
-	char		*rec,wrk[250];
-	int		bChkLinePlus = FALSE;
-	int		opt;
-
-	opt = COB_WRITE_BEFORE | COB_WRITE_LINES | 1;
-	rec = (char *)f->record->data;
-	if(rec) {
-		memset(rec,' ',f->record_max);
-		memset(wrk,0,sizeof(wrk));
-		if(r->curr_line > r->def_last_detail
-		&& !r->in_report_footing
-		&& !r->in_page_footing) {	/* Page overflow */
-			do_page_footing(r);
-			do_page_heading(r);
-		}
-		if(!r->next_just_set && r->next_line_plus) {
-			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
-			DEBUG_LOG("rw",("Execute NEXT GROUP PLUS %d\n",r->next_value));
-			opt = COB_WRITE_BEFORE | COB_WRITE_LINES | (r->next_value);
-			cob_write(f, f->record, opt, NULL, 0);
-			r->curr_line += r->next_value;
-			r->next_line_plus = FALSE;
-			bChkLinePlus = TRUE;
-		} else
-		if(!r->next_just_set && r->next_line) {
-			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
-			DEBUG_LOG("rw",("Execute NEXT GROUP LINE %d\n",r->next_value));
-			r->next_line = FALSE;
-			if(r->curr_line > r->next_value) {
-				do_page_footing(r);
-				do_page_heading(r);
-			}
-			while(r->curr_line < r->next_value) {
-				cob_write(f, f->record, opt, NULL, 0);
-				r->curr_line++;
-			}
-			bChkLinePlus = TRUE;
-		} else
-		if(!r->next_just_set && r->next_page) {
-			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
-			DEBUG_LOG("rw",(" Execute NEXT GROUP PAGE\n"));
-			r->next_page = FALSE;
-			do_page_footing(r);
-			do_page_heading(r);
-			DEBUG_LOG("rw",(" Line# %d of Page# %d; after foot/head\n",r->curr_line,r->curr_page));
-			bChkLinePlus = TRUE;	/* DBG */
-		} else
-		if( !(l->flags & COB_REPORT_LINE_PLUS)
-		&&   (l->flags & COB_REPORT_LINE)) {
-			if(r->curr_line > l->line) {
-				DEBUG_LOG("rw",(" Eject Page %d from line %d for Line %d\n",r->curr_page,r->curr_line,l->line));
-				do_page_footing(r);
-				if(r->in_report_footing) {
-					r->curr_page++;		/* Now on next page */
-					r->curr_line = 1;
-				} else {
-					do_page_heading(r);
-				}
-				r->first_detail = FALSE;
-			}
-			while(r->curr_line < l->line) {
-				cob_write(f, f->record, opt, NULL, 0);
-				r->curr_line++;
-			}
-		} else {
-			bChkLinePlus = TRUE;
-		}
-
-		if(bChkLinePlus
-		&& (l->flags & COB_REPORT_LINE_PLUS)
-		&& l->line > 1) {
-			if(r->curr_line != r->def_first_detail
-			|| r->def_first_detail == 0) {
-				opt = COB_WRITE_BEFORE | COB_WRITE_LINES | (l->line - 1);
-				cob_write(f, f->record, opt, NULL, 0);
-				r->curr_line += l->line - 1;
-			}
-		}
-		bChkLinePlus = FALSE;
-		if(r->curr_line > r->def_last_detail
-		&& !r->in_report_footing
-		&& !r->in_page_heading
-		&& !r->in_page_footing) {	/* Page overflow */
-			do_page_footing(r);
-			do_page_heading(r);
-		}
-		saveLineCounter(r);
-		if(l->fields == NULL) {
-			set_next_info(r,l);
-			return;
-		}
-		if(l->suppress) {
-#if defined(COB_DEBUG_LOG) 
-			if(DEBUG_ISON("rw")) {
-				reportDumpOneLine(r,l,0,1);
-				DEBUG_LOG("rw",("   ^^^ Suppressed ^^^\n\n"));
-			}
-#endif
-			set_next_info(r,l);
-			return;
-		}
-
-		/*
-		 * Copy fields to print line area
-		 */
-		for(rf = l->fields; rf; rf = rf->next) {
-			if(rf->suppress || rf->group_indicate) {
-				if(rf->source) {		/* Copy source field in */
-					cob_move(rf->source,rf->f);
-				}
-				continue;
-			}
-			if(rf->source) {		/* Copy source field in */
-				cob_move(rf->source,rf->f);
-				cob_field_to_string(rf->f, wrk, sizeof(wrk)-1);
-				memcpy(&rec[rf->column-1], wrk, strlen(wrk));
-			} else if(rf->litval) {		/* Refresh literal value */
-				if(rf->f) {
-					cob_str_move(rf->f, (unsigned char*)rf->litval, rf->litlen);
-				}
-				memcpy(&rec[rf->column-1], rf->litval, rf->litlen);
-			} else if(rf->f) {
-				cob_field_to_string(rf->f, wrk, sizeof(wrk)-1);
-				memcpy(&rec[rf->column-1], wrk, strlen(wrk));
-			}
-			if((rf->flags & COB_REPORT_GROUP_INDICATE)) {	/* Suppress subsequent printings */
-				rf->group_indicate = TRUE;
-			}
-		}
-	}
-#if defined(COB_DEBUG_LOG) 
-	if(DEBUG_ISON("rw")) {
-		reportDumpOneLine(r,l,0,1);
-		DEBUG_LOG("rw",("\n"));
-	}
-#endif
-	if(rec) {
-		opt = COB_WRITE_BEFORE | COB_WRITE_LINES | 1;
-		cob_write(f, f->record, opt, NULL, 0);
-		r->curr_line ++;
-		saveLineCounter(r);
-	}
-
-	set_next_info(r,l);
-}
-
-/*
- * GENERATE one report-line
- */
-static void
-report_line_and(cob_report *r, cob_report_line *l, int type)
-{
-	if(l == NULL)
-		return;
-	if(l->fields == NULL
-	&& l->child != NULL) {
-		if(l->flags & type) {
-			report_line(r,l);
-			if(l->child) {
-				report_line_type(r,l->child,COB_REPORT_LINE);
-			}
-			return;
-		} 
-		l = l->child;
-	}
-	report_line_type(r,l,type);
-}
-
-/*
- * Find Report Line of given type
- */
-static cob_report_line *
-get_line_type(cob_report *r, cob_report_line *l, int type)
-{
-	cob_report_line *t;
-	if(l == NULL)
-		return NULL;
-	if(l->flags & type) {
-		return l;
-	}
-	if(l->child)
-		if ((t = get_line_type(r,l->child,type)) != NULL)
-			return t;
-	if(l->sister)
-		return get_line_type(r,l->sister,type);
-	return NULL;
-}
-
-
-/*
- * GENERATE report-line(s) of type 
- */
-static int
-report_line_type(cob_report *r, cob_report_line *l, int type)
-{
-	int	curseq,sisseq;
-	if(l == NULL)
-		return 0;
-	if(l->flags & type) {
-		report_line(r,l);
-		if(l->child) {
-			report_line_type(r,l->child,COB_REPORT_LINE);
-		}
-		if(l->sister) {
-			if((type == COB_REPORT_CONTROL_FOOTING)
-			&& (l->sister->flags & COB_REPORT_CONTROL_FOOTING)) {
-				curseq = get_control_sequence(r,l);
-				sisseq = get_control_sequence(r,l->sister);
-				if(curseq > 0 
-				&& sisseq > 0
-				&& sisseq > curseq) {
-#if defined(COB_DEBUG_LOG) 
-					reportDumpOneLine(r,l->sister,0,1);
-#endif
-					return 1;
-				}
-			}
-			report_line_type(r,l->sister,type);
-		}
-		return 1;
-	}
-	if(l->child)
-		if(report_line_type(r,l->child,type))
-			return 1;
-	if(l->sister)
-		return report_line_type(r,l->sister,type);
-	return 0;
-}
-
-/*
- * SUM all DETAIL counters
- */
-static void
-sum_all_detail(cob_report *r)
-{
-	cob_report_sum_ctr	*sc;
-	cob_report_sum		*rs;
-	int			bHasSum = FALSE;
-
-	/*
-	 * Add up all SUM counter values
-	 */
-	for(sc = r->sum_counters; sc; sc = sc->next) {
-		for(rs = sc->sum; rs && !sc->subtotal; rs = rs->next) {
-			if(!bHasSum) {
-				bHasSum = TRUE;
-				DEBUG_LOG("rw",(" Do SUM detail counters:\n"));
-			}
-			DEBUG_LOG("rw",(" .. %-20s ",sc->name));
-			cob_add_fields(sc->counter,rs->f,sc->counter);
-		}
-	}
-}
-
-/*
- * If the counter is part of another SUM then it is 'rolling forward'
- */
-static void
-sum_this_counter(cob_report *r, cob_field *counter)
-{
-	cob_report_sum_ctr	*sc;
-	cob_report_sum		*rs;
-
-	for(sc = r->sum_counters; sc; sc = sc->next) {
-		for(rs = sc->sum; rs; rs = rs->next) {
-			if(rs->f == counter) {
-				DEBUG_LOG("rw",("SUM %s forward ",sc->name));
-				for(rs = sc->sum; rs; rs = rs->next) {
-					cob_add_fields(sc->counter,rs->f,sc->counter);
-				}
-				break;
-			}
-		}
-	}
-}
-
-/*
- * ZERO counters for a given control level
- */
-static void
-zero_all_counters(cob_report *r, int	flag, cob_report_line *l)
-{
-	cob_report_sum_ctr	*sc;
-	cob_report_sum		*rs;
-	cob_report_control	*rc;
-	cob_report_control_ref	*rr;
-
-	l = get_print_line(l);
-	/*
-	 * ZERO SUM counter 
-	 */
-	for(sc = r->sum_counters; sc; sc = sc->next) {
-		for(rs = sc->sum; rs; rs = rs->next) {
-			if((flag & COB_REPORT_CONTROL_FOOTING_FINAL)) {
-				if(sc->control_final) {
-					DEBUG_LOG("rw",("ZERO SUM Counter %s for FOOTING FINAL\n",sc->name));
-					cob_field_init(sc->counter);
-				}
-			} else if(sc->control) {
-				rc = sc->control;
-				for(rr = rc->control_ref; rr; rr=rr->next) {
-					if(rr->ref_line
-					&& (rr->ref_line->flags & COB_REPORT_CONTROL_HEADING))
-						continue;
-					if(rr->ref_line
-					&& (rr->ref_line->flags & COB_REPORT_CONTROL_HEADING_FINAL))
-						continue;
-					if(l != NULL
-					&& l != get_print_line(rr->ref_line))
-						continue;
-					if(rr->ref_line
-					&& (rr->ref_line->flags & flag)) {
-						sum_this_counter(r,sc->counter);
-#if defined(COB_DEBUG_LOG) 
-						DEBUG_LOG("rw",("ZERO SUM counter %s for ",sc->name)); 
-						dumpFlags(rr->ref_line->flags,0,(char*)rc->name); 
-						DEBUG_LOG("rw",("\n"));
-#endif
-						cob_field_init(sc->counter);
-					}
-				}
-			}
-		}
-	}
-}
-
-/*
- * INITIATE report
- */
-void
-cob_report_initiate(cob_report *r)
-{
-	cob_report_control	*rc;
-	cob_report_control_ref	*rr;
-	cob_report_sum_ctr	*sc;
-
-	reportInitialize();
-	if(r->initiate_done) {
-		cob_runtime_error (_("ERROR INITIATE %s was already done"),r->report_name);
-		DEBUG_LOG("rw",("REPORT was already INITIATEd\n"));
-		cob_set_exception (COB_EC_REPORT_ACTIVE);
-		return;
-	}
-	if((r->def_first_detail > 0 && !(r->def_first_detail >= r->def_heading))
-	|| (r->def_last_detail > 0 && !(r->def_last_detail >= r->def_first_detail))
-	|| (r->def_footing > 0 && !(r->def_footing >= r->def_heading))
-	|| (r->def_footing > 0 && !(r->def_footing >= r->def_last_detail))
-	|| (r->def_lines > 0 && !(r->def_lines >= r->def_heading))
-	|| (r->def_lines > 0 && !(r->def_lines >= r->def_footing))) {
-		cob_runtime_error (_("ERROR INITIATE %s PAGE LIMIT problem"),r->report_name);
-#if defined(COB_DEBUG_LOG) 
-		DEBUG_LOG("rw",("PAGE LIMITs is incorrect\n"));
-		reportDump(r,"INITIATE");
-#endif
-		cob_set_exception (COB_EC_REPORT_PAGE_LIMIT);
-		return;
-	}
-	r->curr_page = 1;
-	r->curr_line = 0;
-	r->incr_line = TRUE;
-	saveLineCounter(r);
-#if defined(COB_DEBUG_LOG) 
-	reportDump(r,"INITIATE");
-#endif
-	r->initiate_done = TRUE;
-	limitCheck(r);
-	if(!r->initiate_done)	/* Problem during LIMIT check */
-		return;
-	r->first_detail = TRUE;
-	r->first_generate = TRUE;
-	r->next_value = 0;
-	r->next_line = 0;
-	r->next_line_plus = FALSE;
-	r->next_page = FALSE;
-	/*
-	 * Allocate temp area for each control field
-	 */
-	for(rc = r->controls; rc; rc = rc->next) {
-		if(rc->val) {
-			cob_field_free(rc->val);
-			rc->val = NULL;
-		}
-		if(rc->sf) {
-			cob_field_free(rc->sf);
-			rc->sf = NULL;
-		}
-		rc->val = cob_field_dup(rc->f,0);
-		rc->sf  = cob_field_dup(rc->f,0);
-		rc->has_heading = FALSE;
-		rc->has_footing = FALSE;
-		for(rr = rc->control_ref; rr; rr = rr->next) {
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING)
-				rc->has_heading = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING_FINAL)
-				rc->has_heading = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING)
-				rc->has_footing = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING_FINAL)
-				rc->has_footing = TRUE;
-		}
-	}
-	for(sc = r->sum_counters; sc; sc = sc->next) {
-		cob_field_init(sc->counter);
-	}
-}
-
-/*
- * TERMINATE report
- */
-int
-cob_report_terminate(cob_report *r, int ctl)
-{
-	cob_report_control	*rc;
-	cob_report_control_ref	*rr;
-	cob_report_line		*pl;
-
-	if(!r->initiate_done) {
-		DEBUG_LOG("rw",("INITIATE was never done!\n"));
-		cob_runtime_error (_("ERROR TERMINATE %s but No INITIATE was done"),r->report_name);
-		cob_set_exception (COB_EC_REPORT_INACTIVE);
-		return 0;
-	}
-	if(r->first_generate) {
-		DEBUG_LOG("rw",("No GENERATE was ever done!\n"));
-		return 0;
-	}
-	if(ctl > 0) {	 /* Continue Processing Footings from last point */
-		for(rc = r->controls; rc; rc = rc->next) {
-			for(rr = rc->control_ref; rr; rr = rr->next) {
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING) {
-					pl = get_print_line(rr->ref_line);
-					if(rr->ref_line->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFooting;	/* Continue Footings */
-					}
-					if(pl != rr->ref_line
-					&& pl->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFooting;	/* Continue Footings */
-					}
-				}
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING_FINAL) {
-					pl = get_print_line(rr->ref_line);
-					if(rr->ref_line->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFootingFinal;	/* Continue Footings */
-					}
-					if(pl != rr->ref_line
-					&& pl->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFootingFinal;	/* Continue Footings */
-					}
-				}
-				if(rr->ref_line->flags & COB_REPORT_FOOTING) {
-					pl = get_print_line(rr->ref_line);
-					if(rr->ref_line->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintReportFooting;/* Continue Footings */
-					}
-					if(pl != rr->ref_line
-					&& pl->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintReportFooting;/* Continue Footings */
-					}
-				}
-			}
-		}
-		DEBUG_LOG("rw",("Could not find Declarative %d\n",ctl));
-		pl = get_line_type(r, r->first_line,COB_REPORT_CONTROL_FOOTING_FINAL);
-		if(pl
-		&& pl->use_decl == ctl) {
-			DEBUG_LOG("rw",("  Continue after Final Declaratives %d\n",ctl));
-			goto PrintFootingFinal;	/* Continue Footings */
-		}
-		pl = get_line_type(r, r->first_line,COB_REPORT_FOOTING);
-		if(pl
-		&& pl->use_decl == ctl) {
-			DEBUG_LOG("rw",("  Continue after Report Declaratives %d\n",ctl));
-			goto PrintReportFooting;	/* Continue Footings */
-		}
-	} else {
-		reportInitialize();
-#if defined(COB_DEBUG_LOG) 
-		reportDump(r,"TERMINATE");
-#endif
-		/* Do CONTROL FOOTING breaks */
-		for(rc = r->controls; rc; rc = rc->next) {
-			for(rr = rc->control_ref; rr; rr = rr->next) {
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING) {
-					if(rr->ref_line->use_decl) {
-						DEBUG_LOG("rw",("  Return for %s Footing Declaratives %d\n",
-								rc->name,rr->ref_line->use_decl));
-						return rr->ref_line->use_decl;
-					}
-					pl = get_print_line(rr->ref_line);
-					if(pl != rr->ref_line
-					&& pl->use_decl) {
-						DEBUG_LOG("rw",("  Return for %s Footing Declaratives %d.\n",
-								rc->name,pl->use_decl));
-						return pl->use_decl;	/* Back for DECLARATIVES */
-					}
-PrintFooting:
-					if(!rc->suppress)
-						report_line_and(r,rr->ref_line,COB_REPORT_CONTROL_FOOTING);
-					rc->suppress = FALSE;
-					zero_all_counters(r, COB_REPORT_CONTROL_FOOTING,pl);
-				}
-			}
-		}
-
-	}
-
-	/* Do CONTROL FOOTING FINAL */
-	pl = get_line_type(r, r->first_line,COB_REPORT_CONTROL_FOOTING_FINAL);
-	if(pl) {
-		if(pl->use_decl) {
-			DEBUG_LOG("rw",("  Return for Footing Final Declaratives %d.\n", pl->use_decl));
-			return pl->use_decl;	/* Back for DECLARATIVES */
-		}
-PrintFootingFinal:
-		report_line_type(r,r->first_line,COB_REPORT_CONTROL_FOOTING_FINAL);
-	}
-	zero_all_counters(r, COB_REPORT_CONTROL_FOOTING_FINAL,NULL);
-
-	do_page_footing(r);
-
-	pl = get_line_type(r, r->first_line,COB_REPORT_FOOTING);
-	if(pl) {
-		if(pl->use_decl) {
-			DEBUG_LOG("rw",("  Return for Report Footing Declaratives %d.\n", pl->use_decl));
-			return pl->use_decl;	/* Back for DECLARATIVES */
-		}
-PrintReportFooting:
-		r->in_report_footing = TRUE;
-		report_line_type(r,r->first_line,COB_REPORT_FOOTING);
-		r->in_report_footing = FALSE;
-	}
-
-	/*
-	 * Free control temp areas
-	 */
-	for(rc = r->controls; rc; rc = rc->next) {
-		if(rc->val) {
-			cob_field_free(rc->val);
-			rc->val = NULL;
-		}
-		if(rc->sf) {
-			cob_field_free(rc->sf);
-			rc->sf = NULL;
-		}
-		rc->has_heading = FALSE;
-		rc->has_footing = FALSE;
-		for(rr = rc->control_ref; rr; rr = rr->next) {
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING)
-				rc->has_heading = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING_FINAL)
-				rc->has_heading = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING)
-				rc->has_footing = TRUE;
-			if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING_FINAL)
-				rc->has_footing = TRUE;
-		}
-	}
-	r->initiate_done = FALSE;
-	return 0;
-}
-
-/*
- * GENERATE report-line
- */
-int
-cob_report_generate(cob_report *r, cob_report_line *l, int ctl)
-{
-	cob_report_control	*rc, *rp;
-	cob_report_control_ref	*rr;
-	cob_report_line		*pl;
-	int			maxctl,ln,num,gengrp;
-#if defined(COB_DEBUG_LOG) 
-	char			wrk[128];
+#if	__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
+#define	COB_NOINLINE	__attribute__((noinline))
+#define	COB_A_INLINE	__attribute__((always_inline))
+#else
+#define	COB_NOINLINE
+#define	COB_A_INLINE
 #endif
 
-	reportInitialize();
-	if(!r->initiate_done) {
-		cob_runtime_error (_("ERROR GENERATE %s but No INITIATE was done"),r->report_name);
-		cob_set_exception (COB_EC_REPORT_INACTIVE);
-		return 0;
-	}
-
-	r->foot_next_page = FALSE;
-	DEBUG_LOG("rw",("~  Enter %sGENERATE with ctl == %d\n",r->first_generate?"first ":"",ctl));
-	if(ctl > 0) {	 /* Continue Processing Footings from last point */
-		for(rc = r->controls; rc; rc = rc->next) {
-			for(rr = rc->control_ref; rr; rr = rr->next) {
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING) {
-					pl = get_print_line(rr->ref_line);
-					if(rr->ref_line->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFooting;	/* Continue Footings */
-					}
-					if(pl != rr->ref_line
-					&& pl->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						goto PrintFooting;	/* Continue Footings */
-					}
-				}
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING) {
-					pl = get_print_line(rr->ref_line);
-					if(rr->ref_line->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						if(r->first_generate)
-							goto PrintFirstHeading;
-						goto PrintHeading;	/* Continue Footings */
-					}
-					if(pl != rr->ref_line
-					&& pl->use_decl == ctl) {
-						DEBUG_LOG("rw",("  Continue after Declaratives %d\n",ctl));
-						if(r->first_generate)
-							goto PrintFirstHeading;
-						goto PrintHeading;	/* Continue Headings */
-					}
-				}
-			}
-		}
-		DEBUG_LOG("rw",("Could not find Declarative %d\n",ctl));
-	}
-
-	if(r->incr_line) {
-		r->incr_line = FALSE;
-		r->curr_line++;
-		saveLineCounter(r);
-	}
-	if(r->first_generate) {
-		/* 
-		 * First GENERATE of the report
-		 */
-		report_line_type(r,r->first_line,COB_REPORT_HEADING);
-		do_page_heading(r);
-		/* do CONTROL Headings */
-		for(rc = r->controls; rc; rc = rc->next) {
-			for(rr = rc->control_ref; rr; rr = rr->next) {
-				if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING) {
-					if(rr->ref_line->use_decl) {
-						DEBUG_LOG("rw",("  Return first %s Heading Declaratives %d\n",
-								rc->name,rr->ref_line->use_decl));
-						return rr->ref_line->use_decl;
-					}
-					pl = get_print_line(rr->ref_line);
-					if(pl != rr->ref_line
-					&& pl->use_decl) {
-						DEBUG_LOG("rw",("  Return first %s Heading Declaratives %d.\n",
-								rc->name,pl->use_decl));
-						return pl->use_decl;	/* Back for DECLARATIVES */
-					}
-PrintFirstHeading:
-					report_line_and(r,rr->ref_line,COB_REPORT_CONTROL_HEADING);
-				}
-			}
-			cob_move (rc->f,rc->val);	/* Save current field data */
-			rc->data_change = FALSE;
-		}
-
-	} else {
-
-		if(r->curr_line > r->def_last_detail) {	/* Page overflow */
-			do_page_footing(r);
-			r->curr_line = 1;
-			do_page_heading(r);
-			r->first_detail = FALSE;
-		} else
-		if(r->curr_line <= 1
-		|| r->first_detail) {
-			if(r->first_detail) {
-				r->curr_line = 1;
-			}
-			do_page_heading(r);
-			r->first_detail = FALSE;
-		}
-
-		/* 
-		 * Check for FOOTINGs on other GENERATEs 
-		 */
-		maxctl = 0;
-		for(rc = r->controls; rc; rc = rc->next) {
-			rc->data_change = (cob_cmp(rc->f,rc->val) != 0);
-			if(rc->data_change) {	/* Data change, implies control break at lower levels */
-#if defined(COB_DEBUG_LOG) 
-				DEBUG_LOG("rw",(" Control Break %s order %d changed from ",
-						rc->name,rc->sequence));
-				cob_field_to_string(rc->val, wrk, sizeof(wrk)-1);
-				DEBUG_LOG("rw",("'%s' to ",wrk));
-				cob_field_to_string(rc->f, wrk, sizeof(wrk)-1);
-				DEBUG_LOG("rw",("'%s'\n",wrk));
+#if	__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+#define	COB_A_COLD	__attribute__((cold))
+#else
+#define	COB_A_COLD
 #endif
-				cob_move(rc->f, rc->sf);	/* Save new CONTROL value */
-				cob_move(rc->val,rc->f);	/* Prev value for FOOTING */
-				if(rc->sequence > maxctl)
-					maxctl = rc->sequence;
 
-			}
-		}
-		if(maxctl > 0) {
-			for(rp = r->controls; rp; rp = rp->next) {
-				if(rp->sequence < maxctl
-				&& !rp->data_change) {
-					rp->data_change = TRUE;
-					DEBUG_LOG("rw",(" Control Break %s order %d also ...\n",
-							rp->name,rp->sequence));
-					cob_move(rp->f, rp->sf); /* Save CONTROL value */
-					cob_move(rp->val,rp->f); /* Prev value for FOOTING */
-				}
-			}
-		}
+#elif	defined(__xlc__) && __IBMC__ >= 700
 
-		for(rc = r->controls; rc; rc = rc->next) {
-			if(rc->data_change) {
-				for(rr = rc->control_ref; rr; rr = rr->next) {
-					if(rr->ref_line->flags & COB_REPORT_CONTROL_FOOTING) {
-						if(rr->ref_line->use_decl) {
-							DEBUG_LOG("rw",("  Return for %s Footing Declaratives %d\n",
-									rc->name,rr->ref_line->use_decl));
-							return rr->ref_line->use_decl;
-						}
-						pl = get_print_line(rr->ref_line);
-						if(pl != rr->ref_line
-						&& pl->use_decl) {
-							DEBUG_LOG("rw",("  Return for %s Footing Declaratives %d.\n",
-									rc->name,pl->use_decl));
-							return pl->use_decl;	/* Back for DECLARATIVES */
-						}
-PrintFooting:
-						if(!rc->suppress
-						&& !rr->ref_line->suppress)
-							report_line_and(r,rr->ref_line,COB_REPORT_CONTROL_FOOTING);
-						rc->suppress = FALSE;
-						rr->ref_line->suppress = FALSE;
-						zero_all_counters(r, COB_REPORT_CONTROL_FOOTING,pl);
-						clear_group_indicate(r->first_line);
-						r->next_just_set = FALSE;
-						if(r->next_page) {
-							r->foot_next_page = TRUE;
-							r->next_page = FALSE;
-						}
-					}
-				}
-				cob_move(rc->sf,rc->f);	/* Put new CONTROL value back */
-			}
-		}
-		if(r->foot_next_page) {
-			DEBUG_LOG("rw",(" Line# %d of Page# %d; ",r->curr_line,r->curr_page));
-			DEBUG_LOG("rw",(" Execute NEXT GROUP PAGE after footings\n"));
-			r->next_page = FALSE;
-			r->foot_next_page = FALSE;
-			do_page_footing(r);
-			do_page_heading(r);
-		}
-		/* 
-		 * Check for Control Headings
-		 */
-		for(rc = r->controls; rc; rc = rc->next) {
-			if(rc->data_change) {
-				for(rr = rc->control_ref; rr; rr = rr->next) {
-					if(rr->ref_line->flags & COB_REPORT_CONTROL_HEADING) {
-						if(rr->ref_line->use_decl) {
-							DEBUG_LOG("rw",("  Return for %s Heading Declaratives %d\n",
-									rc->name,rr->ref_line->use_decl));
-							return rr->ref_line->use_decl;
-						}
-						pl = get_print_line(rr->ref_line);
-						if(pl != rr->ref_line
-						&& pl->use_decl) {
-							DEBUG_LOG("rw",("  Return for %s Heading Declaratives %d.\n",
-									rc->name,pl->use_decl));
-							return pl->use_decl;	/* Back for DECLARATIVES */
-						}
-PrintHeading:
-						if(!rr->ref_line->suppress)
-							report_line_and(r,rr->ref_line,COB_REPORT_CONTROL_HEADING);
-						rr->ref_line->suppress = FALSE;
-					}
-				}
-				cob_move (rc->f,rc->val);	/* Save current field data */
-			}
-			rc->data_change = FALSE;
-		}
-	}
+#if	__IBMC__ >= 900
+#define likely(x)	__builtin_expect((long int)!!(x), 1L)
+#define unlikely(x)	__builtin_expect((long int)!!(x), 0L)
+#else
+#define likely(x)	(x)
+#define unlikely(x)	(x)
+#endif
+#define	COB_NOINLINE	__attribute__((noinline))
+#define	COB_A_INLINE	__attribute__((always_inline))
+#define	COB_A_MALLOC
+#define	COB_A_COLD
+#if	__IBMC__ >= 800
+#define	COB_HAVE_STEXPR	1
+#else
+#undef	COB_HAVE_STEXPR
+#endif
 
-	sum_all_detail(r);			/* SUM detail counters */
-	if(l == NULL)	{			/* GENERATE <report-name> */
+#elif	defined(__SUNPRO_C) && __SUNPRO_C >= 0x590
 
-	} else if(l->suppress) {
-		l->suppress = FALSE;
-	} else {
-		gengrp = 0;
-		if(l->fields == NULL
-		&& l->child != NULL
-		&& l->child->sister != NULL) {
-			l = l->child;		/* Multiple Detail Lines in group */
-			gengrp = 1;
-		}
+#define likely(x)	(x)
+#define unlikely(x)	(x)
+#define	COB_A_MALLOC	__attribute__((malloc))
+#define	COB_NOINLINE	__attribute__((noinline))
+#define	COB_A_INLINE	__attribute__((always_inline))
+#define	COB_A_COLD
+#define	COB_HAVE_STEXPR	1
 
-		num = ln = 0;
-		for(pl = l; pl; pl = pl->sister) {
-			if( NOTDETAIL(pl->flags) )
-				break;
-			if((pl->flags & COB_REPORT_LINE_PLUS)
-			&& pl->line > 1) {
-				ln += pl->line;
-			}
-			num++;
-			if(!gengrp) break;
-		}
-		if(num > 1
-		&& (r->curr_line + ln) > r->def_last_detail) {	/* Page overflow */
-			do_page_footing(r);
-			r->curr_line = 1;
-			do_page_heading(r);
-			r->first_detail = FALSE;
-			saveLineCounter(r);
-		}
+#else
 
-		for(pl = l; pl; pl = pl->sister) {
-			if( NOTDETAIL(pl->flags) )
-				break;
-			l = get_print_line(pl);		/* Find line with data fields */
-			if(!l->suppress) {
-				r->next_just_set = FALSE;
-				report_line(r,l);	/* Generate this DETAIL line */
-			}
-			l->suppress = FALSE;
-			if(!gengrp) break;
-		}
-	}
+#define likely(x)	(x)
+#define unlikely(x)	(x)
+#define	COB_A_MALLOC
+#define	COB_NOINLINE
+#define	COB_A_INLINE
+#define	COB_A_COLD
+#undef	COB_HAVE_STEXPR
 
-	/*
-	 * Zero out SUM counters
-	 */
-	zero_all_counters(r, COB_REPORT_DETAIL, NULL);
-	clear_suppress(r->first_line);
-	r->first_generate = FALSE;
-	r->next_just_set = FALSE;
-	r->curr_line--;
-	r->incr_line = TRUE;
-	saveLineCounter(r);
-	return 0;
-}
+#endif
+
+/* Prevent unwanted verbosity when using icc */
+#ifdef	__INTEL_COMPILER
+
+/* Unreachable code */
+#pragma warning ( disable : 111 )
+/* Declared but never referenced */
+#pragma warning ( disable : 177 )
+/* Format conversion */
+#pragma warning ( disable : 181 )
+/* Enumerated type mixed with other type */
+#pragma warning ( disable : 188 )
+/* #undefine tested for zero */
+#pragma warning ( disable : 193 )
+/* Set but not used */
+#pragma warning ( disable : 593 )
+/* Parameter not referenced */
+#pragma warning ( disable : 869 )
+/* Operands are evaluated in unspecified order */
+#pragma warning ( disable : 981 )
+/* Missing return at end of non-void function */
+/* Note - occurs because we have a non-returning abort call in cobc */
+#pragma warning ( disable : 1011 )
+/* Declaration in same source as definition */
+#pragma warning ( disable : 1419 )
+/* Shadowed variable - 1599 and 1944 are essentially the same */
+#pragma warning ( disable : 1599 )
+#pragma warning ( disable : 1944 )
+/* Possible loss of precision */
+#pragma warning ( disable : 2259 )
+
+#endif
+
+#if !defined(__i386__) && !defined(__x86_64__) && !defined(__powerpc__) && !defined(__powerpc64__) && !defined(__ppc__) && !defined(__amd64__)
+	#define	COB_NON_ALIGNED
+	/* Some DEC Alphas can only load shorts at 4-byte aligned addresses */
+	#ifdef	__alpha
+		#define COB_SHORT_BORK
+	#endif
+	#if defined(_MSC_VER)
+		#define COB_ALLOW_UNALIGNED
+	#else
+		#define __unaligned
+	#endif
+#else
+	#define COB_ALLOW_UNALIGNED
+	#define __unaligned
+#endif
+
+
+
+#if	defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#define PATHSEPC ';'
+#define PATHSEPS ";"
+#else
+#define PATHSEPC ':'
+#define PATHSEPS ":"
+#endif
+
+#ifndef	_WIN32
+#define SLASH_INT	'/'
+#define SLASH_STR	"/"
+#else
+#define SLASH_INT	'\\'
+#define SLASH_STR	"\\"
+#endif
+
+/* End compiler stuff */
+
+/* EBCDIC determination */
+
+#if	' ' == 0x40
+#define	COB_EBCDIC_MACHINE
+#else
+#undef	COB_EBCDIC_MACHINE
+#endif
+
+/* Macro to prevent unused parameter warning */
+
+#define	COB_UNUSED(z)	do { (void)(z); } while (0)
+
+/* Buffer size definitions */
+
+#define	COB_MINI_BUFF		256
+#define	COB_SMALL_BUFF		1024
+#define	COB_NORMAL_BUFF		2048
+#define	COB_FILE_BUFF		4096
+#define	COB_MEDIUM_BUFF		8192
+#define	COB_LARGE_BUFF		16384
+#define	COB_MINI_MAX		(COB_MINI_BUFF - 1)
+#define	COB_SMALL_MAX		(COB_SMALL_BUFF - 1)
+#define	COB_NORMAL_MAX		(COB_NORMAL_BUFF - 1)
+#define	COB_FILE_MAX		(COB_FILE_BUFF - 1)
+#define	COB_MEDIUM_MAX		(COB_MEDIUM_BUFF - 1)
+#define	COB_LARGE_MAX		(COB_LARGE_BUFF - 1)
+
+/* Perform stack size */
+#define	COB_STACK_SIZE		255
+
+/* Maximum size of file records */
+#define	MAX_FD_RECORD		65535
+
+/* Maximum number of parameters */
+#define	COB_MAX_FIELD_PARAMS	36
+
+/* Maximum number of field digits */
+#define	COB_MAX_DIGITS		38
+
+/* Maximum digits in binary field */
+#define	COB_MAX_BINARY		39
+
+/* Maximum digits in binary field */
+#define	COB_MAX_FIELD_SIZE	268435456
+
+/* Maximum number of cob_decimal structures */
+#define	COB_MAX_DEC_STRUCT	32
+
+/* Maximum length of COBOL words */
+#define COB_MAX_WORDLEN		61
+
+/* Memory size for sorting */
+#define COB_SORT_MEMORY		128 * 1024 * 1024
+#define	COB_SORT_CHUNK		256 * 1024
+
+/* Program return types */
+#define	COB_RET_TYPE_INT	0
+#define	COB_RET_TYPE_PTR	1
+#define	COB_RET_TYPE_VOID	2
+
+/* Fold case types */
+#define	COB_FOLD_UPPER		1
+#define	COB_FOLD_LOWER		2
+
+/* Locale types */
+#define	COB_LC_COLLATE		0
+#define	COB_LC_CTYPE		1
+#define	COB_LC_MESSAGES		2
+#define	COB_LC_MONETARY		3
+#define	COB_LC_NUMERIC		4
+#define	COB_LC_TIME		5
+#define	COB_LC_ALL		6
+#define	COB_LC_USER		7
+#define	COB_LC_CLASS		8
+
+/* Field types */
+
+#define COB_TYPE_UNKNOWN		0x00
+#define COB_TYPE_GROUP			0x01U
+#define COB_TYPE_BOOLEAN		0x02U
+
+#define COB_TYPE_NUMERIC		0x10U
+#define COB_TYPE_NUMERIC_DISPLAY	0x10U
+#define COB_TYPE_NUMERIC_BINARY		0x11U
+#define COB_TYPE_NUMERIC_PACKED		0x12U
+#define COB_TYPE_NUMERIC_FLOAT		0x13U
+#define COB_TYPE_NUMERIC_DOUBLE		0x14U
+#define COB_TYPE_NUMERIC_L_DOUBLE	0x15U
+#define COB_TYPE_NUMERIC_FP_DEC64	0x16U
+#define COB_TYPE_NUMERIC_FP_DEC128	0x17U
+#define COB_TYPE_NUMERIC_FP_BIN32	0x18U
+#define COB_TYPE_NUMERIC_FP_BIN64	0x19U
+#define COB_TYPE_NUMERIC_FP_BIN128	0x1AU
+
+#define COB_TYPE_NUMERIC_EDITED		0x24U
+
+#define COB_TYPE_ALPHANUMERIC		0x21U
+#define COB_TYPE_ALPHANUMERIC_ALL	0x22U
+#define COB_TYPE_ALPHANUMERIC_EDITED	0x23U
+
+#define COB_TYPE_NATIONAL		0x40U
+#define COB_TYPE_NATIONAL_EDITED	0x41U
+
+/* Field flags */
+
+#define COB_FLAG_HAVE_SIGN		(1U << 0)	/* 0x0001 */
+#define COB_FLAG_SIGN_SEPARATE		(1U << 1)	/* 0x0002 */
+#define COB_FLAG_SIGN_LEADING		(1U << 2)	/* 0x0004 */
+#define COB_FLAG_BLANK_ZERO		(1U << 3)	/* 0x0008 */
+#define COB_FLAG_JUSTIFIED		(1U << 4)	/* 0x0010 */
+#define COB_FLAG_BINARY_SWAP		(1U << 5)	/* 0x0020 */
+#define COB_FLAG_REAL_BINARY		(1U << 6)	/* 0x0040 */
+#define COB_FLAG_IS_POINTER		(1U << 7)	/* 0x0080 */
+#define COB_FLAG_NO_SIGN_NIBBLE		(1U << 8)	/* 0x0100 */
+#define COB_FLAG_IS_FP			(1U << 9)	/* 0x0200 */
+#define COB_FLAG_REAL_SIGN		(1U << 10)	/* 0x0400 */
+#define COB_FLAG_BINARY_TRUNC		(1U << 11)	/* 0x0800 */
+
+#define COB_FIELD_HAVE_SIGN(f)		((f)->attr->flags & COB_FLAG_HAVE_SIGN)
+#define COB_FIELD_SIGN_SEPARATE(f)	((f)->attr->flags & COB_FLAG_SIGN_SEPARATE)
+#define COB_FIELD_SIGN_LEADING(f)	((f)->attr->flags & COB_FLAG_SIGN_LEADING)
+#define COB_FIELD_BLANK_ZERO(f)		((f)->attr->flags & COB_FLAG_BLANK_ZERO)
+#define COB_FIELD_JUSTIFIED(f)		((f)->attr->flags & COB_FLAG_JUSTIFIED)
+#define COB_FIELD_BINARY_SWAP(f)	((f)->attr->flags & COB_FLAG_BINARY_SWAP)
+#define COB_FIELD_REAL_BINARY(f)	((f)->attr->flags & COB_FLAG_REAL_BINARY)
+#define COB_FIELD_IS_POINTER(f)		((f)->attr->flags & COB_FLAG_IS_POINTER)
+#define COB_FIELD_NO_SIGN_NIBBLE(f)	((f)->attr->flags & COB_FLAG_NO_SIGN_NIBBLE)
+#define COB_FIELD_IS_FP(f)		((f)->attr->flags & COB_FLAG_IS_FP)
+#define COB_FIELD_REAL_SIGN(f)		((f)->attr->flags & COB_FLAG_REAL_SIGN)
+#define COB_FIELD_BINARY_TRUNC(f)	((f)->attr->flags & COB_FLAG_BINARY_TRUNC)
+
+#define	COB_FLAG_LEADSEP		\
+	(COB_FLAG_SIGN_SEPARATE | COB_FLAG_SIGN_LEADING)
+
+#define COB_FIELD_SIGN_LEADSEP(f)	\
+	(((f)->attr->flags & COB_FLAG_LEADSEP) == COB_FLAG_LEADSEP)
+
+#define COB_FIELD_TYPE(f)	((f)->attr->type)
+#define COB_FIELD_DIGITS(f)	((f)->attr->digits)
+#define COB_FIELD_SCALE(f)	((f)->attr->scale)
+#define COB_FIELD_FLAGS(f)	((f)->attr->flags)
+#define COB_FIELD_PIC(f)	((f)->attr->pic)
+
+#define COB_FIELD_DATA(f)	\
+	((f)->data + (COB_FIELD_SIGN_LEADSEP (f) ? 1 : 0))
+
+#define COB_FIELD_SIZE(f)	\
+	(COB_FIELD_SIGN_SEPARATE (f) ? f->size - 1 : f->size)
+
+#define COB_FIELD_IS_NUMERIC(f)	(COB_FIELD_TYPE (f) & COB_TYPE_NUMERIC)
+#define COB_FIELD_IS_NUMDISP(f)	(COB_FIELD_TYPE (f) == COB_TYPE_NUMERIC_DISPLAY)
+#define COB_FIELD_IS_ALNUM(f)	(COB_FIELD_TYPE (f) == COB_TYPE_ALPHANUMERIC)
+#define COB_FIELD_IS_NATIONAL(f)	(COB_FIELD_TYPE (f) & COB_TYPE_NATIONAL)
+
+
+#define	COB_DISPLAY_SIGN_ASCII	0
+#define	COB_DISPLAY_SIGN_EBCDIC	1
+
+#define	COB_NATIONAL_SIZE	2
+
+#define	COB_SET_FLD(v,x,y,z)	(v.size = x, v.data = y, v.attr = z, &v)
+#define	COB_SET_DATA(x,z)	(x.data = z, &x)
+
+/* Fatal error definitions */
+
+#define COB_FERROR_NONE		0
+#define COB_FERROR_CANCEL	1
+#define COB_FERROR_INITIALIZED	2
+#define COB_FERROR_CODEGEN	3
+#define COB_FERROR_CHAINING	4
+#define COB_FERROR_STACK	5
+#define COB_FERROR_GLOBAL	6
+#define COB_FERROR_MEMORY	7
+#define COB_FERROR_MODULE	8
+#define COB_FERROR_RECURSIVE	9
+#define COB_FERROR_SCR_INP	10
+#define COB_FERROR_FILE		11
+#define COB_FERROR_FUNCTION	12
+#define COB_FERROR_FREE		13
+
+/* Exception identifier enumeration */
+
+#undef	COB_EXCEPTION
+#define	COB_EXCEPTION(code,tag,name,critical)	tag,
+
+enum cob_exception_id {
+	COB_EC_ZERO = 0,
+#include <libcob/exception.def>
+	COB_EC_MAX
+};
+
+#undef	COB_EXCEPTION
+
+
+/* File attributes */
+
+/* File version */
+#define	COB_FILE_VERSION	1
+
+/* Start conditions */
+/* Note that COB_NE is disallowed */
+#define COB_EQ			1	/* x == y */
+#define COB_LT			2	/* x <  y */
+#define COB_LE			3	/* x <= y */
+#define COB_GT			4	/* x >  y */
+#define COB_GE			5	/* x >= y */
+#define COB_NE			6	/* x != y */
+#define COB_FI			7	/* First */
+#define COB_LA			8	/* Last */
+
+#define COB_ASCENDING		0
+#define COB_DESCENDING		1
+
+#define COB_FILE_MODE		0644
+
+/* Organization */
+
+#define COB_ORG_SEQUENTIAL	0
+#define COB_ORG_LINE_SEQUENTIAL	1
+#define COB_ORG_RELATIVE	2
+#define COB_ORG_INDEXED		3
+#define COB_ORG_SORT		4
+#define COB_ORG_MAX		5
+
+/* Access mode */
+
+#define COB_ACCESS_SEQUENTIAL	1
+#define COB_ACCESS_DYNAMIC	2
+#define COB_ACCESS_RANDOM	3
+
+/* SELECT features */
+
+#define	COB_SELECT_FILE_STATUS	(1U << 0)
+#define	COB_SELECT_EXTERNAL	(1U << 1)
+#define	COB_SELECT_LINAGE	(1U << 2)
+#define	COB_SELECT_SPLITKEY	(1U << 3)
+#define	COB_SELECT_STDIN	(1U << 4)
+#define	COB_SELECT_STDOUT	(1U << 5)
+#define	COB_SELECT_TEMPORARY	(1U << 6)
+
+#define COB_FILE_SPECIAL(x)	\
+	((x)->flag_select_features & (COB_SELECT_STDIN | COB_SELECT_STDOUT))
+#define COB_FILE_STDIN(x)	((x)->flag_select_features & COB_SELECT_STDIN)
+#define COB_FILE_STDOUT(x)	((x)->flag_select_features & COB_SELECT_STDOUT)
+#define COB_FILE_TEMPORARY(x)	((x)->flag_select_features & COB_SELECT_TEMPORARY)
+
+/* Lock mode */
+
+#define COB_LOCK_EXCLUSIVE	(1U << 0)
+#define COB_LOCK_MANUAL		(1U << 1)
+#define COB_LOCK_AUTOMATIC	(1U << 2)
+#define COB_LOCK_MULTIPLE	(1U << 3)
+#define COB_LOCK_OPEN_EXCLUSIVE	(1U << 4)
+
+#define COB_FILE_EXCLUSIVE	(COB_LOCK_EXCLUSIVE | COB_LOCK_OPEN_EXCLUSIVE)
+
+/* Open mode */
+
+#define COB_OPEN_CLOSED		0
+#define COB_OPEN_INPUT		1
+#define COB_OPEN_OUTPUT		2
+#define COB_OPEN_I_O		3
+#define COB_OPEN_EXTEND		4
+#define COB_OPEN_LOCKED		5
+
+/* Close options */
+
+#define COB_CLOSE_NORMAL	0
+#define COB_CLOSE_LOCK		1
+#define COB_CLOSE_NO_REWIND	2
+#define COB_CLOSE_UNIT		3
+#define COB_CLOSE_UNIT_REMOVAL	4
+
+/* Write options */
+
+#define COB_WRITE_MASK		0x0000FFFF
+
+#define COB_WRITE_LINES		0x00010000
+#define COB_WRITE_PAGE		0x00020000
+#define COB_WRITE_CHANNEL	0x00040000
+#define COB_WRITE_AFTER		0x00100000
+#define COB_WRITE_BEFORE	0x00200000
+#define COB_WRITE_EOP		0x00400000
+#define COB_WRITE_LOCK		0x00800000
+#define COB_WRITE_NO_LOCK	0x01000000
+
+/* Read options */
+
+#define COB_READ_NEXT		(1 << 0)
+#define COB_READ_PREVIOUS	(1 << 1)
+#define COB_READ_FIRST		(1 << 2)
+#define COB_READ_LAST		(1 << 3)
+#define COB_READ_LOCK		(1 << 4)
+#define COB_READ_NO_LOCK	(1 << 5)
+#define COB_READ_KEPT_LOCK	(1 << 6)
+#define COB_READ_WAIT_LOCK	(1 << 7)
+#define COB_READ_IGNORE_LOCK	(1 << 8)
+
+#define COB_READ_MASK		\
+	(COB_READ_NEXT | COB_READ_PREVIOUS | COB_READ_FIRST | COB_READ_LAST)
+
+/* I-O status */
+
+#define COB_STATUS_00_SUCCESS			00
+#define COB_STATUS_02_SUCCESS_DUPLICATE		02
+#define COB_STATUS_04_SUCCESS_INCOMPLETE	04
+#define COB_STATUS_05_SUCCESS_OPTIONAL		05
+#define COB_STATUS_07_SUCCESS_NO_UNIT		07
+#define COB_STATUS_10_END_OF_FILE		10
+#define COB_STATUS_14_OUT_OF_KEY_RANGE		14
+#define COB_STATUS_21_KEY_INVALID		21
+#define COB_STATUS_22_KEY_EXISTS		22
+#define COB_STATUS_23_KEY_NOT_EXISTS		23
+#define COB_STATUS_24_KEY_BOUNDARY		24
+#define COB_STATUS_30_PERMANENT_ERROR		30
+#define COB_STATUS_31_INCONSISTENT_FILENAME	31
+#define COB_STATUS_34_BOUNDARY_VIOLATION	34
+#define COB_STATUS_35_NOT_EXISTS		35
+#define COB_STATUS_37_PERMISSION_DENIED		37
+#define COB_STATUS_38_CLOSED_WITH_LOCK		38
+#define COB_STATUS_39_CONFLICT_ATTRIBUTE	39
+#define COB_STATUS_41_ALREADY_OPEN		41
+#define COB_STATUS_42_NOT_OPEN			42
+#define COB_STATUS_43_READ_NOT_DONE		43
+#define COB_STATUS_44_RECORD_OVERFLOW		44
+#define COB_STATUS_46_READ_ERROR		46
+#define COB_STATUS_47_INPUT_DENIED		47
+#define COB_STATUS_48_OUTPUT_DENIED		48
+#define COB_STATUS_49_I_O_DENIED		49
+#define COB_STATUS_51_RECORD_LOCKED		51
+#define COB_STATUS_57_I_O_LINAGE		57
+#define COB_STATUS_61_FILE_SHARING		61
+#define COB_STATUS_91_NOT_AVAILABLE		91
+
+/* Special status */
+/* Used by extfh handler */
+#define	COB_NOT_CONFIGURED			32768
+
+/* End File attributes */
+
+/* Number store defines */
+
+#define COB_STORE_ROUND			(1 << 0)
+#define COB_STORE_KEEP_ON_OVERFLOW	(1 << 1)
+#define COB_STORE_TRUNC_ON_OVERFLOW	(1 << 2)
+
+#define COB_STORE_AWAY_FROM_ZERO	(1 << 4)
+#define COB_STORE_NEAR_AWAY_FROM_ZERO	(1 << 5)
+#define COB_STORE_NEAR_EVEN		(1 << 6)
+#define COB_STORE_NEAR_TOWARD_ZERO	(1 << 7)
+#define COB_STORE_PROHIBITED		(1 << 8)
+#define COB_STORE_TOWARD_GREATER	(1 << 9)
+#define COB_STORE_TOWARD_LESSER		(1 << 10)
+#define COB_STORE_TRUNCATION		(1 << 11)
+
+#define COB_STORE_MASK					\
+	(COB_STORE_ROUND | COB_STORE_KEEP_ON_OVERFLOW |	\
+	 COB_STORE_TRUNC_ON_OVERFLOW)
+
+/* Screen attribute defines */
+
+#define COB_SCREEN_BLACK		0
+#define COB_SCREEN_BLUE			1
+#define COB_SCREEN_GREEN		2
+#define COB_SCREEN_CYAN			3
+#define COB_SCREEN_RED			4
+#define COB_SCREEN_MAGENTA		5
+#define COB_SCREEN_YELLOW		6
+#define COB_SCREEN_WHITE		7
+
+#define COB_SCREEN_LINE_PLUS		(1 << 0)
+#define COB_SCREEN_LINE_MINUS		(1 << 1)
+#define COB_SCREEN_COLUMN_PLUS		(1 << 2)
+#define COB_SCREEN_COLUMN_MINUS		(1 << 3)
+#define COB_SCREEN_AUTO			(1 << 4)
+#define COB_SCREEN_BELL			(1 << 5)
+#define COB_SCREEN_BLANK_LINE		(1 << 6)
+#define COB_SCREEN_BLANK_SCREEN		(1 << 7)
+#define COB_SCREEN_BLINK		(1 << 8)
+#define COB_SCREEN_ERASE_EOL		(1 << 9)
+#define COB_SCREEN_ERASE_EOS		(1 << 10)
+#define COB_SCREEN_FULL			(1 << 11)
+#define COB_SCREEN_HIGHLIGHT		(1 << 12)
+#define COB_SCREEN_LOWLIGHT		(1 << 13)
+#define COB_SCREEN_REQUIRED		(1 << 14)
+#define COB_SCREEN_REVERSE		(1 << 15)
+#define COB_SCREEN_SECURE		(1 << 16)
+#define COB_SCREEN_UNDERLINE		(1 << 17)
+#define COB_SCREEN_OVERLINE		(1 << 18)
+#define COB_SCREEN_PROMPT		(1 << 19)
+#define COB_SCREEN_UPDATE		(1 << 20)
+#define COB_SCREEN_INPUT		(1 << 21)
+#define COB_SCREEN_SCROLL_DOWN		(1 << 22)
+#define COB_SCREEN_INITIAL		(1 << 23)
+#define COB_SCREEN_NO_ECHO		(1 << 24)
+#define COB_SCREEN_LEFTLINE		(1 << 25)
+#define COB_SCREEN_NO_DISP		(1 << 26)
+#define COB_SCREEN_EMULATE_NL		(1 << 27)
+#define COB_SCREEN_UPPER		(1 << 28)
+#define COB_SCREEN_LOWER		(1 << 29)
+
+#define COB_SCREEN_TYPE_GROUP		0
+#define COB_SCREEN_TYPE_FIELD		1
+#define COB_SCREEN_TYPE_VALUE		2
+#define COB_SCREEN_TYPE_ATTRIBUTE	3
+
+/* End Screen attribute defines */
+
+/* Report attribute defines */
+
+#define COB_REPORT_LINE			(1 << 0)
+#define COB_REPORT_LINE_PLUS		(1 << 1)
+#define COB_REPORT_COLUMN_PLUS		(1 << 2)
+#define COB_REPORT_RESET_FINAL		(1 << 3)
+#define COB_REPORT_HEADING		(1 << 4)
+#define COB_REPORT_FOOTING		(1 << 5)
+#define COB_REPORT_PAGE_HEADING		(1 << 6)
+#define COB_REPORT_PAGE_FOOTING		(1 << 7)
+#define COB_REPORT_CONTROL_HEADING	(1 << 8)
+#define COB_REPORT_CONTROL_HEADING_FINAL (1 << 9)
+#define COB_REPORT_CONTROL_FOOTING	(1 << 10)
+#define COB_REPORT_CONTROL_FOOTING_FINAL (1 << 11)
+#define COB_REPORT_DETAIL		(1 << 12)
+#define COB_REPORT_NEXT_GROUP_LINE	(1 << 13)
+#define COB_REPORT_NEXT_GROUP_PLUS	(1 << 14)
+#define COB_REPORT_NEXT_GROUP_PAGE	(1 << 15)
+#define COB_REPORT_LINE_NEXT_PAGE	(1 << 16)
+#define COB_REPORT_NEXT_PAGE		(1 << 17)
+#define COB_REPORT_GROUP_INDICATE	(1 << 18)
+
+#define COB_REPORT_REF_EMITED		(1 << 31)
+#define COB_REPORT_LINE_EMITED		(1 << 30)
+#define COB_REPORT_SUM_EMITED		(1 << 29)
+#define COB_REPORT_EMITED		(COB_REPORT_REF_EMITED|COB_REPORT_LINE_EMITED|COB_REPORT_SUM_EMITED)
+
+/* End Report attribute defines */
+
+
+/* Structure/union declarations */
+
+
+/* Field attribute structure */
+
+typedef struct {
+	unsigned short	type;		/* Field type */
+	unsigned short	digits;		/* Digit count */
+	signed short	scale;		/* Field scale */
+	unsigned short	flags;		/* Field flags */
+	const char	*pic;		/* Pointer to picture string */
+} cob_field_attr;
+
+/* Field structure */
+
+typedef struct {
+	size_t			size;		/* Field size */
+	unsigned char		*data;		/* Pointer to field data */
+	const cob_field_attr	*attr;		/* Pointer to attribute */
+} cob_field;
+
+#if	0	/* RXWRXW - Constant field */
+/* Field structure for constants */
+
+typedef struct {
+	const size_t		size;		/* Field size */
+	const unsigned char	*data;		/* Pointer to field data */
+	const cob_field_attr	*attr;		/* Pointer to attribute */
+} cob_const_field;
+
+
+/* Union for field constants */
+
+typedef union {
+	const cob_const_field	cf;
+	cob_field		vf;
+} cob_fld_union;
+#endif
+
+/* Representation of 128 bit FP */
+
+typedef struct {
+	cob_u64_t	fpval[2];
+} cob_fp_128;
+
+/* Internal representation of decimal numbers */
+/* n = value / 10 ^ scale */
+/* Decimal structure */
+
+typedef struct {
+	mpz_t		value;			/* GMP value definition */
+	int		scale;			/* Decimal scale */
+} cob_decimal;
+
+/* Perform stack structure */
+struct cob_frame {
+	void		*return_address_ptr;	/* Return address pointer */
+	unsigned int	perform_through;	/* Perform number */
+	unsigned int	return_address_num;	/* Return address number */
+};
+
+/* Call union structures */
+
+typedef union {
+	unsigned char data[8];
+	cob_s64_t     datall;
+	cob_u64_t     dataull;
+	int           dataint;
+} cob_content;
+
+typedef union {
+	void		*(*funcptr)();	/* Function returning "void *" */
+	void		(*funcnull)();	/* Function returning nothing */
+	cob_field	*(*funcfld)();	/* Function returning "cob_field *" */
+	int		(*funcint)();	/* Function returning "int" */
+	void		*funcvoid;	/* Redefine to "void *" */
+#ifdef	_WIN32
+	/* stdcall variants */
+	void		*(__stdcall *funcptr_std)();
+	void		(__stdcall *funcnull_std)();
+	cob_field	*(__stdcall *funcfld_std)();
+	int		(__stdcall *funcint_std)();
+#endif
+} cob_call_union;
+
+struct cob_call_struct {
+	const char		*cob_cstr_name;		/* Call name */
+	cob_call_union		cob_cstr_call;		/* Call entry */
+	cob_call_union		cob_cstr_cancel;	/* Cancel entry */
+};
+
+/* Screen structure */
+typedef struct __cob_screen {
+	struct __cob_screen	*next;		/* Pointer to next */
+	struct __cob_screen	*child;		/* For COB_SCREEN_TYPE_GROUP */
+	cob_field		*field;		/* For COB_SCREEN_TYPE_FIELD */
+	cob_field		*value;		/* For COB_SCREEN_TYPE_VALUE */
+	cob_field		*line;		/* LINE */
+	cob_field		*column;	/* COLUMN */
+	cob_field		*foreg;		/* FOREGROUND */
+	cob_field		*backg;		/* BACKGROUND */
+	cob_field		*prompt;	/* PROMPT */
+	int			type;		/* Structure type */
+	int			occurs;		/* OCCURS */
+	int			attr;		/* COB_SCREEN_TYPE_ATTRIBUTE */
+} cob_screen;
+
+/* Module structure */
+
+typedef struct __cob_module {
+	struct __cob_module	*next;			/* Next pointer */
+	cob_field		**cob_procedure_params;	/* Arguments */
+	const char		*module_name;		/* Module name */
+	const char		*module_formatted_date;	/* Module full date */
+	const char		*module_source;		/* Module source */
+	cob_call_union		module_entry;		/* Module entry */
+	cob_call_union		module_cancel;		/* Module cancel */
+	const unsigned char	*collating_sequence;	/* COLLATING */
+	cob_field		*crt_status;		/* CRT STATUS */
+	cob_field		*cursor_pos;		/* CURSOR */
+	unsigned int		*module_ref_count;	/* Module ref count */
+	const char		**module_path;		/* Module path */
+
+	unsigned int		module_active;		/* Module is active */
+	unsigned int		module_date;		/* Module num date */
+	unsigned int		module_time;		/* Module num time */
+	unsigned int		module_type;		/* Module type */
+	unsigned int		module_param_cnt;	/* Module param count */
+	unsigned int		module_returning;	/* Module return type */
+	int			module_num_params;	/* Module arg count */
+
+	unsigned char		ebcdic_sign;		/* DISPLAY SIGN */
+	unsigned char		decimal_point;		/* DECIMAL POINT */
+	unsigned char		currency_symbol;	/* CURRENCY */
+	unsigned char		numeric_separator;	/* Separator */
+
+	unsigned char		flag_filename_mapping;	/* Mapping */
+	unsigned char		flag_binary_truncate;	/* Truncation */
+	unsigned char		flag_pretty_display;	/* Pretty display */
+	unsigned char		flag_host_sign;		/* Host sign */
+
+	unsigned char		flag_no_phys_canc;	/* No physical cancel */
+	unsigned char		flag_main;		/* Main module */
+	unsigned char		flag_fold_call;		/* Fold case */
+	unsigned char		flag_exit_program;	/* Exit after CALL */
+} cob_module;
+
+
+/* User function structure */
+
+struct cob_func_loc {
+	cob_field		*ret_fld;
+	cob_field		**save_proc_parms;
+	cob_field		**func_params;
+	unsigned char		**data;
+	cob_module		*save_module;
+	int			save_call_params;
+	int			save_num_params;
+};
+
+/* File connector */
+
+/* Key structure */
+
+#define COB_MAX_KEYCOMP 8	/* max number of parts in a compound key (disam.h :: NPARTS ) */
+
+typedef struct {
+	cob_field	*field;				/* Key field */
+	int		flag;				/* ASCENDING/DESCENDING (for SORT) */
+	int		tf_duplicates;			/* WITH DUPLICATES (for RELATIVE/INDEXED) */
+	int		tf_ascending;			/* ASCENDING/DESCENDING (for SORT)*/
+	int		tf_suppress;			/* supress keys where all chars = char_suppress */
+	int		char_suppress;			/* key supression character  */
+	size_t		offset;				/* Offset of field  */
+	int		count_components;		/* 0..1::simple-key  2..n::split-key   */
+	cob_field	*component[COB_MAX_KEYCOMP];	/* key-components iff split-key   */
+} cob_file_key;
+
+
+/* File structure */
+
+typedef struct {
+	const char		*select_name;		/* Name in SELECT */
+	unsigned char		*file_status;		/* FILE STATUS */
+	cob_field		*assign;		/* ASSIGN TO */
+	cob_field		*record;		/* Record area */
+	cob_field		*variable_record;	/* Record size variable */
+	cob_file_key		*keys;			/* ISAM/RANDOM/SORT keys */
+	void			*file;			/* File specific pointer */
+	void			*linorkeyptr;		/* LINAGE or SPLIT KEY */
+	const unsigned char	*sort_collating;	/* SORT collating */
+	void			*extfh_ptr;		/* For EXTFH usage */
+	size_t			record_min;		/* Record min size */
+	size_t			record_max;		/* Record max size */
+	size_t			nkeys;			/* Number of keys */
+	int			fd;			/* File descriptor */
+
+	unsigned char		organization;		/* ORGANIZATION */
+	unsigned char		access_mode;		/* ACCESS MODE */
+	unsigned char		lock_mode;		/* LOCK MODE */
+	unsigned char		open_mode;		/* OPEN MODE */
+	unsigned char		flag_optional;		/* OPTIONAL */
+	unsigned char		last_open_mode;		/* Mode given by OPEN */
+	unsigned char		flag_operation;		/* File type specific */
+	unsigned char		flag_nonexistent;	/* Nonexistent file */
+
+	unsigned char		flag_end_of_file;	/* Reached end of file */
+	unsigned char		flag_begin_of_file;	/* Reached start of file */
+	unsigned char		flag_first_read;	/* OPEN/START read flag */
+	unsigned char		flag_read_done;		/* READ successful */
+	unsigned char		flag_select_features;	/* SELECT features */
+	unsigned char		flag_needs_nl;		/* Needs NL at close */
+	unsigned char		flag_needs_top;		/* Linage needs top */
+	unsigned char		file_version;		/* File I/O version */
+
+} cob_file;
+
+
+/* Linage structure */
+
+typedef struct {
+	cob_field		*linage;		/* LINAGE */
+	cob_field		*linage_ctr;		/* LINAGE-COUNTER */
+	cob_field		*latfoot;		/* LINAGE FOOTING */
+	cob_field		*lattop;		/* LINAGE AT TOP */
+	cob_field		*latbot;		/* LINAGE AT BOTTOM */
+	int			lin_lines;		/* Current Linage */
+	int			lin_foot;		/* Current Footage */
+	int			lin_top;		/* Current Top */
+	int			lin_bot;		/* Current Bottom */
+} cob_linage;
+
+
+/********************/
+/* Report structure */
+/********************/
+
+/* for each SUM field of each line in the report */
+typedef struct cob_report_sum_ {
+	struct cob_report_sum_	*next;			/* Next field */
+	cob_field		*f;			/* Field to be summed */
+} cob_report_sum;
+
+/* for each field of each line in the report */
+typedef struct cob_report_field_ {
+	struct cob_report_field_ *next;			/* Next field */
+	cob_field		*f;			/* Field definition */
+	cob_field		*source;		/* Field SOURCE */
+	cob_field		*control;		/* CONTROL Field */
+	char			*litval;		/* Literal value */
+	int			litlen;			/* Length of literal string */
+	int			flags;
+	int			line;
+	int			column;
+	int			step_count;
+	int			next_group_line;	/* NEXT GROUP line or PLUS line; see flags */
+	unsigned int		group_indicate:1;	/* field had GROUP INDICATE */
+	unsigned int		suppress:1;		/* SUPPRESS display of this field */
+} cob_report_field;
+
+/* for each line of a report */
+typedef struct cob_report_line_ {
+	struct cob_report_line_	*sister;		/* Next line */
+	struct cob_report_line_	*child;			/* Child line */
+	cob_report_field	*fields;		/* List of fields on this line */
+	cob_field		*control;		/* CONTROL Field */
+	int			use_decl;		/* Label# of Declaratives code */
+	int			flags;			/* flags defined with line */
+	int			line;			/* 'LINE' value */
+	int			step_count;
+	int			next_group_line;
+	int			report_flags;		/* flags ORed with upper level flags */
+	unsigned int		suppress:1;		/* SUPPRESS printing this line */
+} cob_report_line;
+
+/* for each 'line referencing a control field' of the report */
+typedef struct cob_report_control_ref_ {
+	struct cob_report_control_ref_ *next;		/* Next control_ref */
+	cob_report_line		*ref_line;		/* Report Line with this control field */
+} cob_report_control_ref;
+
+/* for each 'control field' of the report */
+typedef struct cob_report_control_ {
+	struct cob_report_control_ *next;		/* Next control */
+	const char		*name;			/* Control field name */
+	cob_field		*f;			/* Field definition */
+	cob_field		*val;			/* previous field value */
+	cob_field		*sf;			/* save field value */
+	cob_report_control_ref	*control_ref;		/* References to this control field */
+	int			sequence;		/* Order of Control Break */
+	unsigned int		data_change:1;		/* Control field data did change */
+	unsigned int		has_heading:1;		/* CONTROL HEADING */
+	unsigned int		has_footing:1;		/* CONTROL FOOTING */
+	unsigned int		suppress:1;		/* SUPPRESS printing this break */
+} cob_report_control;
+
+/* for each SUM counter in the report */
+typedef struct cob_report_sumctr_ {
+	struct cob_report_sumctr_ *next;		/* Next sum counter */
+	const char		*name;			/* Name of this SUM counter */
+	cob_report_sum		*sum;			/* list of fields to be summed */
+	cob_field		*counter;		/* Field to hold the SUM counter */
+	cob_field		*f;			/* Data Field for SUM counter */
+	cob_report_control	*control;		/* RESET when this control field changes */
+	unsigned int		reset_final:1;		/* RESET on FINAL */
+	unsigned int		control_final:1;	/* CONTROL FOOTING FINAL */
+	unsigned int		subtotal:1;		/* This is a 'subtotal' counter */
+	unsigned int		crossfoot:1;		/* This is a 'crossfoot' counter */
+} cob_report_sum_ctr;
+
+/* main report table for each RD */
+typedef struct cob_report_ {
+	const char		*report_name;		/* Report name */
+	struct cob_report_	*next;			/* Next report */
+	cob_file		*report_file;		/* Report file */
+	cob_field		*page_counter;		/* PAGE-COUNTER */
+	cob_field		*line_counter;		/* LINE-COUNTER */
+	cob_report_line		*first_line;		/* First defined LINE of report */
+	cob_report_control	*controls;		/* control fields of report */
+	cob_report_sum_ctr	*sum_counters;		/* List of SUM counters in report */
+	int			def_lines;		/* Default lines */
+	int			def_cols;		/* Default columns */
+	int			def_heading;		/* Default heading */
+	int			def_first_detail;	/* Default first detail */
+	int			def_last_control;	/* Default last control */
+	int			def_last_detail;	/* Default last detail */
+	int			def_footing;		/* Default footing */
+	int			curr_page;		/* Current page */
+	int			curr_line;		/* Current line on page */
+	int			curr_cols;		/* Current column on line */
+	int			curr_status;		/* Current status */
+	int			next_value;		/* NEXT GROUP Line/Page/Plus value */
+	unsigned int		control_final:1;	/* CONTROL FINAL declared */
+	unsigned int		global:1;		/* IS GLOBAL declared */
+	unsigned int		first_detail:1;		/* First Detail on page */
+	unsigned int		in_page_footing:1;	/* doing page footing now */
+	unsigned int		in_page_heading:1;	/* doing page heading now */
+	unsigned int		first_generate:1;	/* Ready for first GENERATE */
+	unsigned int		initiate_done:1;	/* INITIATE has been done */
+	unsigned int		next_line:1;		/* Advance to line on next DETAIL */
+	unsigned int		next_line_plus:1;	/* Advance to plus line on next DETAIL */
+	unsigned int		next_page:1;		/* Advance to next page on next DETAIL */
+	unsigned int		next_just_set:1;	/* NEXT xxx was just set so ignore */
+	unsigned int		in_report_footing:1;	/* doing report footing now */
+	unsigned int		incr_line:1;		/* 'curr_lines' should be incremented */
+	unsigned int		foot_next_page:1;	/* Advance to next page after all CONTROL footings */
+} cob_report;
+/***************************/
+/* End of Report structure */
+/***************************/
+
+/* Global variable structure */
+
+typedef struct __cob_global {
+	cob_file		*cob_error_file;	/* Last error file */
+	cob_module		*cob_current_module;	/* Current module */
+	const char		*cob_orig_statement;	/* Statement */
+	const char		*cob_orig_program_id;	/* Program ID */
+	const char		*cob_orig_section;	/* Section */
+	const char		*cob_orig_paragraph;	/* Paragraph */
+	const char		*cob_main_argv0;	/* Main program */
+	char			*cob_locale;		/* Program locale */
+	char			*cob_locale_orig;	/* Initial locale */
+	char			*cob_locale_ctype;	/* Initial locale */
+	char			*cob_locale_collate;	/* Initial locale */
+	char			*cob_locale_messages;	/* Initial locale */
+	char			*cob_locale_monetary;	/* Initial locale */
+	char			*cob_locale_numeric;	/* Initial locale */
+	char			*cob_locale_time;	/* Initial locale */
+
+	int			cob_exception_code;	/* Last exception code */
+	int			cob_call_params;	/* Current arguments */
+	int			cob_initial_external;	/* First external ref */
+	unsigned int		cob_orig_line;		/* Program source line */
+	unsigned int		cob_got_exception;	/* Exception active */
+	unsigned int		cob_screen_initialized;	/* Screen initialized */
+	unsigned int		cob_unix_lf;		/* Use POSIX LF */
+	unsigned int		cob_display_warn;	/* Display warnings */
+	unsigned int		cob_first_init;		/* First call after init */
+	unsigned int		cob_env_mangle;		/* Mangle env names */
+
+	/* Library routine variables */
+
+	/* screenio / termio */
+	unsigned char		*cob_term_buff;		/* Screen I/O buffer */
+
+	unsigned int		cob_disp_to_stderr;	/* Redirect to stderr */
+	unsigned int		cob_beep_value;		/* Bell disposition */
+	int			cob_accept_status;	/* ACCEPT STATUS */
+	int			cob_timeout_scale;	/* timeout scale */
+	unsigned int		cob_extended_status;	/* Extended status */
+	unsigned int		cob_use_esc;		/* Check ESC key */
+	int			cob_max_y;		/* Screen max y */
+	int			cob_max_x;		/* Screen max x */
+
+} cob_global;
+
+
+/* File I/O function pointer structure */
+struct cob_fileio_funcs {
+	int	(*open)		(cob_file *, char *, const int, const int);
+	int	(*close)	(cob_file *, const int);
+	int	(*start)	(cob_file *, const int, cob_field *);
+	int	(*read)		(cob_file *, cob_field *, const int);
+	int	(*read_next)	(cob_file *, const int);
+	int	(*write)	(cob_file *, const int);
+	int	(*rewrite)	(cob_file *, const int);
+	int	(*fdelete)	(cob_file *);
+};
+
+/* Low level jump structure */
+struct cobjmp_buf {
+	int	cbj_int[4];
+	void	*cbj_ptr[4];
+	jmp_buf	cbj_jmp_buf;
+	void	*cbj_ptr_rest[2];
+};
+
+/*******************************/
+
+/* Function declarations */
+
+/*******************************/
+/* Functions in common.c */
+COB_EXPIMP void print_runtime_env(void);
+COB_EXPIMP void print_info(void);
+COB_EXPIMP void print_version(void);
+char* cob_int_to_string(int, char*);
+char* cob_int_to_formatted_bytestring(int, char*);
+char* cob_strcat(char*, char*);
+char* cob_strjoin(char**, int, char*);
+
+/* General functions */
+
+COB_EXPIMP cob_global		*cob_get_global_ptr	(void);
+
+COB_EXPIMP void	cob_init			(const int, char **);
+COB_EXPIMP void	cob_module_enter		(cob_module **, cob_global **,
+						 const int);
+COB_EXPIMP void	cob_module_leave		(cob_module *);
+
+DECLNORET COB_EXPIMP void	cob_stop_run	(const int) COB_A_NORETURN;
+DECLNORET COB_EXPIMP void	cob_fatal_error	(const int) COB_A_NORETURN;
+
+COB_EXPIMP void	*cob_malloc			(const size_t) COB_A_MALLOC;
+COB_EXPIMP void	cob_free			(void *);
+COB_EXPIMP void	*cob_fast_malloc		(const size_t) COB_A_MALLOC;
+COB_EXPIMP void	*cob_cache_malloc		(const size_t) COB_A_MALLOC;
+COB_EXPIMP void	*cob_cache_realloc		(void *, const size_t);
+COB_EXPIMP void	cob_cache_free			(void *);
+COB_EXPIMP void	cob_set_locale			(cob_field *, const int);
+
+COB_EXPIMP void	cob_check_version		(const char *, const char *,
+						 const int);
+
+COB_EXPIMP void	*cob_save_func			(cob_field **, const int,
+						 const int, ...);
+COB_EXPIMP void	cob_restore_func		(struct cob_func_loc *);
+
+COB_EXPIMP void	cob_accept_arg_number		(cob_field *);
+COB_EXPIMP void	cob_accept_arg_value		(cob_field *);
+COB_EXPIMP void	cob_accept_command_line		(cob_field *);
+COB_EXPIMP void	cob_accept_date			(cob_field *);
+COB_EXPIMP void	cob_accept_date_yyyymmdd	(cob_field *);
+COB_EXPIMP void	cob_accept_day			(cob_field *);
+COB_EXPIMP void	cob_accept_day_yyyyddd		(cob_field *);
+COB_EXPIMP void	cob_accept_day_of_week		(cob_field *);
+COB_EXPIMP void	cob_accept_environment		(cob_field *);
+COB_EXPIMP void	cob_accept_exception_status	(cob_field *);
+COB_EXPIMP void	cob_accept_time			(cob_field *);
+COB_EXPIMP void	cob_accept_user_name		(cob_field *);
+COB_EXPIMP void	cob_display_command_line	(cob_field *);
+COB_EXPIMP void	cob_display_environment		(const cob_field *);
+COB_EXPIMP void	cob_display_env_value		(const cob_field *);
+COB_EXPIMP void	cob_display_arg_number		(cob_field *);
+COB_EXPIMP void	cob_get_environment		(const cob_field *, cob_field *);
+COB_EXPIMP void	cob_set_environment		(const cob_field *,
+						 const cob_field *);
+COB_EXPIMP void	cob_chain_setup			(void *, const size_t,
+						 const size_t);
+COB_EXPIMP void	cob_allocate			(unsigned char **, cob_field *,
+						 cob_field *, cob_field *);
+COB_EXPIMP void	cob_free_alloc			(unsigned char **, unsigned char *);
+COB_EXPIMP int	cob_extern_init			(void);
+COB_EXPIMP int	cob_tidy			(void);
+COB_EXPIMP void	*cob_command_line		(int, int *, char ***,
+						 char ***, char **);
+COB_EXPIMP char	*cob_getenv			(const char *);
+COB_EXPIMP int	cob_putenv			(char *);
+
+COB_EXPIMP void	cob_incr_temp_iteration 	(void);
+COB_EXPIMP void	cob_temp_name			(char *, const char *);
+
+#define	cobgetenv(x)			cob_getenv (x)
+#define	cobputenv(x)			cob_putenv (x)
+#define	cobtidy()			cob_tidy ()
+#define	cobinit()			cob_extern_init ()
+#define	cobexit(x)			cob_stop_run (x)
+#define	cobcommandline(v,w,x,y,z)	cob_command_line (v,w,x,y,z)
+
+/* System routines */
+COB_EXPIMP int	cob_sys_exit_proc	(const void *, const void *);
+COB_EXPIMP int	cob_sys_error_proc	(const void *, const void *);
+COB_EXPIMP int	cob_sys_system		(const void *);
+COB_EXPIMP int	cob_sys_and		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_or		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_nor		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_xor		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_imp		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_nimp		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_eq		(const void *, void *, const int);
+COB_EXPIMP int	cob_sys_not		(void *, const int);
+COB_EXPIMP int	cob_sys_xf4		(void *, const void *);
+COB_EXPIMP int	cob_sys_xf5		(const void *, void *);
+COB_EXPIMP int	cob_sys_x91		(void *, const void *, void *);
+COB_EXPIMP int	cob_sys_toupper		(void *, const int);
+COB_EXPIMP int	cob_sys_tolower		(void *, const int);
+COB_EXPIMP int	cob_sys_oc_nanosleep	(const void *);
+COB_EXPIMP int	cob_sys_getpid		(void);
+COB_EXPIMP int	cob_sys_return_args	(void *);
+COB_EXPIMP int	cob_sys_parameter_size	(void *);
 
 /*
- * SUPPRESS printing of this CONTROL level
+ * cob_sys_getopt_long_long
  */
-void
-cob_report_suppress(cob_report *r, cob_report_line *l)
-{
-	cob_report_control	*rc;
-	cob_report_control_ref	*rr;
-	cob_report_line		*pl;
+COB_EXPIMP int	cob_sys_getopt_long_long	(void*, void*, void*, const int, void*, void*);
+typedef struct longoption_def{
+	char name[25];
+	char has_option;
+	char return_value_pointer[sizeof(char*)];
+	char return_value[4];
+} longoption_def;
 
-	for(rc = r->controls; rc; rc = rc->next) {
-		for(rr = rc->control_ref; rr; rr = rr->next) {
-			if(rr->ref_line == l) {
-				rc->suppress = TRUE;
-				return;
-			}
-			pl = get_print_line(rr->ref_line);
-			if(pl == l) {
-				rc->suppress = TRUE;
-				return;
-			}
-		}
-	}
-	cob_runtime_error (_("ERROR Could not find line to suppress in report %s"),r->report_name);
-}
+
+COB_EXPIMP int	cob_sys_sleep		(const void *);
+COB_EXPIMP int	cob_sys_calledby	(void *);
+COB_EXPIMP int	cob_sys_justify		(void *, ...);
+COB_EXPIMP int	cob_sys_printable	(void *, ...);
+
+/* Utilities */
+
+COB_EXPIMP void	cob_set_location	(const char *, const unsigned int,
+					 const char *, const char *,
+					 const char *);
+COB_EXPIMP void	cob_trace_section	(const char *, const char *, const int);
+
+COB_EXPIMP void			*cob_external_addr	(const char *, const int);
+COB_EXPIMP unsigned char	*cob_get_pointer	(const void *);
+COB_EXPIMP void			*cob_get_prog_pointer	(const void *);
+COB_EXPIMP void			cob_ready_trace		(void);
+COB_EXPIMP void			cob_reset_trace		(void);
+
+/* COB_DEBUG_LOG Macros and routines found in common.c */
+COB_EXPIMP int cob_debug_open( const char *cob_debug_env );
+#if defined(COB_DEBUG_LOG)
+COB_EXPIMP int cob_debug_logit( int level, char *module);
+COB_EXPIMP int cob_debug_logger( const char *fmt, ... );
+COB_EXPIMP int cob_debug_dump( void *mem, int len);
+#define DEBUG_TRACE(module, arglist)		cob_debug_logit(3, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_WARN(module, arglist)		cob_debug_logit(2, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_LOG(module, arglist)		cob_debug_logit(0, (char*)module) ? 0 : cob_debug_logger arglist
+#define DEBUG_DUMP_TRACE(module, mem, len)	cob_debug_logit(3, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_DUMP_WARN(module, mem, len)	cob_debug_logit(2, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_DUMP(module, mem, len)		cob_debug_logit(0, (char*)module) ? 0 : cob_debug_dump(mem, len)
+#define DEBUG_ISON_TRACE(module)		!cob_debug_logit(3, (char*)module)
+#define DEBUG_ISON_WARN(module)			!cob_debug_logit(2, (char*)module)
+#define DEBUG_ISON(module)			!cob_debug_logit(0, (char*)module)
+#else
+#define DEBUG_TRACE(module, arglist)
+#define DEBUG_WARN(module, arglist)
+#define DEBUG_LOG(module, arglist)
+#define DEBUG_DUMP_TRACE(module, mem, len)
+#define DEBUG_DUMP_WARN(module, mem, len)
+#define DEBUG_DUMP(module, mem, len)
+#define DEBUG_ISON_TRACE(module)		0
+#define DEBUG_ISON_WARN(module)			0
+#define DEBUG_ISON(module)			0
+#endif
+
+/* Registration of external handlers */
+COB_EXPIMP void	cob_reg_sighnd	(void (*sighnd) (int));
+
+/* Switch */
+
+COB_EXPIMP int	cob_get_switch		(const int);
+COB_EXPIMP void	cob_set_switch		(const int, const int);
+
+/* Comparison */
+
+COB_EXPIMP int	cob_cmp			(cob_field *, cob_field *);
+
+/* Class check */
+
+COB_EXPIMP int	cob_is_omitted		(const cob_field *);
+COB_EXPIMP int	cob_is_numeric		(const cob_field *);
+COB_EXPIMP int	cob_is_alpha		(const cob_field *);
+COB_EXPIMP int	cob_is_upper		(const cob_field *);
+COB_EXPIMP int	cob_is_lower		(const cob_field *);
+
+/* Table sort */
+
+COB_EXPIMP void	cob_table_sort_init	(const size_t, const unsigned char *);
+COB_EXPIMP void	cob_table_sort_init_key	(cob_field *, const int,
+					 const unsigned int);
+COB_EXPIMP void	cob_table_sort		(cob_field *, const int);
+
+/* Run-time error checking */
+
+COB_EXPIMP void	cob_check_numeric	(const cob_field *, const char *);
+COB_EXPIMP void	cob_correct_numeric	(cob_field *);
+COB_EXPIMP void	cob_check_based		(const unsigned char *,
+					 const char *);
+COB_EXPIMP void	cob_check_odo		(const int, const int,
+					 const int, const char *);
+COB_EXPIMP void	cob_check_subscript	(const int, const int,
+					 const int, const char *);
+COB_EXPIMP void	cob_check_ref_mod	(const int, const int,
+					 const int, const char *);
+
+/* Comparison functions */
+COB_EXPIMP int	cob_numeric_cmp		(cob_field *, cob_field *);
+
+/*******************************/
+/* Functions in strings.c */
+
+COB_EXPIMP void cob_inspect_init	(cob_field *, const cob_u32_t);
+COB_EXPIMP void cob_inspect_start	(void);
+COB_EXPIMP void cob_inspect_before	(const cob_field *);
+COB_EXPIMP void cob_inspect_after	(const cob_field *);
+COB_EXPIMP void cob_inspect_characters	(cob_field *);
+COB_EXPIMP void cob_inspect_all		(cob_field *, cob_field *);
+COB_EXPIMP void cob_inspect_leading	(cob_field *, cob_field *);
+COB_EXPIMP void cob_inspect_first	(cob_field *, cob_field *);
+COB_EXPIMP void cob_inspect_trailing	(cob_field *, cob_field *);
+COB_EXPIMP void cob_inspect_converting	(const cob_field *, const cob_field *);
+COB_EXPIMP void cob_inspect_finish	(void);
+
+COB_EXPIMP void cob_string_init		(cob_field *, cob_field *);
+COB_EXPIMP void cob_string_delimited	(cob_field *);
+COB_EXPIMP void cob_string_append	(cob_field *);
+COB_EXPIMP void cob_string_finish	(void);
+
+COB_EXPIMP void cob_unstring_init	(cob_field *, cob_field *, const size_t);
+COB_EXPIMP void cob_unstring_delimited	(cob_field *, const cob_u32_t);
+COB_EXPIMP void cob_unstring_into	(cob_field *, cob_field *, cob_field *);
+COB_EXPIMP void cob_unstring_tallying	(cob_field *);
+COB_EXPIMP void cob_unstring_finish	(void);
+
+/*******************************/
+/* Functions in move.c */
+
+COB_EXPIMP void		cob_move	(cob_field *, cob_field *);
+COB_EXPIMP void		cob_set_int	(cob_field *, const int);
+COB_EXPIMP int		cob_get_int	(cob_field *);
+COB_EXPIMP cob_s64_t	cob_get_llint	(cob_field *);
+
+/*******************************/
+/* Functions in numeric.c */
+
+COB_EXPIMP void	cob_decimal_init	(cob_decimal *);
+COB_EXPIMP void cob_decimal_set_llint	(cob_decimal *, const cob_s64_t);
+COB_EXPIMP void	cob_decimal_set_field	(cob_decimal *, cob_field *);
+COB_EXPIMP int	cob_decimal_get_field	(cob_decimal *, cob_field *, const int);
+COB_EXPIMP void	cob_decimal_add		(cob_decimal *, cob_decimal *);
+COB_EXPIMP void	cob_decimal_sub		(cob_decimal *, cob_decimal *);
+COB_EXPIMP void	cob_decimal_mul		(cob_decimal *, cob_decimal *);
+COB_EXPIMP void	cob_decimal_div		(cob_decimal *, cob_decimal *);
+COB_EXPIMP void	cob_decimal_pow		(cob_decimal *, cob_decimal *);
+COB_EXPIMP int	cob_decimal_cmp		(cob_decimal *, cob_decimal *);
+
+COB_EXPIMP void	cob_add			(cob_field *, cob_field *, const int);
+COB_EXPIMP void	cob_sub			(cob_field *, cob_field *, const int);
+COB_EXPIMP void	cob_mul			(cob_field *, cob_field *, const int);
+COB_EXPIMP void	cob_div			(cob_field *, cob_field *, const int);
+COB_EXPIMP int	cob_add_int		(cob_field *, const int, const int);
+COB_EXPIMP int	cob_sub_int		(cob_field *, const int, const int);
+COB_EXPIMP void	cob_div_quotient	(cob_field *, cob_field *,
+					 cob_field *, const int);
+COB_EXPIMP void	cob_div_remainder	(cob_field *, const int);
+
+COB_EXPIMP int	cob_cmp_int		(cob_field *, const int);
+COB_EXPIMP int	cob_cmp_uint		(cob_field *, const unsigned int);
+COB_EXPIMP int	cob_cmp_llint		(cob_field *, const cob_s64_t);
+COB_EXPIMP int	cob_cmp_packed		(cob_field *, const cob_s64_t);
+COB_EXPIMP int	cob_cmp_numdisp		(const unsigned char *,
+					 const size_t, const cob_s64_t,
+					 const cob_u32_t);
+COB_EXPIMP int	cob_cmp_float		(cob_field *, cob_field *);
+COB_EXPIMP void	cob_set_packed_zero	(cob_field *);
+COB_EXPIMP void	cob_set_packed_int	(cob_field *, const int);
+
+COB_EXPIMP void	cob_decimal_alloc	(const cob_u32_t, ...);
+COB_EXPIMP void	cob_decimal_push	(const cob_u32_t, ...);
+COB_EXPIMP void	cob_decimal_pop		(const cob_u32_t, ...);
+
+COB_EXPIMP void	cob_gmp_free		(void *);
+
+
+/*******************************/
+/* Functions in call.c */
+
+DECLNORET COB_EXPIMP void	cob_call_error		(void) COB_A_NORETURN;
+
+COB_EXPIMP void		cob_set_cancel		(cob_module *);
+COB_EXPIMP void		*cob_resolve		(const char *);
+COB_EXPIMP void		*cob_resolve_cobol	(const char *, const int,
+						 const int);
+COB_EXPIMP void		*cob_resolve_func	(const char *);
+COB_EXPIMP const char	*cob_resolve_error	(void);
+COB_EXPIMP void		*cob_call_field		(const cob_field *,
+						 const struct cob_call_struct *,
+						 const unsigned int,
+						 const int);
+COB_EXPIMP void		cob_cancel_field	(const cob_field *,
+						 const struct cob_call_struct *);
+COB_EXPIMP void		cob_cancel		(const char *);
+COB_EXPIMP int		cob_call		(const char *, const int, void **);
+COB_EXPIMP int		cob_func		(const char *, const int, void **);
+COB_EXPIMP void		*cob_savenv		(struct cobjmp_buf *);
+COB_EXPIMP void		*cob_savenv2		(struct cobjmp_buf *, const int);
+COB_EXPIMP void		cob_longjmp		(struct cobjmp_buf *);
+
+#define	cobsetjmp(x)	setjmp (cob_savenv (x))
+#define	coblongjmp(x)	cob_longjmp (x)
+#define	cobsavenv(x)	cob_savenv (x)
+#define	cobsavenv2(x,z)	cob_savenv2 (x, z)
+#define	cobfunc(x,y,z)	cob_func (x, y, z)
+#define	cobcall(x,y,z)	cob_call (x, y, z)
+#define	cobcancel(x)	cob_cancel (x)
+
+/*******************************/
+/* Functions in screenio.c */
+
+COB_EXPIMP void cob_screen_line_col	(cob_field *, const int);
+COB_EXPIMP void cob_screen_display	(cob_screen *, cob_field *,
+					 cob_field *);
+COB_EXPIMP void cob_screen_accept	(cob_screen *, cob_field *,
+					 cob_field *, cob_field *);
+COB_EXPIMP void cob_field_display	(cob_field *, cob_field *, cob_field *,
+					 cob_field *, cob_field *, cob_field *,
+					 const int);
+COB_EXPIMP void cob_field_accept	(cob_field *, cob_field *, cob_field *,
+					 cob_field *, cob_field *, cob_field *,
+					 cob_field *, cob_field *, const int);
+COB_EXPIMP void cob_accept_escape_key	(cob_field *);
+COB_EXPIMP int	cob_sys_clear_screen	(void);
+COB_EXPIMP int	cob_sys_sound_bell	(void);
+COB_EXPIMP int	cob_sys_get_csr_pos	(unsigned char *);
+COB_EXPIMP int	cob_sys_get_scr_size	(unsigned char *, unsigned char *);
+
+/*******************************/
+/* Functions in termio.c */
+
+COB_EXPIMP void cob_display	(const int, const int, const int, ...);
+COB_EXPIMP void cob_accept	(cob_field *);
+
+/*******************************/
+/* Functions in fileio.c */
+
+COB_EXPIMP void cob_open	(cob_file *, const int, const int, cob_field *);
+COB_EXPIMP void cob_close	(cob_file *, cob_field *, const int, const int);
+COB_EXPIMP void cob_read	(cob_file *, cob_field *, cob_field *, const int);
+COB_EXPIMP void cob_read_next	(cob_file *, cob_field *, const int);
+COB_EXPIMP void cob_rewrite	(cob_file *, cob_field *, const int, cob_field *);
+COB_EXPIMP void cob_delete	(cob_file *, cob_field *);
+COB_EXPIMP void cob_start	(cob_file *, const int, cob_field *,
+				 cob_field *, cob_field *);
+COB_EXPIMP void cob_write	(cob_file *, cob_field *, const int,
+				 cob_field *, const unsigned int);
+
+COB_EXPIMP void cob_delete_file	(cob_file *, cob_field *);
+COB_EXPIMP void cob_unlock_file	(cob_file *, cob_field *);
+COB_EXPIMP void cob_commit	(void);
+COB_EXPIMP void cob_rollback	(void);
+
+/* File system routines */
+COB_EXPIMP int cob_sys_open_file	(unsigned char *, unsigned char *,
+					 unsigned char *, unsigned char *,
+					 unsigned char *);
+COB_EXPIMP int cob_sys_create_file	(unsigned char *, unsigned char *,
+					 unsigned char *, unsigned char *,
+					 unsigned char *);
+COB_EXPIMP int cob_sys_read_file	(unsigned char *, unsigned char *,
+					 unsigned char *, unsigned char *,
+					 unsigned char *);
+COB_EXPIMP int cob_sys_write_file	(unsigned char *, unsigned char *,
+					 unsigned char *, unsigned char *,
+					 unsigned char *);
+COB_EXPIMP int cob_sys_close_file	(unsigned char *);
+COB_EXPIMP int cob_sys_flush_file	(unsigned char *);
+COB_EXPIMP int cob_sys_delete_file	(unsigned char *);
+COB_EXPIMP int cob_sys_copy_file	(unsigned char *, unsigned char *);
+COB_EXPIMP int cob_sys_check_file_exist	(unsigned char *, unsigned char *);
+COB_EXPIMP int cob_sys_rename_file	(unsigned char *, unsigned char *);
+COB_EXPIMP int cob_sys_get_current_dir	(const int, const int, unsigned char *);
+COB_EXPIMP int cob_sys_change_dir	(unsigned char *);
+COB_EXPIMP int cob_sys_create_dir	(unsigned char *);
+COB_EXPIMP int cob_sys_delete_dir	(unsigned char *);
+COB_EXPIMP int cob_sys_chdir		(unsigned char *, unsigned char *);
+COB_EXPIMP int cob_sys_mkdir		(unsigned char *);
+COB_EXPIMP int cob_sys_copyfile		(unsigned char *, unsigned char *,
+					 unsigned char *);
+COB_EXPIMP int cob_sys_file_info	(unsigned char *, unsigned char *);
+COB_EXPIMP int cob_sys_file_delete	(unsigned char *, unsigned char *);
+
+/* SORT routines */
+COB_EXPIMP void	cob_file_sort_init	(cob_file *, const unsigned int,
+					 const unsigned char *,
+					 void *, cob_field *);
+COB_EXPIMP void	cob_file_sort_init_key	(cob_file *, cob_field *,
+					 const int, const unsigned int);
+COB_EXPIMP void	cob_file_sort_close	(cob_file *);
+COB_EXPIMP void	cob_file_sort_using	(cob_file *, cob_file *);
+COB_EXPIMP void	cob_file_sort_giving	(cob_file *, const size_t, ...);
+COB_EXPIMP void	cob_file_release	(cob_file *);
+COB_EXPIMP void	cob_file_return		(cob_file *);
+
+/***************************/
+/* Functions in reportio.c */
+/***************************/
+COB_EXPIMP void cob_report_initiate	(cob_report *);
+COB_EXPIMP int  cob_report_terminate	(cob_report *, int);
+COB_EXPIMP int  cob_report_generate	(cob_report *, cob_report_line *, int);
+COB_EXPIMP void cob_report_suppress	(cob_report *r, cob_report_line *l);
+
+/****************************/
+/* Functions in intrinsic.c */
+/****************************/
+COB_EXPIMP void		cob_put_indirect_field		(cob_field *);
+COB_EXPIMP void		cob_get_indirect_field		(cob_field *);
+COB_EXPIMP cob_field *cob_switch_value			(const int);
+COB_EXPIMP cob_field *cob_intr_binop			(cob_field *, const int,
+							 cob_field *);
+
+COB_EXPIMP int cob_valid_date_format			(const char *);
+COB_EXPIMP int cob_valid_datetime_format		(const char *, const char);
+COB_EXPIMP int cob_valid_time_format			(const char *, const char);
+
+COB_EXPIMP cob_field *cob_intr_current_date		(const int, const int);
+COB_EXPIMP cob_field *cob_intr_when_compiled		(const int, const int,
+							 cob_field *);
+COB_EXPIMP cob_field *cob_intr_module_date		(void);
+COB_EXPIMP cob_field *cob_intr_module_time		(void);
+COB_EXPIMP cob_field *cob_intr_module_id		(void);
+COB_EXPIMP cob_field *cob_intr_module_caller_id		(void);
+COB_EXPIMP cob_field *cob_intr_module_source		(void);
+COB_EXPIMP cob_field *cob_intr_module_formatted_date	(void);
+COB_EXPIMP cob_field *cob_intr_module_path		(void);
+COB_EXPIMP cob_field *cob_intr_exception_file		(void);
+COB_EXPIMP cob_field *cob_intr_exception_location	(void);
+COB_EXPIMP cob_field *cob_intr_exception_status		(void);
+COB_EXPIMP cob_field *cob_intr_exception_statement	(void);
+COB_EXPIMP cob_field *cob_intr_mon_decimal_point	(void);
+COB_EXPIMP cob_field *cob_intr_num_decimal_point	(void);
+COB_EXPIMP cob_field *cob_intr_mon_thousands_sep	(void);
+COB_EXPIMP cob_field *cob_intr_num_thousands_sep	(void);
+COB_EXPIMP cob_field *cob_intr_currency_symbol		(void);
+COB_EXPIMP cob_field *cob_intr_char			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_ord			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_stored_char_length	(cob_field *);
+COB_EXPIMP cob_field *cob_intr_combined_datetime	(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_date_of_integer		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_day_of_integer		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_integer_of_date		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_integer_of_day		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_test_date_yyyymmdd	(cob_field *);
+COB_EXPIMP cob_field *cob_intr_test_day_yyyyddd		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_test_numval		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_test_numval_c		(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_test_numval_f		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_factorial		(cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_pi			(void);
+COB_EXPIMP cob_field *cob_intr_e			(void);
+COB_EXPIMP cob_field *cob_intr_exp			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_exp10			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_abs			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_acos			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_asin			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_atan			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_cos			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_log			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_log10			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_sin			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_sqrt			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_tan			(cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_upper_case		(const int, const int,
+							 cob_field *);
+COB_EXPIMP cob_field *cob_intr_lower_case		(const int, const int,
+							 cob_field *);
+COB_EXPIMP cob_field *cob_intr_reverse			(const int, const int,
+							 cob_field *);
+COB_EXPIMP cob_field *cob_intr_concatenate		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_substitute		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_substitute_case		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_trim			(const int, const int,
+							 cob_field *, const int);
+COB_EXPIMP cob_field *cob_intr_length			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_byte_length		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_integer			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_integer_part		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_fraction_part		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_sign			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_lowest_algebraic		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_highest_algebraic	(cob_field *);
+COB_EXPIMP cob_field *cob_intr_numval			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_numval_c			(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_numval_f			(cob_field *);
+COB_EXPIMP cob_field *cob_intr_annuity			(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_mod			(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_rem			(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_sum			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_ord_min			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_ord_max			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_min			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_max			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_midrange			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_median			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_mean			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_range			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_random			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_variance			(const int, ...);
+COB_EXPIMP cob_field *cob_intr_standard_deviation	(const int, ...);
+COB_EXPIMP cob_field *cob_intr_present_value		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_year_to_yyyy		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_date_to_yyyymmdd		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_day_to_yyyyddd		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_locale_compare		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_locale_date		(const int, const int,
+							 cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_locale_time		(const int, const int,
+							 cob_field *, cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_seconds_past_midnight	(void);
+COB_EXPIMP cob_field *cob_intr_lcl_time_from_secs	(const int, const int,
+							 cob_field *, cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_seconds_from_formatted_time	(cob_field *,
+								 cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_boolean_of_integer	(cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_char_national		(cob_field *);
+COB_EXPIMP cob_field *cob_intr_display_of		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_exception_file_n		(void);
+COB_EXPIMP cob_field *cob_intr_exception_location_n	(void);
+COB_EXPIMP cob_field *cob_intr_formatted_current_date	(const int, const int,
+							 cob_field *);
+COB_EXPIMP cob_field *cob_intr_formatted_date		(const int, const int,
+							 cob_field *, cob_field *);
+COB_EXPIMP cob_field *cob_intr_formatted_datetime	(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_formatted_time		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_integer_of_boolean	(cob_field *);
+COB_EXPIMP cob_field *cob_intr_national_of		(const int, const int,
+							 const int, ...);
+COB_EXPIMP cob_field *cob_intr_standard_compare		(const int, ...);
+COB_EXPIMP cob_field *cob_intr_test_formatted_datetime	(cob_field *, cob_field *);
+
+COB_EXPIMP cob_field *cob_intr_integer_of_formatted_date	(cob_field *,
+								 cob_field *);
+
+/*******************************/
+
+#endif	/* COB_COMMON_H */
