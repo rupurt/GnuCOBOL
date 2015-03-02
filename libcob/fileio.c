@@ -127,9 +127,8 @@
 
 #ifdef	WITH_VBISAM
 #include <vbisam.h>
-#if	1	/* RXWRXW - Status 02 */
+/* VB-ISAM does not set dup key status */
 #undef	COB_WITH_STATUS_02
-#endif
 #if defined(VB_RTD)
 /* Since VBISAM 2.1.1: access to isrecnum iserrno etc is no longer global */
 static	vb_rtd_t *vbisam_rtd = NULL;
@@ -2655,7 +2654,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 	cob_u32_t		i,len;
 	unsigned int		dupno;
 	cob_u32_t		flags;
-	int			close_cursor;
+	int			close_cursor,ret;
 
 	p = f->file;
 	if (bdb_env) {
@@ -2663,6 +2662,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 	} else {
 		flags = 0;
 	}
+	ret = COB_STATUS_00_SUCCESS;
 	if (p->write_cursor_open) {
 		close_cursor = 0;
 	} else {
@@ -2709,6 +2709,8 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 		if (f->keys[i].tf_duplicates) {
 			flags =  0;
 			dupno = get_dupno(f, i);
+			if(dupno > 1)
+				ret = COB_STATUS_02_SUCCESS_DUPLICATE;
 			dupno = COB_DUPSWAP (dupno);
 			len = bdb_savekey(f, p->temp_key, f->record->data, 0);
 			p->data.data = p->temp_key;
@@ -2752,7 +2754,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 		p->cursor[0] = NULL;
 		p->write_cursor_open = 0;
 	}
-	return COB_STATUS_00_SUCCESS;
+	return ret;
 }
 
 static int
@@ -4566,12 +4568,12 @@ indexed_rewrite (cob_file *f, const int opt)
 
 	struct indexfile	*fh;
 	size_t			k;
-	int			ret;
+	int			ret,retdup;
 
 	COB_UNUSED (opt);
 
 	fh = f->file;
-	ret = COB_STATUS_00_SUCCESS;
+	ret = retdup = COB_STATUS_00_SUCCESS;
 	if (f->flag_nonexistent) {
 		return COB_STATUS_49_I_O_DENIED;
 	}
@@ -4626,6 +4628,11 @@ indexed_rewrite (cob_file *f, const int opt)
 				if (isrewcurr (fh->isfd, (void *)f->record->data)) {
 					ret = fisretsts (COB_STATUS_49_I_O_DENIED);
 				}
+#ifdef	COB_WITH_STATUS_02
+				if(!ret && (isstat1 == '0') && (isstat2 == '2')) {
+					ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+				}
+#endif
 			}
 		}
 		restorefileposition (f);
@@ -4651,6 +4658,11 @@ indexed_rewrite (cob_file *f, const int opt)
 		if (isrewrite (fh->isfd, (void *)f->record->data)) {
 			ret = fisretsts (COB_STATUS_49_I_O_DENIED);
 		}
+#ifdef	COB_WITH_STATUS_02
+		if(!ret && (isstat1 == '0') && (isstat2 == '2')) {
+			retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
+		}
+#endif
 	}
 	if (!ret) {
 		if ((f->lock_mode & COB_LOCK_AUTOMATIC) &&
@@ -4662,6 +4674,8 @@ indexed_rewrite (cob_file *f, const int opt)
 			return COB_STATUS_02_SUCCESS_DUPLICATE;
 		}
 #endif
+		if(retdup)
+			return retdup;
 	}
 	return ret;
 
