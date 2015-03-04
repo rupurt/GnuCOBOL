@@ -909,9 +909,9 @@ enum cob_exception_id {
 #define COB_REPORT_NEXT_PAGE		(1 << 17)
 #define COB_REPORT_GROUP_INDICATE	(1 << 18)
 
-#define COB_REPORT_REF_EMITED		(1 << 31)
-#define COB_REPORT_LINE_EMITED		(1 << 30)
-#define COB_REPORT_SUM_EMITED		(1 << 29)
+#define COB_REPORT_REF_EMITED		(1 << 30)
+#define COB_REPORT_LINE_EMITED		(1 << 29)
+#define COB_REPORT_SUM_EMITED		(1 << 28)
 #define COB_REPORT_EMITED		(COB_REPORT_REF_EMITED|COB_REPORT_LINE_EMITED|COB_REPORT_SUM_EMITED)
 
 /* End Report attribute defines */
