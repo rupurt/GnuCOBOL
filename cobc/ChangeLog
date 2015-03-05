@@ -3,11 +3,6 @@
 
 	* codegen.c : added check of recursive CALL for INITIAL programs
 
-2015-03-04  Ron Norman <rjn@inglenet.com>
-
-	* codegen.c: moved allocation of LOCAL-STORAGE so it is created
-	  before any file operations. Bug report 78
-
 2015-03-03  Ron Norman <rjn@inglenet.com>
 
 	* codeoptim.c & typeck.c: fixes for systems which require aligned 
