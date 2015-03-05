@@ -1,10 +1,10 @@
 
-2015-03-03  Ron Norman
+2015-03-03  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c, common.c, common.h updated to resolve little endian
 	  versus big endian issues
 
-2015-03-01  Ron Norman
+2015-03-01  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c updated to return correct status codes for WRITE/REWRITE
 	  related to duplicate keys being detected
@@ -14,24 +14,23 @@
 
 	* screenio.c: fixed buffer overflow in screen section ACCEPT
 
-
-2015-02-26  Ron Norman
+2015-02-26  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c was updated to handle sparse and split keys for BDB
 	  This was tested with BDB, D-ISAM, VB-ISAM 2.0 and VB-ISAM 2.1.1
 
-2015-02-23  Ron Norman
+2015-02-23  Ron Norman <rjn@inglenet.com>
 
 	* Implemented INDEXED file support for sparse and split keys
 	  fileio.c was updated to handle sparse and split keys
 	  This was tested with D-ISAM and VB-ISAM 2.0
 
-2015-02-18  Ron Norman
+2015-02-18  Ron Norman <rjn@inglenet.com>
 
 	* common.c cob_debug_logger: if fmt starts with '~' then force print of line#
 	* reportio.c : Fix spacing problems related to CONTROL FOOTING
 
-2015-02-16  Ron Norman
+2015-02-16  Ron Norman <rjn@inglenet.com>
 
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 
@@ -41,7 +40,7 @@
 	  Logging can be turned and set to certain level using
 	  an environment variable COB_DEBUG_LOG
 
-2015-02-12  Ron Norman
+2015-02-12  Ron Norman <rjn@inglenet.com>
 
 	* Merged Report Writer code into 2.0 code base to create a new 2.0
 	  with all collective features
@@ -54,7 +53,7 @@
 
 2015-01-12  Sergey Kashyrin <ska@kiska.net>
 
-	* intrinsic.cpp : Fix for Bug #120 - Function CURRENT-DATE
+	* intrinsic.c : Fix for Bug #120 - Function CURRENT-DATE
 
 2014-12-11  Ron Norman (rjn@inglenet.com)
 	* reportio.c,  Corrected to handle processing of a single DETAIL line

@@ -1,8 +1,15 @@
-2015-03-04  Ron Norman
+
+2015-03-05  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* codegen.c : added check of recursive CALL for INITIAL programs
+
+2015-03-04  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c: moved allocation of LOCAL-STORAGE so it is created
 	  before any file operations. Bug report 78
 
-2015-03-03  Ron Norman
+2015-03-03  Ron Norman <rjn@inglenet.com>
+
 	* codeoptim.c & typeck.c: fixes for systems which require aligned 
 	  data but the C compile does not support __unaligned directive
 	  codegen.c: fix for C compilers (old SUN for one) that do not
@@ -10,15 +17,16 @@
 	  local variable
 	  tree.c: Check for NULL passed to cb_get_int and report error
 
-2015-02-23  Ron Norman
+2015-02-23  Ron Norman <rjn@inglenet.com>
+
 	* Implemented INDEXED file support for sparse and split keys
 	  Most of the compiler code was borrowed from the fileio-rewrite
 
-2015-02-13  Ron Norman
+2015-02-13  Ron Norman <rjn@inglenet.com>
 
 	* Fix to tree.c to only adjust up file record_max for REPORT files
 
-2015-02-12  Ron Norman
+2015-02-12  Ron Norman <rjn@inglenet.com>
 
 	* Merged Report Writer code into 2.0 code base to create a new 2.0
 	  with all collective features
@@ -34,23 +42,26 @@
 	  ACCEPT OMITTED feature of waiting for a return attempting
 	  to generate code with a null pointer
 
-2015-01-04 Ron Norman (rjn@inglenet.com)
+2015-01-04 Ron Norman <rjn@inglenet.com>
+
 	* Fix for codeoptim.c for cob_add_packed_int to use %% instead of %
 	  due to processing by sprintf on certain platforms the % was getting
 	  droppped.
 
-2014-12-15  Ron Norman (rjn@inglenet.com)
+2014-12-15  Ron Norman <rjn@inglenet.com>
+
 	* Fix for codeoptim.c and typeck.c to correctly handle SET pointer UP/DOWN
 	  on none x86 platforms
 
-2014-12-11  Ron Norman (rjn@inglenet.com)
+2014-12-11  Ron Norman <rjn@inglenet.com>
+
 	* Fixes so WARNING is given if no DETAIL lines in a report
 
 2014-06-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net> 
 
 	* parser.* : fixing Bug #79 by defining PLUS_KEYWORD: PLUS|+
 
-2014-06-14  Ron Norman (rjn@inglenet.com)
+2014-06-14  Ron Norman <rjn@inglenet.com>
 
 	* Fixes for LINE|COL 0 to get error message
 

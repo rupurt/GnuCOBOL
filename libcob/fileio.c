@@ -2899,7 +2899,7 @@ indexed_delete_internal (cob_file *f, const int rewrite)
 	struct indexed_file	*p;
 	int			i,len;
 	DBT			prim_key;
-	int			ret,sts;
+	int			ret;
 	cob_u32_t		flags;
 	int			close_cursor;
 
