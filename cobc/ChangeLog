@@ -1,3 +1,7 @@
+2015-03-04  Ron Norman
+	* codegen.c: moved allocation of LOCAL-STORAGE so it is created
+	  before any file operations. Bug report 78
+
 2015-03-03  Ron Norman
 	* codeoptim.c & typeck.c: fixes for systems which require aligned 
 	  data but the C compile does not support __unaligned directive

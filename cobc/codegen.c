@@ -7413,22 +7413,6 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		}
 	}
 
-	/* Allocate / initialize LOCAL storage */
-	if (prog->local_storage) {
-		if (local_mem) {
-			output_line ("/* Allocate LOCAL storage */");
-			output_line ("cob_local_ptr = cob_malloc (%dU);",
-				     local_mem);
-			if (prog->flag_global_use) {
-				output_line ("cob_local_save = cob_local_ptr;");
-			}
-		}
-		output_newline ();
-		output_line ("/* Initialialize LOCAL storage */");
-		output_initial_values (prog->local_storage);
-		output_newline ();
-	}
-
 	/* Call parameters */
 	if (cb_code_field (prog->cb_call_params)->count) {
 		output_line ("/* Set NUMBER-OF-CALL-PARAMETERS */");
@@ -7816,6 +7800,23 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 				     CB_PREFIX_BASE, f->id, string_buffer,
 				     CB_FILE (CB_VALUE (l))->record_max);
 		}
+	}
+
+	/* Allocate / initialize LOCAL storage */
+	if (prog->local_storage) {
+		if (local_mem) {
+			output_line ("/* Allocate LOCAL storage */");
+			output_line ("	if(cob_local_ptr == NULL)");
+			output_line ("		cob_local_ptr = cob_malloc (%dU);",
+				     local_mem);
+			if (prog->flag_global_use) {
+				output_line ("cob_local_save = cob_local_ptr;");
+			}
+		}
+		output_newline ();
+		output_line ("/* Initialialize LOCAL storage */");
+		output_initial_values (prog->local_storage);
+		output_newline ();
 	}
 
 	/* Initialize WORKING-STORAGE EXTERNAL items */
