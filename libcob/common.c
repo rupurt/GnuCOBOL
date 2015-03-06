@@ -3523,10 +3523,11 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 	int exit_status;
 
 	char* shortoptions;
-	char* temp;
+	char* temp, *tmp_ptr;
 
 	struct option* longoptions;
 	longoption_def* l = NULL;
+	int	*rtns = NULL;
 
 	int longind = 0;
 	unsigned int i;
@@ -3560,6 +3561,7 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 	if (lo_size % sizeof(longoption_def) == 0) {
 		lo_amount = (int)lo_size / sizeof(longoption_def);
 		longoptions = (struct option*) cob_malloc(sizeof(struct option) * (lo_amount + 1U));
+		rtns = (int *)cob_malloc(sizeof(int) * (lo_amount + 1U));
 	}
 	else {
 		cob_runtime_error (_("Call to CBL_OC_GETOPT with wrong longoption size."));
@@ -3592,7 +3594,8 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 		}
 		longoptions->name = l->name;
 		longoptions->has_arg = (int) l->has_option - '0';
-		memcpy (&longoptions->flag, l->return_value_pointer, sizeof(l->return_value_pointer));
+		rtns[i] = 0;
+		longoptions->flag = &rtns[i];
 		memcpy(&longoptions->val, &l->return_value, 4);
 
 		l = l + 1; /* +1 means pointer + 1*sizeof(longoption_def) */
@@ -3612,6 +3615,18 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 	longoptions -= lo_amount;
 
 	return_value = cob_getopt_long_long(cob_argc, cob_argv, shortoptions, longoptions, &longind, long_only);
+	for (i = 0; i < lo_amount; i++) {
+		memcpy(&tmp_ptr, l->return_value_pointer, sizeof(char *));
+		if(tmp_ptr != NULL
+		&& rtns[i] != 0) {
+			memcpy((void*)tmp_ptr, &rtns[i], sizeof(int));
+		}
+		if(return_value == 0
+		&& rtns[i] != 0)
+			return_value = rtns[i];
+		l = l + 1; /* +1 means pointer + 1*sizeof(longoption_def) */
+	}
+	l -= lo_amount; /* Set pointer back to begin of longoptions */
 	temp = (char*) &return_value;
 	
 	/*
@@ -3623,6 +3638,12 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 	else if(temp[3] == -1) exit_status = -1;
 	else exit_status = 3;
 	 /* cob_getopt_long_long sometimes returns and 'int' value and sometimes a 'x   ' in the int */
+	if(temp[0] != ' '
+	&& temp[1] == ' '
+	&& temp[2] == ' '
+	&& temp[3] == ' ') {
+		exit_status = 0;
+	}
 	if(temp[0] == 0x00
 	&& temp[1] == 0x00
 	&& temp[2] == 0x00) {
@@ -3632,7 +3653,14 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 #else
 	if (temp[0] == '?' || temp[0] == ':' || temp[0] == 'W' 
 		|| temp[0] == -1 || temp[0] == 0) exit_status = return_value;
-	else exit_status = 3;
+	else 
+	if(temp[0] != ' '
+	&& temp[1] == ' '
+	&& temp[2] == ' '
+	&& temp[3] == ' ') {
+		exit_status = 0;
+	} else
+		exit_status = 3;
 
 	for(i = 3; i > 0; i--) {
 		if(temp[i] == 0x00) temp[i] = ' ';
@@ -3658,6 +3686,7 @@ cob_sys_getopt_long_long (void* so, void* lo, void* idx, const int long_only, vo
 
 	cob_free (shortoptions);
 	cob_free (longoptions);
+	cob_free (rtns);
 
 	return exit_status;
 

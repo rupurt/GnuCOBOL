@@ -1,4 +1,9 @@
 
+2015-03-06  Ron Norman <rjn@inglenet.com>
+
+	* common.c additional update to resolve pointer/int alignment issues
+	  as 'cob_sys_getopt_long_long' was aborting on SUN system
+
 2015-03-03  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c, common.c, common.h updated to resolve little endian
