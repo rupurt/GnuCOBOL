@@ -3020,7 +3020,10 @@ AT_DATA([prog.cob], [
            TERMINATE STUDENT-REPORT.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [
+prog.cob: In paragraph 'A000-MAINLINE':
+prog.cob: 89: Warning: Overlapping MOVE may produce unpredictable results
+])
 
 AT_CHECK([export DD_STUDENT=./inp_data
 export DD_REPORT1=./report.txt

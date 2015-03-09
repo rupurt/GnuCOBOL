@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
+   Copyright (C) 2012,2014-2015 Simon Sobisch
    Copyright (C) 2013-2015 Ron Norman 
 
    This file is part of GNU Cobol.
@@ -1495,7 +1496,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 		}
 	}
 
-	/* Subscript check */
+	/* Subscript check and setting of table offset*/
 	if (!r->flag_all && r->subs) {
 		l = r->subs;
 		for (p = f; p; p = p->parent) {
@@ -1521,6 +1522,10 @@ cb_build_identifier (cb_tree x, const int subchk)
 					cb_error_x (x, _("Subscript of '%s' out of bounds: %d"),
 						    name, n);
 				}
+				if (p==f) {
+					/* Only valid for single subscript (!) */ 
+					f->mem_offset = f->size * (n - 1);
+			}
 			}
 
 			/* Run-time check */
@@ -5875,20 +5880,13 @@ cb_check_overlapping (cb_tree src, cb_tree dst,
 	struct cb_field	*f1;
 	struct cb_field	*ff1;
 	struct cb_field	*ff2;
+	struct cb_reference *r;
 	cb_tree		loc;
 	int		src_size;
 	int		dst_size;
 	int		src_off;
 	int		dst_off;
 
-	src_size = cb_field_size (src);
-	dst_size = cb_field_size (dst);
-
-	if (src_size <= 0 || dst_size <= 0 ||
-	    cb_field_variable_size (src_f) ||
-	    cb_field_variable_size (dst_f)) {
-		return 0;
-	}
 	/* Check basic overlapping */
 	for (f1 = src_f->children; f1; f1 = f1->sister) {
 		if (f1 == dst_f) {
@@ -5911,19 +5909,44 @@ cb_check_overlapping (cb_tree src, cb_tree dst,
 	if (ff1 != ff2) {
 		return 0;
 	}
+
+	src_size = cb_field_size (src);
+	dst_size = cb_field_size (dst);
+
+	if (src_size <= 0 || dst_size <= 0 ||
+	    cb_field_variable_size (src_f) ||
+	    cb_field_variable_size (dst_f)) {
+		return 1; /* overlapping possible, would need more checks */
+	}
 	/* Check literal occurs? */
-	if (src_f->indexes || dst_f->indexes) {
-		return 0;
+	if ((src_f->flag_occurs && !src_f->mem_offset) ||
+		(dst_f->flag_occurs && !dst_f->mem_offset)) {
+		return 1; /* overlapping possible, would need more checks */
 	}
-	/* Check reference modification ? */
-	if (CB_REFERENCE_P (src) && CB_REFERENCE(src)->offset) {
-		return 0;
-	}
-	if (CB_REFERENCE_P (dst) && CB_REFERENCE(dst)->offset) {
-		return 0;
-	}
+	
+	/* Same field - Check offsets */
 	src_off = src_f->offset;
 	dst_off = dst_f->offset;
+
+	/* Adjusting offsets by occurs and reference modification */
+	src_off += src_f->mem_offset ;
+	r = CB_REFERENCE (src);
+	if (r->offset) {
+		if (CB_LITERAL_P (r->offset)) {
+			src_off += cb_get_int (r->offset) - 1;
+		} else {
+			goto overlapret;
+	}
+	}
+	dst_off += dst_f->mem_offset;
+	r = CB_REFERENCE (dst);
+	if (r->offset) {
+		if (CB_LITERAL_P (r->offset)) {
+			dst_off += cb_get_int (r->offset) - 1;
+		} else {
+			goto overlapret;
+		}
+	}
 	if (src_off >= dst_off && src_off < (dst_off + dst_size)) {
 		goto overlapret;
 	}
@@ -6522,7 +6545,9 @@ cb_build_move_copy (cb_tree src, cb_tree dst)
 	}
 	if (overlapping 
 	|| CB_FIELD_PTR (src)->storage == CB_STORAGE_LINKAGE
-	|| CB_FIELD_PTR (dst)->storage == CB_STORAGE_LINKAGE) {
+	|| CB_FIELD_PTR (dst)->storage == CB_STORAGE_LINKAGE
+	|| CB_FIELD_PTR (src)->flag_item_based
+	|| CB_FIELD_PTR (dst)->flag_item_based) {
 		overlapping = 0;
 		return CB_BUILD_FUNCALL_3 ("memmove",
 					   CB_BUILD_CAST_ADDRESS (dst),
