@@ -142,6 +142,7 @@ config/default.conf -text
 config/ibm.conf -text
 config/mf.conf -text
 config/mvs.conf -text
+config/runtime.cfg -text
 /configure -text
 /configure.ac -text
 copy/ChangeLog -text
