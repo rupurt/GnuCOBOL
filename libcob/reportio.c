@@ -171,10 +171,10 @@ static cob_field *
 cob_field_dup (cob_field *f, int incr)
 {
 	cob_field	temp;
-	cob_field	*fld = calloc(1,sizeof(cob_field));
+	cob_field	*fld = cob_malloc(sizeof(cob_field));
 
 	fld->size = f->size+incr;
-	fld->data = calloc(1,f->size+incr);
+	fld->data = cob_malloc(f->size+incr);
 	fld->attr = f->attr;
 
 	temp.size = 1;
@@ -198,8 +198,8 @@ cob_field_free (cob_field *f)
 	if(f == NULL)
 		return;
 	if(f->data)
-		free((void*)f->data);
-	free((void*)f);
+		cob_free((void*)f->data);
+	cob_free((void*)f);
 	return ;
 }
 
@@ -523,7 +523,7 @@ reportDump(const cob_report *r, const char *msg)
 			 */
 			cob_linage      *lingptr;
 			if(r->report_file->linorkeyptr == NULL) {
-				r->report_file->linorkeyptr = calloc(1,sizeof(cob_linage));
+				r->report_file->linorkeyptr = cob_malloc(sizeof(cob_linage));
 				lingptr = r->report_file->linorkeyptr;
 				lingptr->lin_top = r->def_heading;
 				lingptr->lin_bot = r->def_footing;
