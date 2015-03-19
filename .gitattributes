@@ -292,6 +292,7 @@ tests/testsuite.src/run_subscripts.at -text
 tests/testsuite.src/syn_copy.at -text
 tests/testsuite.src/syn_definition.at -text
 tests/testsuite.src/syn_file.at -text
+tests/testsuite.src/syn_functions.at -text
 tests/testsuite.src/syn_misc.at -text
 tests/testsuite.src/syn_move.at -text
 tests/testsuite.src/syn_multiply.at -text
