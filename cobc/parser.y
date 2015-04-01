@@ -394,7 +394,7 @@ terminator_warning (cb_tree stmt, const unsigned int termid,
 				name, name);
 		}
 	}
-	/* Free tree assocated with terminator */
+	/* Free tree associated with terminator */
 	cobc_parse_free (stmt);
 }
 
@@ -408,7 +408,7 @@ terminator_error (cb_tree stmt, const unsigned int termid, const char *name)
 	if (term_array[termid]) {
 		term_array[termid]--;
 	}
-	/* Free tree assocated with terminator */
+	/* Free tree associated with terminator */
 	cobc_parse_free (stmt);
 }
 
@@ -419,7 +419,7 @@ terminator_clear (cb_tree stmt, const unsigned int termid)
 	if (term_array[termid]) {
 		term_array[termid]--;
 	}
-	/* Free tree assocated with terminator */
+	/* Free tree associated with terminator */
 	cobc_parse_free (stmt);
 }
 
@@ -802,6 +802,7 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token CALL
 %token CANCEL
 %token CAPACITY
+%token CENTER
 %token CF
 %token CH
 %token CHAINING
@@ -3654,7 +3655,7 @@ data_description:
 
 	x = cb_build_field_tree ($1, $2, current_field, current_storage,
 				 current_file, 0);
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	if (CB_INVALID_TREE (x)) {
 		YYERROR;
@@ -3685,7 +3686,7 @@ data_description:
   }
 | level_number error TOK_DOT
   {
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	yyerrok;
 	cb_unput_dot ();
@@ -3843,7 +3844,7 @@ constant_entry:
 
 	cobc_cs_check = 0;
 	level = cb_get_level ($1);
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	if (level != 1) {
 		cb_error (_("CONSTANT item not at 01 level"));
@@ -4400,6 +4401,15 @@ synchronized_clause:
   }
 ;
 
+_left_or_right:
+  /* empty -> implemented as LEFT */
+| LEFT
+| RIGHT
+  {
+	PENDING ("SYNCHRONIZED RIGHT");
+  }
+;
+
 
 /* BLANK clause */
 
@@ -4840,7 +4850,7 @@ report_group_description_entry:
 
 	x = cb_build_field_tree ($1, $2, current_field, current_storage,
 				 current_file, 0);
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	check_pic_duplicate = 0;
 	if (CB_INVALID_TREE (x)) {
@@ -5116,26 +5126,34 @@ column_clause:
 ;
 
 col_keyword_clause:
-  column_or_col _numbers _is_are
+  column_or_col _numbers _orientation _is_are
 | columns_or_cols _are
 ;
 
-col_or_plus:
-  PLUS report_integer 
+_orientation:
+  /* empty */
+| _left_right_center
   {
-	current_field->report_column = cb_get_int ($2);
-	if(current_field->report_column > 0)
-		current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
-	else
-		current_field->report_column = 0;
+	/* ToDo: Add check in typeck that all operands are absolute */
+	PENDING ("COLUMN orientation (LEFT/RIGHT/CENTER)");
   }
-| TOK_PLUS report_integer 
+;
+
+_left_right_center:
+  LEFT
+| RIGHT
+| CENTER
+;
+
+col_or_plus:
+  plus_plus report_integer 
   {
 	current_field->report_column = cb_get_int ($2);
-	if(current_field->report_column > 0)
+	if (current_field->report_column > 0) {
 		current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
-	else
+	} else {
 		current_field->report_column = 0;
+	}
   }
 | report_integer
   {
@@ -5221,7 +5239,7 @@ screen_description:
 
 	x = cb_build_field_tree ($1, $2, current_field, current_storage,
 				 current_file, 0);
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	check_pic_duplicate = 0;
 	if (CB_INVALID_TREE (x)) {
@@ -5273,7 +5291,7 @@ screen_description:
   }
 | level_number error TOK_DOT
   {
-	/* Free tree assocated with level number */
+	/* Free tree associated with level number */
 	cobc_parse_free ($1);
 	yyerrok;
 	cb_unput_dot ();
@@ -11092,7 +11110,6 @@ _into:		| INTO ;
 _is:		| IS ;
 _is_are:	| IS | ARE ;
 _key:		| KEY ;
-_left_or_right:	| LEFT | RIGHT ;
 _line_or_lines:	| LINE | LINES ;
 _limits:	| LIMIT _is | LIMITS _are ;
 _lines:		| LINES ;

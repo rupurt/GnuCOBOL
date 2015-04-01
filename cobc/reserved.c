@@ -322,7 +322,7 @@ static const struct cobc_reserved reserved_words[] = {
   { "CD",			0, 0, 0,			/* 85 CM */
 				0, 0
   },
-  { "CENTER",			0, 1, -1,			/* 2002 (C/S) */
+  { "CENTER",			0, 1, CENTER,			/* 2002 (C/S) */
 				0, 0
 	/* FIXME + Check: 2014 Context-sensitive to COLUMN clause */
   },
