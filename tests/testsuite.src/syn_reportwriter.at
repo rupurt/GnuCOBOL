@@ -19,7 +19,7 @@
  
 ### ISO+IEC+1989-2002 REPORT WRITER module
 
-AT_SETUP([Check REPORT error/warning])
+AT_SETUP([REPORT error/warning])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -144,16 +144,15 @@ AT_DATA([prog.cob], [
           02  LINE 1, COL 0 VALUE "Hello!".
           02  LINE 2, COL 2 VALUE "Hello!".
           02  LINE PLUS 1.
-              03 COLUMN PLUS 01 PIC X(09) VALUE 'CUST. NO.'.
+              03 COLUMN 01      PIC X(09) VALUE 'CUST. NO.'.
               03 COLUMN PLUS 0  PIC X(09) VALUE 'ITEM'.
           02  LINE PLUS 2.
               03 COLUMN 1.5     PIC X(09) VALUE 'CUST. NO.'.
               03 COLUMN + -10   PIC X(09) VALUE 'ITEM'.
-      
+
        01 rp-detail TYPE DETAIL.
           02 LINE PLUS 1.
              03 COLUMN 03   PIC X(06) VALUE 'SAMPLE'.
-
 
        PROCEDURE DIVISION.
            OPEN OUTPUT out-file.
@@ -168,118 +167,6 @@ AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob: 18: Error: Invalid COLUMN integer; Must be > 0
 prog.cob: 24: Error: Positive Integer value expected
 prog.cob: 25: Error: Positive Integer value expected
-])
-
-AT_CLEANUP
-
-
-AT_SETUP([REPORT LINE PLUS ZERO])
-AT_KEYWORDS([report])
-
-# Not implemented, ToDo
-AT_SKIP_IF(true)
-
-AT_DATA([prog.cob], [
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. prog.
-
-       ENVIRONMENT DIVISION.
-       INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-       SELECT out-file ASSIGN "blah.txt"
-           ORGANIZATION LINE SEQUENTIAL.
-
-       DATA DIVISION.
-       FILE SECTION.
-       FD  out-file REPORT rp.
-
-       REPORT SECTION.
-       RD  rp.
-       01  rp-head TYPE PH.
-          02  LINE 1, COL 5 VALUE "Hello!".
-          02  LINE 2, COL 2 VALUE "Hello!".
-          02  LINE PLUS 0.
-              03 COLUMN 01      PIC X(09) VALUE 'CUST. NO.'.
-              03 COLUMN PLUS 0  PIC X(09) VALUE 'ITEM'.
-          02  LINE PLUS zero.
-              03 COLUMN 1       PIC X(09) VALUE 'CUST. NO.'.
-              03 COLUMN + 10    PIC X(09) VALUE 'ITEM'.
-      
-       01 rp-detail TYPE DETAIL.
-          02 LINE PLUS 1.
-             03 COLUMN 03   PIC X(06) VALUE 'SAMPLE'.
-
-
-       PROCEDURE DIVISION.
-           OPEN OUTPUT out-file.
-           INITIATE rp.
-           GENERATE rp-detail.
-           TERMINATE rp.
-           CLOSE out-file.
-           STOP RUN.
-])
-
-AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[Output should *NOT* be:
-prog.cob: 20: Warning: LINE PLUS 0 not implemented
-prog.cob: 23: Warning: LINE PLUS 0 not implemented
-])
-
-AT_CLEANUP
-
-
-AT_SETUP([REPORT COLUMN orientation: LEFT/CENTER/RIGHT])
-AT_KEYWORDS([report])
-
-# Not implemented, ToDo
-AT_SKIP_IF(true)
-
-AT_DATA([prog.cob], [
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. prog.
-
-       ENVIRONMENT DIVISION.
-       INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-       SELECT out-file ASSIGN "blah.txt"
-           ORGANIZATION LINE SEQUENTIAL.
-
-       DATA DIVISION.
-       FILE SECTION.
-       FD  out-file REPORT rp.
-
-       REPORT SECTION.
-       RD  rp.
-       01  rp-head TYPE PH.
-          02  LINE 1, COL LEFT   10 VALUE "Hello!".
-          02  LINE 2, COL RIGHT  20 VALUE "Hello!".
-          02  LINE PLUS 2.
-              03 COLUMN LEFT 01   PIC X(09) VALUE 'CUST. NO.'.
-              03 COLUMN PLUS 0    PIC X(09) VALUE 'ITEM'.
-          02  LINE PLUS 2.
-              03 COLUMN 18        PIC X(09) VALUE 'CUST. NO.'.
-              03 COLUMN PLUS 20   PIC X(09) VALUE 'ITEM'.
-              03 COLUMN CENTER 40 PIC X(09) VALUE 'DESC'.
-      
-       01 rp-detail TYPE DETAIL.
-          02 LINE PLUS 1.
-             03 COLUMN 03   PIC X(06) VALUE 'SAMPLE'.
-
-
-       PROCEDURE DIVISION.
-           OPEN OUTPUT out-file.
-           INITIATE rp.
-           GENERATE rp-detail.
-           TERMINATE rp.
-           CLOSE out-file.
-           STOP RUN.
-])
-
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob: 22: Error: All column operands need to be absolute with orientation.
-prog.cob: 21: Error: Column orientation defined here.
-prog.cob: 25: Error: All column operands need to be absolute with orientation.
-prog.cob: 26: Error: Column orientation defined here.
 ])
 
 AT_CLEANUP

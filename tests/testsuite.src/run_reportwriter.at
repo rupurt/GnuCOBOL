@@ -1,4 +1,3 @@
-## Copyright (C) 2014-2015 Ron Norman
 ## 
 ## This file is part of GNU Cobol.
 ## 
@@ -19,7 +18,7 @@
  
 ### ISO+IEC+1989-2002 REPORT WRITER module
 
-AT_SETUP([REPORT BUG1])
+AT_SETUP([Report Line Order])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -117,7 +116,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([REPORT COL PLUS])
+AT_SETUP([Report COL PLUS])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -187,7 +186,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([REPORT BUG3])
+AT_SETUP([Report Overlapping Fields])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -463,7 +462,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Customer Report])
+AT_SETUP([Sample Customer Report])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
@@ -780,7 +779,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Charge Report])
+AT_SETUP([Sample Charge Report])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
@@ -1135,7 +1134,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Charge Report 2])
+AT_SETUP([Sample Charge Report 2])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
@@ -1507,7 +1506,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Charge Report 3])
+AT_SETUP([Sample Charge Report 3])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[0152 J. LANGDON       87653 02475
@@ -1809,7 +1808,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Charge Report 4])
+AT_SETUP([Sample Charge Report 4])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[05 A 007328
@@ -2227,7 +2226,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Payroll Report])
+AT_SETUP([Sample Payroll Report])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 00075 021042
@@ -2891,7 +2890,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([STUDENT REPORT; Test INITIAL])
+AT_SETUP([STUDENT REPORT with INITIAL])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[00123Dorken, Keith       CS 08
@@ -2932,16 +2931,6 @@ AT_DATA([prog.cob], [
 
        WORKING-STORAGE SECTION.
        01   ARE-THERE-MORE-RECORDS       PIC  XXX   VALUE  "YES".          
-       01   REPORT-DUMMY.
-            05  FILLER        PIC X(3) VALUE SPACES.
-            05  COLUMN-4      PIC 9(6).
-            05  FILLER        PIC X(5) VALUE SPACES.
-            05  COLUMN-15     PIC X(20).
-            05  FILLER        PIC X(5) VALUE SPACES.
-            05  COLUMN-40     PIC XXX.
-            05  FILLER        PIC X(4) VALUE SPACES.
-            05  COLUMN-46     PIC Z99.9.
-            05  LAST-CHAR     PIC X.
 
        REPORT SECTION.
        RD   STUDENT-REPORT
@@ -2985,18 +2974,6 @@ AT_DATA([prog.cob], [
        A000-MAINLINE.
            OPEN  INPUT  INPUT-FILE
                  OUTPUT PRINT-FILE
-           MOVE SPACES  TO REPORT-DUMMY.
-           DISPLAY "*** Report Test 1 ***" UPON CONSOLE.
-           MOVE SPACES  TO REPORT-DUMMY.
-           MOVE 5       TO COLUMN-4.
-           MOVE "Hello" TO COLUMN-15.
-           MOVE "Bye"   TO COLUMN-40.
-           MOVE 75.0    TO COLUMN-46.
-           MOVE "*"     TO LAST-CHAR
-      *  Test that overlapping move does not mangle data
-           MOVE REPORT-DUMMY (2:50) TO REPORT-DUMMY.
-           MOVE "*"     TO LAST-CHAR
-           DISPLAY REPORT-DUMMY UPON CONSOLE.
            PERFORM DO-INIT.
            READ INPUT-FILE
                AT END
@@ -3020,16 +2997,11 @@ AT_DATA([prog.cob], [
            TERMINATE STUDENT-REPORT.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob: In paragraph 'A000-MAINLINE':
-prog.cob: 89: Warning: Overlapping MOVE may produce unpredictable results
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([export DD_STUDENT=./inp_data
 export DD_REPORT1=./report.txt
-./prog], [0], [*** Report Test 1 ***
-  000005     Hello                    Bye     75.0 *
-], [])
+./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3444,7 +3416,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Control Break Report])
+AT_SETUP([Sample Control Break])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[Norman, Ronald J    25CS Malcolm, Mike        Waterloo
@@ -3688,7 +3660,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Inventory Report])
+AT_SETUP([Sample Inventory Report])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[01Data Processing   02000500012388
@@ -3880,7 +3852,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Dup Detail Line])
+AT_SETUP([Duplicate Detail Line])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -4009,7 +3981,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([OCCURS Test])
+AT_SETUP([Report with OCCURS])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -4082,7 +4054,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Dupliate INITIATE])
+AT_SETUP([Duplicate INITIATE])
 AT_KEYWORDS([report])
 
 AT_DATA([prog.cob], [
@@ -4210,7 +4182,7 @@ AT_CHECK([diff reference report.txt], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Next Page Bug ])
+AT_SETUP([Next Group Next Page])
 AT_KEYWORDS([report])
 
 AT_DATA([inp_data],[MW1000051IN15021220150212OR150212043ITEM_NUMBER_22      0000002800002999
