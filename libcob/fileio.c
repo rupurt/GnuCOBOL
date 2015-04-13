@@ -1265,7 +1265,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 		fperms = _S_IREAD | _S_IWRITE ;
 #else
-		fperms = 0666;
+		fperms = COB_FILE_MODE;
 #endif
 		break;
 	case COB_OPEN_I_O:
@@ -1274,7 +1274,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 			fperms = _S_IREAD | _S_IWRITE ;
 #else
-			fperms = 0666;
+			fperms = COB_FILE_MODE;
 #endif
 		} else {
 			fdmode |= O_RDWR;
@@ -1285,7 +1285,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 #ifdef	_WIN32
 		fperms = _S_IREAD | _S_IWRITE ;
 #else
-		fperms = 0666;
+		fperms = COB_FILE_MODE;
 #endif
 		break;
 	}
@@ -2492,8 +2492,8 @@ join_environment (void)
 	}
 	ret = db_env_create (&bdb_env, 0);
 	if (ret) {
-		cob_runtime_error (_("Cannot join BDB environment, error: %d %s"),
-				   ret, db_strerror (ret));
+		cob_runtime_error (_("Cannot join BDB environment (%s), error: %d %s"),
+				   "env_create", ret, db_strerror (ret));
 		cob_stop_run (1);
 	}
 #if	0	/* RXWRXW - BDB msg */
@@ -2512,8 +2512,8 @@ join_environment (void)
 	flags = DB_CREATE | DB_INIT_MPOOL | DB_INIT_CDB;
 	ret = bdb_env->open (bdb_env, bdb_home, flags, 0);
 	if (ret) {
-		cob_runtime_error (_("Cannot join BDB environment, env_open: %d %s"),
-				   ret, db_strerror (ret));
+		cob_runtime_error (_("Cannot join BDB environment (%s), error: %d %s"),
+				   "env->open", ret, db_strerror (ret));
 		bdb_env->close (bdb_env, 0);
 		bdb_env = NULL;
 		cob_stop_run (1);
@@ -5369,7 +5369,7 @@ open_cbl_file (unsigned char *file_name, unsigned char *file_access,
 			return -1;
 	}
 	fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
-	fd = open (fn, flag, 0660);
+	fd = open (fn, flag, COB_FILE_MODE);
 	if (fd < 0) {
 		cob_free (fn);
 		memset (file_handle, -1, (size_t)4);
@@ -5604,7 +5604,7 @@ cob_sys_copy_file (unsigned char *fname1, unsigned char *fname2)
 	fn2 = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[1]);
 	flag &= ~O_RDONLY;
 	flag |= O_CREAT | O_TRUNC | O_WRONLY;
-	fd2 = open (fn2, flag, 0660);
+	fd2 = open (fn2, flag, COB_FILE_MODE);
 	if (fd2 < 0) {
 		close (fd1);
 		cob_free (fn2);
@@ -5645,7 +5645,7 @@ cob_sys_check_file_exist (unsigned char *file_name, unsigned char *file_info)
 		return -1;
 	}
 	if (COB_MODULE_PTR->cob_procedure_params[1]->size < 16U) {
-		cob_runtime_error (_("'CBL_CHECK_FILE_EXIST' - File detail area is too short"));
+		cob_runtime_error (_("'%s' - File detail area is too short"), "CBL_CHECK_FILE_EXIST");
 		cob_stop_run (1);
 	}
 
@@ -5899,7 +5899,7 @@ cob_sys_file_info (unsigned char *file_name, unsigned char *file_info)
 		return 128;
 	}
 	if (COB_MODULE_PTR->cob_procedure_params[1]->size < 16U) {
-		cob_runtime_error (_("'C$FILEINFO' - File detail area is too short"));
+		cob_runtime_error (_("'%s' - File detail area is too short"), "C$FILEINFO");
 		cob_stop_run (1);
 	}
 
@@ -6100,7 +6100,7 @@ cob_srttmpfile (void)
 		    _O_CREAT | _O_TRUNC | _O_RDWR | _O_BINARY | _O_TEMPORARY,
 		    _S_IREAD | _S_IWRITE);
 #else
-	fd = open (filename, O_CREAT | O_TRUNC | O_RDWR | O_BINARY, 0660);
+	fd = open (filename, O_CREAT | O_TRUNC | O_RDWR | O_BINARY, COB_FILE_MODE);
 #endif
 	if (fd < 0) {
 		cob_free (filename);

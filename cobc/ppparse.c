@@ -1783,15 +1783,13 @@ yydestruct (yymsg, yytype, yyvaluep)
 
 /* Prevent warnings from -Wmissing-prototypes.  */
 #ifdef YYPARSE_PARAM
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
 #else
 int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#if defined __STDC__ || defined __cplusplus
 int yyparse (void);
 #else
 int yyparse ();
@@ -2140,7 +2138,7 @@ yyreduce:
 		p++;
 		size = strlen (p) - 1;
 		if (p[size] != quote) {
-			cb_error (_("Invalid SOURCEFORMAT directive"));
+			cb_error (_("Invalid %s directive"), "SOURCEFORMAT");
 		}
 		p[size] = 0;
 	}
@@ -2149,7 +2147,7 @@ yyreduce:
 	} else if (!strcasecmp (p, "FREE")) {
 		cb_source_format = CB_FORMAT_FREE;
 	} else {
-		cb_error (_("Invalid SOURCEFORMAT directive"));
+		cb_error (_("Invalid %s directive"), "SOURCEFORMAT");
 	}
   }
     break;
@@ -2178,7 +2176,7 @@ yyreduce:
 		p++;
 		size = strlen (p) - 1;
 		if (p[size] != quote) {
-			cb_error (_("Invalid FOLD-COPY-NAME directive"));
+			cb_error (_("Invalid %s directive"), "FOLD-COPY-NAME");
 		}
 		p[size] = 0;
 	}
@@ -2187,7 +2185,7 @@ yyreduce:
 	} else if (!strcasecmp (p, "LOWER")) {
 		cb_fold_copy = COB_FOLD_LOWER;
 	} else {
-		cb_error (_("Invalid FOLD-COPY-NAME directive"));
+		cb_error (_("Invalid %s directive"), "FOLD-COPY-NAME");
 	}
   }
     break;
@@ -2233,7 +2231,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 735 "ppparse.y"
     {
-	cb_error (_("Invalid SOURCE directive"));
+	cb_error (_("Invalid %s directive"), "SOURCE");
 	YYERROR;
   }
     break;
@@ -2320,7 +2318,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 800 "ppparse.y"
     {
-	cb_error (_("Invalid DEFINE/SET directive"));
+	cb_error (_("Invalid %s directive"), "DEFINE/SET");
   }
     break;
 
@@ -2329,7 +2327,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 808 "ppparse.y"
     {
-	cb_warning (_("TURN directive not yet implemented"));
+	cb_warning (_("%s directive not yet implemented"), "TURN");
   }
     break;
 
@@ -2397,7 +2395,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 871 "ppparse.y"
     {
-	cb_error (_("Invalid IF/ELIF directive"));
+	cb_error (_("Invalid %s directive"), "IF/ELIF");
   }
     break;
 
@@ -2900,7 +2898,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2904 "ppparse.c"
+#line 2902 "ppparse.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3019,6 +3017,8 @@ yyerrorlab:
   /* Pacify compilers like GCC when the user code never invokes
      YYERROR and the label yyerrorlab therefore never appears in user
      code.  */
+  if (/*CONSTCOND*/ 0)
+     goto yyerrorlab;
 
   /* Do not reclaim the symbols of the rule which action triggered
      this YYERROR.  */
@@ -3128,7 +3128,7 @@ yyreturn:
 
 
 
-/* Line 2065 of yacc.c  */
+/* Line 2067 of yacc.c  */
 #line 1202 "ppparse.y"
 
 

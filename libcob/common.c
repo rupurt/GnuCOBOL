@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
+   Copyright (C) 2014,2015 Simon Sobisch
 
    This file is part of GNU Cobol.
 
@@ -60,6 +61,8 @@
 #ifdef	HAVE_LOCALE_H
 #include <locale.h>
 #endif
+
+#include "lib/gettext.h"
 
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP
@@ -175,6 +178,10 @@ static volatile sig_atomic_t	sig_is_handled = 0;
 
 /* Function Pointer for external signal handling */
 static void		(*cob_ext_sighdl) (int) = NULL;
+
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+static VOID		(WINAPI *time_as_filetime_func) (LPFILETIME) = NULL;
+#endif
 
 #undef	COB_EXCEPTION
 #define COB_EXCEPTION(code,tag,name,critical)	name,
@@ -438,9 +445,9 @@ cob_sig_handler (int sig)
 #else
 	fprintf (stderr, _("Caught Signal"));
 #endif
-	putc (' ', stderr);
-	fprintf (stderr, _("(Signal %s)"), signal_name);
-	putc ('\n', stderr);
+	fprintf (stderr, " (");
+	fprintf (stderr, _("Signal %s"), signal_name);
+	fprintf (stderr, ")\n");
 
 	if (cob_initialized) {
 		cob_terminate_routines ();
@@ -1087,6 +1094,50 @@ cob_rescan_env_vals (void)
 	}
 }
 
+static int
+one_indexed_day_of_week_from_monday(int zero_indexed_from_sunday)
+{
+	return ((zero_indexed_from_sunday + 6) % 7) + 1;
+}
+
+static void
+set_unknown_offset(struct cob_time *time)
+{
+	time->offset_known = 0;
+	time->utc_offset = 0;
+}
+
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+static void
+set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time)
+{
+	ULONGLONG	filetime_int;
+
+	filetime_int = (((ULONGLONG) filetime.dwHighDateTime) << 32)
+		+ filetime.dwLowDateTime;
+	/* FILETIMEs are accurate to 100 nanosecond intervals */
+	cb_time->nanosecond = (filetime_int % (ULONGLONG) 10000000) * 100;
+
+}
+#endif
+
+#if defined (_WIN32) && !defined (__CYGWIN__)
+static void
+set_cob_time_offset (struct cob_time *cb_time)
+{
+	DWORD	time_zone_result;
+	TIME_ZONE_INFORMATION	time_zone_info;
+
+	time_zone_result = GetTimeZoneInformation (&time_zone_info);
+	if (time_zone_result != TIME_ZONE_ID_INVALID) {
+		cb_time->offset_known = 1;
+		cb_time->utc_offset = time_zone_info.Bias;
+	} else {
+		set_unknown_offset (cb_time);
+	}
+}
+#endif
+
 /* Global functions */
 
 int
@@ -1466,9 +1517,11 @@ cob_fatal_error (const int fatal_error)
 	int		status;
 
 	switch (fatal_error) {
+#if 0 /* Currently not in use, should enter unknown error */
 	case COB_FERROR_NONE:
 		cob_runtime_error (_("cob_init() has not been called"));
 		break;
+#endif
 	case COB_FERROR_CANCEL:
 		cob_runtime_error (_("Attempt to CANCEL active program"));
 		break;
@@ -1498,7 +1551,7 @@ cob_fatal_error (const int fatal_error)
 				   COB_MODULE_PTR->module_name);
 		break;
 	case COB_FERROR_FREE:
-		cob_runtime_error (_("Call to cob_free with NULL pointer"));
+		cob_runtime_error (_("Call to %s with NULL pointer"), "cob_free");
 		break;
 	case COB_FERROR_FILE:
 		file_status = cobglobptr->cob_error_file->file_status;
@@ -1541,7 +1594,7 @@ cob_fatal_error (const int fatal_error)
 			msg = _("Record overflow");
 			break;
 		case COB_STATUS_46_READ_ERROR:
-			msg = _("Failed to read");
+			msg = _("Failed to READ");
 			break;
 		case COB_STATUS_47_INPUT_DENIED:
 			msg = _("READ/START not allowed");
@@ -2429,6 +2482,132 @@ cob_external_addr (const char *exname, const int exlength)
 	return eptr->ext_alloc;
 }
 
+/* Retrieving current date and time */
+
+int
+cob_ctoi (const char digit)
+{
+	return (int) (digit - '0');
+}
+
+#if defined (_WIN32) && !defined (__CYGWIN__)
+struct cob_time
+cob_get_current_date_and_time (void)
+{
+	SYSTEMTIME	local_time;
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+	FILETIME	filetime;
+	SYSTEMTIME	utc_time;
+#endif
+	struct cob_time	cb_time;
+
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+	(time_as_filetime_func) (&filetime);
+	FileTimeToSystemTime (&filetime, &utc_time);
+	SystemTimeToTzSpecificLocalTime (NULL, &utc_time, &local_time);
+#else
+	GetLocalTime (&local_time);
+#endif
+
+	cb_time.year = local_time.wYear;
+	cb_time.month = local_time.wMonth;
+	cb_time.day_of_month = local_time.wDay;
+	cb_time.day_of_week = one_indexed_day_of_week_from_monday (local_time.wDayOfWeek);
+	cb_time.hour = local_time.wHour;
+	cb_time.minute = local_time.wMinute;
+	cb_time.second = local_time.wSecond;
+	cb_time.nanosecond = local_time.wMilliseconds;
+	cb_time.offset_known = 0;
+	cb_time.utc_offset = 0;
+
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+	set_cob_time_ns_from_filetime (filetime, &cb_time);
+#endif
+
+	set_cob_time_offset (&cb_time);
+
+	return cb_time;
+}
+#else
+struct cob_time
+cob_get_current_date_and_time (void)
+{
+#if defined (HAVE_CLOCK_GETTIME)
+	struct timespec	time_spec;
+#elif defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
+	struct timeval	tmv;
+#endif
+	time_t		curtime;
+	struct tm	*tmptr;
+	struct cob_time	cb_time;
+#if defined(COB_STRFTIME)
+	char		iso_timezone[6] = { '\0' };
+#endif
+
+	/* Get the current time */
+#if defined (HAVE_CLOCK_GETTIME)
+	clock_gettime (CLOCK_REALTIME, &time_spec);
+	curtime = time_spec.tv_sec;
+#elif defined (HAVE_SYS_TIME_H) && defined (HAVE_GETTIMEOFDAY)
+	gettimeofday(&tmv, NULL);
+	curtime = tmv.tv_sec;
+#else
+	curtime = time (NULL);
+#endif
+	tmptr = localtime (&curtime);
+	/* Leap seconds ? */
+	if (tmptr->tm_sec >= 60) {
+		tmptr->tm_sec = 59;
+	}
+
+	cb_time.year = tmptr->tm_year + 1900;
+	cb_time.month = tmptr->tm_mon + 1;
+	cb_time.day_of_month = tmptr->tm_mday;
+	cb_time.day_of_week = one_indexed_day_of_week_from_monday (tmptr->tm_wday);
+	cb_time.hour = tmptr->tm_hour;
+	cb_time.minute = tmptr->tm_min;
+	cb_time.second = tmptr->tm_sec;
+	cb_time.nanosecond = 0;
+	cb_time.offset_known = 0;
+	cb_time.utc_offset = 0;
+
+	/* Get nanoseconds or microseconds, if possible */
+#if defined (HAVE_CLOCK_GETTIME)
+	cb_time.nanosecond = time_spec.tv_nsec;
+#elif defined (HAVE_SYS_TIME_H) && defined (HAVE_GETTIMEOFDAY)
+	cb_time.nanosecond = tmv.tv_usec * 1000;
+#else
+	cb_time.nanosecond = 0;
+#endif
+
+	/* Get the offset from UTC */
+#if defined (COB_STRFTIME)
+	strftime (iso_timezone, (size_t) 6, "%z", tmptr);
+
+	if (iso_timezone[0] == '0') {
+		set_unknown_offset (&cb_time);
+	} else {
+		/* Convert the timezone string into minutes from UTC */
+		cb_time.utc_offset =
+			cob_ctoi (iso_timezone[1]) * 60 * 10
+			+ cob_ctoi (iso_timezone[2]) * 60
+			+ cob_ctoi (iso_timezone[3]) * 10
+			+ cob_ctoi (iso_timezone[4]);
+		if (iso_timezone[0] == '-') {
+			cb_time.utc_offset *= -1;
+		}
+	}
+#elif defined (HAVE_TIMEZONE)
+	cb_time.offset_known = 1;
+	cb_time.utc_offset = timezone / 60;
+#else
+	set_unknown_offset(&cb_time);
+#endif
+
+	return cb_time;
+}
+#endif
+
 /* Extended ACCEPT/DISPLAY */
 
 void
@@ -2493,43 +2672,16 @@ cob_accept_day_of_week (cob_field *f)
 }
 
 void
-cob_accept_time (cob_field *f)
+cob_accept_time (cob_field *field)
 {
-#ifdef	_WIN32
-	SYSTEMTIME	syst;
-#else
-	struct tm	*tlt;
-	time_t		t;
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
-	struct timeval	tmv;
-	char		buff2[8];
-#endif
-#endif
-	char		s[12];
+	struct cob_time	time;
+	char		str[9] = { '\0' };
+	
+	time = cob_get_current_date_and_time ();
+	snprintf (str, 9, "%2.2d%2.2d%2.2d%2.2d", time.hour, time.minute,
+		  time.second, time.nanosecond / 10000000);
 
-#ifdef	_WIN32
-	GetLocalTime (&syst);
-	sprintf (s, "%2.2d%2.2d%2.2d%2.2d", syst.wHour, syst.wMinute,
-		syst.wSecond, syst.wMilliseconds / 10);
-#else
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
-	gettimeofday (&tmv, NULL);
-	t = tmv.tv_sec;
-#else
-	t = time (NULL);
-#endif
-	tlt = localtime (&t);
-	/* Leap seconds ? */
-	if (tlt->tm_sec >= 60) {
-		tlt->tm_sec = 59;
-	}
-	strftime (s, (size_t)9, "%H%M%S00", tlt);
-#if defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
-	sprintf(buff2, "%2.2ld", (long int)(tmv.tv_usec / 10000));
-	memcpy (&s[6], buff2, (size_t)2);
-#endif
-#endif
-	cob_memcpy (f, s, (size_t)8);
+	cob_memcpy (field, str, (size_t)8);
 }
 
 void
@@ -3116,7 +3268,7 @@ cob_sys_system (const void *cmdline)
 		cmd = cmdline;
 		i = (int)COB_MODULE_PTR->cob_procedure_params[0]->size;
 		if (unlikely(i > COB_MEDIUM_MAX)) {
-			cob_runtime_error (_("Parameter to SYSTEM call is larger than 8192 characters"));
+			cob_runtime_error (_("Parameter to SYSTEM call is larger than %d characters"), COB_MEDIUM_MAX);
 			cob_stop_run (1);
 		}
 		i--;
@@ -4074,8 +4226,10 @@ print_runtime_env (void)
 	char* intstring;
 	char* intstring2;
 
-	printf ("GNU Cobol runtime environment\n\n");
-	printf ("All values were resolved from current environment. \n\n");
+	puts (_("GNU Cobol runtime environment"));
+	putchar ('\n');
+	puts (_("All values were resolved from current environment."));
+	putchar ('\n');
 
 	if (!cob_initialized) {
 		cob_init(cob_argc, cob_argv);
@@ -4086,7 +4240,7 @@ print_runtime_env (void)
 	intstring = (char*) cob_fast_malloc(10);
 	intstring2 = (char*) cob_fast_malloc(10);
 
-	printf (_("Call environment\n"));
+	puts (_("Handling of CALLs"));
 
 	var_print ("COB_LIBRARY_PATH", runtimeptr->cob_library_path_env, not_set, 2);
 	var_print ("resolve_path",
@@ -4105,7 +4259,9 @@ print_runtime_env (void)
 			cob_int_to_string(*(runtimeptr->physical_cancel), intstring),
 			no_default, 3);
 
-	printf (_("\n\nFile I/O\n"));
+	putchar ('\n');
+	putchar ('\n');
+	puts (_("File I/O"));
 	var_print ("COB_SYNC", runtimeptr->cob_do_sync_env, not_set, 2);
 	var_print ("cob_do_sync",
 			cob_int_to_string(*(runtimeptr->cob_do_sync), intstring),
@@ -4146,7 +4302,9 @@ print_runtime_env (void)
 			no_default, 3);
 
 	if (runtimeptr->cob_local_edit) {
-		printf (_("\n\nLocale Properties\n"));
+		putchar ('\n');
+		putchar ('\n');
+		puts (_("Locale Properties"));
 		var_print ("COB_LOCALE_NUMERIC_EDITED", runtimeptr->cob_local_edit_env,
 				not_set, 2);
 		var_print ("cob_local_edit",
@@ -4154,7 +4312,9 @@ print_runtime_env (void)
 				no_default, 3);
 	}
 
-	printf (_("\n\nScreen I/O\n"));
+	putchar ('\n');
+	putchar ('\n');
+	puts (_("Screen I/O"));
 	var_print ("COB_REDIRECT_DISPLAY",
 			runtimeptr->cob_disp_to_stderr_env, not_set, 2);
 	var_print ("cob_disp_to_stderr",
@@ -4183,7 +4343,9 @@ print_runtime_env (void)
 				cob_int_to_string(*(runtimeptr->cob_legacy), intstring),
 				no_default, 3);
 	
-	printf (_("\n\nMiscellaneous\n"));
+	putchar ('\n');
+	putchar ('\n');
+	puts (_("Miscellaneous"));
 	var_print ("COB_SET_TRACE", runtimeptr->cob_line_trace_env, not_set, 2);
 	var_print ("cob_line_trace", cob_int_to_string(cob_line_trace, intstring), no_default, 3);
 	cob_check_trace_file ();
@@ -4233,7 +4395,7 @@ print_version (void)
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
 	puts ("Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida");
 	puts ("Copyright (C) 2006-2012 Roger While");
-	puts ("Copyright (C) 2009,2010,2012,2014 Simon Sobisch");
+	puts ("Copyright (C) 2009,2010,2012,2014,2015 Simon Sobisch");
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 	printf (_("Built     %s"), cobc_buffer);
@@ -4282,10 +4444,10 @@ print_info (void)
 	var_print ("\"CBL_\" param check",	_("Disabled"), "", 0);
 #endif
 
-	snprintf (buff, sizeof(buff), "%d", WITH_VARSEQ);
-	var_print (_("Variable format"), buff, "", 0);
-	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
-		var_print ("COB_VARSEQ_FORMAT", s, "", 1);
+	if (sizeof (void *) > 4U) {
+		var_print ("64bit-mode",	_("yes"), "", 0);
+	} else {
+		var_print ("64bit-mode",	_("no"), "", 0);
 	}
 
 #ifdef	COB_LI_IS_LL
@@ -4294,25 +4456,32 @@ print_info (void)
 	var_print ("BINARY-C-LONG", _("4 bytes"), "", 0);
 #endif
 
+	var_print (_("Extended screen I/O"),	WITH_CURSES, "", 0);
+
+	snprintf (buff, sizeof(buff), "%d", WITH_VARSEQ);
+	var_print (_("Variable format"), buff, "", 0);
+	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
+		var_print ("COB_VARSEQ_FORMAT", s, "", 1);
+	}
+
 #ifdef	WITH_SEQRA_EXTFH
 	var_print (_("Sequential handler"),	_("External"), "", 0);
 #else
 	var_print (_("Sequential handler"), _("Internal"), "", 0);
 #endif
-#ifdef	WITH_INDEX_EXTFH
+
+#if defined	(WITH_INDEX_EXTFH)
 	var_print (_("ISAM handler"),		_("External"), "", 0);
-#endif
-#ifdef	WITH_DB
-	var_print (_("ISAM handler"),		_("BDB"), "", 0);
-#endif
-#ifdef	WITH_CISAM
-	var_print (_("ISAM handler"),		_("C-ISAM (Experimental)"), "", 0);
-#endif
-#ifdef	WITH_DISAM
-	var_print (_("ISAM handler"),		_("D-ISAM (Experimental)"), "", 0);
-#endif
-#ifdef	WITH_VBISAM
-	var_print (_("ISAM handler"),		_("VBISAM (Experimental)"), "", 0);
+#elif defined	(WITH_DB)
+	var_print (_("ISAM handler"),		"BDB", "", 0);
+#elif defined	(WITH_CISAM)
+	var_print (_("ISAM handler"),		"C-ISAM" "", 0);
+#elif defined	(WITH_DISAM)
+	var_print (_("ISAM handler"),		"D-ISAM", "", 0);
+#elif defined	(WITH_VBISAM)
+	var_print (_("ISAM handler"),		"VBISAM", "", 0);
+#else
+	var_print (_("ISAM handler"),		_("Not available"), "", 0);
 #endif
 }
 
@@ -4323,6 +4492,12 @@ cob_init (const int argc, char **argv)
 	char		*s;
 #if	defined(HAVE_READLINK) || defined(HAVE_GETEXECNAME)
 	const char	*path;
+#endif
+#ifdef	ENABLE_NLS
+	const char* localedir;
+#endif
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+	HMODULE		kernel32_handle;
 #endif
 	int		i;
 
@@ -4414,6 +4589,16 @@ cob_init (const int argc, char **argv)
 			cobglobptr->cob_locale = cob_strdup (s);
 		}
 	}
+#endif
+
+#ifdef	ENABLE_NLS
+	localedir = getenv("LOCALEDIR");
+	if (localedir != NULL) {
+		bindtextdomain (PACKAGE, localedir);
+	} else {
+		bindtextdomain (PACKAGE, LOCALEDIR);
+	}
+	textdomain (PACKAGE);
 #endif
 
 #ifdef	_WIN32
@@ -4531,6 +4716,18 @@ cob_init (const int argc, char **argv)
 	if (!cob_user_name) {
 		cob_user_name = cob_strdup (_("Unknown"));
 	}
+
+#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+   /* Get function pointer for most precisise time function */
+   kernel32_handle = GetModuleHandle (TEXT ("kernel32.dll"));
+   if (kernel32_handle != NULL) {
+       time_as_filetime_func = (VOID (WINAPI *) (LPFILETIME))
+           GetProcAddress (kernel32_handle, "GetSystemTimePreciseAsFileTime");
+   }
+   if (time_as_filetime_func == NULL) {
+       time_as_filetime_func = GetSystemTimeAsFileTime;
+   }
+#endif
 
 	/* This must be last in this function as we do early return */
 	/* from certain ifdef's */

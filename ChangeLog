@@ -1,4 +1,24 @@
+
+2015-02-27  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* general: removed "Experimental" marker from CISAM/DISAM/VBISAM
+
+2014-08-07  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+2015-03-06  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* m4/gettext.m4: Upgrade to gettext-0.19.4.
+	* m4/iconv.m4: Upgrade to gettext-0.19.4.
+	* m4/lib-ld.m4: Upgrade to gettext-0.19.4.
+	* m4/lib-link.m4: Upgrade to gettext-0.19.4.
+	* m4/lib-prefix.m4: Upgrade to gettext-0.19.4.
+	* m4/nls.m4: Upgrade to gettext-0.19.4.
+	* m4/po.m4: Upgrade to gettext-0.19.4.
+	* m4/progtest.m4: Upgrade to gettext-0.19.4.
+	* configure.ac (AM_GNU_GETTEXT_VERSION): Bump to 0.19.4.
+
 2015-02-26  Ron Norman
+
 	* fileio.c was updated to handle sparse and split keys for BDB
 	  This was tested with BDB, D-ISAM, VB-ISAM 2.0 and VB-ISAM 2.1.1
 	  configure was updated with new option -enable-bdbdupno which 
@@ -6,12 +26,14 @@
 	  method of computing the next duplicate sequence value
 
 2015-02-23  Ron Norman
+
 	* Implemented INDEXED file support for sparse and split keys
 	  Most of the compiler code was borrowed from the fileio-rewrite
 	  fileio.c was updated to handle sparse and split keys
 	  This was tested with D-ISAM and VB-ISAM 2.0
 
 2015-02-16  Ron Norman
+
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 
 	  Added DEBUG_xxx macros to common.h
@@ -24,6 +46,13 @@
 
 	* Merged Report Writer code into 2.0 code base to create a new 2.0
 	  with all collective features
+
+
+2014-08-07  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* general: message strings revised (not all done yet);
+	  similar message strings combined (23 translatable strings removed);
+	  removed line breaks from translatable strings
 
 2014-12-04  Edward Hart <edward-h@users.sf.net>
 

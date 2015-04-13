@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2006-2012 Roger While
-   Copyright (C) 2009,2010,2012,2014 Simon Sobisch
+   Copyright (C) 2009,2010,2012,2014,2015 Simon Sobisch
 
    This file is part of GNU Cobol.
 
@@ -54,6 +54,8 @@
 
 #include "cobc.h"
 #include "tree.h"
+
+#include "lib/gettext.h"
 
 #include "libcob.h"
 
@@ -274,7 +276,7 @@ static size_t		verbose_output = 0;
 static size_t		cob_optimize = 0;
 
 #ifdef	_MSC_VER
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 static const char	*manicmd;
 #endif
 static const char	*manilink;
@@ -656,7 +658,7 @@ cobc_free(void * mptr)
 {
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!mptr)) {
-		cobc_abort_pr (_("Call to cobc_free with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_free"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -671,7 +673,7 @@ cobc_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to cobc_strdup with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_strdup"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -722,7 +724,7 @@ cobc_main_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to cobc_main_strdup with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_main_strdup"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -824,7 +826,7 @@ cobc_parse_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to cobc_parse_strdup with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_parse_strdup"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -925,7 +927,7 @@ cobc_plex_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to cobc_plex_strdup with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_plex_strdup"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -942,7 +944,7 @@ cobc_check_string (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to cobc_check_string with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_check_string"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -1279,7 +1281,7 @@ cobc_stradd_dup (const char *str1, const char *str2)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!str1 || !str2)) {
-		cobc_abort_pr (_("Call to cobc_stradd_dup with NULL pointer"));
+		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_stradd_dup"));
 		cobc_abort_terminate ();
 	}
 #endif
@@ -1530,7 +1532,7 @@ cobc_print_version (void)
 	puts ("Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida");
 	puts ("Copyright (C) 2006-2012 Roger While");
 	puts ("Copyright (C) 2013-2015 Ron Norman");
-	puts ("Copyright (C) 2009,2010,2012,2014-2015 Simon Sobisch");
+	puts ("Copyright (C) 2009,2010,2012,2014,2015 Simon Sobisch");
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 	printf (_("Built     %s"), cb_oc_build_stamp);
@@ -1687,10 +1689,10 @@ cobc_print_info (void)
 #endif
 #endif
 
-	snprintf (buff, sizeof(buff), "%d", WITH_VARSEQ);
-	cobc_var_print (_("Variable format"),	buff, 0);
-	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
-		cobc_var_print ("COB_VARSEQ_FORMAT", s, 1);
+	if (sizeof (void *) > 4U) {
+		cobc_var_print ("64bit-mode",	_("yes"), 0);
+	} else {
+		cobc_var_print ("64bit-mode",	_("no"), 0);
 	}
 
 #ifdef	COB_LI_IS_LL
@@ -1699,25 +1701,43 @@ cobc_print_info (void)
 	cobc_var_print ("BINARY-C-LONG",	_("4 bytes"), 0);
 #endif
 
+	cobc_var_print (_("Extended screen I/O"),	WITH_CURSES, 0);
+
+	snprintf (buff, sizeof(buff), "%d", WITH_VARSEQ);
+	cobc_var_print (_("Variable format"),	buff, 0);
+	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
+		cobc_var_print ("COB_VARSEQ_FORMAT", s, 1);
+	}
+
 #ifdef	WITH_SEQRA_EXTFH
 	cobc_var_print (_("Sequential handler"),	_("External"), 0);
 #else
 	cobc_var_print (_("Sequential handler"),	_("Internal"), 0);
 #endif
-#ifdef	WITH_INDEX_EXTFH
+
+#if defined	(WITH_INDEX_EXTFH)
 	cobc_var_print (_("ISAM handler"),		_("External"), 0);
+#elif defined	(WITH_DB)
+	cobc_var_print (_("ISAM handler"),		"BDB", 0);
+#elif defined	(WITH_CISAM)
+	cobc_var_print (_("ISAM handler"),		"C-ISAM", 0);
+#elif defined	(WITH_DISAM)
+	cobc_var_print (_("ISAM handler"),		"D-ISAM", 0);
+#elif defined	(WITH_VBISAM)
+	cobc_var_print (_("ISAM handler"),		"VBISAM", 0);
+#else
+	cobc_var_print (_("ISAM handler"),		_("Not available"), 0);
+#endif
+
+#ifdef	WITH_INDEX_EXTFH
 #endif
 #ifdef	WITH_DB
-	cobc_var_print (_("ISAM handler"),		_("BDB"), 0);
 #endif
 #ifdef	WITH_CISAM
-	cobc_var_print (_("ISAM handler"),		_("C-ISAM "), 0);
 #endif
 #ifdef	WITH_DISAM
-	cobc_var_print (_("ISAM handler"),		_("D-ISAM "), 0);
 #endif
 #ifdef	WITH_VBISAM
-	cobc_var_print (_("ISAM handler"),		_("VBISAM "), 0);
 #endif
 }
 
@@ -1768,8 +1788,8 @@ cobc_print_usage (char * prog)
 	puts (_("  -x                    Build an executable program"));
 	puts (_("  -m                    Build a dynamically loadable module (default)"));
 	puts (_("  -std=<dialect>        Warnings/features for a specific dialect:"));
-	puts (_("                          cobol2002   Cobol 2002"));
-	puts (_("                          cobol85     Cobol 85"));
+	puts (_("                          cobol2002   COBOL 2002"));
+	puts (_("                          cobol85     COBOL 85"));
 	puts (_("                          ibm         IBM Compatible"));
 	puts (_("                          mvs         MVS Compatible"));
 	puts (_("                          bs2000      BS2000 Compatible"));
@@ -3193,11 +3213,11 @@ preprocess (struct filename *fn)
 					stderr);
 				putc ('\n', stderr);
 #ifdef	_WIN32
-				fputs (_("Check that 'cobxref' is in %%PATH%%"),
-					stderr);
+				fprintf (stderr, _("Check that 'cobxref' is in %s"),
+					"%%PATH%%");
 #else
-				fputs (_("Check that 'cobxref' is in $PATH"),
-					stderr);
+				fprintf (stderr, _("Check that 'cobxref' is in %s"),
+					"$PATH");
 #endif
 				putc ('\n', stderr);
 				fputs (_("No listing produced"),
@@ -3547,7 +3567,7 @@ process_module_direct (struct filename *fn)
 			fn->translate,
 			manilink, cobc_ldflags, cobc_libs, cobc_lib_paths);
 	ret = process (cobc_buffer, fn);
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 	/* Embedding manifest */
 	if (ret == 0) {
 		sprintf (cobc_buffer,
@@ -3646,7 +3666,7 @@ process_module (struct filename *fn)
 		cobc_cc, name, fn->object,
 		manilink, cobc_ldflags, cobc_libs, cobc_lib_paths);
 	ret = process (cobc_buffer, fn);
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 	/* Embedding manifest */
 	if (ret == 0) {
 		sprintf (cobc_buffer,
@@ -3738,7 +3758,7 @@ process_library (struct filename *l)
 		cobc_cc, name, cobc_objects_buffer,
 		manilink, cobc_ldflags, cobc_libs, cobc_lib_paths);
 	ret = process (cobc_buffer, l);
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 	/* Embedding manifest */
 	if (ret == 0) {
 		sprintf (cobc_buffer,
@@ -3828,7 +3848,7 @@ process_link (struct filename *l)
 		cobc_cc, name, cobc_objects_buffer,
 		manilink, cobc_ldflags, cobc_libs, cobc_lib_paths);
 	ret = process (cobc_buffer, l);
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 	/* Embedding manifest */
 	if (ret == 0) {
 		sprintf (cobc_buffer,
@@ -3892,6 +3912,11 @@ main (int argc, char **argv)
 	struct sigaction	sa;
 	struct sigaction	osa;
 #endif
+#ifdef	ENABLE_NLS
+	struct stat	localest;
+	const char* localedir;
+#endif
+
 
 	file_list = NULL;
 	cb_listing_file = NULL;
@@ -4040,7 +4065,14 @@ main (int argc, char **argv)
 #endif
 
 #ifdef	ENABLE_NLS
+	localedir = getenv("LOCALEDIR");
+	if (localedir != NULL
+	&& !stat (localedir, &localest)
+	&& (S_ISDIR (localest.st_mode))) {
+		bindtextdomain (PACKAGE, localedir);
+	} else {
 	bindtextdomain (PACKAGE, LOCALEDIR);
+	}
 	textdomain (PACKAGE);
 #endif
 
@@ -4181,7 +4213,7 @@ main (int argc, char **argv)
 	if (!verbose_output) {
 		COBC_ADD_STR (cobc_cflags, " /nologo", NULL, NULL);
 	}
-#if	_MSC_VER >= 1400
+#if	defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 	if (!verbose_output) {
 		manicmd = "mt /nologo";
 		manilink = "/link /nologo /manifest";
@@ -4267,7 +4299,7 @@ main (int argc, char **argv)
 
 	if (output_name && cb_compile_level < CB_LEVEL_LIBRARY &&
 	    (argc - iargs) > 1) {
-		cobc_err_exit (_("-o option invalid in this combination"));
+		cobc_err_exit (_("%s option invalid in this combination"), "-o");
 	}
 
 	if (cb_flag_notrunc) {
@@ -4313,6 +4345,7 @@ main (int argc, char **argv)
 	status = 0;
 	iparams = 0;
 	local_level = 0;
+
 	while (iargs < argc) {
 		/* Set up file parameters */
 		fn = process_filename (argv[iargs++]);

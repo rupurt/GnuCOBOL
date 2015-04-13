@@ -1,4 +1,25 @@
 
+2015-04-02  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: implemented FORMATTED-CURRENT-DATE,
+	  INTEGER-OF-FORMATTED-DATE and TEST-FORMATTED-DATETIME
+	* intrinsic.c: updated FORMATTED-DATETIME and FORMATTED-TIME to support
+	  fractional number of seconds.
+	* common.c: refactored (cob_accept_time)
+	* intrinsic.c: miscellaneous refactoring and deleted precondition
+	  comments which are currently just cluttering the code
+
+2015-04-02  Edward Hart <edward.dan.hart@gmail.com>
+
+	* common.h: added new macros COB_USE_VC(2005/2008/2013)_OR_GREATER to
+	  replace _MSC_VER comparison
+
+2015-03-30  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* common.h: Changed COB_FILE_MODE to 0666
+	* fileio.c: use COB_FILE_MODE as permission for all cases where
+	  files are possibly created (fixes bug #126)
+
 2015-03-06  Ron Norman <rjn@inglenet.com>
 
 	* common.c additional update to resolve pointer/int alignment issues
@@ -14,6 +35,12 @@
 	* fileio.c updated to return correct status codes for WRITE/REWRITE
 	  related to duplicate keys being detected
 	  This was tested with BDB, D-ISAM and VB-ISAM 2.1.1
+
+2015-02-26  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* cobgetopt.c (cob_getopt_long_long): List all ambiguous possibilities,
+	  applied patch of Ulrich Drepper (see glibc's BZ #7101 - 2011-05-15)
+	* cobgetopt.c: removed \n from msgids, converted all backtick to apostrophe
 
 2015-02-26  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -176,6 +203,10 @@
 
 	* common.c, common.h, system.def : Added cob_sys_getopt_long_long
 	* makefile.am : Added cobgetopt.c, cobgetopt.h
+
+2014-03-10  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* common.c: support for user-defined LOCALEDIR via environment
 
 2014-03-03  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

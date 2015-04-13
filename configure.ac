@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
 # Copyright (C) 2007-2012 Roger While
-# Copyright (C) 2014 Simon Sobisch
+# Copyright (C) 2014,2015 Simon Sobisch
 #
 # This file is part of GNU Cobol.
 #
@@ -58,15 +58,17 @@ AM_INIT_AUTOMAKE([gnu no-texinfo.tex])
 AM_MAINTAINER_MODE
 
 # Autoheader templates
-AH_TEMPLATE([WITH_DB], [Compile with the Berkeley DB library])
+AH_TEMPLATE([COB_DEBUG_LOG], [Enable internal logging (Developers only!)])
+AH_TEMPLATE([COB_EXPERIMENTAL], [Enable experimental code (Developers only!)])
+AH_TEMPLATE([COB_PARAM_CHECK], [Enable CALL parameter checking])
+AH_TEMPLATE([PATCH_LEVEL], [Define a patch level])
 AH_TEMPLATE([WITH_INDEX_EXTFH], [Compile with an external ISAM handler])
 AH_TEMPLATE([WITH_SEQRA_EXTFH], [Compile with an external SEQ/RAN handler])
+AH_TEMPLATE([WITH_DB], [Use Berkeley DB library as emulation of ISAM handler])
+AH_TEMPLATE([COB_BDB_BAD_DUPNO], [Retain incorrect duplicate sequence for compatibility on little endian!])
 AH_TEMPLATE([WITH_CISAM], [Use CISAM as ISAM handler])
 AH_TEMPLATE([WITH_DISAM], [Use DISAM as ISAM handler])
 AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as ISAM handler])
-AH_TEMPLATE([COB_DEBUG_LOG], [Enable internal logging (Developers only!)])
-AH_TEMPLATE([COB_BDB_BAD_DUPNO], [Retain incorrect duplicate sequence for compatibility on little endian!])
-AH_TEMPLATE([COB_EXPERIMENTAL], [Enable experimental code (Developers only!)])
 AH_TEMPLATE([COB_PARAM_CHECK], [Enable CALL parameter checking])
 AH_TEMPLATE([COB_EXPORT_DYN], [Compile/link option for exporting symbols])
 AH_TEMPLATE([COB_PIC_FLAGS], [Compile/link option for PIC code])
@@ -74,7 +76,6 @@ AH_TEMPLATE([COB_SHARED_OPT], [Compile/link option for shared code])
 AH_TEMPLATE([COB_STRIP_CMD], [Strip command])
 AH_TEMPLATE([USE_LIBDL], [Use system dynamic loader])
 AH_TEMPLATE([HAVE_DLADDR], [Has dladdr function])
-AH_TEMPLATE([PATCH_LEVEL], [Define a patch level])
 AH_TEMPLATE([WITH_VARSEQ], [Define variable sequential file format])
 AH_TEMPLATE([HAVE_PSIGN_OPT], [Has -Wno-pointer-sign])
 AH_TEMPLATE([HAVE_ATTRIBUTE_ALIGNED], [Has __attribute__((aligned))])
@@ -91,6 +92,7 @@ AH_TEMPLATE([HAVE_CURSES_FREEALL], [ncurses has _nc_freeall function])
 AH_TEMPLATE([HAVE_USE_LEGACY_CODING], [ncurses has use_legacy_coding function])
 AH_TEMPLATE([HAVE_DESIGNATED_INITS], [Has designated initializers])
 AH_TEMPLATE([HAVE_NANO_SLEEP], [Has nanosleep function])
+AH_TEMPLATE([HAVE_CLOCK_GETTIME], [Has clock_gettime function and CLOCK_REALTIME])
 AH_TEMPLATE([HAVE_MP_GET_MEMORY_FUNCTIONS], [Do we have mp_get_memory_functions in gmp])
 #AH_TEMPLATE([HAVE_RAISE], [Has raise function])
 AH_TEMPLATE([HAVE_FINITE_IEEEFP_H],
@@ -241,105 +243,6 @@ fi
 
 # Configure options.
 
-AC_ARG_WITH([curses],
-  [  --with-curses           (GNU Cobol) Used curses library for extended SCREEN I/O (default=check)],
-  [case "$with_curses" in
-    ncursesw | ncurses | pdcurses | curses | check | no)
-		USE_NCURSES="$with_curses"
-		;;
-    *)
-		AC_MSG_ERROR([Wrong value for --with-curses, must be one of the following
-  ncursesw, ncurses, pdcurses, curses  (use only the specified library)
-  check  (use whatever curses libary is usable, disable if no curses usable)
-  no  (disable curses usage)])
-		;;
-  esac],
-  [USE_NCURSES="check"])
-
-AC_ARG_WITH([seqra-extfh],
-  [  --with-seqra-extfh      (GNU Cobol) Use external SEQ/RAN file handler],
-  [ if test "$with_seqra_extfh" = "yes"
-    then
-	AC_DEFINE([WITH_SEQRA_EXTFH], [1])
-    fi ],
-  [])
-
-AC_ARG_WITH([cisam],
-  [  --with-cisam            (GNU Cobol) Use CISAM for ISAM I/O (Experimental)],
-  [ if test "$with_cisam" = "yes"
-    then
-	AC_CHECK_HEADERS([isam.h], [],
-		AC_MSG_ERROR([isam.h is required for CISAM]))
-	AC_CHECK_LIB([ifisam], [isopen],
-		[AC_DEFINE([WITH_CISAM], [1])
-		LIBCOB_LIBS="$LIBCOB_LIBS -lifisam -lifisamx"],
-		AC_MSG_ERROR([libifisam is required for CISAM]), [-lifisamx])
-    fi ],
-  [])
-
-if test "$with_cisam" != "yes"
-then
-  AC_ARG_WITH([disam],
-  [  --with-disam            (GNU Cobol) Use DISAM for ISAM I/O (Experimental)],
-  [ if test "$with_disam" = "yes"
-    then
-	AC_CHECK_HEADERS([disam.h], [],
-		AC_MSG_ERROR([disam.h is required for DISAM]))
-	AC_CHECK_LIB([disam], [isopen],
-		[AC_DEFINE([WITH_DISAM], [1])
-		LIBCOB_LIBS="$LIBCOB_LIBS -ldisam"],
-		AC_MSG_ERROR([libdisam is required for DISAM]), [])
-    fi ],
-  [])
-fi
-
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes"
-then
-  AC_ARG_WITH([vbisam],
-  [  --with-vbisam           (GNU Cobol) Use VBISAM for ISAM I/O (Experimental)],
-  [ if test "$with_vbisam" = "yes"
-    then
-	AC_CHECK_HEADERS([vbisam.h], [],
-		AC_MSG_ERROR([vbisam.h is required for VBISAM]))
-	AC_CHECK_LIB([vbisam], [isopen],
-		[AC_DEFINE([WITH_VBISAM], [1])
-		LIBCOB_LIBS="$LIBCOB_LIBS -lvbisam"],
-		AC_MSG_ERROR([libvbisam is required for VBISAM]), [])
-    fi ],
-  [])
-fi
-
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes"
-then
-  AC_ARG_WITH([index-extfh],
-  [  --with-index-extfh      (GNU Cobol) Use external ISAM file handler],
-  [ if test "$with_index_extfh" = "yes"
-    then
-	AC_DEFINE([WITH_INDEX_EXTFH], [1])
-    fi ],
-  [])
-fi
-
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes" -a "$with_index_extfh" != "yes"
-then
-  AC_ARG_WITH([db],
-  [  --with-db               (GNU Cobol) Use Berkeley DB >= 4.1 for ISAM I/O (default)],
-  [],
-  [with_db=yes])
-fi
-
-AC_ARG_WITH([dl],
-  [  --with-dl               (GNU Cobol) Use system dynamic loader (default)],
-  [case $with_dl in  
-    yes)
-		;;
-    no)
-		;;
-    *)		AC_MSG_ERROR([[--with/without-dl can not have a value]])
-		;;
-   esac],
-  [with_dl=yes])
-
 AC_ARG_ENABLE([debug],
   [  --enable-debug          (GNU Cobol) Enable -g C compiler debug option],
   [],
@@ -350,14 +253,6 @@ AC_ARG_ENABLE([debuglog],
   [ if test "$enable_debuglog" = "yes"
     then
 	AC_DEFINE([COB_DEBUG_LOG], [1])
-    fi ],
-  [])
-
-AC_ARG_ENABLE([bdbdupno],
-  [  --enable-bdbdupno      (GNU Cobol) Retain old BDB duplicate sequence (Incorrect on little-endian!)],
-  [ if test "$enable_bdbdupno" = "yes"
-    then
-	AC_DEFINE([COB_BDB_BAD_DUPNO], [1])
     fi ],
   [])
 
@@ -392,6 +287,114 @@ AC_ARG_WITH([patch-level],
   [with_patch_level=0])
 
 AC_DEFINE_UNQUOTED([PATCH_LEVEL], [$with_patch_level])
+
+AC_ARG_WITH([curses],
+  [  --with-curses           (GNU Cobol) Used curses library for extended SCREEN I/O (default=check)],
+  [case "$with_curses" in
+    ncursesw | ncurses | pdcurses | curses | check | no)
+		USE_NCURSES="$with_curses"
+		;;
+    *)
+		AC_MSG_ERROR([Wrong value for --with-curses, must be one of the following
+  ncursesw, ncurses, pdcurses, curses  (use only the specified library)
+  check  (use whatever curses library is usable, disable if no one usable)
+  no  (disable curses usage)])
+		;;
+  esac],
+  [USE_NCURSES="check"])
+
+AC_ARG_WITH([seqra-extfh],
+  [  --with-seqra-extfh      (GNU Cobol) Use external SEQ/RAN file handler],
+  [ if test "$with_seqra_extfh" = "yes"
+    then
+	AC_DEFINE([WITH_SEQRA_EXTFH], [1])
+    fi ],
+  [])
+
+AC_ARG_WITH([cisam],
+  [  --with-cisam            (GNU Cobol) Use CISAM for ISAM I/O],
+  [ if test "$with_cisam" = "yes"
+    then
+	AC_CHECK_HEADERS([isam.h], [],
+		AC_MSG_ERROR([isam.h is required for CISAM]))
+	AC_CHECK_LIB([ifisam], [isopen],
+		[AC_DEFINE([WITH_CISAM], [1])
+		LIBCOB_LIBS="$LIBCOB_LIBS -lifisam -lifisamx"],
+		AC_MSG_ERROR([libifisam is required for CISAM]), [-lifisamx])
+    fi ],
+  [])
+
+if test "$with_cisam" != "yes"
+then
+  AC_ARG_WITH([disam],
+  [  --with-disam            (GNU Cobol) Use DISAM for ISAM I/O],
+  [ if test "$with_disam" = "yes"
+    then
+	AC_CHECK_HEADERS([disam.h], [],
+		AC_MSG_ERROR([disam.h is required for DISAM]))
+	AC_CHECK_LIB([disam], [isopen],
+		[AC_DEFINE([WITH_DISAM], [1])
+		LIBCOB_LIBS="$LIBCOB_LIBS -ldisam"],
+		AC_MSG_ERROR([libdisam is required for DISAM]), [])
+    fi ],
+  [])
+fi
+
+if test "$with_cisam" != "yes" -a "$with_disam" != "yes"
+then
+  AC_ARG_WITH([vbisam],
+  [  --with-vbisam           (GNU Cobol) Use VBISAM for ISAM I/O],
+  [ if test "$with_vbisam" = "yes"
+    then
+	AC_CHECK_HEADERS([vbisam.h], [],
+		AC_MSG_ERROR([vbisam.h is required for VBISAM]))
+	AC_CHECK_LIB([vbisam], [isopen],
+		[AC_DEFINE([WITH_VBISAM], [1])
+		LIBCOB_LIBS="$LIBCOB_LIBS -lvbisam"],
+		AC_MSG_ERROR([libvbisam is required for VBISAM]), [])
+    fi ],
+  [])
+fi
+
+if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes"
+then
+  AC_ARG_WITH([index-extfh],
+  [  --with-index-extfh      (GNU Cobol) Use external ISAM file handler],
+  [ if test "$with_index_extfh" = "yes"
+    then
+	AC_DEFINE([WITH_INDEX_EXTFH], [1])
+    fi ],
+  [])
+fi
+
+if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes" -a "$with_index_extfh" != "yes"
+then
+  AC_ARG_WITH([db],
+  [  --with-db               (GNU Cobol) Use Berkeley DB >= 4.1 for ISAM I/O (default)],
+  [],
+  [with_db=yes])
+fi
+
+AC_ARG_ENABLE([bdbdupno],
+  [  --enable-bdbdupno      (GNU Cobol) Retain old BDB duplicate sequence (Incorrect on little-endian!)],
+  [ if test "$enable_bdbdupno" = "yes"
+    then
+	AC_DEFINE([COB_BDB_BAD_DUPNO], [1])
+    fi ],
+  [])
+
+
+AC_ARG_WITH([dl],
+  [  --with-dl               (GNU Cobol) Use system dynamic loader (default)],
+  [case $with_dl in  
+    yes)
+		;;
+    no)
+		;;
+    *)		AC_MSG_ERROR([[--with/without-dl can not have a value]])
+		;;
+   esac],
+  [with_dl=yes])
 
 AC_ARG_WITH([varseq],
   [  --with-varseq           (GNU Cobol) Define variable sequential format (default 0)],
@@ -502,6 +505,12 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]],
      fi
    fi])
 
+AC_MSG_CHECKING([for clock_gettime and CLOCK_REALTIME])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]],
+  [[clock_gettime (CLOCK_REALTIME, NULL);]])],
+  [AC_DEFINE([HAVE_CLOCK_GETTIME], [1]) AC_MSG_RESULT([yes])],
+  [AC_MSG_RESULT([no])])
+
 # Check for raise (optional) --> done via AC_CHECK_FUNCS
 #AC_MSG_CHECKING([for raise])
 #AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <signal.h>]],
@@ -546,7 +555,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 	[])
 
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT_VERSION([0.19.4])
 if test "x$LTLIBINTL" != "x"
 then
   COBC_LIBS="$COBC_LIBS $LTLIBINTL"
@@ -637,7 +646,7 @@ then
   if test "x$ac_cv_lib_curses_initscr" = "xyes"
   then
     AC_CHECK_HEADERS([curses.h], [USE_NCURSES="curses"],
-      [if test "$USE_NCURSES" = "pdcurses"
+      [if test "$USE_NCURSES" = "curses"
        then
          USE_NCURSES="missing_header"
        fi], [])
@@ -662,6 +671,18 @@ case "$USE_NCURSES" in
 	;;
   missing_header)
 	AC_MSG_ERROR([[No header found for configured library $with_curses]])
+	;;
+  ncursesw)
+	AC_DEFINE([WITH_CURSES], ["ncursesw"])
+	;;
+  ncurses)
+	AC_DEFINE([WITH_CURSES], ["ncurses"])
+	;;
+  pdcurses)
+	AC_DEFINE([WITH_CURSES], ["pdcurses"])
+	;;
+  curses)
+	AC_DEFINE([WITH_CURSES], ["curses"])
 	;;
 esac
 
@@ -1231,7 +1252,7 @@ case "$USE_NCURSES" in
     AC_MSG_NOTICE([ screen I/O (no curses found):                NO])
 	;;
   no)
-    AC_MSG_NOTICE([ screen I/O (disabled)       :                NO])
+    AC_MSG_NOTICE([ screen I/O (disabled):                       NO])
 	;;
   *)
     AC_MSG_NOTICE([ Use ncurses/pdcurses/curses for screen I/O:  ${USE_NCURSES}])

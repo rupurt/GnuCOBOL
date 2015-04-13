@@ -79,6 +79,28 @@
 #define	cob_screen_ptr		cob_screen *
 #define	cob_file_key_ptr	cob_file_key *
 
+/* Readable compiler version defines */
+
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1400
+#define COB_USE_VC2005_OR_GREATER 1
+#else
+#define COB_USE_VC2005_OR_GREATER 0
+#endif
+
+#if _MSC_VER >= 1500
+#define COB_USE_VC2008_OR_GREATER 1
+#else
+#define COB_USE_VC2008_OR_GREATER 0
+#endif
+
+#if _MSC_VER >= 1800
+#define COB_USE_VC2013_OR_GREATER 1
+#else
+#define COB_USE_VC2013_OR_GREATER 0
+#endif
+#endif
+
 /* Byte swap functions */
 
 /*
@@ -223,7 +245,7 @@
 
 #endif
 
-#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
+#elif defined(_MSC_VER) && COB_USE_VC2005_OR_GREATER
 
 #define COB_BSWAP_16(val) (_byteswap_ushort (val))
 #define COB_BSWAP_32(val) (_byteswap_ulong (val))
@@ -692,7 +714,7 @@ enum cob_exception_id {
 #define COB_ASCENDING		0
 #define COB_DESCENDING		1
 
-#define COB_FILE_MODE		0644
+#define COB_FILE_MODE		0666
 
 /* Organization */
 
