@@ -490,7 +490,7 @@ AT_DATA([prog.cob], [
 ])
 
 # AT_DATA workaround via sed:
-AT_CHECK([sed -i -e 's/_$//' prog.cob], [0])
+AT_CHECK([sed -e 's/_$//' prog.cob > prog.sed && mv prog.sed prog.cob], [0])
 
 AT_CHECK([$COMPILE_ONLY -fixed -W prog.cob], [0], [],
 [prog.cob: 7: Warning: Source text exceeds 512 bytes, will be truncated
