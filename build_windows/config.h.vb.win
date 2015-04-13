@@ -3,6 +3,15 @@
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
 
+/* Retain incorrect duplicate sequence for compatibility on little endian! */
+#undef COB_BDB_BAD_DUPNO
+
+/* Enable internal logging (Developers only!) */
+/* #undef COB_DEBUG_LOG */
+#ifdef _DEBUG
+#define COB_DEBUG_LOG 1
+#endif
+
 /* Executable extension */
 #define COB_EXEEXT ".exe"
 
