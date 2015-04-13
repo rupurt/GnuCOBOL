@@ -20,6 +20,22 @@
 	* fileio.c: use COB_FILE_MODE as permission for all cases where
 	  files are possibly created (fixes bug #126)
 
+2015-03-14  Ron Norman <rjn@inglenet.com> 
+
+	* common.c has new code for table driven processing of runtime.cfg
+	  (runtime configuration) file and environment variables
+	  New cob_settings structure used to store all run-time options
+	  The old runtime_env was removed
+	  call.c cobgetopt.c fileio.c intrinsic.c move.c numeric.c screenio.c
+	  all updated to work with the new cob_settings structure
+
+2015-03-10  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* common.c (cob_load_config, cob_load_config_file, cb_config_entry): new
+	  functions for loading a runtime configuration file
+	* call.c, common.c, intrinsic.c, numeric.c: fix segfault on early exit
+	  during runtime initialisation
+
 2015-03-06  Ron Norman <rjn@inglenet.com>
 
 	* common.c additional update to resolve pointer/int alignment issues
@@ -41,7 +57,6 @@
 	* cobgetopt.c (cob_getopt_long_long): List all ambiguous possibilities,
 	  applied patch of Ulrich Drepper (see glibc's BZ #7101 - 2011-05-15)
 	* cobgetopt.c: removed \n from msgids, converted all backtick to apostrophe
-
 2015-02-26  Edward Hart <edward.dan.hart@gmail.com>
 
 	* screenio.c: fixed buffer overflow in screen section ACCEPT

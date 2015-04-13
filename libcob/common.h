@@ -1315,27 +1315,17 @@ typedef struct __cob_global {
 	unsigned int		cob_orig_line;		/* Program source line */
 	unsigned int		cob_got_exception;	/* Exception active */
 	unsigned int		cob_screen_initialized;	/* Screen initialized */
-	unsigned int		cob_unix_lf;		/* Use POSIX LF */
-	unsigned int		cob_display_warn;	/* Display warnings */
-	unsigned int		cob_first_init;		/* First call after init */
-	unsigned int		cob_env_mangle;		/* Mangle env names */
 
 	/* Library routine variables */
 
 	/* screenio / termio */
 	unsigned char		*cob_term_buff;		/* Screen I/O buffer */
-
-	unsigned int		cob_disp_to_stderr;	/* Redirect to stderr */
-	unsigned int		cob_beep_value;		/* Bell disposition */
 	int			cob_accept_status;	/* ACCEPT STATUS */
-	int			cob_timeout_scale;	/* timeout scale */
-	unsigned int		cob_extended_status;	/* Extended status */
-	unsigned int		cob_use_esc;		/* Check ESC key */
+
 	int			cob_max_y;		/* Screen max y */
 	int			cob_max_x;		/* Screen max x */
 
 } cob_global;
-
 
 /* File I/O function pointer structure */
 struct cob_fileio_funcs {
@@ -1363,13 +1353,15 @@ struct cobjmp_buf {
 
 /*******************************/
 /* Functions in common.c */
-COB_EXPIMP void print_runtime_env(void);
-COB_EXPIMP void print_info(void);
-COB_EXPIMP void print_version(void);
-char* cob_int_to_string(int, char*);
-char* cob_int_to_formatted_bytestring(int, char*);
-char* cob_strcat(char*, char*);
-char* cob_strjoin(char**, int, char*);
+COB_EXPIMP void print_info			(void);
+COB_EXPIMP void print_version		(void);
+COB_EXPIMP int cob_load_config		(void);
+COB_EXPIMP void print_runtime_env	(void);
+
+char* cob_int_to_string				(int, char*);
+char* cob_int_to_formatted_bytestring	(int, char*);
+char* cob_strcat					(char*, char*);
+char* cob_strjoin					(char**, int, char*);
 
 /* General functions */
 
@@ -1390,6 +1382,7 @@ COB_EXPIMP void	*cob_cache_malloc		(const size_t) COB_A_MALLOC;
 COB_EXPIMP void	*cob_cache_realloc		(void *, const size_t);
 COB_EXPIMP void	cob_cache_free			(void *);
 COB_EXPIMP void	cob_set_locale			(cob_field *, const int);
+COB_EXPIMP char *cob_expand_env_string		(char *);
 
 COB_EXPIMP void	cob_check_version		(const char *, const char *,
 						 const int);

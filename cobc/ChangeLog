@@ -1,4 +1,9 @@
 
+2015-04-12  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* config.c: load configuration file from COB_CONFIG_DIR if file cannot be
+	  accessed in current directory, only check for missing definitions if
+	  configuration file loaded without errors
 2015-04-02  Edward Hart <edward.dan.hart@gmail.com>
 
 	* reserved.c: set FORMATTED-CURRENT-DATE, INTEGER-OF-FORMATTED-DATE, and
@@ -12,6 +17,12 @@
 
 	* reserved.c, parser.y : added column orientation as pending
 	* reserved.c : marked SYNCHRONIZED RIGHT as pending as generation was LEFT
+
+2015-03-10  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* config.c: support for multiple inclusion of conf files while
+	  checking for recursion
+
 
 2015-03-09  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

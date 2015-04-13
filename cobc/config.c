@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
-   Copyright (C) 2014 Simon Sobisch
+   Copyright (C) 2014-2015 Simon Sobisch
 
    This file is part of GNU Cobol.
 
@@ -81,6 +81,12 @@ static struct config_struct {
 #include "config.def"
 };
 
+/* Configuration includes */
+static struct includelist {
+	struct includelist	*next;
+	const char		*name;
+} *conf_includes = NULL;
+
 #undef	CB_CONFIG_ANY
 #undef	CB_CONFIG_INT
 #undef	CB_CONFIG_STRING
@@ -128,7 +134,7 @@ unsupported_value (const char *fname, const int line, const char *name, const ch
 int
 cb_load_std (const char *name)
 {
-	return cb_load_conf (name, 1, 1);
+	return cb_load_conf (name, 1);
 }
 
 int
@@ -236,6 +242,7 @@ cb_config_entry (char *buff, const char *fname, const int line)
 			if (strcmp (name, "include") == 0) {
 				if (fname) {
 					/* Include another conf file */
+					strcpy (buff, val);
 					return 1;
 				} else {
 					configuration_error (NULL, 0,
@@ -294,36 +301,53 @@ cb_config_entry (char *buff, const char *fname, const int line)
 	return 0;
 }
 
-int
-cb_load_conf (const char *fname, const int check_nodef, const int prefix_dir)
+static int
+cb_load_conf_file (const char *conf_file)
 {
+	char			filename[COB_MEDIUM_BUFF];
+	struct includelist	*c, *cc;
+
 	const unsigned char	*x;
-	const char		*name;
 	FILE			*fp;
-	size_t			i;
 	int			sub_ret, ret;
-	int			line;
+	int			i, line;
 	char			buff[COB_SMALL_BUFF];
 
-	/* Initialize the configuration table */
-	if (check_nodef) {
-		for (i = 0; i < CB_CONFIG_SIZE; i++) {
-			config_table[i].val = NULL;
+	for (i=0; conf_file[i] != 0 && conf_file[i] != SLASH_INT; i++);
+	if (conf_file[i] == 0) {			/* Just a name, No directory */
+		if (access(conf_file, F_OK) != 0) {	/* and file does not exist */
+			sprintf (filename, "%s%s%s", cob_config_dir, SLASH_STR, conf_file);
+			if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
+				conf_file = filename;		/* Prefix COB_CONFIG_DIR */
+			}
 		}
 	}
 
-	if (prefix_dir) {
-		snprintf (buff, (size_t)COB_SMALL_MAX,
-			  "%s%s%s", cob_config_dir, SLASH_STR, fname);
-		name = buff;
-	} else {
-		name = fname;
+	/* check for recursion */
+	c = cc = conf_includes;
+	while (c != NULL) {
+		if (strcmp(c->name, conf_file) == 0) {
+			configuration_error (conf_file, 0, _("Recursive inclusion!"));
+			return -2;
+		}
+		cc = c;
+		c = c->next;
 	}
+	/* add current entry to list*/
+	c = cob_malloc (sizeof(struct includelist));
+	c->next = NULL;
+	c->name = conf_file;
+	if (cc != NULL) {
+		cc->next = c;
+	} else {
+		conf_includes = c;
+	}
+
 	/* Open the configuration file */
-	fp = fopen (name, "r");
+	fp = fopen (conf_file, "r");
 	if (fp == NULL) {
 		fflush (stderr);
-		configuration_error (name, 0, _("No such file or directory"));
+		configuration_error (conf_file, 0, _("No such file or directory"));
 		return -1;
 	}
 
@@ -348,36 +372,61 @@ cb_load_conf (const char *fname, const int check_nodef, const int prefix_dir)
 			continue;
 		}
 
-		sub_ret = cb_config_entry (buff, fname, line);
+		sub_ret = cb_config_entry (buff, conf_file, line);
 		if (sub_ret == 1) {
-			/* Include another configuration file */
-			/* Find entry for getting include value */
-			for (i = 0; i < CB_CONFIG_SIZE; i++) {
-				if (strcmp (buff, config_table[i].name) == 0) {
-					break;
-				}
-			}
-			sub_ret = cb_load_conf (read_string(config_table[i].val), 0, 1);
-			if (sub_ret != 0) {
-				fclose (fp);
-				/* Only 1 include allowed */
-				if (sub_ret == 1) {
-					configuration_error (read_string(config_table[i].val), 0,
-						_("Only one include in configuration files allowed"));
-					sub_ret = -1;
-				}
+			sub_ret = cb_load_conf_file (buff);
+			if (sub_ret == -1) {
+				ret = -1;
+				configuration_error (conf_file, line,
+						    _("Configuration file was included here."));
+				break;
 			}
 		}
 		if (sub_ret != 0) ret = sub_ret;
 	}
 	fclose (fp);
 
+	/* remove current entry from list*/
+	if (cc) {
+		cc->next = NULL;
+	} else {
+		conf_includes = NULL;
+	}
+	cob_free (c);
+
+	return ret;
+}
+
+int
+cb_load_conf (const char *fname, const int prefix_dir)
+{
+	const char		*name;
+	int				ret;
+	size_t			i;
+	char			buff[COB_SMALL_BUFF];
+
+	/* Initialize the configuration table */
+	for (i = 0; i < CB_CONFIG_SIZE; i++) {
+		config_table[i].val = NULL;
+	}
+
+	/* Get the name for the configuration file */
+	if (prefix_dir) {
+		snprintf (buff, (size_t)COB_SMALL_MAX,
+			  "%s%s%s", cob_config_dir, SLASH_STR, fname);
+		name = buff;
+	} else {
+		name = fname;
+	}
+
+	ret = cb_load_conf_file (name);
+
 	/* Checks for missing definitions */
-	if (check_nodef) {
+	if (ret == 0) {
 		for (i = 2U; i < CB_CONFIG_SIZE; i++) {
 			if (config_table[i].val == NULL) {
 				configuration_error (fname, 0, _("No definition of '%s'"),
-					 config_table[i].name);
+						config_table[i].name);
 				ret = -1;
 			}
 		}

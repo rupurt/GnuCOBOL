@@ -417,30 +417,14 @@ struct cobsort {
 /* Local variables */
 
 static cob_global	*cobglobptr;
+static cob_settings	*cobsetptr;
 
 static unsigned int	eop_status;
 static unsigned int	check_eop_status;
-static unsigned int	cob_ls_uses_cr;
-static char*		cob_ls_uses_cr_env = NULL;
-static unsigned int	cob_ls_nulls;
-static char*		cob_ls_nulls_env = NULL;
-static unsigned int	cob_ls_fixed;
-static char*		cob_ls_fixed_env = NULL;
-static unsigned int	cob_do_sync;
-static char*		cob_do_sync_env = NULL;
 static size_t		cob_vsq_len;
-static size_t 		cob_varseq_type;
-static char*		cob_varseq_type_env = NULL;
-
-static size_t		cob_sort_memory;
-static char*		cob_sort_memory_env = NULL;
-static size_t		cob_sort_chunk;
-static char*		cob_sort_chunk_env = NULL;
 
 static struct file_list	*file_cache = NULL;
 
-static char*		cob_file_path = NULL;
-static char*		cob_file_path_env = NULL;
 static char		*file_open_env = NULL;
 static char		*file_open_name = NULL;
 static char		*file_open_buff = NULL;
@@ -585,7 +569,6 @@ extern int extfh_relative_delete	(cob_file *);
 #ifdef	WITH_DB
 
 static DB_ENV		*bdb_env = NULL;
-static char		*bdb_home = NULL;
 static char		*bdb_buff = NULL;
 static const char	**bdb_data_dir = NULL;
 static void		*record_lock_object = NULL;
@@ -817,21 +800,6 @@ dummy_start (cob_file *f, const int cond, cob_field *key)
 }
 
 static char *
-cob_fileio_getenv (const char *env)
-{
-	char	*p;
-
-	p = getenv (env);
-	if (!p) {
-		return NULL;
-	}
-	if (*p == 0 || *p == ' ') {
-		return NULL;
-	}
-	return cob_strdup (p);
-}
-
-static char *
 cob_chk_file_env (const char *src)
 {
 	char		*p;
@@ -839,7 +807,7 @@ cob_chk_file_env (const char *src)
 	char		*s;
 	size_t		i;
 
-	if (unlikely(cobglobptr->cob_env_mangle)) {
+	if (unlikely(cobsetptr->cob_env_mangle)) {
 		q = cob_strdup (src);
 		s = q;
 		for (i = 0; i < strlen (s); ++i) {
@@ -901,9 +869,9 @@ cob_chk_file_mapping (void)
 		/* If not found, use as is including the dollar character */
 		if ((p = cob_chk_file_env (src)) != NULL) {
 			strncpy (file_open_name, p, (size_t)COB_FILE_MAX);
-		} else if (cob_file_path) {
+		} else if (cobsetptr->cob_file_path) {
 			snprintf (file_open_buff, (size_t)COB_FILE_MAX, "%s%s%s",
-				  cob_file_path, SLASH_STR, file_open_name);
+				  cobsetptr->cob_file_path, SLASH_STR, file_open_name);
 			strncpy (file_open_name, file_open_buff,
 				 (size_t)COB_FILE_MAX);
 		}
@@ -1043,7 +1011,7 @@ save_status (cob_file *f, cob_field *fnstatus, const int status)
 		} else {
 			cob_set_exception (0);
 		}
-		if (unlikely(cob_do_sync)) {
+		if (unlikely(cobsetptr->cob_do_sync)) {
 			cob_sync (f);
 		}
 		return;
@@ -1429,14 +1397,14 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 	/* Open the file */
 	switch (mode) {
 	case COB_OPEN_INPUT:
-		if (!cobglobptr->cob_unix_lf) {
+		if (!cobsetptr->cob_unix_lf) {
 			fmode = "r";
 		} else {
 			fmode = "rb";
 		}
 		break;
 	case COB_OPEN_OUTPUT:
-		if (!cobglobptr->cob_unix_lf) {
+		if (!cobsetptr->cob_unix_lf) {
 			fmode = "w";
 		} else {
 			fmode = "wb";
@@ -1452,7 +1420,7 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		/* Possible Solutions: */
 		/* a) Create the file and reopen it with a+ */
 		/* b) Check this stuff in EINVAL and just go on */
-		if (!cobglobptr->cob_unix_lf) {
+		if (!cobsetptr->cob_unix_lf) {
 			fmode = "a+";
 		} else {
 			fmode = "ab+";
@@ -1643,7 +1611,7 @@ sequential_read (cob_file *f, const int read_opts)
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
 		}
-		switch (cob_varseq_type) {
+		switch (cobsetptr->cob_varseq_type) {
 		case 1:
 			f->record->size = COB_MAYSWAP_32 (recsize.sint);
 			break;
@@ -1704,7 +1672,7 @@ sequential_write (cob_file *f, const int opt)
 	if (unlikely(f->record_min != f->record_max)) {
 		/* Write record size */
 
-		switch (cob_varseq_type) {
+		switch (cobsetptr->cob_varseq_type) {
 		case 1:
 			recsize.sint = COB_MAYSWAP_32 (f->record->size);
 			break;
@@ -1793,7 +1761,7 @@ lineseq_read (cob_file *f, const int read_opts)
 				break;
 			}
 		}
-		if (unlikely(n == 0 && cob_ls_nulls != 0)) {
+		if (unlikely(n == 0 && cobsetptr->cob_ls_nulls != 0)) {
 			n = getc ((FILE *)f->file);
 			if (n == EOF) {
 				return COB_STATUS_30_PERMANENT_ERROR;
@@ -1839,7 +1807,7 @@ lineseq_write (cob_file *f, const int opt)
 #endif
 
 	/* Determine the size to be written */
-	if (unlikely(cob_ls_fixed != 0)) {
+	if (unlikely(cobsetptr->cob_ls_fixed != 0)) {
 		size = f->record->size;
 	} else {
 		for (i = (int)f->record->size - 1; i >= 0; --i) {
@@ -1870,7 +1838,7 @@ lineseq_write (cob_file *f, const int opt)
 
 	/* Write to the file */
 	if (size) {
-		if (unlikely(cob_ls_nulls != 0)) {
+		if (unlikely(cobsetptr->cob_ls_nulls != 0)) {
 			p = f->record->data;
 			for (i = 0; i < (int)size; ++i, ++p) {
 				if (*p < ' ') {
@@ -1888,7 +1856,7 @@ lineseq_write (cob_file *f, const int opt)
 
 	if (unlikely(f->flag_select_features & COB_SELECT_LINAGE)) {
 		putc ('\n', (FILE *)f->file);
-	} else if (cob_ls_uses_cr) {
+	} else if (cobsetptr->cob_ls_uses_cr) {
 		if (opt & COB_WRITE_PAGE) {
 			putc ('\r', (FILE *)f->file);
 		} else if ((opt & COB_WRITE_BEFORE) && f->flag_needs_nl) {
@@ -2487,7 +2455,7 @@ join_environment (void)
 	cob_u32_t	flags;
 	int		ret;
 
-	if (bdb_home == NULL) {
+	if (cobsetptr->bdb_home == NULL) {
 		return;
 	}
 	ret = db_env_create (&bdb_env, 0);
@@ -2510,7 +2478,7 @@ join_environment (void)
 	bdb_env->set_cachesize (bdb_env, 0, 2*1024*1024, 0);
 	bdb_env->set_alloc (bdb_env, cob_malloc, realloc, cob_free);
 	flags = DB_CREATE | DB_INIT_MPOOL | DB_INIT_CDB;
-	ret = bdb_env->open (bdb_env, bdb_home, flags, 0);
+	ret = bdb_env->open (bdb_env, cobsetptr->bdb_home, flags, 0);
 	if (ret) {
 		cob_runtime_error (_("Cannot join BDB environment (%s), error: %d %s"),
 				   "env->open", ret, db_strerror (ret));
@@ -3040,7 +3008,7 @@ bdb_nofile (const char *filename)
 				  bdb_data_dir[i], SLASH_STR, filename);
 		} else {
 			snprintf (bdb_buff, (size_t)COB_SMALL_MAX, "%s%s%s%s%s",
-				  bdb_home, SLASH_STR, bdb_data_dir[i], SLASH_STR, filename);
+				  cobsetptr->bdb_home, SLASH_STR, bdb_data_dir[i], SLASH_STR, filename);
 		}
 		errno = 0;
 		if (access (bdb_buff, F_OK) == 0 || errno != ENOENT) {
@@ -3050,7 +3018,7 @@ bdb_nofile (const char *filename)
 	if (i == 0) {
 		bdb_buff[COB_SMALL_MAX] = 0;
 		snprintf (bdb_buff, (size_t)COB_SMALL_MAX, "%s%s%s",
-			  bdb_home, SLASH_STR, filename);
+			  cobsetptr->bdb_home, SLASH_STR, filename);
 		errno = 0;
 		if (access (bdb_buff, F_OK) == 0 || errno != ENOENT) {
 			return 0;
@@ -5360,7 +5328,7 @@ open_cbl_file (unsigned char *file_name, unsigned char *file_access,
 			flag |= O_RDWR;
 			break;
 		default:
-			if (cobglobptr->cob_display_warn) {
+			if (cobsetptr->cob_display_warn) {
 				fprintf (stderr, _("WARNING - Call to CBL_OPEN_FILE with wrong access mode: %d"), *file_access & 0x3F);
 				putc ('\n', stderr);
 				fflush (stderr);
@@ -5435,12 +5403,12 @@ cob_sys_create_file (unsigned char *file_name, unsigned char *file_access,
 		 file_dev += 3;
 #endif
 
-	if (*file_lock != 0 && cobglobptr->cob_display_warn) {
+	if (*file_lock != 0 && cobsetptr->cob_display_warn) {
 		fprintf (stderr, _("WARNING - Call to CBL_CREATE_FILE with wrong file_lock: %d"), *file_lock);
 		putc ('\n', stderr);
 		fflush (stderr);
 	}
-	if (*file_dev != 0 && cobglobptr->cob_display_warn) {
+	if (*file_dev != 0 && cobsetptr->cob_display_warn) {
 		fprintf (stderr, _("WARNING - Call to CBL_CREATE_FILE with wrong file_dev: %d"), *file_dev);
 		putc ('\n', stderr);
 		fflush (stderr);
@@ -6074,7 +6042,7 @@ cob_new_item (struct cobsort *hp, const size_t size)
 	}
 	q = (struct cobitem *)(hp->mem_base->mem_ptr + hp->mem_used);
 	hp->mem_used += hp->alloc_size;
-	if (unlikely(hp->mem_total >= cob_sort_memory)) {
+	if (unlikely(hp->mem_total >= cobsetptr->cob_sort_memory)) {
 		if ((hp->mem_used + hp->alloc_size) > hp->mem_size) {
 			hp->switch_to_file = 1;
 		}
@@ -6553,7 +6521,7 @@ cob_file_sort_init (cob_file *f, const unsigned int nkeys,
 	if (p->alloc_size % sizeof(void *)) {
 		p->alloc_size += sizeof(void *) - (p->alloc_size % sizeof(void *));
 	}
-	p->chunk_size = cob_sort_chunk;
+	p->chunk_size = cobsetptr->cob_sort_chunk;
 	if (p->chunk_size % p->alloc_size) {
 		p->chunk_size += p->alloc_size - (p->chunk_size % p->alloc_size);
 	}
@@ -6678,7 +6646,7 @@ cob_exit_fileio (void)
 				continue;
 			}
 			cob_close (l->file, NULL, COB_CLOSE_NORMAL, 0);
-			if (cobglobptr->cob_display_warn) {
+			if (cobsetptr->cob_display_warn) {
 				cob_field_to_string (l->file->assign,
 						     runtime_buffer,
 						     (size_t)COB_FILE_MAX);
@@ -6703,9 +6671,9 @@ cob_exit_fileio (void)
 		cob_free (bdb_buff);
 		bdb_buff = NULL;
 	}
-	if (bdb_home) {
-		cob_free (bdb_home);
-		bdb_home = NULL;
+	if (cobsetptr->bdb_home) {
+		cob_free (cobsetptr->bdb_home);
+		cobsetptr->bdb_home = NULL;
 	}
 
 #elif	defined(WITH_ANY_ISAM)
@@ -6717,11 +6685,6 @@ cob_exit_fileio (void)
 #if	defined(WITH_INDEX_EXTFH) || defined(WITH_SEQRA_EXTFH)
 	extfh_cob_exit_fileio ();
 #endif
-
-	if (cob_file_path) {
-		cob_free (cob_file_path);
-		cob_file_path = NULL;
-	}
 
 	if (runtime_buffer) {
 		cob_free (runtime_buffer);
@@ -6737,12 +6700,8 @@ cob_exit_fileio (void)
 }
 
 void
-cob_init_fileio (cob_global *lptr, runtime_env* runtimeptr)
+cob_init_fileio (cob_global *lptr, cob_settings *sptr)
 {
-	char		*s;
-	cob_sli_t	memsiz;
-	int		n;
-	struct	stat	st;
 
 #if defined(VB_RTD)
 	if(vbisam_rtd == NULL) {	/* VB-ISAM 2.1.1 run-time pointer */
@@ -6751,99 +6710,18 @@ cob_init_fileio (cob_global *lptr, runtime_env* runtimeptr)
 #endif
 
 	cobglobptr = lptr;
+	cobsetptr  = sptr;
 	file_cache = NULL;
 	eop_status = 0;
 	check_eop_status = 0;
-	cob_do_sync = 0;
-	cob_ls_uses_cr = 0;
-	cob_ls_nulls = 0;
-	cob_ls_fixed = 0;
-	if ((s = getenv ("COB_SYNC")) != NULL) {
-		cob_do_sync_env = cob_save_env_value(cob_do_sync_env, s);
-
-		if (cob_check_env_true(s) || *s == 'P' || *s == 'p' ) {
-			cob_do_sync = 1;
+	if (cobsetptr->cob_sort_chunk > (cobsetptr->cob_sort_memory / 2)) {
+		cobsetptr->cob_sort_chunk = cobsetptr->cob_sort_memory / 2;
 		}
-	}
-	if ((s = getenv ("COB_LS_USES_CR")) != NULL) {
-		cob_ls_uses_cr_env = cob_save_env_value(cob_ls_uses_cr_env, s);
 
-		if (cob_check_env_true(s)) {
-			cob_ls_uses_cr = 1;
-		}
-	}
-	cob_sort_memory = COB_SORT_MEMORY;
-	if ((s = getenv ("COB_SORT_MEMORY")) != NULL) {
-		cob_sort_memory_env = cob_save_env_value(cob_sort_memory_env, s);
-
-		errno = 0;
-		memsiz = strtol (s, NULL, 10);
-		if (!errno && memsiz >= 1024 * 1024) {
-			cob_sort_memory = (size_t)memsiz;
-		}
-	}
-	cob_sort_chunk = COB_SORT_CHUNK;
-	if ((s = getenv ("COB_SORT_CHUNK")) != NULL) {
-		cob_sort_chunk_env = cob_save_env_value(cob_sort_chunk_env, s);
-
-		n = atoi (s);
-		if (n >= (128 * 1024) && n <= (16 * 1024 * 1024)) {
-			cob_sort_chunk = (size_t)n;
-			if (cob_sort_chunk % sizeof(void *)) {
-				cob_sort_chunk += sizeof(void *) -
-					(cob_sort_chunk % sizeof(void *));
-			}
-		}
-	}
-	if (cob_sort_chunk > (cob_sort_memory / 2)) {
-		cob_sort_chunk = cob_sort_memory / 2;
-	}
-	cob_file_path = cob_fileio_getenv ("COB_FILE_PATH");
-	cob_file_path_env = cob_save_env_value(cob_file_path_env, cob_file_path);
-	if (cob_file_path) {
-		if (stat (cob_file_path, &st) || !(S_ISDIR (st.st_mode))) {
-			cob_free (cob_file_path);
-			cob_file_path = NULL;
-		}
-	}
-	if ((s = getenv ("COB_LS_NULLS")) != NULL) {
-		cob_ls_nulls_env = cob_save_env_value(cob_ls_nulls_env, s);
-
-		if (cob_check_env_true(s)) {
-			cob_ls_nulls = 1;
-		}
-	}
-	if ((s = getenv ("COB_LS_FIXED")) != NULL) {
-		cob_ls_fixed_env = cob_save_env_value(cob_ls_fixed_env, s);
-
-		if (cob_check_env_true(s)) {
-			cob_ls_fixed = 1;
-		}
-	}
-
-#if	WITH_VARSEQ == 3
+	if(cobsetptr->cob_varseq_type == 3)
 	cob_vsq_len = 2;
-#else
+	else
 	cob_vsq_len = 4;
-#endif
-	cob_varseq_type = WITH_VARSEQ;
-	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
-		cob_varseq_type_env = cob_save_env_value(cob_varseq_type_env, s);
-
-		if (*s == '0') {
-			cob_varseq_type = 0;
-			cob_vsq_len = 4;
-		} else if (*s == '1') {
-			cob_varseq_type = 1;
-			cob_vsq_len = 4;
-		} else if (*s == '2') {
-			cob_varseq_type = 2;
-			cob_vsq_len = 4;
-		} else if (*s == '3') {
-			cob_varseq_type = 3;
-			cob_vsq_len = 2;
-		}
-	}
 
 	runtime_buffer = cob_fast_malloc ((size_t)(4 * COB_FILE_BUFF));
 	file_open_env = runtime_buffer + COB_FILE_BUFF;
@@ -6853,7 +6731,6 @@ cob_init_fileio (cob_global *lptr, runtime_env* runtimeptr)
 #ifdef	WITH_DB
 	bdb_env = NULL;
 	bdb_data_dir = NULL;
-	bdb_home = cob_fileio_getenv ("DB_HOME");
 	join_environment ();
 	record_lock_object = cob_malloc ((size_t)1024);
 	bdb_buff = cob_malloc ((size_t)COB_SMALL_BUFF);
@@ -6864,22 +6741,4 @@ cob_init_fileio (cob_global *lptr, runtime_env* runtimeptr)
 	extfh_cob_init_fileio (&sequential_funcs, &lineseq_funcs,
 			       &relative_funcs, &cob_file_write_opt);
 #endif
-
-
-	runtimeptr->cob_do_sync = &cob_do_sync;
-	runtimeptr->cob_do_sync_env = cob_do_sync_env;
-	runtimeptr->cob_ls_nulls = &cob_ls_nulls;
-	runtimeptr->cob_ls_nulls_env = cob_ls_nulls_env;
-	runtimeptr->cob_ls_fixed = &cob_ls_fixed;
-	runtimeptr->cob_ls_fixed_env = cob_ls_fixed_env;
-	runtimeptr->cob_ls_uses_cr = &cob_ls_uses_cr;
-	runtimeptr->cob_ls_uses_cr_env = cob_ls_uses_cr_env;
-	runtimeptr->cob_file_path = cob_file_path;
-	runtimeptr->cob_file_path_env = cob_file_path_env;
-	runtimeptr->cob_sort_memory = &cob_sort_memory;
-	runtimeptr->cob_sort_memory_env = cob_sort_memory_env;
-	runtimeptr->cob_sort_chunk = &cob_sort_chunk;
-	runtimeptr->cob_sort_chunk_env = cob_sort_chunk_env;
-	runtimeptr->cob_varseq_type = &cob_varseq_type;
-	runtimeptr->cob_varseq_type_env = cob_varseq_type_env;
 }

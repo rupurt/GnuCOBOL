@@ -1432,7 +1432,7 @@ extern void			cb_build_symbolic_chars (const cb_tree,
 
 extern struct cb_field		*cb_field_add (struct cb_field *,
 					       struct cb_field *);
-extern int			cb_field_size (cb_tree x);
+extern int			cb_field_size (const cb_tree x);
 extern struct cb_field		*cb_field_founder (const struct cb_field *);
 extern struct cb_field		*cb_field_variable_size (const struct cb_field *);
 extern unsigned int		cb_field_variable_address (const struct cb_field *);

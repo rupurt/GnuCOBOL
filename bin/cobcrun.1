@@ -4,7 +4,7 @@
 cobcrun \- manual page for cobcrun 2.0.0
 .SH SYNOPSIS
 .B cobcrun
-\fIPROGRAM \fR[\fIparam \fR...]
+[\fIoptions\fR] \fIPROGRAM \fR[\fIparam \fR...]
 .br
 .B cobcrun
 \fIoptions\fR
@@ -16,21 +16,24 @@ COBOL driver program for GNU Cobol modules
 Display this help and exit
 .TP
 \fB\-V\fR, \fB\-version\fR
-Display runtime version
+Display cobcrun and runtime version
 .TP
 \fB\-i\fR, \fB\-info\fR
 Display runtime information (build/environment)
 .TP
+\fB\-c\fR <file>, \fB\-config=\fR<file>
+Set runtime configuration from <file>
+.TP
 \fB\-r\fR, \fB\-runtime\-env\fR
-Display runtime information (build/environment)
+Display current runtime configuration
 .SH COPYRIGHT
 Copyright \(co 2004\-2012 Roger While
 .br
-Copyright \(co 2012,2014 Simon Sobisch
+Copyright \(co 2012,2014,2015 Simon Sobisch
 .br
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-Built     Apr 13 2015 10:05:02
+Built     Apr 13 2015 15:56:29
 Packaged  Mrz 29 2015 14:56:23 UTC
 .PP
 libcob (GNU Cobol) 2.0.0
@@ -43,7 +46,7 @@ Copyright \(co 2009,2010,2012,2014,2015 Simon Sobisch
 .br
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-Built     Apr 13 2015 10:04:20
+Built     Apr 13 2015 15:55:36
 Packaged  Mrz 29 2015 14:56:23 UTC
 .SH "SEE ALSO"
 The full documentation for

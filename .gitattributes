@@ -142,6 +142,7 @@ config/default.conf -text
 config/ibm.conf -text
 config/mf.conf -text
 config/mvs.conf -text
+config/runtime.cfg -text
 /configure -text
 /configure.ac -text
 copy/ChangeLog -text
@@ -274,6 +275,7 @@ tests/cobol85/summarynoix.txt -text
 tests/package.m4 -text
 tests/testsuite -text
 tests/testsuite.at -text
+tests/testsuite.src/configuration.at -text
 tests/testsuite.src/data_binary.at -text
 tests/testsuite.src/data_display.at -text
 tests/testsuite.src/data_packed.at -text
@@ -304,3 +306,4 @@ tests/testsuite.src/syn_screen.at -text
 tests/testsuite.src/syn_set.at -text
 tests/testsuite.src/syn_subscripts.at -text
 tests/testsuite.src/syn_value.at -text
+tests/testsuite.src/used_binaries.at -text
