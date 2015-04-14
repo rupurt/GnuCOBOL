@@ -106,7 +106,7 @@ enum cb_tag {
 	CB_TAG_DIRECT,		/* 33 Code output or comment */
 	CB_TAG_DEBUG,		/* 34 Debug item set */
 	CB_TAG_DEBUG_CALL,	/* 35 Debug callback */
-	CB_TAG_REPORT_LINE  /* 36 Report line description */
+	CB_TAG_REPORT_LINE	/* 36 Report line description */
 };
 
 /* Alphabet type */
@@ -837,6 +837,7 @@ struct cb_file {
 	cb_tree			latfoot;		/* LINAGE FOOTING */
 	cb_tree			lattop;			/* LINAGE TOP */
 	cb_tree			latbot;			/* LINAGE BOTTOM */
+	cb_tree			extfh;			/* EXTFH module to call for I/O */
 	struct cb_label		*handler;		/* Error handler */
 	struct cb_program	*handler_prog;		/* Prog where defined */
 	struct cb_label		*debug_section;		/* DEBUG SECTION */

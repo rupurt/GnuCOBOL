@@ -277,6 +277,7 @@ extern cob_u32_t		optimize_defs[];
 extern char			*cb_oc_build_stamp;
 extern const char		*cb_source_file;
 extern int			cb_source_line;
+extern const char		*cb_call_extfh;
 
 extern const char		*cob_config_dir;
 

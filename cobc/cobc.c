@@ -145,6 +145,7 @@ const char		*cb_source_file = NULL;
 char			*cb_oc_build_stamp = NULL;
 const char		*demangle_name = NULL;
 const char		*cb_storage_file_name = NULL;
+const char		*cb_call_extfh = NULL;
 struct cb_text_list	*cb_include_list = NULL;
 struct cb_text_list	*cb_intrinsic_list = NULL;
 struct cb_text_list	*cb_extension_list = NULL;
@@ -420,6 +421,7 @@ static const struct option long_options[] = {
 	{"Xref",		CB_NO_ARG, NULL, 'X'},
 	{"Wall",		CB_NO_ARG, NULL, 'W'},
 	{"W",			CB_NO_ARG, NULL, 'Z'},
+	{"use-extfh",		CB_RQ_ARG, NULL, 7},	/* This is used by COBOL-IT; Same is -fcallfh= */
 
 #undef	CB_FLAG
 #undef	CB_FLAG_RQ
@@ -2313,6 +2315,10 @@ process_command_line (const int argc, char **argv)
 				cobc_err_exit (COBC_INV_PAR, "-fdefaultbyte");
 			}
 			cb_default_byte = n;
+			break;
+
+		case 7:
+			cb_call_extfh = cobc_main_strdup (cob_optarg);
 			break;
 
 		case 10:

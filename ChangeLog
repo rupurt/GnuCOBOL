@@ -1,4 +1,14 @@
 
+2015-04-14  Ron Norman
+
+	* cobc.c, fileio.c, common.h updated to include support to a
+	  Micro Focus style EXTFH interface. The allows for users to 
+	  insert an external file handler while retaining all of the 
+	  normal COBOL I/O functions.
+	  To have the compiled program call 'yurfh' for I/O use:
+	     cobc -fcallfh=yurfh
+	  In turn 'yurfh' may call EXTFH for I/O functions
+
 2015-02-27  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* general: removed "Experimental" marker from CISAM/DISAM/VBISAM

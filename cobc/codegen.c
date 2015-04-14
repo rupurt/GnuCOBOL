@@ -5499,6 +5499,7 @@ output_stmt (cb_tree x)
 static int
 output_file_allocation (struct cb_file *f)
 {
+	int	i;
 
 	if (f->flag_global) {
 #if	0	/* RXWRXW - Global status */
@@ -5532,6 +5533,16 @@ output_file_allocation (struct cb_file *f)
 			CB_PREFIX_FILE, f->cname);
 		output_local ("static unsigned char\t%s%s_status[4];\n",
 			CB_PREFIX_FILE, f->cname);
+	}
+	if (f->organization == COB_ORG_RELATIVE
+	&&  f->key == NULL) {
+		output_local ("static unsigned char\t%s%s_recnum[12+1] = \"000000000000\";\n",
+			CB_PREFIX_SEQUENCE, f->cname);
+		i = lookup_attr (COB_TYPE_NUMERIC_DISPLAY, 0, 0, 0, NULL, 0);
+		output_local ("static cob_field %s%s_recnum = { 12, (cob_u8_ptr)%s%s_recnum, &%s%d };\n",
+			CB_PREFIX_FIELD, f->cname,
+			CB_PREFIX_SEQUENCE, f->cname,
+			CB_PREFIX_ATTR, i);
 	}
 
 	if (f->code_set) {
@@ -5598,7 +5609,12 @@ output_file_initialization (struct cb_file *f)
 		nkeys = 1;
 		output_prefix ();
 		output ("%s%s->field = ", CB_PREFIX_KEYS, f->cname);
-		output_param (f->key, -1);
+		if (f->organization == COB_ORG_RELATIVE
+		&&  f->key == NULL) {
+			output ("&%s%s_recnum", CB_PREFIX_FIELD, f->cname);
+		} else {
+			output_param (f->key, -1);
+		}
 		output (";\n");
 		output_prefix ();
 		output ("%s%s->tf_duplicates = 0;\n", CB_PREFIX_KEYS, f->cname);
@@ -5686,6 +5702,7 @@ output_file_initialization (struct cb_file *f)
 		     f->cname, f->record_min);
 	output_line ("%s%s->record_max = %d;", CB_PREFIX_FILE,
 		     f->cname, f->record_max);
+
 	if (f->organization == COB_ORG_RELATIVE
 	 || f->organization == COB_ORG_INDEXED) {
 		output_line ("%s%s->nkeys = %d;", CB_PREFIX_FILE,
@@ -5749,6 +5766,8 @@ output_file_initialization (struct cb_file *f)
 	output_line ("%s%s->open_mode = 0;", CB_PREFIX_FILE, f->cname);
 	output_line ("%s%s->flag_optional = %d;", CB_PREFIX_FILE, f->cname,
 		     f->optional);
+	output_line ("%s%s->flag_line_adv = %d;", CB_PREFIX_FILE, f->cname,
+		     f->flag_line_adv);
 	output_line ("%s%s->last_open_mode = 0;", CB_PREFIX_FILE, f->cname);
 	output_line ("%s%s->flag_operation = 0;", CB_PREFIX_FILE, f->cname);
 	output_line ("%s%s->flag_nonexistent = 0;", CB_PREFIX_FILE, f->cname);
@@ -8611,6 +8630,7 @@ codegen (struct cb_program *prog, const int nested)
 	struct string_list	*stp;
 	struct call_list	*clp;
 	struct base_list	*blp;
+	struct cb_file		*f;
 	unsigned char		*s;
 	struct nested_list	*nlp;
 	struct cb_program	*cp;
@@ -8757,6 +8777,16 @@ codegen (struct cb_program *prog, const int nested)
 		output ("#include \"%s\"\n\n", cb_storage_file_name);
 
 		output ("/* Function prototypes */\n\n");
+		if(cb_call_extfh)
+			output ("extern int %s();\n",cb_call_extfh);
+		for (l = prog->file_list; l; l = CB_CHAIN (l)) {
+			f =  CB_FILE (CB_VALUE (l));
+			if(f->extfh
+			&& strcmp(cb_call_extfh,CB_CONST (f->extfh)->val) != 0) {
+				output ("extern int %s();\n",CB_CONST (f->extfh)->val);
+			}
+		}
+
 		for (cp = prog; cp; cp = cp->next_program) {
 			/* Build parameter list */
 			for (l = cp->entry_list; l; l = CB_CHAIN (l)) {

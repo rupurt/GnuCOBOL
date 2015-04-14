@@ -51,6 +51,9 @@ CB_FLAG_RQ (cb_fold_call, 1, "fold-call", 0, 5,
 CB_FLAG_RQ (cb_default_byte, 1, "defaultbyte", -1, 6,
 	 _("Initialize fields without VALUE to decimal value\n\t\t\t- 0 to 255 (Default : initialize to picture)"))
 
+CB_FLAG_RQ (cb_def_callfh, 1, "callfh", -1, 7,
+	 _("Call user written EXTFH interface module for I/O"))
+
 /* Flags with required parameter and no associated variable */
 
 CB_FLAG_NQ (1, "intrinsics", 10,
