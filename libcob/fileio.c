@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
+   Copyright (c) 2015 Ron Norman
 
    This file is part of GNU Cobol.
 
@@ -416,12 +417,12 @@ struct cobsort {
 
 /* Local variables */
 
-static cob_global	*cobglobptr;
-static cob_settings	*cobsetptr;
+static cob_global	*cobglobptr= NULL;
+static cob_settings	*cobsetptr= NULL;
 
-static unsigned int	eop_status;
-static unsigned int	check_eop_status;
-static size_t		cob_vsq_len;
+static unsigned int	eop_status = 0;
+static unsigned int	check_eop_status = 0;
+static int		cob_vsq_len = 0;
 
 static struct file_list	*file_cache = NULL;
 
@@ -6755,54 +6756,6 @@ static struct fcd_file {
 } *fcd_file_list = NULL;
 
 /*
- *  getFileName - generate the actual file name.  Use the one given
- *                in the FCD unless the file is EXTERNAL.  Then we
- *                must get the ENVIRONMENT variable and use that.
-*/
-static char	*
-getFileName(FCD3 *fcd, int *envUsed)
-{
-static  char	fname[512 + 1];
-	char	internalName[512 + 1], wrk[256], *envName;
-	int	fnameLen,i;
-
-	fnameLen = LDCOMPX2(fcd->fnameLen);
-	memset(internalName, 0, sizeof(internalName));
-	if(fcd->fnamePtr != NULL) {
-		for(i=0; i < fnameLen && fcd->fnamePtr[i] > ' '; i++)
-			internalName[i] = fcd->fnamePtr[i];
-	}
-	strcpy(fname, internalName);
-	*envUsed = 0;
-	if (fcd->otherFlags & OTH_EXTERNAL) {
-		sprintf(wrk,"DD_%s",internalName);
-		envName = getenv(wrk);
-		if(envName == NULL) {
-			sprintf(wrk,"dd_%s",internalName);
-			envName = getenv(wrk);
-		}
-		if(envName == NULL) {
-			sprintf(wrk,"%s",internalName);
-			envName = getenv(wrk);
-		}
-		if (envName) {
-			fnameLen = strlen(envName);
-			if (fnameLen > sizeof(fname)) {
-				fnameLen = sizeof(fname);
-			}
-			memset(fname, 0, sizeof(fname));
-			memcpy(fname, envName, fnameLen);
-			*envUsed = 1;
-		} else {
-			strcpy(fname, internalName);
-		}
-	} else {
-		strcpy(fname, internalName);
-	}
-	return fname;
-}
-
-/*
  * Update FCD from cob_file
  */
 static void
@@ -6835,8 +6788,8 @@ update_file_to_fcd(cob_file *f, FCD3 *fcd, unsigned char *fnstatus)
 static void
 copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 {
-	char	assignto[512], *fn;
-	int	fnlen,nkeys,kdblen,idx,keypos,keycomp,k;
+	char	assignto[512];
+	int	fnlen,kdblen,idx,keypos,keycomp,k,nkeys;
 	KDB	*kdb;
 	EXTKEY	*key;
 
@@ -6882,7 +6835,7 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 		fcd->fileOrg = ORG_INDEXED;
 		fcd->fileFormat = MF_FF_CISAM;
 		/* Copy Key information from cob_file to FCD */
-		for(idx=keycomp=0; idx < nkeys; idx++) {
+		for(idx=keycomp=0; idx < f->nkeys; idx++) {
 			if(f->keys[idx].count_components <= 1)
 				keycomp++;
 			else
@@ -6974,10 +6927,6 @@ update_fcd_to_file(FCD3* fcd, cob_file *f, cob_field *fnstatus, int wasOpen)
 static void
 copy_fcd_to_file(FCD3* fcd, cob_file *f)
 {
-	char	assignto[512], *fn;
-	int	fnlen,nkeys,kdblen,idx,keypos,keycomp,k;
-	KDB	*kdb;
-	EXTKEY	*key;
 
 	if(fcd->accessFlags == ACCESS_SEQ)
 		f->access_mode = COB_ACCESS_SEQUENTIAL;
@@ -7171,14 +7120,13 @@ cob_extfh_close(
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts;
 	struct fcd_file	*ff,*pff;
 
 	fcd = find_fcd(f);
 	STCOMPX2(OP_CLOSE, opcode);
 
 	/* Keep table of 'fcd' created */
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 
 	pff = NULL;
@@ -7209,7 +7157,7 @@ cob_extfh_start (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts,keyn,keylen,partlen;
+	int	keyn,keylen,partlen;
 
 	fcd = find_fcd(f);
 	keyn = cob_findkey(f,key,&keylen,&partlen);
@@ -7230,7 +7178,7 @@ cob_extfh_start (
 			STCOMPX2(OP_START_EQ_ANY, opcode); break;
 	}
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 
@@ -7244,7 +7192,7 @@ cob_extfh_read (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts,keyn,keylen,partlen;
+	int	keyn,keylen,partlen;
 
 	fcd = find_fcd(f);
 	if(key == NULL) {
@@ -7260,7 +7208,7 @@ cob_extfh_read (
 		STCOMPX2(OP_READ_RAN, opcode);
 	}
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 
@@ -7274,7 +7222,6 @@ cob_extfh_read_next (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts,keyn,keylen,partlen;
 
 	fcd = find_fcd(f);
 	if((read_opts & COB_READ_PREVIOUS)) {
@@ -7283,7 +7230,7 @@ cob_extfh_read_next (
 		STCOMPX2(OP_READ_SEQ, opcode);
 	}
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 /*
@@ -7296,12 +7243,12 @@ cob_extfh_write (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts;
 
 	fcd = find_fcd(f);
 	STCOMPX2(OP_WRITE, opcode);
+	STCOMPX2(check_eop, fcd->eop);
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 
@@ -7315,12 +7262,11 @@ cob_extfh_rewrite (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts;
 
 	fcd = find_fcd(f);
 	STCOMPX2(OP_REWRITE, opcode);
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 
@@ -7334,12 +7280,11 @@ cob_extfh_delete (
 {
 	unsigned char opcode[2];
 	FCD3	*fcd;
-	int	sts;
 
 	fcd = find_fcd(f);
 	STCOMPX2(OP_DELETE, opcode);
 
-	sts = callfh(opcode,fcd);
+	callfh(opcode,fcd);
 	update_fcd_to_file(fcd,f,fnstatus,0);
 }
 
@@ -7353,7 +7298,7 @@ int
 EXTFH(unsigned char *opcode, FCD3 *fcd)
 {
 	int	opcd,sts,opts,eop,k;
-	char	fnstatus[2],keywrk[80];
+	unsigned char	fnstatus[2],keywrk[80];
 	cob_field fs[1];
 	cob_field key[1];
 	cob_field rec[1];
@@ -7537,6 +7482,7 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 		break;
 
 	case OP_WRITE:
+		eop = LDCOMPX2(fcd->eop);
 		cob_write(f, rec, opts, fs, eop);
 		update_file_to_fcd(f,fcd,fnstatus);
 		break;

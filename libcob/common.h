@@ -1857,7 +1857,7 @@ typedef struct {
 	unsigned char	gcFlags; 			/* Local GNUCobol feature only */
 #define MF_CALLFH_GNUCOBOL	0x80			/* GNUCobol is being used */
 #define MF_CALLFH_BYPASS	0x40			/* Stop passing this file to 'callfh' */
-	char		res4[2];
+	unsigned char	eop[2];				/* Was reserverd: Use for cob_write eop value */
 	char		fsv2FileId[2];			/* Fileshare V2 file id */
 	char		retryOpenCount[2];
 	unsigned char	fnameLen[2];			/* file name length */
@@ -1879,7 +1879,7 @@ typedef struct {
 	unsigned char	relKey[8];			/* 64-bit, (cur) relative key/Record num */
 	void		*fileHandle;			/* file handle */
 	PTRFILLER(fill1)
-	char		*recPtr;			/* Pointer to record area */
+	unsigned char	*recPtr;			/* Pointer to record area */
 	PTRFILLER(fill2)
 	char		*fnamePtr;			/* pointer to file name area */
 	PTRFILLER(fill3)
@@ -1897,8 +1897,8 @@ typedef struct {
 
 #define LDCOMPX2(f) (((f[0] << 8 ) & 0xFF00) | (f[1] & 0xFF))
 #define LDCOMPX4(f) (((f[0] << 24 ) & 0xFF000000) | ((f[1] << 16 ) & 0xFF0000) | ((f[2] << 8 ) & 0xFF00) | (f[3] & 0xFF))
-#define STCOMPX2(v,f) (f[1] = v & 0xFF, f[0] = (v >> 8) & 0xFF)
-#define STCOMPX4(v,f) (f[3] = v & 0xFF, f[2] = (v >> 8) & 0xFF, f[1] = (v >> 16) & 0xFF, f[0] = (v >> 24) & 0xFF)
+#define STCOMPX2(v,f) (f[1] = (v) & 0xFF, f[0] = ((v) >> 8) & 0xFF)
+#define STCOMPX4(v,f) (f[3] = (v) & 0xFF, f[2] = ((v) >> 8) & 0xFF, f[1] = ((v) >> 16) & 0xFF, f[0] = ((v) >> 24) & 0xFF)
 
 /*************************/
 /* EXTFH operation codes */
@@ -2001,6 +2001,7 @@ COB_EXPIMP void cob_rollback	(void);
 /*********************************************/
 /* Functions in fileio.c for EXTFH interface */
 
+COB_EXPIMP int	EXTFH(unsigned char *opcode, FCD3 *fcd);
 COB_EXPIMP void cob_extfh_open		(int (*callfh)(unsigned char *opcode, FCD3 *fcd),
 					cob_file *, const int, const int, cob_field *);
 COB_EXPIMP void cob_extfh_close		(int (*callfh)(unsigned char *opcode, FCD3 *fcd),
