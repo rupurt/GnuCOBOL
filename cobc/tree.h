@@ -661,6 +661,7 @@ struct cb_field {
 	cb_tree			report_reset;	/* RESET ON field */
 	cb_tree			report_control;	/* CONTROL identifier */
 	cb_tree			report_when;	/* PRESENT WHEN condition */
+	cb_tree			report_column_list;/* List of Column Numbers */
 
 	int			id;		/* Field id */
 	int			size;		/* Field size */
@@ -678,7 +679,8 @@ struct cb_field {
 	int			screen_flag;	/* Flags used in SCREEN SECTION */
 	int			report_flag;	/* Flags used in REPORT SECTION */
 	int			report_line;	/* LINE */
-	int			report_column;	/* COLUMN */
+	int			report_column;	/* COLUMN (first value) */
+	int			report_num_col;	/* Number of COLUMNs defined */
 	int			report_decl_id;	/* Label id of USE FOR REPORTING */
 	int			step_count;	/* STEP in REPORT */
 	int			next_group_line;/* NEXT GROUP [PLUS] line# */

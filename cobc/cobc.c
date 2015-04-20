@@ -1919,6 +1919,7 @@ process_command_line (const int argc, char **argv)
 	int			ret = 0;
 	int			sub_ret;
 
+	cb_mf_ibm_comp = -1;
 #ifdef _WIN32
 	/* Translate command line arguments from WIN to UNIX style */
 	argnum = 1;
@@ -2435,6 +2436,14 @@ process_command_line (const int argc, char **argv)
 	if (cb_flag_traceall) {
 		cb_flag_trace = 1;
 		cb_flag_source_location = 1;
+	}
+
+	if(cb_mf_ibm_comp == 0) {		/* NO-IBMCOMP */
+		cb_binary_size = CB_BINARY_SIZE_1__8;
+		cb_synchronized_clause = CB_IGNORE;
+	} else if(cb_mf_ibm_comp == 1) {	/* IBMCOMP */
+		cb_binary_size = CB_BINARY_SIZE_2_4_8;
+		cb_synchronized_clause = CB_OK;
 	}
 
 	return cob_optind;

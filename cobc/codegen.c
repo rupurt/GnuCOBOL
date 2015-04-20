@@ -155,6 +155,7 @@ static unsigned int		gen_native = 0;
 static unsigned int		gen_custom = 0;
 static unsigned int		gen_figurative = 0;
 static unsigned int		gen_dynamic = 0;
+static int			report_field_id = 0;
 static int			generate_id = 0;
 static int			generate_bgn_lbl = -1;
 
@@ -1215,6 +1216,8 @@ output_emit_field(cb_tree x, const char *cmt)
 	int	i;
 	if(f
 	&& !(f->report_flag & COB_REPORT_REF_EMITED)) {
+		if(f->step_count < f->size)
+			f->step_count = f->size;
 		f->report_flag |= COB_REPORT_REF_EMITED;
 		if(f->flag_occurs && f->occurs_max > 1) {
 			output_local("\t\t/* col%3d %s OCCURS %d ", f->report_column, f->name, f->occurs_max);
@@ -1237,7 +1240,17 @@ output_emit_field(cb_tree x, const char *cmt)
 			output_local(";\t/* ");
 			if(f->report_column > 0)
 				output_local("col%3d ", f->report_column);
-			output_local("%s ", f->name);
+			if(memcmp(f->name,"FILLER ",7) != 0)
+				output_local("%s ", f->name);
+			if((f->report_flag & COB_REPORT_COLUMN_RIGHT)) {
+				output_local("RIGHT ");
+			} else
+			if((f->report_flag & COB_REPORT_COLUMN_LEFT)) {
+				output_local("LEFT ");
+			} else
+			if((f->report_flag & COB_REPORT_COLUMN_CENTER)) {
+				output_local("CENTER ");
+			}
 			if(cmt && strlen(cmt) > 0)
 				output_local(": %s ",cmt);
 			output_local("*/\n");
@@ -5334,15 +5347,22 @@ output_stmt (cb_tree x)
 		&& ip->stmt1 == NULL
 		&& ip->stmt2 != NULL) {	/* Really PRESENT WHEN for Report field */
 			struct cb_field *p = (struct cb_field *)ip->stmt2;
-			output_line ("/* PRESENT WHEN */");
+			char	*px;
+			if((p->report_flag & COB_REPORT_LINE)) {
+				px = (char*)CB_PREFIX_REPORT_LINE;
+				output_line ("/* PRESENT WHEN Line */");
+			} else {
+				px = (char*)CB_PREFIX_REPORT_FIELD;
+				output_line ("/* PRESENT WHEN field */");
+			}
 			output_prefix ();
 			output ("if (");
 			output_cond (ip->test, 0);
 			output (")\n");
 			output_line ("{");
-			output("\t%s%d.suppress = 0;\n",CB_PREFIX_REPORT_FIELD,p->id);
+			output("\t%s%d.suppress = 0;\n",px,p->id);
 			output_line ("} else {");
-			output("\t%s%d.suppress = 1;\n",CB_PREFIX_REPORT_FIELD,p->id);
+			output("\t%s%d.suppress = 1;\n",px,p->id);
 			output_line ("}");
 			gen_if_level--;
 			break;
@@ -5351,15 +5371,22 @@ output_stmt (cb_tree x)
 		&& ip->stmt1 == NULL
 		&& ip->stmt2 != NULL) {	/* Really PRESENT WHEN for Report line */
 			struct cb_field *p = (struct cb_field *)ip->stmt2;
-			output_line ("/* PRESENT WHEN */");
+			char	*px;
+			if((p->report_flag & COB_REPORT_LINE)) {
+				px = (char*)CB_PREFIX_REPORT_LINE;
+				output_line ("/* PRESENT WHEN line */");
+			} else {
+				px = (char*)CB_PREFIX_REPORT_FIELD;
+				output_line ("/* PRESENT WHEN Field */");
+			}
 			output_prefix ();
 			output ("if (");
 			output_cond (ip->test, 0);
 			output (")\n");
 			output_line ("{");
-			output("\t%s%d.suppress = 0;\n",CB_PREFIX_REPORT_LINE,p->id);
+			output("\t%s%d.suppress = 0;\n",px,p->id);
 			output_line ("} else {");
-			output("\t%s%d.suppress = 1;\n",CB_PREFIX_REPORT_LINE,p->id);
+			output("\t%s%d.suppress = 1;\n",px,p->id);
 			output_line ("}");
 			gen_if_level--;
 			break;
@@ -5933,15 +5960,17 @@ static int report_col_pos = 1;
 static void
 output_report_data (struct cb_field *p)
 {
-	int	prev_col_pos;
+	int	prev_col_pos,idx;
 	struct cb_field *pp;
+	cb_tree	x, l;
 
 	if (p == NULL) {
 		return;
 	}
 
 	if (p->storage == CB_STORAGE_REPORT) {
-		if((p->report_flag & COB_REPORT_LINE)
+		if (p->level == 1
+		|| (p->report_flag & COB_REPORT_LINE)
 		|| (p->report_flag & COB_REPORT_LINE_PLUS)
 		|| (p->report_flag & COB_REPORT_DETAIL)
 		|| (p->report_flag & COB_REPORT_HEADING)
@@ -5952,17 +5981,46 @@ output_report_data (struct cb_field *p)
 		} else {
 			if((p->report_flag & COB_REPORT_COLUMN_PLUS)) {
 				p->report_column = report_col_pos + p->report_column;
-				p->report_flag &= ~COB_REPORT_COLUMN_PLUS;
+				/*p->report_flag &= ~COB_REPORT_COLUMN_PLUS;*/
 			} else if(p->report_column <= 0) {	/* No COLUMN was given */
 				p->report_column = report_col_pos;
 			}
 			prev_col_pos = report_col_pos;
 			if(p->flag_occurs && p->occurs_max > 1) {
-				report_col_pos = p->report_column + (p->size * p->occurs_max);
+				if(p->step_count < p->size)
+					p->step_count = p->size;
+				x = NULL;
+				idx = 0;
+				for (l = p->report_column_list; l; l = CB_CHAIN (l)) {
+					x = CB_VALUE (l);
+					idx++;
+				}
+				if(x && idx >= p->occurs_max) {
+					report_col_pos = cb_get_int(x) + p->step_count;
+				} else
+				if(x && idx > 1) {
+					report_col_pos = cb_get_int(x) + (p->step_count * (p->occurs_max - idx + 1));
+				} else {
+					report_col_pos = p->report_column + (p->step_count * p->occurs_max);
+				}
 				for(pp=p->parent; pp; pp = pp->parent) {
 					if(pp->flag_occurs) {
 						cb_warning(_("Line %d Nested OCCURS in report not Implemented"),p->common.source_line);
+						break;
 					}
+				}
+			} else
+			if((p->report_flag & COB_REPORT_COLUMN_RIGHT)) {
+				report_col_pos = p->report_column + 1;
+				p->report_column =  report_col_pos - p->size;
+			} else
+			if((p->report_flag & COB_REPORT_COLUMN_CENTER)) {
+				if(p->size & 1) {
+					p->report_column = p->report_column - ((p->size - 1) / 2);
+					report_col_pos = p->report_column + (p->size / 2) + 1;
+				} else {
+					p->report_column = p->report_column - (p->size / 2) + 1;
+					report_col_pos = p->report_column + (p->size / 2) + 1;
 				}
 			} else {
 				report_col_pos = p->report_column + p->size;
@@ -6126,12 +6184,14 @@ output_report_control(struct cb_report *p, int id, cb_tree ctl, cb_tree nx)
 static void
 output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report *r, int subscript)
 {
-	struct cb_field *n = NULL;
-	int	idx;
+	int	idx, colnum;
+	cb_tree	l,x;
 
 	if (f == NULL) {
 		return;
 	}
+	if(bgn == 1)
+		report_field_id = 0;
 
 	if (bgn == 0
 	&& (f->report_flag & COB_REPORT_LINE)) {	/* Start of next Line */
@@ -6148,14 +6208,14 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 			return;
 		} 
 
+		if (f->sister) {
+			output_report_def_fields (0,id,f->sister,r,0);
+		}
 		if (f->children
 		&& f->storage == CB_STORAGE_REPORT
 		&& f->report == r) {
-			output_report_def_fields (0,id,n=f->children,r,0);
-		}
-		if (f->sister) {
-			output_report_def_fields (0,id,n=f->sister,r,0);
-		}
+			output_report_def_fields (0,id,f->children,r,0);
+		} 
 		if (f->report_source || f->report_control) {
 			output_local("\t\t/* ");
 			if(f->report_source) {
@@ -6169,27 +6229,22 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 			output_local("*/\n");
 		}
 		output_local ("static cob_report_field %s%d\t= {", CB_PREFIX_REPORT_FIELD,f->id);
-		if(n == NULL)
+		if(report_field_id == 0)
 			output_local("NULL,");
 		else
-			output_local("&%s%d,",CB_PREFIX_REPORT_FIELD,n->id);
+			output_local("&%s%d,",CB_PREFIX_REPORT_FIELD,report_field_id);
 		output_local("&%s%d,",CB_PREFIX_FIELD,f->id);
 	} else {
-		if (f->sister) {
-			n = f->sister;
-		} else {
-			n = NULL;
-		}
 		if(subscript == 1) {
 			output_local ("static cob_report_field %s%d\t= {", CB_PREFIX_REPORT_FIELD,f->id);
 			output_local("&%s%d_2,",CB_PREFIX_REPORT_FIELD,f->id);
 			output_local("&%s%d,",CB_PREFIX_FIELD,f->id);
 		} else if(subscript == f->occurs_max) {
 			output_local ("static cob_report_field %s%d_%d\t= {", CB_PREFIX_REPORT_FIELD,f->id,subscript);
-			if(n == NULL)
+			if(report_field_id == 0)
 				output_local("NULL,");
 			else
-				output_local("&%s%d,",CB_PREFIX_REPORT_FIELD,n->id);
+				output_local("&%s%d,",CB_PREFIX_REPORT_FIELD,report_field_id);
 			output_local("&%s%d_%d,",CB_PREFIX_FIELD,f->id,subscript);
 		} else {
 			output_local ("static cob_report_field %s%d_%d\t= {", CB_PREFIX_REPORT_FIELD,f->id,subscript);
@@ -6197,6 +6252,7 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 			output_local("&%s%d_%d,",CB_PREFIX_FIELD,f->id,subscript);
 		}
 	}
+	report_field_id = f->id;
 
 	if(f->report_source) {
 		output_param (f->report_source, 0);
@@ -6235,15 +6291,46 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 	} else {
 		output_local("NULL,0,");	
 	}
+	if(f->step_count < f->size)
+		f->step_count = f->size;
 	if(f->report_column <= 0)	/* No COLUMN was given */
 		f->report_column = 1;
-	output_local("%d,%d,",f->report_flag&~COB_REPORT_EMITED,f->report_line);
-	if(subscript > 1) {
-		output_local("%d,",f->report_column+(f->size * (subscript-1)));
+	if(f->children)
+		f->report_flag |= COB_REPORT_GROUP_ITEM;
+	if(f->report_when)
+		f->report_flag |= COB_REPORT_HAD_WHEN;
+	if((f->report_flag&~(COB_REPORT_EMITED|COB_REPORT_COLUMN_PLUS)) == 0) {
+		output_local("0,%d",f->report_line);
+	}else
+	if(subscript > 0) {
+		output_local("0x%X,%d",f->report_flag&~(COB_REPORT_EMITED|COB_REPORT_GROUP_ITEM),f->report_line);
 	} else {
-		output_local("%d,",f->report_column);
+		output_local("0x%X,%d",f->report_flag&~COB_REPORT_EMITED,f->report_line);
 	}
-	output_local("%d,%d",f->step_count,f->next_group_line);
+	if(subscript > 1) {
+		idx = 1;
+		colnum = 1;
+		x = NULL;
+		for (l = f->report_column_list; l && idx < subscript; l = CB_CHAIN (l)) {
+			idx++;
+			x = CB_VALUE (l);
+			colnum = cb_get_int(x);
+		}
+		if(l) {
+			x = CB_VALUE (l);
+			output_local(",%d",cb_get_int(x));
+		} else
+		if(idx > 2) {
+			output_local(",%d",colnum + (f->step_count * (subscript - idx + 1)));
+		} else {
+			output_local(",%d",f->report_column + (f->step_count * (subscript-1)));
+		}
+	} else {
+		output_local(",%d",f->report_column);
+	}
+	output_local(",%d,%d",f->step_count,f->next_group_line);
+	output_local(",%d",f->level);
+	output_local(",0,0"); /* reportio flags: group_indicate & suppress */
 	output_local ("};\n");
 }
 

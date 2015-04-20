@@ -1,4 +1,10 @@
 
+2015-04-14  Ron Norman
+
+	* cobc.c codegen.c common.h tree.h parser.y typeck.c
+	  updated to include support REPORT COLUMN LEFT/RIGHT/CENTER
+	  Also REPORT: PLUS, STEP on OCCURS and multi COLUMN numbers
+
 2015-04-14  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c, fileio.c, common.h updated to include support to a

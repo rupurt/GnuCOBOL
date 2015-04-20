@@ -5119,54 +5119,99 @@ column_clause:
   col_keyword_clause col_or_plus
   {
 	check_pic_repeated ("COLUMN", SYN_CLAUSE_18);
+	if((current_field->report_flag & (COB_REPORT_COLUMN_LEFT|COB_REPORT_COLUMN_RIGHT|COB_REPORT_COLUMN_CENTER))
+	&& (current_field->report_flag & COB_REPORT_COLUMN_PLUS)) {
+		if (cb_relaxed_syntax_check) {
+			cb_warning (_("PLUS is not recommended with LEFT, RIGHT or CENTER"));
+		} else {
+			cb_error (_("PLUS is not allowed with LEFT, RIGHT or CENTER"));
+		}
+	}
   }
 ;
 
 col_keyword_clause:
-  column_or_col _numbers _orientation _is_are
-| columns_or_cols _are
+  column_or_cols _numbers _orientation _is_are
 ;
 
 _orientation:
   /* empty */
 | _left_right_center
-  {
-	/* ToDo: Add check in typeck that all operands are absolute */
-	PENDING ("COLUMN orientation (LEFT/RIGHT/CENTER)");
-  }
 ;
 
 _left_right_center:
   LEFT
+  {
+	current_field->report_flag |= COB_REPORT_COLUMN_LEFT;
+  }
 | RIGHT
+  {
+	current_field->report_flag |= COB_REPORT_COLUMN_RIGHT;
+  }
 | CENTER
+  {
+	current_field->report_flag |= COB_REPORT_COLUMN_CENTER;
+  }
 ;
 
 col_or_plus:
   plus_plus report_integer 
   {
-	current_field->report_column = cb_get_int ($2);
-	if (current_field->report_column > 0) {
-		current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
+	int colnum;
+	colnum = cb_get_int ($2);
+	if (colnum > 0) {
+		if(current_field->parent
+		&& current_field->parent->children == current_field) {
+			cb_warning (_("PLUS is ignored on first field of line"));
+			if(current_field->step_count == 0)
+				current_field->step_count = colnum;
+		} else {
+			current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
+		}
 	} else {
-		current_field->report_column = 0;
+		colnum = 0;
 	}
+	if(current_field->report_column == 0)
+		current_field->report_column = colnum;
+	current_field->report_num_col++;
   }
-| report_integer
+| column_integer_list
+;
+
+column_integer_list:
+  column_integer
+| column_integer column_integer_list
+;
+
+column_integer:
+  report_integer
   {
-	current_field->report_column = cb_get_int ($1);
+	int colnum;
+	colnum = cb_get_int ($1);
 	if (CB_LITERAL ($1)->sign > 0) {
-		current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
+		if(current_field->parent
+		&& current_field->parent->children == current_field) {
+			cb_warning (_("PLUS is ignored on first field of line"));
+		} else {
+			current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
+		}
 	}
 	if($1 != cb_int1
 	&& $1 != cb_int0) {
-		if (current_field->report_column <= 0
+		if (colnum <= 0
 		|| CB_LITERAL ($1)->sign < 0) {
 			cb_error (_("Invalid COLUMN integer; Must be > 0"));
-			current_field->report_column = 0;
+			colnum = 0;
 			$$ = cb_int0;
+		} else if(colnum <= current_field->report_column) {
+			cb_warning (_("COLUMN numbers should increase"));
 		}
+		current_field->report_column_list = 
+				cb_list_append (current_field->report_column_list, CB_LIST_INIT ($1));
 	}
+	if(current_field->report_column == 0)
+		current_field->report_column = colnum;
+	current_field->report_num_col++;
   }
 ;
 
@@ -11142,6 +11187,7 @@ rel_record:	| RECORD ;
 coll_sequence:		COLLATING SEQUENCE | SEQUENCE ;
 column_or_col:		COLUMN | COL ;
 columns_or_cols:	COLUMNS | COLS ;
+column_or_cols:		column_or_col | columns_or_cols ;
 comp_equal:		TOK_EQUAL | EQUAL ;
 exception_or_error:	EXCEPTION | ERROR ;
 exception_or_overflow:	EXCEPTION | TOK_OVERFLOW ;

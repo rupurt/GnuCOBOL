@@ -1096,18 +1096,56 @@ compute_binary_size (struct cb_field *f, const int size)
 	}
 }
 
+static void
+set_report_field(struct cb_field *f)
+{
+	struct cb_field *c,*pp;
+	if(f->storage == CB_STORAGE_REPORT
+	&& f->report_column > 0) { 		
+		if(!(f->report_flag & COB_REPORT_COLUMN_PLUS)) {
+			f->offset = f->report_column - 1;		/* offset based on COLUMN value */
+		} else {
+			if((pp=f->parent) != NULL
+			&& pp->children == f) {
+				f->offset = f->report_column - 1;	/* First in line */
+			} else if(pp) {
+				for(c=pp->children; c; c = c->sister) {	/* Find previous field */
+					if(c->sister == f) {
+						if(c->occurs_max > 1) 
+					 		f->offset = c->offset + c->size * c->occurs_max + f->report_column;
+						else
+						 	f->offset = c->offset + c->size + f->report_column;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 static int
 compute_size (struct cb_field *f)
 {
 	struct cb_field	*c;
 	int		size = 0;
-	cob_u64_t	size_check = 0;
+	int		size_check = 0;
 	int		align_size;
 	int		pad;
 
 	int		maxsz;
 	struct cb_field *c0;
 
+	if (f->storage == CB_STORAGE_REPORT) {
+		if(f->report_num_col > 1
+		&& f->occurs_max > 1) {
+			cb_error_x (CB_TREE (f), _("OCCURS and multi COLUMNs is not allowed"));
+		} else
+		if(f->report_num_col > 1) {
+			f->occurs_max = f->occurs_min = f->report_num_col;
+			f->flag_occurs = 1;
+			f->indexes = 1;
+		}
+	}
 	if (f->level == 66) {
 		/* Rename */
 		if (f->rename_thru) {
@@ -1120,9 +1158,10 @@ compute_size (struct cb_field *f)
 	}
 
 	if (f->children) {
-		if(f->storage == CB_STORAGE_REPORT
-		&& (f->report_flag && COB_REPORT_LINE) )
+		if (f->storage == CB_STORAGE_REPORT
+		&& (f->report_flag && COB_REPORT_LINE) ) {
 			f->offset = 0;
+		}
 
 		/* Groups */
 		if (f->flag_synchronized && warningopt) {
@@ -1162,10 +1201,8 @@ compute_size (struct cb_field *f)
 				c->offset = f->offset + (int) size_check;
 				size_check += compute_size (c) * c->occurs_max;
 
-				if(c->storage == CB_STORAGE_REPORT
-				&& !(c->report_flag & COB_REPORT_COLUMN_PLUS)
-				&& c->report_column > 0) {	/* offset based on COLUMN value */
-					c->offset = c->report_column - 1;
+				if(c->report_column > 0) { 		/* offset based on COLUMN value */
+					set_report_field(c);
 				}
 
 				/* Word alignment */
@@ -1235,10 +1272,8 @@ compute_size (struct cb_field *f)
 		f->size = (int) size_check;
 	} else {
 		/* Elementary item */
-		if(f->storage == CB_STORAGE_REPORT
-		&& !(f->report_flag & COB_REPORT_COLUMN_PLUS)
-		&& f->report_column > 0) {		/* offset based on COLUMN value */
-				f->offset = f->report_column - 1;	
+		if(f->report_column > 0) { 		/* offset based on COLUMN value */
+			set_report_field(f);
 		}
 
 		switch (f->usage) {
@@ -1347,6 +1382,13 @@ compute_size (struct cb_field *f)
 		}
 	}
 
+	if (f->storage == CB_STORAGE_REPORT) {
+		if(f->occurs_max > 1
+		&& (f->report_flag & COB_REPORT_COLUMN_PLUS)
+		&& f->step_count == 0) {
+			f->step_count = f->report_column + f->size;
+		}
+	}
 	return f->size;
 }
 
@@ -1370,6 +1412,7 @@ void
 cb_validate_field (struct cb_field *f)
 {
 	struct cb_field		*c;
+
 
 	if (f->flag_is_verified) {
 		return;

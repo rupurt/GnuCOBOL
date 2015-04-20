@@ -238,6 +238,7 @@ static struct config_tbl gc_conf[] = {
 	{"COB_PRE_LOAD","pre_load",		NULL,	NULL,GRP_CALL,ENV_STR,SETPOS(cob_preload_str)},
 	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT,SETPOS(cob_beep_value)},
 	{"COB_DEBUG_LOG","debug_log",		NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_debug_log)},
+	{"COB_COL_JUST_LRC","col_just_lrc",	"true",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_col_just_lrc)},
 	{"COB_DISABLE_WARNINGS","disable_warnings","0",	NULL,GRP_MISC,ENV_BOOL|ENV_NOT,SETPOS(cob_display_warn)},
 	{"COB_ENV_MANGLE","env_mangle",		"0",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_env_mangle)},
 	{"COB_REDIRECT_DISPLAY","redirect_display","0",	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_disp_to_stderr)},
@@ -416,6 +417,7 @@ cob_terminate_routines (void)
 	cob_exit_strings ();
 	cob_exit_numeric ();
 	cob_exit_call ();
+	cob_exit_reportio ();
 	cob_exit_common ();
 }
 
@@ -5225,6 +5227,7 @@ cob_init (const int argc, char **argv)
 	cob_init_fileio(cobglobptr, cobsetptr);
 	cob_init_call(cobglobptr, cobsetptr);
 	cob_init_termio(cobglobptr, cobsetptr);
+	cob_init_reportio(cobglobptr, cobsetptr);
 
 	/* Set up library routine stuff */
 	cobglobptr->cob_term_buff = cob_malloc ((size_t)COB_MEDIUM_BUFF);

@@ -1,4 +1,12 @@
 
+2015-04-14  Ron Norman
+
+	* reportio.c common.c
+	  updated to include support REPORT COLUMN LEFT/RIGHT/CENTER
+	  Also REPORT: PLUS, STEP on OCCURS and multi COLUMN numbers
+	  Runtime option: col_just_lrc if set to false will disable
+	  justification of LEFT/RIGHT/CENTER data with the field
+
 2015-04-14  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c, fileio.c, common.h updated to include support to an EXTFH inter-

@@ -930,6 +930,11 @@ enum cob_exception_id {
 #define COB_REPORT_LINE_NEXT_PAGE	(1 << 16)
 #define COB_REPORT_NEXT_PAGE		(1 << 17)
 #define COB_REPORT_GROUP_INDICATE	(1 << 18)
+#define COB_REPORT_GROUP_ITEM		(1 << 19)
+#define COB_REPORT_HAD_WHEN		(1 << 20)
+#define COB_REPORT_COLUMN_LEFT		(1 << 21)
+#define COB_REPORT_COLUMN_CENTER	(1 << 22)
+#define COB_REPORT_COLUMN_RIGHT		(1 << 23)
 
 #define COB_REPORT_REF_EMITED		(1 << 30)
 #define COB_REPORT_LINE_EMITED		(1 << 29)
@@ -1196,6 +1201,7 @@ typedef struct cob_report_field_ {
 	int			column;
 	int			step_count;
 	int			next_group_line;	/* NEXT GROUP line or PLUS line; see flags */
+	unsigned int		level:8;		/* Data item level number */
 	unsigned int		group_indicate:1;	/* field had GROUP INDICATE */
 	unsigned int		suppress:1;		/* SUPPRESS display of this field */
 } cob_report_field;
