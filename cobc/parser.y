@@ -4403,7 +4403,9 @@ _left_or_right:
 | LEFT
 | RIGHT
   {
+	/* Stay quiet on this
 	PENDING ("SYNCHRONIZED RIGHT");
+	*/
   }
 ;
 

@@ -133,5 +133,8 @@ CB_FLAG (cb_flag_optional_file, 1, "optional-file",
 	 _("Treat all files as OPTIONAL\n\t\t\t- unless NOT OPTIONAL specified"))
 
 CB_FLAG (cb_mf_ibm_comp, 1, "ibmcomp",
-	 _("Handle COMP fields like Micro Focus IBMCOMP\n\t\t\t- binary-size: 1--8 & synchronized-clause: ignore"))
+	 _("Handle COMP fields like Micro Focus IBMCOMP\n\t\t\t- binary-size: 2-4-8 & synchronized-clause: ok"))
+
+CB_FLAG (cb_mf_files, 1, "mf-files",
+	 _("Sequential & Relative files will match Micro Focus format"))
 

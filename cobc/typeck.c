@@ -4921,6 +4921,10 @@ cb_emit_delete (cb_tree file)
 		cb_error_x (CB_TREE (current_statement),
 				_("%s not allowed on %s files"), "DELETE", "LINE SEQUENTIAL");
 		return;
+	} else if (f->organization == COB_ORG_SEQUENTIAL) {
+		cb_error_x (CB_TREE (current_statement),
+				_("%s not allowed on %s files"), "DELETE", "SEQUENTIAL");
+		return;
 	}
 
 	/* Check for file debugging */
@@ -7296,11 +7300,6 @@ cb_emit_open (cb_tree file, cb_tree mode, cb_tree sharing)
 		cb_error_x (CB_TREE (current_statement),
 				_("%s not allowed on %s files"), "OPEN", "SORT");
 		return;
-	} else if (f->organization == COB_ORG_LINE_SEQUENTIAL &&
-		   mode == cb_int (COB_OPEN_I_O)) {
-		cb_error_x (CB_TREE (current_statement),
-				_("%s not allowed on %s files"), "OPEN I-O", "LINE SEQUENTIAL");
-		return;
 	}
 	if (sharing == NULL) {
 		if (f->sharing) {
@@ -7581,10 +7580,6 @@ cb_emit_rewrite (cb_tree record, cb_tree from, cb_tree lockopt)
 	if (f->organization == COB_ORG_SORT) {
 		cb_error_x (CB_TREE (current_statement),
 				_("%s not allowed on %s files"), "REWRITE", "SORT");
-		return;
-	} else if (f->organization == COB_ORG_LINE_SEQUENTIAL) {
-		cb_error_x (CB_TREE (current_statement),
-				_("%s not allowed on %s files"), "REWRITE", "LINE SEQUENTIAL");
 		return;
 	} else if (current_statement->handler_id == COB_EC_I_O_INVALID_KEY &&
 		  (f->organization != COB_ORG_RELATIVE &&
@@ -8524,12 +8519,27 @@ cb_emit_write (cb_tree record, cb_tree from, cb_tree opt, cb_tree lockopt)
 		cb_emit (cb_build_move (record, cb_debug_contents));
 		cb_emit (cb_build_debug_call (CB_FIELD_PTR (record)->debug_section));
 	}
-	if (f->organization == COB_ORG_LINE_SEQUENTIAL &&
-	    opt == cb_int0) {
-		if (cb_flag_write_after || CB_FILE (file)->flag_line_adv) {
-			opt = cb_int_hex (COB_WRITE_AFTER | COB_WRITE_LINES | 1);
+	if (f->organization == COB_ORG_LINE_SEQUENTIAL 
+	&&  opt == cb_int0) {
+		if(cb_mf_files) {
+			/* Micro Focus has omission of ADVANCING default to 
+			 *   BEFORE ADVANCING 1 LINE
+			 */
+			if (cb_flag_write_after) {		/* -fwrite-after */
+				opt = cb_int_hex (COB_WRITE_AFTER | COB_WRITE_LINES | 1);
+			} else {
+				opt = cb_int_hex (COB_WRITE_BEFORE | COB_WRITE_LINES | 1);
+			}
 		} else {
-			opt = cb_int_hex (COB_WRITE_BEFORE | COB_WRITE_LINES | 1);
+			/* ISO Standard has omission of ADVANCING default to 
+			 *   AFTER ADVANCING 1 LINE
+			 */
+			if (cb_flag_write_after			/* -fwrite-after */
+			||  CB_FILE(file)->flag_line_adv) {
+				opt = cb_int_hex (COB_WRITE_AFTER | COB_WRITE_LINES | 1);
+			} else {
+				opt = cb_int_hex (COB_WRITE_BEFORE | COB_WRITE_LINES | 1);
+			}
 		}
 	}
 	if (current_statement->handler_id == COB_EC_I_O_EOP &&

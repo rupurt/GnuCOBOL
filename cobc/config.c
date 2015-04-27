@@ -62,11 +62,11 @@ enum cb_config_type {
 #undef	CB_CONFIG_BOOLEAN
 #undef	CB_CONFIG_SUPPORT
 
-#define CB_CONFIG_ANY(type,var,name)	, {CB_ANY, name, (void *)&var, NULL}
-#define CB_CONFIG_INT(var,name)		, {CB_INT, name, (void *)&var, NULL}
-#define CB_CONFIG_STRING(var,name)	, {CB_STRING, name, (void *)&var, NULL}
-#define CB_CONFIG_BOOLEAN(var,name)	, {CB_BOOLEAN, name, (void *)&var, NULL}
-#define CB_CONFIG_SUPPORT(var,name)	, {CB_SUPPORT, name, (void *)&var, NULL}
+#define CB_CONFIG_ANY(type,var,name)	, {CB_ANY, name, (void *)&var, 0}
+#define CB_CONFIG_INT(var,name)		, {CB_INT, name, (void *)&var, 0}
+#define CB_CONFIG_STRING(var,name)	, {CB_STRING, name, (void *)&var, 0}
+#define CB_CONFIG_BOOLEAN(var,name)	, {CB_BOOLEAN, name, (void *)&var, 0}
+#define CB_CONFIG_SUPPORT(var,name)	, {CB_SUPPORT, name, (void *)&var, 0}
 
 /* Local variables */
 
@@ -74,10 +74,10 @@ static struct config_struct {
 	const enum cb_config_type	type;
 	const char			*name;
 	void				*var;
-	char				*val;
+	int				set;
 } config_table[] = {
-	{CB_STRING, "include", NULL, NULL}
-	, {CB_STRING, "not-reserved", NULL, NULL}
+	{CB_STRING, "include", NULL, 0},
+	{CB_STRING, "not-reserved", NULL, 0}
 #include "config.def"
 };
 
@@ -184,12 +184,12 @@ cb_config_entry (char *buff, const char *fname, const int line)
 		;
 	}
 	e[1] = 0;
-	config_table[i].val = s;
+	config_table[i].set = 1;
 
 	/* Set value */
 	name = config_table[i].name;
 	var = config_table[i].var;
-	val = config_table[i].val;
+	val = s;
 	switch (config_table[i].type) {
 		case CB_ANY:
 			if (strcmp (name, "assign-clause") == 0) {
@@ -407,7 +407,7 @@ cb_load_conf (const char *fname, const int prefix_dir)
 
 	/* Initialize the configuration table */
 	for (i = 0; i < CB_CONFIG_SIZE; i++) {
-		config_table[i].val = NULL;
+		config_table[i].set = 0;
 	}
 
 	/* Get the name for the configuration file */
@@ -424,7 +424,7 @@ cb_load_conf (const char *fname, const int prefix_dir)
 	/* Checks for missing definitions */
 	if (ret == 0) {
 		for (i = 2U; i < CB_CONFIG_SIZE; i++) {
-			if (config_table[i].val == NULL) {
+			if (config_table[i].set == 0) {
 				configuration_error (fname, 0, _("No definition of '%s'"),
 						config_table[i].name);
 				ret = -1;

@@ -698,7 +698,7 @@ enum cob_exception_id {
 /* File attributes */
 
 /* File version */
-#define	COB_FILE_VERSION	1
+#define	COB_FILE_VERSION	2
 
 /* Start conditions */
 /* Note that COB_NE is disallowed */
@@ -756,6 +756,26 @@ enum cob_exception_id {
 #define COB_LOCK_OPEN_EXCLUSIVE	(1U << 4)
 
 #define COB_FILE_EXCLUSIVE	(COB_LOCK_EXCLUSIVE | COB_LOCK_OPEN_EXCLUSIVE)
+
+/* File: 'file_format' as stored on disk */
+#define COB_FILE_IS_GCVS0	0	/* GNUCobol VarSeq 0 */
+#define COB_FILE_IS_GCVS1	1	/* GNUCobol VarSeq 1 */
+#define COB_FILE_IS_GCVS2	2	/* GNUCobol VarSeq 2 */
+#define COB_FILE_IS_GCVS3	3	/* GNUCobol VarSeq 3 */
+#define COB_FILE_IS_B32		4	/* 32-bit BigEndian record prefix */
+#define COB_FILE_IS_B64		5	/* 64-bit BigEndian record prefix */
+#define COB_FILE_IS_L32		6	/* 32-bit LittleEndian record prefix */
+#define COB_FILE_IS_L64		7	/* 64-bit LittleEndian record prefix */
+#define COB_FILE_IS_GC		10	/* GNUCobol default format */
+#define COB_FILE_IS_MF		11	/* Micro Focus format */
+
+/* File: 'file_features' file processing features */
+#define COB_FILE_SYNC		(1 << 0)/* sync writes to disk */
+#define COB_FILE_LS_VALIDATE	(1 << 1)/* Validate LINE SEQUENTIAL data */
+#define COB_FILE_LS_NULLS	(1 << 2)/* Do NUL insertion for LINE SEQUENTIAL */
+#define COB_FILE_LS_FIXED	(1 << 3)/* Do NUL insertion for LINE SEQUENTIAL */
+#define COB_FILE_LS_CRLF	(1 << 4)/* End LINE SEQUENTIAL records with CR LF */
+#define COB_FILE_LS_LF		(1 << 5)/* End LINE SEQUENTIAL records with LF */
 
 /* Open mode */
 
@@ -1125,7 +1145,19 @@ typedef struct {
 
 /* File structure */
 
+/* The 8 flag bytes specifically moved to top; 
+ * Add new fields to end and change COB_FILE_VERSION
+ */
 typedef struct {
+	unsigned char		file_version;		/* File handler version */
+	unsigned char		organization;		/* ORGANIZATION */
+	unsigned char		access_mode;		/* ACCESS MODE */
+	unsigned char		flag_line_adv;		/* LINE ADVANCING */
+	unsigned char		flag_optional;		/* OPTIONAL */
+	unsigned char		flag_select_features;	/* SELECT features */
+	unsigned char		file_format;		/* File I/O format: 255 means unspecified */
+	unsigned char		file_features;		/* File I/O features: 0 means unspecified */
+
 	const char		*select_name;		/* Name in SELECT */
 	unsigned char		*file_status;		/* FILE STATUS */
 	cob_field		*assign;		/* ASSIGN TO */
@@ -1139,26 +1171,24 @@ typedef struct {
 	size_t			record_min;		/* Record min size */
 	size_t			record_max;		/* Record max size */
 	size_t			nkeys;			/* Number of keys */
+	off_t			record_off;		/* Starting position of last record read/written */
 	int			fd;			/* File descriptor */
+	int			record_slot;		/* Record size on disk including prefix/suffix */
+	int			record_prefix;		/* Size of record prefix */
+	int			file_header;		/* Size of file header record on disk */
 
-	unsigned char		organization;		/* ORGANIZATION */
-	unsigned char		access_mode;		/* ACCESS MODE */
 	unsigned char		lock_mode;		/* LOCK MODE */
 	unsigned char		open_mode;		/* OPEN MODE */
-	unsigned char		flag_line_adv;		/* LINE ADVANCING */
-	unsigned char		flag_optional;		/* OPTIONAL */
 	unsigned char		last_open_mode;		/* Mode given by OPEN */
 	unsigned char		flag_operation;		/* File type specific */
 	unsigned char		flag_nonexistent;	/* Nonexistent file */
-
 	unsigned char		flag_end_of_file;	/* Reached end of file */
 	unsigned char		flag_begin_of_file;	/* Reached start of file */
 	unsigned char		flag_first_read;	/* OPEN/START read flag */
 	unsigned char		flag_read_done;		/* READ successful */
-	unsigned char		flag_select_features;	/* SELECT features */
 	unsigned char		flag_needs_nl;		/* Needs NL at close */
 	unsigned char		flag_needs_top;		/* Linage needs top */
-	unsigned char		file_version;		/* File I/O version */
+
 
 } cob_file;
 
@@ -1767,9 +1797,6 @@ typedef struct {
 ****************************/
 
 #if defined(__MINGW64__) || defined(__x86_64__) || defined(_LP64) || defined(__64BIT__) || defined(__LP64__) || defined(HPUX_IA64) || defined(__s390x__)
-#ifndef dBit64
-#define dBit64 1
-#endif
 #define PTRFILLER(n)
 #else
 #define PTRFILLER(n)  char n[4];
@@ -1901,10 +1928,18 @@ typedef struct {
 	PTRFILLER(fill9)
 } FCD3;
 
-#define LDCOMPX2(f) (((f[0] << 8 ) & 0xFF00) | (f[1] & 0xFF))
-#define LDCOMPX4(f) (((f[0] << 24 ) & 0xFF000000) | ((f[1] << 16 ) & 0xFF0000) | ((f[2] << 8 ) & 0xFF00) | (f[3] & 0xFF))
-#define STCOMPX2(v,f) (f[1] = (v) & 0xFF, f[0] = ((v) >> 8) & 0xFF)
-#define STCOMPX4(v,f) (f[3] = (v) & 0xFF, f[2] = ((v) >> 8) & 0xFF, f[1] = ((v) >> 16) & 0xFF, f[0] = ((v) >> 24) & 0xFF)
+#define LSUCHAR(f)	((unsigned char*)(f))
+/* xxCOMPXn : Big Endian Binary data */
+#define LDCOMPX2(f)	(((f[0] << 8 ) & 0xFF00) | (f[1] & 0xFF))
+#define LDCOMPX4(f)	(((f[0] << 24 ) & 0xFF000000) | ((f[1] << 16 ) & 0xFF0000) | ((f[2] << 8 ) & 0xFF00) | (f[3] & 0xFF))
+#define STCOMPX2(v,f)	(f[1] = (v) & 0xFF, f[0] = ((v) >> 8) & 0xFF)
+#define STCOMPX4(v,f)	(f[3] = (v) & 0xFF, f[2] = ((v) >> 8) & 0xFF, f[1] = ((v) >> 16) & 0xFF, f[0] = ((v) >> 24) & 0xFF)
+
+/* xxBINLEn : Little Endian Binary data */
+#define LDBINLE2(f)	(((f[1] << 8 ) & 0xFF00) | (f[0] & 0xFF))
+#define LDBINLE4(f)	(((f[3] << 24 ) & 0xFF000000) | ((f[2] << 16 ) & 0xFF0000) | ((f[1] << 8 ) & 0xFF00) | (f[0] & 0xFF))
+#define STBINLE2(v,f)	(f[0] = (v) & 0xFF, f[1] = ((v) >> 8) & 0xFF)
+#define STBINLE4(v,f)	(f[0] = (v) & 0xFF, f[1] = ((v) >> 8) & 0xFF, f[2] = ((v) >> 16) & 0xFF, f[3] = ((v) >> 24) & 0xFF)
 
 /*************************/
 /* EXTFH operation codes */
@@ -1963,6 +1998,8 @@ typedef struct {
 #define OP_START_GE			0xFAEB
 #define OP_START_LT			0xFAFE
 #define OP_START_LE			0xFAFF
+#define OP_START_LA			0xFAEC	/* LAST: Not in MF standard */
+#define OP_START_FI			0xFAED	/* FIRST: Not in MF standard */
 
 #define OP_STEP_NEXT_NO_LOCK		0xFA90
 #define OP_STEP_NEXT_LOCK		0xFAD4

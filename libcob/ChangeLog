@@ -1,4 +1,13 @@
 
+2015-04-27  Ron Norman
+
+	* common.c fileio.c common.h
+	  updated to support Micro Focus format files. 
+	  fileio.c also check for environment variable
+	  IO_filename that can speficy options for just the one file
+	  New runtime option (mf_files) to set all files to default
+	  to Micro Focus format
+
 2015-04-14  Ron Norman
 
 	* reportio.c common.c

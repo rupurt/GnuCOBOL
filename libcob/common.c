@@ -220,12 +220,23 @@ static struct handlerlist {
 static const char *setting_group[] = {" hidden setting ","Call environment","File I/O","Screen I/O","Miscellaneous"};
 
 static char	not_set[] = "not set";
-static struct config_enum lwrupr[] = {{"LOWER","1"},{"UPPER","2"},{not_set,"0"},{NULL,NULL}};
-static struct config_enum beepopts[] = {{"FLASH","1"},{"SPEAKER","2"},{"FALSE","9"},{"NONE","0"},{NULL,NULL}};
-static struct config_enum timeopts[] = {{"1","100"},{"2","10"},{"3","1"},{NULL,NULL}};
-static struct config_enum syncopts[] = {{"P","1"},{NULL,NULL}};
-static struct config_enum varseqopts[] = {{"0","0"},{"1","1"},{"2","2"},{"3","3"},{NULL,NULL}};
-static char	varseq_dflt[8] = "0";
+static struct config_enum lwrupr[]	= {{"LOWER","1"},{"UPPER","2"},{not_set,"0"},{NULL,NULL}};
+static struct config_enum beepopts[]	= {{"FLASH","1"},{"SPEAKER","2"},{"FALSE","9"},{"NONE","0"},{NULL,NULL}};
+static struct config_enum timeopts[]	= {{"1","100"},{"2","10"},{"3","1"},{NULL,NULL}};
+static struct config_enum syncopts[]	= {{"P","1"},{NULL,NULL}};
+static struct config_enum varseqopts[]	= {{"0","0"},{"1","1"},{"2","2"},{"3","3"},
+					   {"mf","11"},{"gc","10"},
+					   {"b4","4"},{"b32","4"},
+					   {"l4","6"},{"l32","6"},
+					   {NULL,NULL}};
+/* Make sure the values here match up with those defined in common.h */
+static struct config_enum relopts[]	= {{"0","0"},{"gc","10"},{"mf","11"},
+					   {"b4","4"},{"b32","4"},{"b8","5"},{"b64","5"},
+					   {"l4","6"},{"l32","6"},{"l8","7"},{"l64","7"},
+					   {NULL,NULL}};
+static char	varseq_dflt[8] = "0";	/* varseq0: Default Variable length Sequential file format */
+static char	varrel_dflt[8] = "gc";	/* Default Variable length Relative file format */
+static char	fixrel_dflt[8] = "gc";	/* Default Fixed length Relative file format */
 
 
 /*
@@ -250,17 +261,22 @@ static struct config_tbl gc_conf[] = {
 #ifdef  _WIN32
 	{"COB_UNIX_LF","unix_lf",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_unix_lf)},
 #endif
-	{"COB_VARSEQ_FORMAT","varseq_format",	varseq_dflt,varseqopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_varseq_type)},
 	{"USERNAME","username",			NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_user_name)},
 	{"LOGNAME","logname",			NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_user_name)},
 	{"COB_FILE_PATH","file_path",		NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(cob_file_path)},
 	{"COB_LIBRARY_PATH","library_path",	"." PATHSEPS COB_LIBRARY_PATH,
 							NULL,GRP_CALL,ENV_PATH,SETPOS(cob_library_path)},
-	{"COB_LS_FIXED","ls_fixed",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_fixed)},
-	{"COB_LS_NULLS","ls_nulls",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_nulls)},
+	{"COB_MF_FILES","mf_files",		"false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_mf_files)},
+	{"COB_FIXREL_FORMAT","fixrel_format",	fixrel_dflt,relopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_fixrel_type)},
+	{"COB_VARREL_FORMAT","varrel_format",	varrel_dflt,relopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_varrel_type)},
+	{"COB_VARSEQ_FORMAT","varseq_format",	varseq_dflt,varseqopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_varseq_type)},
+	{"COB_LS_FIXED","ls_fixed",		"false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_fixed)},
+	{"COB_LS_NULLS","ls_nulls",		"false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_nulls)},
+	{"COB_LS_VALIDATE","ls_validate",	"true",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_validate)},
+	{"COB_GC_FILES","gc_files",		"false",NULL,GRP_HIDE,ENV_BOOL,SETPOS(cob_gc_files)},
 	{"COB_SORT_CHUNK","sort_chunk",		"256K",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_chunk),(128 * 1024),(16 * 1024 * 1024)},
 	{"COB_SORT_MEMORY","sort_memory",	"128M",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_memory),(1024*1024)},
-	{"COB_SYNC","sync",			"0",	syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
+	{"COB_SYNC","sync",			"false",syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
 #ifdef  WITH_DB
 	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(bdb_home)},
 #endif
@@ -4434,7 +4450,7 @@ set_config_val(char *value, int pos)
 			break;
 		default:
 			break;
-	}
+		}
 		if(numval == -1) {
 			cob_runtime_error (_("%s should be 'true' or 'false'; '%s' is invalid"),gc_conf[pos].env_name,ptr); 
 			return 1;
