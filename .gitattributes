@@ -281,6 +281,7 @@ tests/testsuite.src/numeric-display.cob -text
 tests/testsuite.src/numeric-dump.cob -text
 tests/testsuite.src/run_accept.at -text
 tests/testsuite.src/run_extensions.at -text
+tests/testsuite.src/run_file.at -text
 tests/testsuite.src/run_functions.at -text
 tests/testsuite.src/run_fundamental.at -text
 tests/testsuite.src/run_initialize.at -text
