@@ -4066,9 +4066,7 @@ output_call (struct cb_call *p)
 					nlp->nested_prog->toplev_count);
 			} else {
 				output ("%s", callp);
-				if (p->call_returning != cb_null) {
-					lookup_static_call (callp);
-				}
+				lookup_static_call (callp);
 			}
 		}
 	} else {
