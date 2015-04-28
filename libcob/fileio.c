@@ -819,8 +819,8 @@ cob_chk_file_env (const char *src)
 		snprintf (file_open_env, (size_t)COB_FILE_MAX, "%s%s", "io_", s);
 		if ((file_open_io_env = getenv (file_open_env)) == NULL) {
 			for (i = 0; file_open_env[i] != 0; ++i) {	/* Try all Upper Case */
-				if(islower(file_open_env[i]))
-					file_open_env[i] = toupper(file_open_env[i]);
+				if(islower((unsigned char)file_open_env[i]))
+					file_open_env[i] = toupper((unsigned char)file_open_env[i]);
 			}
 			file_open_io_env = getenv (file_open_env);
 		}
@@ -836,8 +836,8 @@ cob_chk_file_env (const char *src)
 		for (i = 0; i < NUM_PREFIX; ++i) {
 			snprintf (file_open_env, (size_t)COB_FILE_MAX, "%s%s", prefix[i], s);
 			for (i = 0; file_open_env[i] != 0; ++i) {
-				if(islower(file_open_env[i]))
-					file_open_env[i] = toupper(file_open_env[i]);
+				if(islower((unsigned char)file_open_env[i]))
+					file_open_env[i] = toupper((unsigned char)file_open_env[i]);
 			}
 			if((p = getenv (file_open_env)) != NULL)
 				break;
@@ -1108,10 +1108,10 @@ set_file_format(cob_file *f)
 				}
 				value[j] = 0;
 				if(value[0] == '1'
-				|| toupper(value[0]) == 'T')
+				|| toupper((unsigned char)value[0]) == 'T')
 					settrue = 1;
 				if(value[0] == '0'
-				|| toupper(value[0]) == 'F')
+				|| toupper((unsigned char)value[0]) == 'F')
 					settrue = 0;
 			}
 			if(strcasecmp(option,"sync") == 0) {
