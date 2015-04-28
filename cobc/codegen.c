@@ -125,6 +125,7 @@ static struct field_list	*field_cache = NULL;
 static struct field_list	*local_field_cache = NULL;
 static struct call_list		*call_cache = NULL;
 static struct call_list		*func_call_cache = NULL;
+static struct call_list		*static_call_cache = NULL;
 static struct base_list		*base_cache = NULL;
 static struct base_list		*globext_cache = NULL;
 static struct base_list		*local_base_cache = NULL;
@@ -267,6 +268,22 @@ lookup_func_call (const char *p)
 	clp->callname = p;
 	clp->next = func_call_cache;
 	func_call_cache = clp;
+}
+
+static void
+lookup_static_call (const char *p)
+{
+	struct call_list *clp;
+
+	for (clp = static_call_cache; clp; clp = clp->next) {
+		if (strcmp (p, clp->callname) == 0) {
+			return;
+		}
+	}
+	clp = cobc_parse_malloc (sizeof (struct call_list));
+	clp->callname = p;
+	clp->next = static_call_cache;
+	static_call_cache = clp;
 }
 
 static struct attr_list *
@@ -4049,6 +4066,7 @@ output_call (struct cb_call *p)
 					nlp->nested_prog->toplev_count);
 			} else {
 				output ("%s", callp);
+				lookup_static_call (callp);
 			}
 		}
 	} else {
@@ -9017,6 +9035,10 @@ codegen (struct cb_program *prog, const int nested)
 		output_local ("static cob_call_union\tfunc_%s;\n",
 			      clp->callname);
 	}
+	output_local ("/* Define external subroutines being called staticly */\n");
+	for (clp = static_call_cache; clp; clp = clp->next) {
+		output_local ("extern int %s ();\n",clp->callname);
+	}
 	needs_unifunc = 0;
 
 	/* Nested / contained list */
@@ -9226,6 +9248,7 @@ codegen (struct cb_program *prog, const int nested)
 			}
 		}
 		output_local ("\n/* End of fields */\n\n");
+
 		/* Switch to main storage file */
 		output_target = cb_storage_file;
 	}
