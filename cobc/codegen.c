@@ -108,6 +108,7 @@ struct field_list {
 struct call_list {
 	struct call_list	*next;
 	const char		*callname;
+	int			return_type;
 };
 
 struct base_list {
@@ -271,7 +272,7 @@ lookup_func_call (const char *p)
 }
 
 static void
-lookup_static_call (const char *p)
+lookup_static_call (const char *p, int return_type)
 {
 	struct call_list *clp;
 
@@ -284,6 +285,7 @@ lookup_static_call (const char *p)
 	clp->callname = p;
 	clp->next = static_call_cache;
 	static_call_cache = clp;
+	clp->return_type = return_type;
 }
 
 static struct attr_list *
@@ -4066,7 +4068,13 @@ output_call (struct cb_call *p)
 					nlp->nested_prog->toplev_count);
 			} else {
 				output ("%s", callp);
-				lookup_static_call (callp);
+				if (p->call_returning == cb_null) {
+					lookup_static_call (callp, 2);
+				} else if(retptr == 1) {
+					lookup_static_call (callp, 1);
+				} else {
+					lookup_static_call (callp, 0);
+				}
 			}
 		}
 	} else {
@@ -9035,9 +9043,17 @@ codegen (struct cb_program *prog, const int nested)
 		output_local ("static cob_call_union\tfunc_%s;\n",
 			      clp->callname);
 	}
-	output_local ("/* Define external subroutines being called staticly */\n");
+	if(static_call_cache)
+		output_local ("/* Define external subroutines being called statically */\n");
 	for (clp = static_call_cache; clp; clp = clp->next) {
-		output_local ("extern int %s ();\n",clp->callname);
+		if(clp->return_type == 2) {	/* RETURNING NULL */
+			output_local ("extern void %s ();\n",clp->callname);
+		} else
+		if(clp->return_type == 1) {	/* RETURNING ADDRESS OF */
+			output_local ("extern void * %s ();\n",clp->callname);
+		} else {
+			output_local ("extern int %s ();\n",clp->callname);
+		}
 	}
 	needs_unifunc = 0;
 
