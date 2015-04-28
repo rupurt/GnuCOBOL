@@ -109,6 +109,9 @@ struct call_list {
 	struct call_list	*next;
 	const char		*callname;
 	int			return_type;
+#define COB_RETURN_INT		0
+#define COB_RETURN_ADDRESS_OF	1
+#define COB_RETURN_NULL		2
 };
 
 struct base_list {
@@ -4069,11 +4072,11 @@ output_call (struct cb_call *p)
 			} else {
 				output ("%s", callp);
 				if (p->call_returning == cb_null) {
-					lookup_static_call (callp, 2);
+					lookup_static_call (callp, COB_RETURN_NULL);
 				} else if(retptr == 1) {
-					lookup_static_call (callp, 1);
+					lookup_static_call (callp, COB_RETURN_ADDRESS_OF);
 				} else {
-					lookup_static_call (callp, 0);
+					lookup_static_call (callp, COB_RETURN_INT);
 				}
 			}
 		}
@@ -9046,10 +9049,10 @@ codegen (struct cb_program *prog, const int nested)
 	if(static_call_cache)
 		output_local ("/* Define external subroutines being called statically */\n");
 	for (clp = static_call_cache; clp; clp = clp->next) {
-		if(clp->return_type == 2) {	/* RETURNING NULL */
+		if(clp->return_type == COB_RETURN_NULL) {
 			output_local ("extern void %s ();\n",clp->callname);
 		} else
-		if(clp->return_type == 1) {	/* RETURNING ADDRESS OF */
+		if(clp->return_type == COB_RETURN_ADDRESS_OF) {
 			output_local ("extern void * %s ();\n",clp->callname);
 		} else {
 			output_local ("extern int %s ();\n",clp->callname);

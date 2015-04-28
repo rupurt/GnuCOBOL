@@ -1,8 +1,8 @@
 
 2015-04-28  Ron Norman
-	* codegen.c updated to emit extern int routinename ();
-	  for each subroutine called statically. Without this
-	  you get C compiler warnings
+	* codegen.c now emits extern <function prototype> ();
+	  for each subroutine called statically to avoid 
+	  C compiler warnings
 
 2015-04-27  Ron Norman
 
