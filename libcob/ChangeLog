@@ -1,4 +1,10 @@
 
+2015-04-29  Ron Norman
+	* reportio.c change to allocate larger size data area for temp
+	  fields used for CONTROL breaks. This is a cludge to avoid
+	  something that is clobbering free memory on SUN system.
+	  It did work fine on x86 Linux so watch out for this later.
+
 2015-04-27  Ron Norman
 
 	* common.c fileio.c common.h
