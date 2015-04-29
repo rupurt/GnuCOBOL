@@ -5645,7 +5645,10 @@ output_file_initialization (struct cb_file *f)
 	} else {
 		output_line ("if (!%s%s)", CB_PREFIX_FILE, f->cname);
 		output_indent ("{");
-		output_line ("%s%s = cob_cache_malloc (sizeof(cob_file));", CB_PREFIX_FILE, f->cname);
+		/* 20 extra is allocated due to recent increase in size and possible problem
+		 * if an old common.h was lying around; RJN Apr 2015
+		 */
+		output_line ("%s%s = cob_cache_malloc (sizeof(cob_file)+20);", CB_PREFIX_FILE, f->cname);
 		if (f->linage) {
 			output_line ("%s%s->linorkeyptr = cob_cache_malloc (sizeof(cob_linage));", CB_PREFIX_FILE, f->cname);
 		}
