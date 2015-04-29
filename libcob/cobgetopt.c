@@ -32,6 +32,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#ifdef  HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #ifdef	HAVE_UNISTD_H
 #include <unistd.h>
 #endif
