@@ -1171,7 +1171,7 @@ typedef struct {
 	size_t			record_min;		/* Record min size */
 	size_t			record_max;		/* Record max size */
 	size_t			nkeys;			/* Number of keys */
-	off_t			record_off;		/* Starting position of last record read/written */
+	cob_s64_t		record_off;		/* Starting position of last record read/written */
 	int			fd;			/* File descriptor */
 	int			record_slot;		/* Record size on disk including prefix/suffix */
 	int			record_prefix;		/* Size of record prefix */
