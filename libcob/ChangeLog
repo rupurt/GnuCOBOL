@@ -1,4 +1,13 @@
 
+2015-05-12  Ron Norman
+	* common.c, changed to be more specific about acceptable values for
+	  runtime Boolean options
+
+2015-04-30  Ron Norman
+	* common.h, change cob_file record_off to type cob_s64_t (from off_t)
+	  so that the size does not change depending on C comppiler 
+	  This is most likely the cause of the previous issue.
+
 2015-04-29  Ron Norman
 	* reportio.c change to allocate larger size data area for temp
 	  fields used for CONTROL breaks. This is a cludge to avoid
