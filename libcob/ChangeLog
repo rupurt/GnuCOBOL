@@ -1,4 +1,9 @@
 
+2015-05-14  Ron Norman
+	* common.c removed redundant !copy, !set, !unset directives
+	  in favour of using 'include', 'setenv' and 'unsetenv' directives
+	  in the runtime.cfg file
+
 2015-05-12  Ron Norman
 	* common.c, changed to be more specific about acceptable values for
 	  runtime Boolean options

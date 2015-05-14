@@ -4589,7 +4589,7 @@ cb_lookup_config (char *keyword)
 static int
 cb_config_entry (char *buf, int line)
 {
-	int	i,j,bang;
+	int	i,j;
 	void	*data;
 	char	*env,*str,qt;
 	char	keyword[COB_MINI_BUFF],value[COB_SMALL_BUFF],value2[COB_SMALL_BUFF];
@@ -4599,13 +4599,6 @@ cb_config_entry (char *buf, int line)
 		buf[--j] = 0;
 
 	for (i=0; isspace((unsigned char)buf[i]); i++);
-	if (buf[i] == '!') {
-		bang = 1;
-		i++;
-		while(isspace((unsigned char)buf[i])) i++;
-	} else {
-		bang = 0;
-	}
 
 	for (j=0; buf[i] != ':' && !isspace((unsigned char)buf[i]) && buf[i] != '=' && buf[i] != '#'; )
 		keyword[j++] = buf[i++];
@@ -4628,8 +4621,7 @@ cb_config_entry (char *buf, int line)
 		return 2;
 	}
 
-	if (strcasecmp (keyword,"setenv") == 0
-	||  strcasecmp (keyword,"set") == 0) {
+	if (strcasecmp (keyword,"setenv") == 0) {
 		/* collect additional value and push into environment */
 		strcpy(value2,"");
 		while(isspace((unsigned char)buf[i]) || buf[i] == ':' || buf[i] == '=') i++;
@@ -4663,8 +4655,7 @@ cb_config_entry (char *buf, int line)
 		return 0;
 	}
 
-	if (strcasecmp (keyword,"unsetenv") == 0
-	||  strcasecmp (keyword,"unset") == 0) {
+	if (strcasecmp (keyword,"unsetenv") == 0) {
 		if (strcmp(value, "") == 0) {
 			cob_runtime_error (_("WARNING - '%s' without a value - ignored!"), keyword);
 			return 2;
@@ -4689,8 +4680,7 @@ cb_config_entry (char *buf, int line)
 		return 0;
 	}
 
-	if (strcasecmp (keyword, "include") == 0
-	||  (bang && strcasecmp (keyword, "copy") == 0)) {
+	if (strcasecmp (keyword, "include") == 0) {
 		if (strcmp(value, "") == 0) {
 			return -1;
 		}
