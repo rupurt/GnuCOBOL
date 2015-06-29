@@ -1,4 +1,7 @@
 
+2015-05-29  Ron Norman
+	* parser.y fixed so unstring works with identifier/literal/function
+
 2015-04-28  Ron Norman
 	* codegen.c now emits extern <function prototype> ();
 	  for each subroutine called statically to avoid 

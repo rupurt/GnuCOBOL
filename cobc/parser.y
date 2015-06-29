@@ -9218,7 +9218,7 @@ unstring_statement:
 ;
 
 unstring_body:
-  identifier unstring_delimited unstring_into
+  id_or_lit_or_func unstring_delimited unstring_into
   opt_with_pointer unstring_tallying on_overflow
   {
 	cb_emit_unstring ($1, $2, $3, $4, $5);
