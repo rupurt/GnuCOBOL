@@ -611,6 +611,7 @@ cb_check_group_name (cb_tree x)
 static cb_tree
 cb_check_numeric_name (cb_tree x)
 {
+	struct cb_field		*f;
 	if (x == cb_error_node) {
 		return cb_error_node;
 	}
@@ -620,6 +621,12 @@ cb_check_numeric_name (cb_tree x)
 	    CB_TREE_CATEGORY (x) == CB_CATEGORY_NUMERIC) {
 		return x;
 	}
+	if(CB_REFERENCE_P (x)
+	&& CB_FIELD_P (cb_ref (x))) {
+		f = CB_FIELD_PTR (x);
+		if(f->usage == CB_USAGE_COMP_X)
+			return x;
+	}
 
 	cb_error_x (x, _("'%s' is not a numeric name"), cb_name (x));
 	return cb_error_node;
@@ -628,6 +635,7 @@ cb_check_numeric_name (cb_tree x)
 static cb_tree
 cb_check_numeric_edited_name (cb_tree x)
 {
+	struct cb_field		*f;
 	if (x == cb_error_node) {
 		return cb_error_node;
 	}
@@ -639,6 +647,12 @@ cb_check_numeric_edited_name (cb_tree x)
 		return x;
 	}
 
+	if(CB_REFERENCE_P (x)
+	&& CB_FIELD_P (cb_ref (x))) {
+		f = CB_FIELD_PTR (x);
+		if(f->usage == CB_USAGE_COMP_X)
+			return x;
+	}
 	cb_error_x (x, _("'%s' is not numeric or numeric-edited name"), cb_name (x));
 	return cb_error_node;
 }
@@ -6095,6 +6109,10 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 			switch (CB_TREE_CATEGORY (dst)) {
 			case CB_CATEGORY_ALPHANUMERIC:
 			case CB_CATEGORY_ALPHANUMERIC_EDITED:
+				if (fdst->usage == CB_USAGE_COMP_X) {
+					break;
+				}
+
 				if (is_value) {
 					goto expect_alphanumeric;
 				}

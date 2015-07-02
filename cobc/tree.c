@@ -726,6 +726,9 @@ cb_tree_category (cb_tree x)
 				x->category = CB_CATEGORY_BOOLEAN;
 				break;
 			default:
+				if (f->usage == CB_USAGE_COMP_X)
+					x->category = CB_CATEGORY_NUMERIC;
+				else
 				if (f->pic) {
 					x->category = f->pic->category;
 				} else {
@@ -780,6 +783,9 @@ cb_tree_type (const cb_tree x, const struct cb_field *f)
 	switch (CB_TREE_CATEGORY (x)) {
 	case CB_CATEGORY_ALPHABETIC:
 	case CB_CATEGORY_ALPHANUMERIC:
+		if(f->usage == CB_USAGE_COMP_X) {
+			return COB_TYPE_NUMERIC_BINARY;
+		}
 		return COB_TYPE_ALPHANUMERIC;
 	case CB_CATEGORY_ALPHANUMERIC_EDITED:
 		return COB_TYPE_ALPHANUMERIC_EDITED;
@@ -2177,6 +2183,10 @@ cb_field_size (const cb_tree x)
 	case CB_TAG_LITERAL:
 		return CB_LITERAL (x)->size;
 	case CB_TAG_FIELD:
+		f = CB_FIELD (x);
+		if(f->usage == CB_USAGE_COMP_X
+		&& f->compx_size > 0)
+			return f->compx_size;
 		return CB_FIELD (x)->size;
 	case CB_TAG_REFERENCE:
 		r = CB_REFERENCE (x);
@@ -2194,6 +2204,9 @@ cb_field_size (const cb_tree x)
 			} else {
 				return -1;
 			}
+		} else if(f->usage == CB_USAGE_COMP_X
+			&& f->compx_size > 0) {
+				return f->compx_size;
 		} else {
 			return f->size;
 		}

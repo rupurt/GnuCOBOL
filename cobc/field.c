@@ -41,7 +41,7 @@ size_t			cb_needs_01 = 0;
 
 static struct cb_field	*last_real_field = NULL;
 static int		occur_align_size = 0;
-static const int	pic_digits[] = { 2, 4, 7, 9, 12, 14, 16, 18 };
+static const int	pic_digits[] = { 3, 5, 8, 10, 13, 15, 17, 19 };
 
 int
 cb_get_level (cb_tree x)
@@ -905,7 +905,9 @@ setup_parameters (struct cb_field *f)
 
 		case CB_USAGE_COMP_5:
 		case CB_USAGE_COMP_X:
-			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC) {
+			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC
+			&& f->usage == CB_USAGE_COMP_X) {
+				f->compx_size = f->size = f->pic->size;
 				if (f->pic->size > 8) {
 					strcpy (pic, "9(36)");
 				} else {
@@ -1278,6 +1280,10 @@ compute_size (struct cb_field *f)
 
 		switch (f->usage) {
 		case CB_USAGE_COMP_X:
+			if(f->compx_size > 0) {
+				size = f->compx_size;
+				break;
+			}
 			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC) {
 				break;
 			}

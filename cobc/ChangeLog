@@ -1,5 +1,9 @@
 
-2015-05-29  Ron Norman
+2015-07-02  Ron Norman
+	* Fixes to tree.c, tree,h typeck.c field.c codegen.c to correctly
+	  handle COMP-X data fields. This now works the same as Micro Focus
+
+2015-06-29  Ron Norman
 	* parser.y fixed so unstring works with identifier/literal/function
 
 2015-04-28  Ron Norman
