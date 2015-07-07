@@ -1,5 +1,12 @@
 
 2015-07-07  Ron Norman
+	* Accept env var COB_CURRENT_DATE and runtime.cfg current_date
+	  to specify a date override for the application.
+	  All ACCEPT FROM DATE, DAY, TIME will the use the value defined
+	  rather than the current system time.
+	  This will be a useful feature for application testing.
+
+2015-07-07  Ron Norman
 	* DISPLAY ... UPON PRINTER can be redirected via
 	  the env var COBPRINTER similar to what Micro Focus supports
 	  cob_display will do a popen of whatever COBPRINTER is defined
