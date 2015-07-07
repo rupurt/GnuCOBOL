@@ -284,6 +284,7 @@ static struct config_tbl gc_conf[] = {
 	{"COBPRINTER","printer",		NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_printer)},
 	{"COB_DISPLAY_PRINTER","display_printer",NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_display_print)},
 	{"COB_CURRENT_DATE","current_date",	NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_date)},
+	{"COB_DATE","date",			NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_date)},
 	{NULL,NULL,0,0}
 };
 #define NUM_CONFIG (sizeof(gc_conf)/sizeof(struct config_tbl)-1)
