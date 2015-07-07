@@ -240,12 +240,36 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 	FILE		*fp;
 	cob_field	*f;
 	int		i;
-	int		nlattr;
+	int		nlattr, close_fp, pclose_fp;
 	cob_u32_t	disp_redirect;
 	va_list		args;
 
 	disp_redirect = 0;
-	if (to_stderr) {
+	pclose_fp = close_fp = 0;
+	if (to_stderr == 2) {
+		if(cobsetptr->cob_display_print != NULL) {
+			fp = fopen(cobsetptr->cob_display_print, "a");
+			if(fp == NULL)
+				fp = stderr;
+			else
+				close_fp = 1;
+		} else if(cobsetptr->cob_printer != NULL) {
+			fp = popen(cobsetptr->cob_printer, "w");
+			if(fp == NULL)
+				fp = stderr;
+			else
+				pclose_fp = 1;
+		} else {
+			fp = stdout;
+			if (cobglobptr->cob_screen_initialized) {
+				if (!COB_DISP_TO_STDERR) {
+					disp_redirect = 1;
+				} else {
+					fp = stderr;
+				}
+			}
+		}
+	} else if (to_stderr) {
 		fp = stderr;
 	} else {
 		fp = stdout;
@@ -275,6 +299,10 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 		putc ('\n', fp);
 		fflush (fp);
 	}
+	if(pclose_fp)
+		pclose(fp);
+	if(close_fp)
+		fclose(fp);
 }
 
 /* ACCEPT */

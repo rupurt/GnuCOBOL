@@ -246,6 +246,10 @@ typedef struct __cob_settings {
 
 	/* reportio.c */
 	unsigned int 	cob_col_just_lrc;	/* Justify data in column LEFT/RIGHT/CENTER */
+
+	/* termio.c */
+	char 		*cob_printer;		/* DISPLAY UPON PRINTER destination */
+	char		*cob_display_print;	/* File name for DISPLAY UPON PRINTER */
 } cob_settings;
 
 

@@ -281,6 +281,8 @@ static struct config_tbl gc_conf[] = {
 	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(bdb_home)},
 #endif
 	{"COB_LEGACY","legacy",			NULL,	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_legacy)},
+	{"COBPRINTER","printer",		NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_printer)},
+	{"COB_DISPLAY_PRINTER","display_printer",NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_display_print)},
 	{NULL,NULL,0,0}
 };
 #define NUM_CONFIG (sizeof(gc_conf)/sizeof(struct config_tbl)-1)
@@ -4327,6 +4329,8 @@ cob_expand_env_string (char *strval)
 				k--;
 			} else if(!isspace((unsigned char)strval[k])) {
 				env[j++] = strval[k];
+			} else {
+				env[j++] = ' ';
 			}
 		}
 		env[j] = 0;

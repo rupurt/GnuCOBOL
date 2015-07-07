@@ -1,4 +1,11 @@
 
+2015-07-07  Ron Norman
+	* Added CB_DEVICE_PRINTER with a new value to differentiate between
+	  PRINTER and SYSOUT. DISPLAY ... UPON PRINTER can be redirected via
+	  the env var COBPRINTER similar to what Micro Focus supports
+	  parser.y, typeck.c & tree.h changed for this in the compiler
+	  termio.c, common.c changed in the runtime
+
 2015-07-02  Ron Norman
 	* Fixes to tree.c, tree,h typeck.c field.c codegen.c to correctly
 	  handle COMP-X data fields. This now works the same as Micro Focus

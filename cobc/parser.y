@@ -7011,7 +7011,7 @@ display_upon:
   }
 | UPON PRINTER
   {
-	$$ = cb_int0;
+	$$ = cb_int2;
   }
 | UPON CRT
   {

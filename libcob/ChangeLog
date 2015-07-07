@@ -1,4 +1,13 @@
 
+2015-07-07  Ron Norman
+	* DISPLAY ... UPON PRINTER can be redirected via
+	  the env var COBPRINTER similar to what Micro Focus supports
+	  cob_display will do a popen of whatever COBPRINTER is defined
+	  In addtion COB_DISPLAY_PRINTER can be used as a file name and
+	  cob_display will do an fopen "a" and append to that file
+	  termio.c, common.c changed 
+	* fileio.c fixed to avoid core dump when COB_SYNC and using BDB
+
 2015-05-14  Ron Norman
 	* common.c removed redundant !copy, !set, !unset directives
 	  in favour of using 'include', 'setenv' and 'unsetenv' directives
