@@ -969,7 +969,7 @@ cob_sync (cob_file *f)
 	if (f->organization == COB_ORG_INDEXED) {
 #ifdef	WITH_DB
 		p = f->file;
-		for (i = 0; i < f->nkeys; ++i) {
+		for (i = 0; i < f->nkeys && p; ++i) {
 			if (p->db[i]) {
 				DB_SYNC (p->db[i]);
 			}
