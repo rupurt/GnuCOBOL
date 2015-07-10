@@ -99,6 +99,8 @@ copy/.deps
 copy/Makefile
 copy/atlocal
 /defaults.h
+doc/*.cps
+doc/*.vrs
 doc/.deps
 doc/Makefile
 doc/atlocal
