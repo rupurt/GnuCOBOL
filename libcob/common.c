@@ -244,7 +244,7 @@ static char	fixrel_dflt[8] = "gc";	/* Default Fixed length Relative file format 
  */
 static struct config_tbl gc_conf[] = {
 	{"COB_LOAD_CASE","load_case",		"0",	lwrupr,GRP_CALL,ENV_INT,SETPOS(name_convert)},
-	{"default_cancel_mode","cancel_mode",	"0",	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
+	{"default_cancel_mode","cancel_mode",	NULL,	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
 	{"COB_PHYSICAL_CANCEL","physical_cancel","0",	NULL,GRP_CALL,ENV_BOOL,SETPOS(physical_cancel)},
 	{"COB_PRE_LOAD","pre_load",		NULL,	NULL,GRP_CALL,ENV_STR,SETPOS(cob_preload_str)},
 	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT,SETPOS(cob_beep_value)},
