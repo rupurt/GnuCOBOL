@@ -1433,3 +1433,71 @@ prog3.cob: 13: Error: syntax error, unexpected Literal
 
 AT_CLEANUP
 
+AT_SETUP([REDEFINES with VALUE])
+AT_KEYWORDS([Numeric])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       01  NUM9    PIC 9(6).
+       01  NUM9C   PIC 9(6).
+       01  TSRDF.
+           05  WS-ASK-ID-DATE                PIC X(10).
+           05  WS-ASK-ID-DATE-R              REDEFINES WS-ASK-ID-DATE.
+               10  WS-ASK-ID-DATE-YYYY       PIC 9(4).
+               10  FILLER                    PIC X VALUE '-'.
+               10  WS-ASK-ID-DATE-MM         PIC 9(2).
+               10  FILLER                    PIC X VALUE '-'.
+               10  WS-ASK-ID-DATE-DD         PIC 9(2).
+       PROCEDURE DIVISION.
+           MOVE SPACES TO NUM9
+           DISPLAY "NUM9 value SPACES is " NUM9.
+           MOVE LOW-VALUES TO NUM9
+           DISPLAY "NUM9 value LOW-VALUES is " NUM9.
+           IF NUM9 = LOW-VALUES
+               DISPLAY "9(6) tests OK for LOW-VALUES"
+           ELSE
+               DISPLAY "9(6) Does NOT test OK for LOW-VALUES"
+               IF NUM9 = ZERO  
+                   DISPLAY "9(6) tests as ZERO instead of LOW-VALUES"
+               END-IF
+           END-IF.
+           MOVE HIGH-VALUES TO NUM9
+           DISPLAY "NUM9 value HIGH-VALUES is " NUM9.
+           IF NUM9 = HIGH-VALUES
+               DISPLAY "9(6) tests OK for HIGH-VALUES"
+           ELSE
+               DISPLAY "9(6) Does NOT test OK for HIGH-VALUES"
+               IF NUM9 = ZERO  
+                   DISPLAY "9(6) tests as ZERO instead of HIGH-VALUES"
+               END-IF
+           END-IF.
+           IF NUM9 (1:6) = LOW-VALUES
+               DISPLAY "9(6)(1:6) tests OK for LOW-VALUES"
+           ELSE
+               DISPLAY "9(6)(1:6) Does NOT test OK for LOW-VALUES"
+           END-IF.
+           MOVE ZERO TO NUM9
+           IF NUM9 = ZERO  
+               DISPLAY "9(6) tests OK for ZERO"
+           ELSE
+               DISPLAY "9(6) Does NOT test OK for ZERO"
+           END-IF.
+           MOVE 2015 TO WS-ASK-ID-DATE-YYYY
+           MOVE 08 TO WS-ASK-ID-DATE-MM
+           MOVE 21 TO WS-ASK-ID-DATE-DD
+           DISPLAY "The date is " WS-ASK-ID-DATE.
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [1], [], [prog.cob: 12: Error: Entries under REDEFINES cannot have a VALUE clause
+prog.cob: 14: Error: Entries under REDEFINES cannot have a VALUE clause
+prog.cob: 17: Error: Invalid MOVE statement
+prog.cob: 19: Error: Invalid MOVE statement
+prog.cob: 29: Error: Invalid MOVE statement
+])
+
+AT_CLEANUP
+

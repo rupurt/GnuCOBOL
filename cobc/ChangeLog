@@ -1,5 +1,9 @@
 
 2015-08-19  Ron Norman
+	* If -frelax-syntax then just give Warning when VALUEs in REDEFINES
+	  instead of an error. Some legacy COBOL code can be doing this.
+
+2015-08-19  Ron Norman
 	* Swapped order of parameters for C compiler and Linking so that
 	  -L options come before -l 
 	  Otherwise the linker does not find things correctly on Linux
