@@ -1,4 +1,9 @@
 
+2015-08-19  Ron Norman
+	* Swapped order of parameters for C compiler and Linking so that
+	  -L options come before -l 
+	  Otherwise the linker does not find things correctly on Linux
+
 2015-07-07  Ron Norman
 	* Added CB_DEVICE_PRINTER with a new value to differentiate between
 	  PRINTER and SYSOUT. DISPLAY ... UPON PRINTER can be redirected via
