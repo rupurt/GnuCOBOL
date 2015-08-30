@@ -27,6 +27,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
+#include <errno.h>
 
 #include "cobc.h"
 #include "tree.h"
@@ -3068,6 +3070,8 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 {
 	struct cb_binary_op	*p;
 	enum cb_category	category = CB_CATEGORY_UNKNOWN;
+	cob_s64_t			xval,yval;
+	char				result[48];
 
 	switch (op) {
 	case '+':
@@ -3085,6 +3089,58 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		y = cb_check_numeric_value (y);
 		if (x == cb_error_node || y == cb_error_node) {
 			return cb_error_node;
+		}
+		/*
+		 * If this is an operation between two simple integer numerics
+		 * then resolve the value here at compile time
+		 */
+		if (CB_NUMERIC_LITERAL_P(x) 
+		&&  CB_NUMERIC_LITERAL_P(y)) {
+			struct cb_literal *xl, *yl;
+			xl = (void*)x;
+			yl = (void*)y;
+			if(xl->llit == 0
+			&& xl->scale == 0
+			&& yl->llit == 0
+			&& yl->scale == 0
+			&& xl->sign == 0
+			&& yl->sign == 0
+			&& xl->all == 0
+			&& yl->all == 0) {
+				xval = atoll((const char*)xl->data);
+				yval = atoll((const char*)yl->data);
+				switch(op) {
+				case '+':
+					sprintf(result,"%lld",xval + yval);
+					return cb_build_numeric_literal (0, result, 0);
+				case '-':
+					sprintf(result,"%lld",xval - yval);
+					return cb_build_numeric_literal (0, result, 0);
+				case '*':
+					sprintf(result,"%lld",xval * yval);
+					return cb_build_numeric_literal (0, result, 0);
+				case '/':
+					if(yval == 0) {				/* Avoid Divide by ZERO */
+						cb_warning_x (x, _("Divide by constant ZERO"));
+						break;
+					}
+					sprintf(result,"%lld",xval / yval);
+					return cb_build_numeric_literal (0, result, 0);
+				case '^':
+					if(yval == 0
+					|| xval == 1) {
+						strcpy(result,"1");
+					} else {
+						errno = 0;
+						sprintf(result,"%lld",(cob_s64_t)pow((double)xval,(double)yval));
+						if(errno != 0)	/* 'pow' raised some error */
+							break;
+					}
+					return cb_build_numeric_literal (0, result, 0);
+				default:
+					break;
+				}
+			}
 		}
 		category = CB_CATEGORY_NUMERIC;
 		break;

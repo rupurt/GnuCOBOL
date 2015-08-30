@@ -1,4 +1,9 @@
 
+2015-08-30  Ron Norman
+	* In tree.c, for binary operations between integer constants, resolve 
+	  the value at compile time and reduce the expression down to the 
+	  computed value
+
 2015-08-19  Ron Norman
 	* If -frelax-syntax then just give Warning when VALUEs in REDEFINES
 	  instead of an error. Some legacy COBOL code can be doing this.
