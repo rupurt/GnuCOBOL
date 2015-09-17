@@ -7830,7 +7830,7 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 		fcd->lockMode = FCD_LOCK_AUTO_LOCK;
 	fcd->recPtr = f->record->data;
 	if (f->organization == COB_ORG_INDEXED) {
-		STCOMPX2(1, fcd->refKey);
+		STCOMPX2(0, fcd->refKey);
 		fcd->fileOrg = ORG_INDEXED;
 		fcd->fileFormat = MF_FF_CISAM;
 		/* Copy Key information from cob_file to FCD */
@@ -7889,7 +7889,7 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 		STCOMPX2(0, fcd->refKey);
 	} else if(f->organization == COB_ORG_RELATIVE) {
 		fcd->fileOrg = ORG_RELATIVE;
-		STCOMPX2(1, fcd->refKey);
+		STCOMPX2(0, fcd->refKey);
 	}
 	update_file_to_fcd(f, fcd, NULL);
 }
@@ -8044,7 +8044,7 @@ cob_findkey(cob_file *f, cob_field *kf, int *fullkeylen, int *partlen)
 		&&  f->keys[k].field->data == kf->data) {
 			*fullkeylen = f->keys[k].field->size;
 			*partlen = kf->size;
-			return k;	/* keyn is ZERO relative */
+			return k;
 		}
 	}
 	for (k = 0; k < f->nkeys; ++k) {
@@ -8059,7 +8059,7 @@ cob_findkey(cob_file *f, cob_field *kf, int *fullkeylen, int *partlen)
 					*partlen = kf->size;
 				else
 					*partlen = *fullkeylen;
-				return k;	/* keyn is ZERO relative */
+				return k;
 			}
 		}
 	}
@@ -8378,15 +8378,15 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 
 	if(fcd->fileOrg == ORG_INDEXED) {
 		k = LDCOMPX2(fcd->refKey);
-		if(k > 0) {
-			if(f->keys[k-1].count_components <= 1) {
-				key->size = f->keys[k-1].field->size;
-				key->attr = f->keys[k-1].field->attr;
-				key->data = f->record->data + f->keys[k-1].offset;
+		if(k >= 0) {
+			if(f->keys[k].count_components <= 1) {
+				key->size = f->keys[k].field->size;
+				key->attr = f->keys[k].field->attr;
+				key->data = f->record->data + f->keys[k].offset;
 			} else {
-				key->size = f->keys[k-1].component[0]->size;
-				key->attr = f->keys[k-1].component[0]->attr;
-				key->data = f->keys[k-1].component[0]->data;
+				key->size = f->keys[k].component[0]->size;
+				key->attr = f->keys[k].component[0]->attr;
+				key->data = f->keys[k].component[0]->data;
 			}
 		} else {
 			memset(keywrk,0,sizeof(keywrk));
