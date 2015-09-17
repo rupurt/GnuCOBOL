@@ -8044,7 +8044,7 @@ cob_findkey(cob_file *f, cob_field *kf, int *fullkeylen, int *partlen)
 		&&  f->keys[k].field->data == kf->data) {
 			*fullkeylen = f->keys[k].field->size;
 			*partlen = kf->size;
-			return k + 1;
+			return k;	/* keyn is ZERO relative */
 		}
 	}
 	for (k = 0; k < f->nkeys; ++k) {
@@ -8059,7 +8059,7 @@ cob_findkey(cob_file *f, cob_field *kf, int *fullkeylen, int *partlen)
 					*partlen = kf->size;
 				else
 					*partlen = *fullkeylen;
-				return k + 1;
+				return k;	/* keyn is ZERO relative */
 			}
 		}
 	}

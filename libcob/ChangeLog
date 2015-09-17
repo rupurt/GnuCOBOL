@@ -1,4 +1,9 @@
 
+2015-09-16  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c fixed coding error related to support for EXTFH
+	  It was returning the index number as 1 relative instead of 0 relative
+
 2015-07-07  Ron Norman
 	* Accept env var COB_CURRENT_DATE and runtime.cfg current_date
 	  to specify a date override for the application.
