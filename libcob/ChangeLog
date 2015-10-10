@@ -1,4 +1,7 @@
 
+2015-10-10 Ron Norman <rjn@inglenet.com>
+	* common.c added code to report additional environment settings
+
 2015-09-16  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c fixed coding error related to support for EXTFH
