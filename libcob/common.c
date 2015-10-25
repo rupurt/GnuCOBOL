@@ -169,6 +169,10 @@ static char			*strbuff = NULL;
 static int		cob_process_id = 0;
 static int		cob_temp_iteration = 0;
 
+static unsigned int conf_runtime_error_displayed = 0;
+static unsigned int last_runtime_error_line = 0;
+static const char	*last_runtime_error_file = "unknown";
+
 #if	defined(HAVE_SIGNAL_H) && defined(HAVE_SIG_ATOMIC_T)
 static volatile sig_atomic_t	sig_is_handled = 0;
 #endif
@@ -223,8 +227,8 @@ static const char *setting_group[] = {" hidden setting ","Call environment",
 
 static char	not_set[] = "not set";
 static struct config_enum lwrupr[]	= {{"LOWER","1"},{"UPPER","2"},{not_set,"0"},{NULL,NULL}};
-static struct config_enum beepopts[]	= {{"FLASH","1"},{"SPEAKER","2"},{"FALSE","9"},{"NONE","0"},{NULL,NULL}};
-static struct config_enum timeopts[]	= {{"1","100"},{"2","10"},{"3","1"},{NULL,NULL}};
+static struct config_enum beepopts[]	= {{"FLASH","1"},{"SPEAKER","2"},{"FALSE","9"},{"BEEP","0"},{NULL,NULL}};
+static struct config_enum timeopts[]	= {{"0","1000"},{"1","100"},{"2","10"},{"3","1"},{NULL,NULL}};
 static struct config_enum syncopts[]	= {{"P","1"},{NULL,NULL}};
 static struct config_enum varseqopts[]	= {{"0","0"},{"1","1"},{"2","2"},{"3","3"},
 					   {"mf","11"},{"gc","10"},
@@ -243,13 +247,19 @@ static char	fixrel_dflt[8] = "gc";	/* Default Fixed length Relative file format 
 
 /*
  * Table of possible environment variables and/or runtime.cfg parameters
+   Env Var name, Name used in run-time config file, Default value (NULL for aliases), Table of Alternate values,
+   Grouping for display of run-time options, Data type, Location within structure, Length of referenced field,
+   Set by which runtime.cfg file, value set by a different keyword,
+   optional: Minimum accepted value, Maximum accepted value
  */
 static struct config_tbl gc_conf[] = {
-	{"COB_LOAD_CASE","load_case",		"0",	lwrupr,GRP_CALL,ENV_INT,SETPOS(name_convert)},
-	{"COB_PHYSICAL_CANCEL","physical_cancel","0",	NULL,GRP_CALL,ENV_BOOL,SETPOS(physical_cancel)},
+	{"COB_LOAD_CASE","load_case",		"0",	lwrupr,GRP_CALL,ENV_INT|ENV_ENUMVAL,SETPOS(name_convert)},
+	{"COB_PHYSICAL_CANCEL","physical_cancel",	"0",	NULL,GRP_CALL,ENV_BOOL,SETPOS(physical_cancel)},
+	{"default_cancel_mode","default_cancel_mode",	NULL,NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
+	{"LOGICAL_CANCELS","logical_cancels",	NULL,NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
 	{"default_cancel_mode","cancel_mode",	NULL,	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
 	{"COB_PRE_LOAD","pre_load",		NULL,	NULL,GRP_CALL,ENV_STR,SETPOS(cob_preload_str)},
-	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT,SETPOS(cob_beep_value)},
+	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT|ENV_ENUMVAL,SETPOS(cob_beep_value)},
 	{"COB_DEBUG_LOG","debug_log",		NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_debug_log)},
 	{"COB_COL_JUST_LRC","col_just_lrc",	"true",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_col_just_lrc)},
 	{"COB_DISABLE_WARNINGS","disable_warnings","0",	NULL,GRP_MISC,ENV_BOOL|ENV_NOT,SETPOS(cob_display_warn)},
@@ -258,19 +268,22 @@ static struct config_tbl gc_conf[] = {
 	{"COB_SCREEN_ESC","screen_esc",		"0",	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_use_esc)},
 	{"COB_SCREEN_EXCEPTIONS","screen_exceptions","0",NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_extended_status)},
 	{"COB_SET_TRACE","set_trace",		"0",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_line_trace)},
-	{"COB_TIMEOUT_SCALE","timeout_scale",	"1000",	timeopts,GRP_SCREEN,ENV_INT,SETPOS(cob_timeout_scale)},
+	{"COB_TIMEOUT_SCALE","timeout_scale",	"0",	timeopts,GRP_SCREEN,ENV_INT,SETPOS(cob_timeout_scale)},
 	{"COB_TRACE_FILE","trace_file",		NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_trace_filename)},
 #ifdef  _WIN32
 	{"COB_UNIX_LF","unix_lf",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_unix_lf)},
 #endif
-	{"USERNAME","username",			NULL,	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_user_name)},
+	{"USERNAME","username",			"Unknown",	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_user_name)},
 	{"LOGNAME","logname",			NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_user_name)},
-#ifndef  _WIN32
+#if !defined(_WIN32) || defined (__MINGW32__) /* cygwin does not define _WIN32 */
 	{"LANG","lang",				NULL,	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_sys_lang)},
-#if defined(__linux__)
+#if defined(__linux__) || defined(__CYGWIN__) || defined(__MINGW32__)
 	{"OSTYPE","ostype",			NULL,	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_sys_type)},
 #endif
 	{"TERM","term",				NULL,	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_sys_term)},
+#endif
+#if defined(_WIN32) && !defined(__MINGW32__)
+	{"OS","ostype",			NULL,	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_sys_type)},
 #endif
 	{"COB_FILE_PATH","file_path",		NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(cob_file_path)},
 	{"COB_LIBRARY_PATH","library_path",	"." PATHSEPS COB_LIBRARY_PATH,
@@ -279,12 +292,13 @@ static struct config_tbl gc_conf[] = {
 	{"COB_FIXREL_FORMAT","fixrel_format",	fixrel_dflt,relopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_fixrel_type)},
 	{"COB_VARREL_FORMAT","varrel_format",	varrel_dflt,relopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_varrel_type)},
 	{"COB_VARSEQ_FORMAT","varseq_format",	varseq_dflt,varseqopts,GRP_FILE,ENV_INT|ENV_ENUM,SETPOS(cob_varseq_type)},
-	{"COB_LS_FIXED","ls_fixed",		"false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_fixed)},
-	{"COB_LS_NULLS","ls_nulls",		"false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_nulls)},
+	{"COB_LS_FIXED","ls_fixed",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_fixed)},
+	{"STRIP_TRAILING_SPACES","strip_trailing_spaces",		NULL,	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(cob_ls_fixed)},
+	{"COB_LS_NULLS","ls_nulls",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_nulls)},
 	{"COB_LS_VALIDATE","ls_validate",	"true",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_ls_validate)},
 	{"COB_GC_FILES","gc_files",		"false",NULL,GRP_HIDE,ENV_BOOL,SETPOS(cob_gc_files)},
 	{"COB_SORT_CHUNK","sort_chunk",		"256K",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_chunk),(128 * 1024),(16 * 1024 * 1024)},
-	{"COB_SORT_MEMORY","sort_memory",	"128M",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_memory),(1024*1024)},
+	{"COB_SORT_MEMORY","sort_memory",	"128M",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_memory),(1024*1024),4294967294 /* max. guaranteed - 1 */},
 	{"COB_SYNC","sync",			"false",syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
 #ifdef  WITH_DB
 	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(bdb_home)},
@@ -297,10 +311,13 @@ static struct config_tbl gc_conf[] = {
 	{NULL,NULL,0,0}
 };
 #define NUM_CONFIG (sizeof(gc_conf)/sizeof(struct config_tbl)-1)
+#define FUNC_NAME_IN_DEFAULT NUM_CONFIG + 1
 
 /* Local functions */
 static int	set_config_val(char *value, int pos);
 static char *	get_config_val(char *value, int pos, char *orgvalue);
+void conf_runtime_error_value(char *value, const int conf_pos);
+void conf_runtime_error(const int finish_error, const char *fmt, ...);
 static void	check_current_date();
 
 static void
@@ -387,12 +404,12 @@ cob_exit_common (void)
 		cob_free (cobglobptr);
 		cobglobptr = NULL;
 	}
-	if (cobsetptr->cob_user_name) {
-		cob_free (cobsetptr->cob_user_name);
-		cobsetptr->cob_user_name = NULL;
-	}
-	if(cobsetptr) {
-		if(cobsetptr->cob_config_file) {
+	if (cobsetptr) {
+		if (cobsetptr->cob_user_name) {
+			cob_free (cobsetptr->cob_user_name);
+			cobsetptr->cob_user_name = NULL;
+		}
+		if (cobsetptr->cob_config_file) {
 			for (i=0; i < cobsetptr->cob_config_num; i++) 
 				cob_free((void*)cobsetptr->cob_config_file[i]);
 			cob_free((void*)cobsetptr->cob_config_file);
@@ -411,8 +428,8 @@ cob_exit_common (void)
 			}
 		}
 		cob_free (cobsetptr);
+		cobsetptr = NULL;
 	}
-	cobsetptr = NULL;
 	cob_initialized = 0;
 }
 
@@ -474,6 +491,7 @@ cob_sig_handler_ex (int sig)
 #endif
 	exit (sig);
 }
+
 
 static void COB_A_NORETURN
 cob_sig_handler (int sig)
@@ -541,7 +559,10 @@ cob_sig_handler (int sig)
 	cob_exit_screen ();
 	putc ('\n', stderr);
 	if (cob_source_file) {
-		fprintf (stderr, "%s: %u: ", cob_source_file, cob_source_line);
+		fprintf (stderr, "%s: ", cob_source_file);
+		if (cob_source_line) {
+			fprintf (stderr, "%u: ", cob_source_line);
+		}
 	}
 
 #ifdef	SIGSEGV
@@ -1121,22 +1142,25 @@ cob_check_env_false (char* s)
 static void
 cob_rescan_env_vals (void)
 {
-	int		i, j;
+	int		i, j, old_type;
 	char		*env, *sv_src_file;
 
 	sv_src_file = (char*)cob_source_file;
-	cob_source_file = "environment variables";
+	cob_source_file = NULL;
+	cob_source_line = 0;
 	/* Check for possible environment variables */
 	for (i=0; i < NUM_CONFIG; i++) {
 		if(gc_conf[i].env_name
 		&& (env = getenv(gc_conf[i].env_name)) != NULL) {
+			old_type = gc_conf[i].data_type;
+			gc_conf[i].data_type |= STS_ENVSET;
 			if(*env != 0					/* If *env -> Nul then ignore this */
 			&& set_config_val(env,i)) {
+				gc_conf[i].data_type = old_type;
 #if HAVE_SETENV
 				unsetenv(gc_conf[i].env_name);		/* Remove invalid setting */
 #endif
 		} else {
-				gc_conf[i].data_type |= STS_ENVSET;
 				if(gc_conf[i].env_group == GRP_HIDE) {
 					for (j=0; j < NUM_CONFIG; j++) {/* Any alias present? */
 						if(j != i
@@ -1701,6 +1725,62 @@ cob_fatal_error (const int fatal_error)
 		break;
 	}
 	cob_stop_run (1);
+}
+
+void
+conf_runtime_error_value(char *value, const int pos)
+{
+	const char *name = NULL;
+
+	if (gc_conf[pos].data_type & STS_CNFSET) {
+		name = gc_conf[pos].conf_name;
+	} else {
+		name = gc_conf[pos].env_name;
+	}
+	conf_runtime_error(0, _("Invalid value '%s' for configuration tag '%s'"), value, name);
+}
+
+void
+conf_runtime_error(const int finish_error, const char *fmt, ...)
+{
+	va_list args;
+
+	if (!conf_runtime_error_displayed) {
+		conf_runtime_error_displayed = 1;
+		fputs(_("Configuration Error"), stderr);
+		putc('\n', stderr);
+	}
+
+	/* Prefix */
+	if (cob_source_file != last_runtime_error_file 
+	|| cob_source_line != last_runtime_error_line) {
+		last_runtime_error_file = cob_source_file;
+		last_runtime_error_line = cob_source_line;
+		if (cob_source_file) {
+			fprintf(stderr, "%s: ", cob_source_file);
+		} else {
+			fprintf(stderr, "%s", _("environment variables"));
+			fprintf(stderr, ": ");
+		}
+		if (cob_source_line) {
+			fprintf(stderr, "%u: ", cob_source_line);
+		}
+	}
+
+	/* Body */
+	va_start(args, fmt);
+	vfprintf(stderr, fmt, args);
+	va_end(args);
+
+	/* Postfix */
+	if (!finish_error) {
+		putc(';', stderr);
+		putc('\n', stderr);
+		putc('\t', stderr);
+	} else {
+		putc('\n', stderr);
+		fflush(stderr);
+	}
 }
 
 cob_global *
@@ -4386,12 +4466,8 @@ var_print (const char *msg, const char *val, const char *default_val,
 		return;
 	}
 
-	p = strdup (val);
-	if (!p) {
-		fputs (_("Memory allocation failure"), stderr);
-		putc ('\n', stderr);
-		return;
-	}
+	p = cob_strdup (val);
+
 	n = 0;
 	token = strtok (p, " ");
 	for (; token; token = strtok (NULL, " ")) {
@@ -4478,7 +4554,7 @@ cob_expand_env_string (char *strval)
 			}
 		}
 		env[j] = 0;
-		str = strdup(env);
+		str = cob_strdup(env);
 		cob_free(env);
 	}
 	return str;
@@ -4520,7 +4596,7 @@ set_config_val(char *value, int pos)
 {
 	void 	*data;
 	char	*ptr = value,*str;
-	long	numval = 0;
+	unsigned long	numval = 0;
 	int	i,data_type,data_loc,data_len,slen;
 
 	data_type = gc_conf[pos].data_type;
@@ -4530,15 +4606,30 @@ set_config_val(char *value, int pos)
 	data = (void*)((char *)cobsetptr + data_loc);
 
 	if(gc_conf[pos].enums) {		/* Translate 'word' into alternate 'value' */
+
 		for (i=0; gc_conf[pos].enums[i].match != NULL; i++) {
-			if(strcasecmp(value,gc_conf[pos].enums[i].match) == 0) {
+			if (strcasecmp(value,gc_conf[pos].enums[i].match) == 0) {
 				ptr = value = (char*)gc_conf[pos].enums[i].value;
 				break;
 			}
+			if ((data_type & ENV_ENUMVAL) && strcasecmp(value,gc_conf[pos].enums[i].value) == 0) {
+				break;
+			}
 		}
-		if((data_type & ENV_ENUM)			/* Must be one of the 'enum' values */
+		if((data_type & ENV_ENUM || data_type & ENV_ENUMVAL)	/* Must be one of the 'enum' values */
 		&& gc_conf[pos].enums[i].match == NULL) {
-			cob_runtime_error (_("%s does not accept '%s' as valid"),gc_conf[pos].env_name,ptr); 
+			str = cob_strcat((char*)"", (char*)"");
+			for (i = 0; gc_conf[pos].enums[i].match != NULL; i++) {
+				if (i != 0)	str = cob_strcat(str, (char*)", ");
+				str = cob_strcat(str, (char*)gc_conf[pos].enums[i].match);
+				if (data_type & ENV_ENUMVAL) {
+					str = cob_strcat(str, (char*)"(");
+					str = cob_strcat(str, (char*)gc_conf[pos].enums[i].value);
+					str = cob_strcat(str, (char*)")");
+				}
+			}
+			conf_runtime_error_value(ptr, pos);
+			conf_runtime_error(1, _("should be one of the following values: %s"), str); 
 			return 1;
 		}
 	}
@@ -4546,8 +4637,9 @@ set_config_val(char *value, int pos)
 	if((data_type & ENV_INT) 				/* Integer data */
 	|| (data_type & ENV_SIZE) ) {				/* Size: integer with K, M, G */
 		for (; *ptr != 0 && (isdigit((unsigned char)*ptr) || *ptr == ' '); ptr++) {
-			if(*ptr != ' ')
+			if (*ptr != ' ') {
 				numval = (numval * 10) + (*ptr - '0');
+			}
 		}
 		if((data_type & ENV_SIZE)			/* Size: any K, M, G */
 		&& *ptr != 0) {
@@ -4556,23 +4648,31 @@ set_config_val(char *value, int pos)
 				numval = numval * 1024;
 				break;
 			case 'M':
-				numval = numval * 1024 * 1024;
+				if (numval < 4001) {
+					numval = numval * 1024 * 1024;
+				} else {
+					numval = 4294967295; /* max. guaranteed value for unsigned long */
+				}
 				break;
 			case 'G':
-				numval = numval * 1024 * 1024 * 1024;
+				if (numval < 4) {
+					numval = numval * 1024 * 1024 * 1024;
+				} else {
+					numval = 4294967295; /* max. guaranteed value for unsigned long */
+				}
 				break;
 			}
 		}
 		if(gc_conf[pos].min_value > 0
 		&& numval < gc_conf[pos].min_value) {
-			cob_runtime_error (_("%s has minimum of %ld; '%s' is invalid"),
-						gc_conf[pos].env_name,gc_conf[pos].min_value,value); 
+			conf_runtime_error_value(value, pos);
+			conf_runtime_error(1, _("minimum value: %lu"),gc_conf[pos].min_value); 
 			return 1;
 		}
 		if(gc_conf[pos].max_value > 0
 		&& numval > gc_conf[pos].max_value) {
-			cob_runtime_error (_("%s has maximum of %ld; '%s' is invalid"),
-						gc_conf[pos].env_name,gc_conf[pos].max_value,value); 
+			conf_runtime_error_value(value, pos);
+			conf_runtime_error(1, _("maximum value: %lu"),gc_conf[pos].max_value); 
 			return 1;
 		}
 		set_value((char *)data,data_len,numval);
@@ -4599,11 +4699,13 @@ set_config_val(char *value, int pos)
 
 		if(numval != 1
 		&& numval != 0) {
-			cob_runtime_error (_("%s should be 'true' or 'false'; '%s' is invalid"),gc_conf[pos].env_name,ptr); 
+			conf_runtime_error_value(ptr, pos);
+			conf_runtime_error(1, _("should be one of the following values: %s"), "true, false");
 			return 1;
 		} else {
-			if((data_type & ENV_NOT))	/* Negate logic for actual setting */
+			if ((data_type & ENV_NOT)) {	/* Negate logic for actual setting */
 				numval = !numval;
+			}
 			set_value((char *)data,data_len,numval);
 		}
 
@@ -4619,11 +4721,31 @@ set_config_val(char *value, int pos)
 	} else if((data_type & ENV_CHAR)) {	/* 'char' field inline */
 		memset(data,0,data_len);
 		slen = strlen(value);
-		if(slen > data_len)
+		if (slen > data_len) {
 			slen = data_len;
+		}
 		memcpy(data,value,slen);
 	}
 	return 0;
+}
+
+/* Set runtime setting by name with given value */
+static int					/* returns 1 if any error, else 0 */
+set_config_val_by_name(char *value, const char *name, const char *func)
+{
+	int	i;
+	int ret = 1;
+
+	for (i = 0; i < NUM_CONFIG; i++) {
+		if (!strcmp(gc_conf[i].conf_name,name)) {
+			ret = set_config_val(value, i);
+			gc_conf[i].data_type |= STS_FNCSET;
+			gc_conf[i].set_by = FUNC_NAME_IN_DEFAULT;
+			gc_conf[i].default_val = func;
+			break;
+		}
+	}
+	return ret;
 }
 
 /* Return setting value as a 'string' */
@@ -4737,7 +4859,7 @@ cb_lookup_config (char *keyword)
 static int
 cb_config_entry (char *buf, int line)
 {
-	int	i,j;
+	int	i,j,k, old_type;
 	void	*data;
 	char	*env,*str,qt;
 	char	keyword[COB_MINI_BUFF],value[COB_SMALL_BUFF],value2[COB_SMALL_BUFF];
@@ -4765,13 +4887,19 @@ cb_config_entry (char *buf, int line)
 	}
 	value[j] = 0;
 	if (strcmp(value, "") == 0) {
-		cob_runtime_error (_("WARNING - '%s' without a value - ignored!"), keyword);
+		conf_runtime_error(1, _("WARNING - '%s' without a value - ignored!"), keyword);
 		return 2;
 	}
 
 	if (strcasecmp (keyword,"setenv") == 0) {
 		/* collect additional value and push into environment */
 		strcpy(value2,"");
+		/*check for := in value 2 and split, if necessary*/
+		k = 0; while (value[k] != '=' && value[k] != ':' && value[k] != '"' && value[k] != '\'' && value[k] != 0) k++;
+		if (value[k] == '=' || value[k] == ':') {
+			i = i - strlen(value + k);
+			value[k] = 0;
+		}
 		while(isspace((unsigned char)buf[i]) || buf[i] == ':' || buf[i] == '=') i++;
 		if(buf[i] == '"' 
 		|| buf[i] == '\'') {
@@ -4779,12 +4907,12 @@ cb_config_entry (char *buf, int line)
 			for (j=0; buf[i] != qt && buf[i] != 0; )
 				value2[j++] = buf[i++];
 		} else {
-			for (j=0; !isspace((unsigned char)buf[i]) && buf[i] != '#'; )
+			for (j=0; !isspace((unsigned char)buf[i]) && buf[i] != '#' && buf[i] != 0; )
 				value2[j++] = buf[i++];
 		}
 		value2[j] = 0;
 		if (strcmp(value2, "") == 0) {
-			cob_runtime_error (_("WARNING - '%s %s' without a value - ignored!"), keyword, value);
+			conf_runtime_error(1, _("WARNING - '%s %s' without a value - ignored!"), keyword, value);
 			return 2;
 		}
 		/* check additional value for inline env vars ${varname:-default} */
@@ -4805,7 +4933,7 @@ cb_config_entry (char *buf, int line)
 
 	if (strcasecmp (keyword,"unsetenv") == 0) {
 		if (strcmp(value, "") == 0) {
-			cob_runtime_error (_("WARNING - '%s' without a value - ignored!"), keyword);
+			conf_runtime_error(1, _("WARNING - '%s' without a value - ignored!"), keyword);
 			return 2;
 		}
 		if ( (env = getenv(value)) != NULL ) {
@@ -4851,7 +4979,7 @@ cb_config_entry (char *buf, int line)
 	if (strcasecmp (keyword, "reset") == 0) {
 		i = cb_lookup_config(value);
 		if(i >= NUM_CONFIG) {
-			cob_runtime_error ( _("Invalid configuration name '%s'"), value);
+			conf_runtime_error (1,_("Unknown configuration tag '%s'"), value);
 			return -1;
 		}
 		gc_conf[i].data_type &= ~(STS_ENVSET|STS_CNFSET|STS_ENVCLR);	/* Clear status */
@@ -4860,9 +4988,8 @@ cb_config_entry (char *buf, int line)
 		gc_conf[i].config_num = cobsetptr->cob_config_cur - 1;
 		if(gc_conf[i].default_val) {
 			set_config_val((char*)gc_conf[i].default_val,i);
-		} else
-		if ((gc_conf[i].data_type & ENV_STR)
-		||  (gc_conf[i].data_type & ENV_PATH)) {	/* String/Path stored as a string */
+		} else if ((gc_conf[i].data_type & ENV_STR)
+		      ||  (gc_conf[i].data_type & ENV_PATH)) {	/* String/Path stored as a string */
 			data = (void*)((char *)cobsetptr + gc_conf[i].data_loc);
 			memcpy(&str,data,sizeof(char *));
 			if( str != NULL) {
@@ -4878,13 +5005,14 @@ cb_config_entry (char *buf, int line)
 
 	i = cb_lookup_config(keyword);
 
-	if(i >= NUM_CONFIG) {
-		cob_runtime_error ( _("Invalid configuration name '%s'"), keyword);
+	if (i >= NUM_CONFIG) {
+		conf_runtime_error (1,_("Unknown configuration tag '%s'"), keyword);
 		return -1;
 	}
 
+	old_type = gc_conf[i].data_type;
+	gc_conf[i].data_type |= STS_CNFSET;
 	if(!set_config_val(value,i)) {
-		gc_conf[i].data_type |= STS_CNFSET;
 		gc_conf[i].data_type &= ~STS_RESET;
 		gc_conf[i].config_num = cobsetptr->cob_config_cur - 1;
 
@@ -4899,6 +5027,8 @@ cb_config_entry (char *buf, int line)
 				}
 			}
 		}
+	} else {
+		gc_conf[i].data_type = old_type;
 	}
 	return 0;
 }
@@ -4907,6 +5037,7 @@ static int
 cob_load_config_file (const char *config_file, int isoptional)
 {
 	char			buff[COB_MEDIUM_BUFF], filename[COB_MEDIUM_BUFF];
+	char			*penv;
 	int			sub_ret, ret;
 	unsigned int	i;
 	int			line;
@@ -4915,9 +5046,32 @@ cob_load_config_file (const char *config_file, int isoptional)
 	for (i=0; config_file[i] != 0 && config_file[i] != SLASH_INT; i++);
 	if (config_file[i] == 0) {			/* Just a name, No directory */
 		if (access(config_file, F_OK) != 0) {	/* and file does not exist */
-			sprintf (filename, "%s%s%s", COB_CONFIG_DIR, SLASH_STR, config_file);
-			if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
-				config_file = filename;		/* Prefix COB_CONFIG_DIR */
+			/* check for path of previous configuration file (for includes) */
+			filename[0] = 0;
+			if (cobsetptr->cob_config_cur != 0) {
+				strcpy(buff, cobsetptr->cob_config_file[cobsetptr->cob_config_cur - 1]);
+				for (i = strlen(buff); i != 0 && buff[i] != SLASH_INT; i--);
+				if (i != 0) {
+					buff[i] = 0;
+					snprintf(filename, (size_t)COB_MEDIUM_MAX, "%s%s%s", buff, SLASH_STR, config_file);
+					if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
+						config_file = filename;		/* Prefix last directory */
+					} else {
+						filename[0] = 0;
+					}
+				}
+			}
+			if (filename[0] == 0) {
+				/* check for COB_CONFIG_DIR (use default if not in environment) */
+				penv = getenv("COB_CONFIG_DIR");
+				if (penv != NULL) {
+					snprintf(filename, (size_t)COB_MEDIUM_MAX, "%s%s%s", penv, SLASH_STR, config_file);
+				} else {
+					snprintf(filename, (size_t)COB_MEDIUM_MAX, "%s%s%s", COB_CONFIG_DIR, SLASH_STR, config_file);
+				}
+				if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
+					config_file = filename;		/* Prefix COB_CONFIG_DIR */
+				}
 			}
 		}
 	}
@@ -4927,7 +5081,8 @@ cob_load_config_file (const char *config_file, int isoptional)
 	/* check for recursion */
 	for (i=0; i < cobsetptr->cob_config_num; i++) {
 		if (strcmp(cobsetptr->cob_config_file[i], config_file) == 0) {
-			cob_runtime_error (_("Recursive inclusion of %s !"), config_file);
+			cob_source_line = 0;
+			conf_runtime_error (1,_("Recursive inclusion"));
 			return -2;
 		}
 	}
@@ -4935,16 +5090,15 @@ cob_load_config_file (const char *config_file, int isoptional)
 	/* Open the configuration file */
 	conf_fd = fopen (config_file, "r");
 	if (conf_fd == NULL && !isoptional) {
-		fflush (stderr);
+		cob_source_line = 0;
+		conf_runtime_error (1,_("No such file or directory"));
 		if (cobsetptr->cob_config_file) {
 			cob_source_file = cobsetptr->cob_config_file[cobsetptr->cob_config_num-1];
-	}
-		cob_runtime_error (_("Unable to open %s"), config_file);
-		cob_source_line = 0;
+		}
 		return -1;
 	}
 	if (conf_fd != NULL) {
-		if(cobsetptr->cob_config_file == NULL) {
+		if (cobsetptr->cob_config_file == NULL) {
 			cobsetptr->cob_config_file = cob_malloc( sizeof(char *));
 		} else {
 			cobsetptr->cob_config_file = realloc(cobsetptr->cob_config_file, sizeof(char *)*(cobsetptr->cob_config_num+1));
@@ -4975,10 +5129,10 @@ cob_load_config_file (const char *config_file, int isoptional)
 			cob_source_line = line;
 			sub_ret = cob_load_config_file (buff, sub_ret == 3);
 			cob_source_file = config_file;
-			if (sub_ret == -2) {
+			if (sub_ret < 0) {
 				ret = -1;
 				cob_source_line = line;
-				cob_runtime_error(_("Configuration file was included here."));
+				conf_runtime_error (1, _("Configuration file was included here"));
 				break;
 			}
 		}
@@ -5001,16 +5155,21 @@ int
 cob_load_config (void)
 {
 	char		*env;
-	char		conf_file[COB_SMALL_BUFF];
+	char		conf_file[COB_MEDIUM_BUFF];
 	int		isoptional = 1, sts, i, j;
 
 	
 	/* Get the name for the configuration file */
-	if ((env = getenv ("COB_RUNTIME_CONFIG")) != NULL) {
+	if ((env = getenv ("COB_RUNTIME_CONFIG")) != NULL && env[0]) {
 		strcpy (conf_file, env);
 		isoptional = 0;			/* If declared then it is NOT optional */
 	} else {
-		sprintf (conf_file, "%s%s%s", COB_CONFIG_DIR, SLASH_STR, "runtime.cfg");
+		/* check for COB_CONFIG_DIR (use default if not in environment) */
+		if ((env = getenv("COB_CONFIG_DIR")) != NULL && env[0]) {
+			snprintf (conf_file, (size_t)COB_MEDIUM_MAX, "%s%s%s", env, SLASH_STR, "runtime.cfg");
+		} else {
+			snprintf (conf_file, (size_t)COB_MEDIUM_MAX, "%s%s%s", COB_CONFIG_DIR, SLASH_STR, "runtime.cfg");
+		}
 		isoptional = 1;			/* If not present, then just use env vars */
 	}
 
@@ -5025,7 +5184,7 @@ cob_load_config (void)
 
 	/* Set with default value if present and not set otherwise */
 	for (i=0; i < NUM_CONFIG; i++) {				
-		if(gc_conf[i].default_val
+		if (gc_conf[i].default_val
 		&& !(gc_conf[i].data_type & STS_CNFSET)
 		&& !(gc_conf[i].data_type & STS_ENVSET)) {
 			for (j=0; j < NUM_CONFIG; j++) {	/* Any alias present? */
@@ -5039,7 +5198,7 @@ cob_load_config (void)
 					set_config_val((char*)gc_conf[i].default_val,i);
 				}
 			} else {
-				set_config_val((char*)gc_conf[i].default_val,i);/*Set default value */
+				set_config_val((char*)gc_conf[i].default_val,i); /*Set default value */
 			}
 		}
 	}
@@ -5173,14 +5332,35 @@ print_runtime_env()
 	unsigned int 	i,j,k,vl,dohdg,hdlen,plen;
 	char	value[COB_MEDIUM_BUFF],orgvalue[COB_MINI_BUFF];
 
-	strcpy(value,"todo");
-	printf ("%s  %s.%d runtime environment\n", PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	if(cobsetptr->cob_config_file) {
-		printf(" via %s\n",cobsetptr->cob_config_file[0]);
-		for (i=1; i < cobsetptr->cob_config_num; i++)
-			printf("  %d  %s\n",i,cobsetptr->cob_config_file[i]);
+	printf ("%s %s.%d runtime environment\n", PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
+	if (cobsetptr->cob_config_file) {
+		strcpy(value, _("via"));
+		hdlen = strlen(value) + 3;
+
+		/* output path of main configuration file */
+		printf(" %s  ", value);
+		plen = 80 - hdlen;
+		strcpy(value, cobsetptr->cob_config_file[0]);
+		vl = strlen(value);
+		for (k = 0; vl > plen; vl -= plen, k += plen) {
+			printf("%.*s\n%-*s", plen, &value[k], hdlen, "");
+		}
+		printf("%s\n", &value[k]);
+
+		/* output path of additional configuration files */
+		for (i = 1; i < cobsetptr->cob_config_num; i++) {
+			printf("%*d  ", hdlen - 2, i);
+			strcpy(value, cobsetptr->cob_config_file[i]);
+			vl = strlen(value);
+			for (k = 0; vl > plen; vl -= plen, k += plen) {
+				printf("%.*s\n%-*s", plen, &value[k], hdlen, "");
+			}
+			printf("%s\n", &value[k]);
+		}
+
 	}
-	printf("\n");
+	putchar('\n');
+	strcpy(value,"todo");
 	hdlen = 15;
 	for (i=0; i < NUM_CONFIG; i++) {
 		j = strlen(gc_conf[i].env_name);
@@ -5197,57 +5377,77 @@ print_runtime_env()
 			if(gc_conf[i].env_group == j) {
 				if(dohdg) {
 					dohdg = 0;
-					if(j > 1)
-						printf("\n");
+					if (j > 1) {
+						putchar('\n');
+					}
 					printf(" %s\n",setting_group[j]);
 				}
 				/* Convert value back into string and display it */
 				get_config_val(value,i,orgvalue);
-				if((gc_conf[i].data_type & STS_ENVSET)) {
-					if((gc_conf[i].data_type & STS_CNFSET)) 
-						printf(" Ovr");
-					else
-						printf(" env");
+				if((gc_conf[i].data_type & STS_ENVSET)
+				|| (gc_conf[i].data_type & STS_FNCSET)) {
+					putchar(' ');
+					if (gc_conf[i].data_type & STS_FNCSET) {
+						printf("   ");
+					} else if ((gc_conf[i].data_type & STS_CNFSET)) {
+						printf("Ovr");
+					} else {
+						printf("env");
+					}
 					printf(": %-*s : ",hdlen,gc_conf[i].env_name);
 				} else if((gc_conf[i].data_type & STS_CNFSET)) {
-					if(gc_conf[i].config_num > 0)
-						printf("  %d ",gc_conf[i].config_num);
-					else
+					if (gc_conf[i].config_num > 0) {
+						printf("  %d ", gc_conf[i].config_num);
+					} else {
 						printf("    ");
-					if(gc_conf[i].set_by > 0) 
-						printf(": %-*s : ",hdlen,gc_conf[i].env_name);
-					else
-						printf(": %-*s : ",hdlen,gc_conf[i].conf_name);
+					}
+					if (gc_conf[i].set_by > 0) {
+						printf(": %-*s : ", hdlen, gc_conf[i].env_name);
+					} else {
+						printf(": %-*s : ", hdlen, gc_conf[i].conf_name);
+					}
 				} else if(gc_conf[i].env_name) {
-					if(gc_conf[i].config_num > 0)
+					if(gc_conf[i].config_num > 0){
 						printf("  %d ",gc_conf[i].config_num);
-					else
+					} else {
 						printf("    ");
+					}
 					printf(": %-*s : ",hdlen,gc_conf[i].env_name);
 				} else {
 					printf("    : %-*s : ",hdlen,gc_conf[i].conf_name);
 				}
 				vl = strlen(value);
 				plen = 71 - hdlen;
-				for (k=0; vl > plen; vl -= plen, k += plen)
-					printf("%.*s\n      %-*s : ",plen,&value[k],hdlen,"");
+				for (k = 0; vl > plen; vl -= plen, k += plen) {
+					printf("%.*s\n      %-*s : ", plen, &value[k], hdlen, "");
+				}
 				printf("%s",&value[k]);
-				if(orgvalue[0] > ' ')
-					printf(" (%s)",orgvalue);
-				if(gc_conf[i].set_by > 0) {
-					printf(" (set by %s)",gc_conf[gc_conf[i].set_by].env_name);
+				if (orgvalue[0] > ' ') {
+					printf(" (%s)", orgvalue);
+				}
+				if (gc_conf[i].set_by > 0) {
+					putchar(' ');
+					if (gc_conf[i].set_by != FUNC_NAME_IN_DEFAULT) {
+						printf(_("(set by %s)"), gc_conf[gc_conf[i].set_by].env_name);
+					} else {
+						printf(_("(set by %s)"), gc_conf[i].default_val);
+					}
 				}
 				if(!(gc_conf[i].data_type & STS_ENVSET)
-				&& !(gc_conf[i].data_type & STS_CNFSET)) {
-					if((gc_conf[i].data_type & STS_RESET))
-						printf(" (reset)");
-					else
-					if(strcmp(value,not_set) != 0)
-						printf(" (default)");
+				&& !(gc_conf[i].data_type & STS_CNFSET)
+				&& !(gc_conf[i].data_type & STS_FNCSET)) {
+					putchar(' ');
+					if ((gc_conf[i].data_type & STS_RESET)) {
+						printf(_("(reset)"));
+					} else if (strcmp(value, not_set) != 0) {
+						printf(_("(default)"));
+					}
 				}
-				printf("\n");
-				if((gc_conf[i].data_type & STS_ENVCLR))
-					printf("    : %s\n"," ... removed from environment");
+				putchar('\n');
+				if ((gc_conf[i].data_type & STS_ENVCLR)) {
+					puts("    :  ");
+					puts(_("... removed from environment"));
+				}
 			}
 		}
 	}
@@ -5255,7 +5455,9 @@ print_runtime_env()
 	printf("    : %-*s : %s\n",hdlen,"LC_CTYPE", (char*) setlocale (LC_CTYPE, NULL));
 	printf("    : %-*s : %s\n",hdlen,"LC_NUMERIC", (char*) setlocale (LC_NUMERIC, NULL));
 	printf("    : %-*s : %s\n",hdlen,"LC_COLLATE", (char*) setlocale (LC_COLLATE, NULL));
+#ifdef	LC_MESSAGES
 	printf("    : %-*s : %s\n",hdlen,"LC_MESSAGES", (char*) setlocale (LC_MESSAGES, NULL));
+#endif
 	printf("    : %-*s : %s\n",hdlen,"LC_MONETARY", (char*) setlocale (LC_MONETARY, NULL));
 	printf("    : %-*s : %s\n",hdlen,"LC_TIME", (char*) setlocale (LC_TIME, NULL));
 #endif
@@ -5320,7 +5522,7 @@ cob_init (const int argc, char **argv)
 
 	/* Get global structure */
 	cobglobptr = cob_malloc (sizeof(cob_global));
-
+	
 	/* Get settings structure */
 	cobsetptr = cob_malloc (sizeof(cob_settings));
 
@@ -5385,7 +5587,6 @@ cob_init (const int argc, char **argv)
 #endif
 
 #ifdef	_WIN32
-
 	if (cobsetptr->cob_unix_lf) {
 			_setmode (_fileno (stdin), _O_BINARY);
 			_setmode (_fileno (stdout), _O_BINARY);
@@ -5393,13 +5594,13 @@ cob_init (const int argc, char **argv)
 		}
 #endif
 
-	/* Call inits with runtimeptr to get the adresses of all */
+	/* Call inits with cobsetptr to get the adresses of all */
+	/* Screen-IO might be needed for error outputs */
+	cob_init_screenio(cobglobptr, cobsetptr);
 	cob_init_numeric(cobglobptr);
 	cob_init_strings();
 	cob_init_move(cobglobptr, cobsetptr);
 	cob_init_intrinsic(cobglobptr);
-	/* Screen-IO might be needed for error outputs */
-	cob_init_screenio(cobglobptr, cobsetptr);
 	cob_init_fileio(cobglobptr, cobsetptr);
 	cob_init_call(cobglobptr, cobsetptr);
 	cob_init_termio(cobglobptr, cobsetptr);
@@ -5427,22 +5628,19 @@ cob_init (const int argc, char **argv)
 		cob_debug_open(cob_debug_env);
 	}
 	/* Get user name */
-	if (cobsetptr->cob_user_name == NULL) {
+	if (cobsetptr->cob_user_name == NULL || !strcmp(cobsetptr->cob_user_name, "Unknown")) {
 #ifdef	_WIN32
 			unsigned long bsiz = COB_ERRBUF_SIZE;
 			if (GetUserName (runtime_err_str, &bsiz)) {
-			cobsetptr->cob_user_name = cob_strdup (runtime_err_str);
+			set_config_val_by_name(runtime_err_str, "username", "GetUserName()");
 			}
 #elif	!defined(__OS400__)
 			s = getlogin ();
 			if (s) {
-			cobsetptr->cob_user_name = cob_strdup (s);
+			set_config_val_by_name(s, "username", "getlogin()");
 			}
 #endif
 		}
-	if (!cobsetptr->cob_user_name) {
-		cobsetptr->cob_user_name = cob_strdup (_("Unknown"));
-	}
 
 #if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
    /* Get function pointer for most precisise time function */
