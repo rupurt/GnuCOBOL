@@ -80,6 +80,17 @@ build_windows/vc12/libcob.vcxproj -text
 build_windows/vc12/libcob.vcxproj.filters -text
 build_windows/vc12/libsupport.vcxproj -text
 build_windows/vc12/libsupport.vcxproj.filters -text
+build_windows/vc14/GNU[!!-~]Cobol.sln -text
+build_windows/vc14/cobc.vcxproj -text
+build_windows/vc14/cobc.vcxproj.filters -text
+build_windows/vc14/cobcrun.vcxproj -text
+build_windows/vc14/cobcrun.vcxproj.filters -text
+build_windows/vc14/config.h -text
+build_windows/vc14/defaults.h -text
+build_windows/vc14/libcob.vcxproj -text
+build_windows/vc14/libcob.vcxproj.filters -text
+build_windows/vc14/libsupport.vcxproj -text
+build_windows/vc14/libsupport.vcxproj.filters -text
 build_windows/vc7/GNU[!!-~]Cobol.sln -text
 build_windows/vc7/cobc.vcproj -text
 build_windows/vc7/cobcrun.vcproj -text
