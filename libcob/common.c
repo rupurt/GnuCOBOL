@@ -1102,17 +1102,8 @@ cob_memcpy (cob_field *dst, const void *src, const size_t size)
 static void
 cob_check_trace_file (void)
 {
-	char	*p,*val;
 	if(cobsetptr->cob_trace_file)
 		return;
-	/*
-	 * Check on first call to check_trace_file only
-	 */
-	p = getenv ("COB_TRACE_FILE_ADRS");
-	if(p) {
-		val = (void*)atol(p);
-		memcpy(&cobsetptr->cob_trace_file,&val,sizeof(void*));
-	}
 
 	if (!cobsetptr->cob_trace_filename
 	&&  !cobsetptr->cob_trace_file) {
@@ -4821,6 +4812,14 @@ get_config_val(char *value, int pos, char *orgvalue)
 
 	} else if((data_type & ENV_STR)) {	/* String stored as a string */
 		memcpy(&str,data,sizeof(char *));
+		if(data_loc == offsetof(cob_settings,cob_display_print)
+		&& cobsetptr->external_display_print_file) 
+			strcpy(value,"set by cob_set_runtime_option");
+		else
+		if(data_loc == offsetof(cob_settings,cob_trace_filename)
+		&& cobsetptr->external_trace_file) 
+			strcpy(value,"set by cob_set_runtime_option");
+		else 
 		if(str == NULL)
 			sprintf(value,"%s","not set");
 		else
@@ -5747,13 +5746,15 @@ cob_init (const int argc, char **argv)
 	/* from certain ifdef's */
 }
 
-void *
+/*
+ * Set certain runtime options: 
+ * Currently this is only FILE * for trace and printer output
+ */
+void 
 cob_set_runtime_option( int opt, void *p )
 {
-	void *oldval = NULL;
 	switch(opt) {
 	case COB_SET_RUNTIME_TRACE_FILE:
-		oldval = (void*)cobsetptr->cob_trace_file;
 		cobsetptr->cob_trace_file = (FILE *)p;
 		if(p)
 			cobsetptr->external_trace_file = 1;
@@ -5761,15 +5762,39 @@ cob_set_runtime_option( int opt, void *p )
 			cobsetptr->external_trace_file = 0;
 		break;
 	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
-		oldval = (void*)cobsetptr->cob_display_print_file;
 		cobsetptr->cob_display_print_file = (FILE *)p;
 		if(p)
 			cobsetptr->external_display_print_file = 1;
 		else
 			cobsetptr->external_display_print_file = 0;
 		break;
+	case COB_SET_RUNTIME_RESCAN_ENV:
+		cob_rescan_env_vals ();
+		break;
+	default:
+		cob_runtime_error (_("cob_set_runtime_option called with unknown option: %d"),opt);
 	}
-	return oldval;
+	return;
+}
+
+/*
+ * Return current value of runtime option
+ */
+void *
+cob_get_runtime_option( int opt )
+{
+	switch(opt) {
+	case COB_SET_RUNTIME_TRACE_FILE:
+		return (void*)cobsetptr->cob_trace_file;
+	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
+		return (void*)cobsetptr->cob_display_print_file;
+	case COB_SET_RUNTIME_RESCAN_ENV:
+		cob_rescan_env_vals ();
+		break;
+	default:
+		cob_runtime_error (_("cob_get_runtime_option called with unknown option: %d"),opt);
+	}
+	return NULL;
 }
 
 /******************************/

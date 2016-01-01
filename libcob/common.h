@@ -1524,7 +1524,9 @@ COB_EXPIMP void			cob_reset_trace(void);
 /* Call from outside to set libcob options */
 #define COB_SET_RUNTIME_TRACE_FILE 		0	/* 'p' is  FILE *  */
 #define COB_SET_RUNTIME_DISPLAY_PRINTER_FILE	1	/* 'p' is  FILE *  */
-COB_EXPIMP void			*cob_set_runtime_option(int opt, void *p);
+#define COB_SET_RUNTIME_RESCAN_ENV		2	/* rescan environment variables */
+COB_EXPIMP void			cob_set_runtime_option(int opt, void *p);
+COB_EXPIMP void			*cob_get_runtime_option(int opt);
 
 /* COB_DEBUG_LOG Macros and routines found in common.c */
 COB_EXPIMP int cob_debug_open( const char *cob_debug_env );
