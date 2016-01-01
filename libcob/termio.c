@@ -240,14 +240,17 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 	FILE		*fp;
 	cob_field	*f;
 	int		i;
-	int		nlattr, close_fp, pclose_fp;
+	int		nlattr, close_fp, pclose_fp, trace_fp;
 	cob_u32_t	disp_redirect;
 	va_list		args;
 
 	disp_redirect = 0;
-	pclose_fp = close_fp = 0;
+	trace_fp = pclose_fp = close_fp = 0;
 	if (to_stderr == 2) {
-		if(cobsetptr->cob_display_print != NULL) {
+		if(cobsetptr->cob_display_print_file) {
+			fp = cobsetptr->cob_display_print_file;
+			trace_fp = 1;
+		} else if(cobsetptr->cob_display_print != NULL) {
 			fp = fopen(cobsetptr->cob_display_print, "a");
 			if(fp == NULL)
 				fp = stderr;

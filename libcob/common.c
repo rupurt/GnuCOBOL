@@ -153,7 +153,6 @@ static const char		*cob_current_section = NULL;
 static const char		*cob_current_paragraph = NULL;
 static const char		*cob_source_file = NULL;
 static const char		*cob_source_statement = NULL;
-static FILE			*cob_trace_file = NULL;
 static unsigned int		cob_source_line = 0;
 static const char		*cob_debug_env = NULL;
 static FILE			*cob_debug_file = NULL;
@@ -443,7 +442,9 @@ cob_terminate_routines (void)
 		return;
 	}
 
-	if (cob_debug_file && cob_debug_file != cob_trace_file) {
+	if (cob_debug_file 
+	&& !cobsetptr->external_trace_file
+	&& cob_debug_file != cobsetptr->cob_trace_file) {
 		if(cob_debug_file_name != NULL
 		&& ftell(cob_debug_file) == 0) {
 			fclose (cob_debug_file);
@@ -455,9 +456,11 @@ cob_terminate_routines (void)
 	}
 	cob_debug_file = NULL;
 
-	if (cob_trace_file && cob_trace_file != stderr) {
-		fclose (cob_trace_file);
-		cob_trace_file = NULL;
+	if (cobsetptr->cob_trace_file 
+	&& !cobsetptr->external_trace_file
+	&& cobsetptr->cob_trace_file != stderr) {
+		fclose (cobsetptr->cob_trace_file);
+		cobsetptr->cob_trace_file = NULL;
 	}
 
 	cob_exit_screen ();
@@ -1099,17 +1102,32 @@ cob_memcpy (cob_field *dst, const void *src, const size_t size)
 static void
 cob_check_trace_file (void)
 {
-	if (!cobsetptr->cob_trace_filename) {
-		cob_trace_file = stderr;
+	char	*p,*val;
+	if(cobsetptr->cob_trace_file)
+		return;
+	/*
+	 * Check on first call to check_trace_file only
+	 */
+	p = getenv ("COB_TRACE_FILE_ADRS");
+	if(p) {
+		val = (void*)atol(p);
+		memcpy(&cobsetptr->cob_trace_file,&val,sizeof(void*));
+	}
+
+	if (!cobsetptr->cob_trace_filename
+	&&  !cobsetptr->cob_trace_file) {
+		cobsetptr->cob_trace_file = stderr;
 		return;
 	}
+	if(cobsetptr->cob_trace_file)
+		return;
 	if (!cobsetptr->cob_unix_lf) {
-		cob_trace_file = fopen (cobsetptr->cob_trace_filename, "w");
+		cobsetptr->cob_trace_file = fopen (cobsetptr->cob_trace_filename, "w");
 	} else {
-		cob_trace_file = fopen (cobsetptr->cob_trace_filename, "wb");
+		cobsetptr->cob_trace_file = fopen (cobsetptr->cob_trace_filename, "wb");
 	}
-	if (!cob_trace_file) {
-		cob_trace_file = stderr;
+	if (!cobsetptr->cob_trace_file) {
+		cobsetptr->cob_trace_file = stderr;
 	}
 }
 
@@ -1408,23 +1426,23 @@ cob_set_location (const char *sfile, const unsigned int sline,
 		cob_source_statement = cstatement;
 	}
 	if (cobsetptr->cob_line_trace) {
-		if (!cob_trace_file) {
+		if (!cobsetptr->cob_trace_file) {
 			cob_check_trace_file ();
 		}
 		if (!cob_last_sfile || strcmp (cob_last_sfile, sfile)) {
 			cob_last_sfile = sfile;
-			fprintf (cob_trace_file, "Source :    '%s'\n", sfile);
+			fprintf (cobsetptr->cob_trace_file, "Source :    '%s'\n", sfile);
 		}
 		if (COB_MODULE_PTR->module_name) {
 			s = COB_MODULE_PTR->module_name;
 		} else {
 			s = "Unknown";
 		}
-		fprintf (cob_trace_file,
+		fprintf (cobsetptr->cob_trace_file,
 			 "Program-Id: %-16s Statement: %-21.21s  Line: %u\n",
 			 s, cstatement ? (char *)cstatement : "Unknown",
 			 sline);
-		fflush (cob_trace_file);
+		fflush (cobsetptr->cob_trace_file);
 	}
 }
 
@@ -1435,26 +1453,26 @@ cob_trace_section (const char *para, const char *source, const int line)
 	const char	*s;
 
 	if (cobsetptr->cob_line_trace) {
-		if (!cob_trace_file) {
+		if (!cobsetptr->cob_trace_file) {
 			cob_check_trace_file ();
 		}
 		if (source &&
 		    (!cob_last_sfile || strcmp (cob_last_sfile, source))) {
 			cob_last_sfile = source;
-			fprintf (cob_trace_file, "Source:     '%s'\n", source);
+			fprintf (cobsetptr->cob_trace_file, "Source:     '%s'\n", source);
 		}
 		if (COB_MODULE_PTR->module_name) {
 			s = COB_MODULE_PTR->module_name;
 		} else {
 			s = "Unknown";
 		}
-		fprintf (cob_trace_file, "Program-Id: %-16s ", s);
+		fprintf (cobsetptr->cob_trace_file, "Program-Id: %-16s ", s);
 		if (line) {
-			fprintf (cob_trace_file, "%-34.34sLine: %d\n", para, line);
+			fprintf (cobsetptr->cob_trace_file, "%-34.34sLine: %d\n", para, line);
 		} else {
-			fprintf (cob_trace_file, "%s\n", para);
+			fprintf (cobsetptr->cob_trace_file, "%s\n", para);
 		}
-		fflush (cob_trace_file);
+		fflush (cobsetptr->cob_trace_file);
 	}
 }
 
@@ -5727,6 +5745,31 @@ cob_init (const int argc, char **argv)
 	}
 	/* The above must be last in this function as we do early return */
 	/* from certain ifdef's */
+}
+
+void *
+cob_set_runtime_option( int opt, void *p )
+{
+	void *oldval = NULL;
+	switch(opt) {
+	case COB_SET_RUNTIME_TRACE_FILE:
+		oldval = (void*)cobsetptr->cob_trace_file;
+		cobsetptr->cob_trace_file = (FILE *)p;
+		if(p)
+			cobsetptr->external_trace_file = 1;
+		else
+			cobsetptr->external_trace_file = 0;
+		break;
+	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
+		oldval = (void*)cobsetptr->cob_display_print_file;
+		cobsetptr->cob_display_print_file = (FILE *)p;
+		if(p)
+			cobsetptr->external_display_print_file = 1;
+		else
+			cobsetptr->external_display_print_file = 0;
+		break;
+	}
+	return oldval;
 }
 
 /******************************/

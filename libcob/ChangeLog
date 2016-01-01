@@ -1,4 +1,10 @@
 
+2016-01-01 Ron Norman <rjn@inglenet.com>
+
+	* common.c,common.h,coblocal.h,termio.c: 
+	  added cob_set_runtime_option routine to allow TRACE and/or DISPLAY
+	  UPON PRINTER output to be redirected to a specific (FILE*)
+
 2015-10-24  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* common.c (conf_runtime_error): add function for configuration specific
