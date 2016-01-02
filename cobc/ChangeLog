@@ -1,4 +1,9 @@
 
+2016-01-02  Ron Norman
+	* In codegen.c, output_index: if subscript is unsigned then
+	  output the code as if it was signed. This is to avoid a core dump
+	  when an unsigned binary subscript has a value of ZERO.
+
 2015-10-25  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* config.c: tweaked error messages, added possible values if invalid
