@@ -7900,6 +7900,11 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 static void
 update_fcd_to_file(FCD3* fcd, cob_file *f, cob_field *fnstatus, int wasOpen)
 {
+	cobglobptr->cob_error_file = f;
+	if(isdigit(fcd->fileStatus[0]))
+		cob_set_exception (status_exception[(fcd->fileStatus[0] - '0')]);
+	else
+		cobglobptr->cob_exception_code = 0; 
 	if(f->file_status)
 		memcpy(f->file_status, fcd->fileStatus, 2);
 	if(fnstatus)

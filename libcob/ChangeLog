@@ -1,4 +1,7 @@
 
+2016-02-01 Ron Norman <rjn@inglenet.com>
+	* fileio.c fixed to call cob_set_exception for the EXTFH interface
+
 2016-01-01 Ron Norman <rjn@inglenet.com>
 
 	* common.c,common.h,coblocal.h,termio.c: 
