@@ -170,6 +170,7 @@ doc/cbrese.tex -text
 doc/cbrunt.tex -text
 doc/cbsyst.tex -text
 doc/cobcinfo.sh -text
+doc/fdl.texi -text
 doc/gnucobol.info -text
 doc/gnucobol.pdf -text
 doc/gnucobol.texi -text
