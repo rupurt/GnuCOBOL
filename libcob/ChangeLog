@@ -1,4 +1,9 @@
 
+2016-03-07 Ron Norman <rjn@inglenet.com>
+	* fileio.c fixed EXTFH to save/restore 'opts' value for some
+	  READ/WRITE operations. Without this it was not writing LF
+	  at end of line sequential records
+
 2016-02-01 Ron Norman <rjn@inglenet.com>
 	* fileio.c fixed to call cob_set_exception for the EXTFH interface
 

@@ -1908,7 +1908,8 @@ typedef struct {
 	unsigned char	useFiles;	
 	unsigned char	giveFiles;	
 	unsigned char	effKeyLen[2];			/* effective key length */
-	char		res5[20];		
+	char		res5[16];		
+	char		opt[4];				/* Was res5: Use for cob_write opts value */
 	unsigned char	curRecLen[4];			/* current record length in bytes */
 	unsigned char	minRecLen[4];			/* min. record length in bytes */
 	unsigned char	maxRecLen[4];			/* max. record length in bytes */

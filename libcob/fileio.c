@@ -8128,6 +8128,7 @@ cob_extfh_close(
 	struct fcd_file	*ff,*pff;
 
 	fcd = find_fcd(f);
+	STCOMPX4(opt, fcd->opt);
 	STCOMPX2(OP_CLOSE, opcode);
 
 	/* Keep table of 'fcd' created */
@@ -8211,6 +8212,7 @@ cob_extfh_read (
 	int	keyn,keylen,partlen;
 
 	fcd = find_fcd(f);
+	STCOMPX4(read_opts, fcd->opt);
 	if(key == NULL) {
 		if((read_opts & COB_READ_PREVIOUS)) {
 			STCOMPX2(OP_READ_PREV, opcode);
@@ -8255,6 +8257,7 @@ cob_extfh_read_next (
 	int	recn;
 
 	fcd = find_fcd(f);
+	STCOMPX4(read_opts, fcd->opt);
 	if((read_opts & COB_READ_PREVIOUS)) {
 		STCOMPX2(OP_READ_PREV, opcode);
 	} else {
@@ -8284,6 +8287,7 @@ cob_extfh_write (
 	fcd = find_fcd(f);
 	STCOMPX2(OP_WRITE, opcode);
 	STCOMPX2(check_eop, fcd->eop);
+	STCOMPX4(opt, fcd->opt);
 	if (f->variable_record) {
 		f->record->size = (size_t)cob_get_int (f->variable_record);
 		if (unlikely(f->record->size > rec->size)) {
@@ -8319,6 +8323,7 @@ cob_extfh_rewrite (
 	fcd = find_fcd(f);
 	STCOMPX2(OP_REWRITE, opcode);
 	STCOMPX4(rec->size,fcd->curRecLen);
+	STCOMPX4(opt, fcd->opt);
 	fcd->recPtr = rec->data;
 	if(f->organization == COB_ORG_RELATIVE) {
 		memset(fcd->relKey,0,sizeof(fcd->relKey));
@@ -8542,7 +8547,7 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 	case OP_READ_RAN_LOCK:
 	case OP_READ_RAN_NO_LOCK:
 	case OP_READ_RAN_KEPT_LOCK:
-		opts = 0;
+		opts = LDCOMPX4(fcd->opt);
 		if(opcd == OP_READ_RAN_LOCK)
 			opts |= COB_READ_LOCK;
 		else if(opcd == OP_READ_RAN_NO_LOCK)
@@ -8555,11 +8560,13 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 
 	case OP_WRITE:
 		eop = LDCOMPX2(fcd->eop);
+		opts = LDCOMPX4(fcd->opt);
 		cob_write(f, rec, opts, fs, eop);
 		update_file_to_fcd(f,fcd,fnstatus);
 		break;
 
 	case OP_REWRITE:
+		opts = LDCOMPX4(fcd->opt);
 		cob_rewrite(f, rec, opts, fs);
 		update_file_to_fcd(f,fcd,fnstatus);
 		break;
