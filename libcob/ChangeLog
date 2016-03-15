@@ -1,10 +1,12 @@
 
 2016-03-07 Ron Norman <rjn@inglenet.com>
+
 	* fileio.c fixed EXTFH to save/restore 'opts' value for some
 	  READ/WRITE operations. Without this it was not writing LF
 	  at end of line sequential records
 
 2016-02-01 Ron Norman <rjn@inglenet.com>
+
 	* fileio.c fixed to call cob_set_exception for the EXTFH interface
 
 2016-01-01 Ron Norman <rjn@inglenet.com>
@@ -51,6 +53,7 @@
 	  It was returning the index number as 1 relative instead of 0 relative
 
 2015-07-07  Ron Norman
+
 	* Accept env var COB_CURRENT_DATE and runtime.cfg current_date
 	  to specify a date override for the application.
 	  All ACCEPT FROM DATE, DAY, TIME will the use the value defined
@@ -58,6 +61,7 @@
 	  This will be a useful feature for application testing.
 
 2015-07-07  Ron Norman
+
 	* DISPLAY ... UPON PRINTER can be redirected via
 	  the env var COBPRINTER similar to what Micro Focus supports
 	  cob_display will do a popen of whatever COBPRINTER is defined
@@ -67,20 +71,24 @@
 	* fileio.c fixed to avoid core dump when COB_SYNC and using BDB
 
 2015-05-14  Ron Norman
+
 	* common.c removed redundant !copy, !set, !unset directives
 	  in favour of using 'include', 'setenv' and 'unsetenv' directives
 	  in the runtime.cfg file
 
 2015-05-12  Ron Norman
+
 	* common.c, changed to be more specific about acceptable values for
 	  runtime boolean options
 
 2015-04-30  Ron Norman
+
 	* common.h, change cob_file record_off to type cob_s64_t (from off_t)
 	  so that the size does not change depending on C comppiler 
 	  This is most likely the cause of the previous issue.
 
 2015-04-29  Ron Norman
+
 	* reportio.c change to allocate larger size data area for temp
 	  fields used for CONTROL breaks. This is a cludge to avoid
 	  something that is clobbering free memory on SUN system.

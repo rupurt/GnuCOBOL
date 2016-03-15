@@ -1,5 +1,6 @@
 
 2015-07-07  Ron Norman
+
 	* DISPLAY ... UPON PRINTER can be redirected via
 	  the env var COBPRINTER similar to what Micro Focus supports
 	  In addtion COB_DISPLAY_PRINTER can be used as a file name and
