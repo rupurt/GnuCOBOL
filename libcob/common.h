@@ -283,6 +283,8 @@ GLib is licensed under the GNU Lesser General Public License.
 #define snprintf		_snprintf
 #define getpid			_getpid
 #define access			_access
+#define popen			_popen
+#define pclose			_pclose
 
 #define __attribute__(x)
 
