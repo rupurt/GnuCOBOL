@@ -797,7 +797,7 @@ cob_chk_file_env (const char *src)
 	char		*p;
 	char		*q;
 	char		*s;
-	int		i;
+	unsigned int		i;
 
 	if (unlikely(cobsetptr->cob_env_mangle)) {
 		q = cob_strdup (src);
