@@ -9,6 +9,12 @@
 
 	* fileio.c fixed to call cob_set_exception for the EXTFH interface
 
+2016-01-30  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* cobgetopt.c (cob_getopt_long_long): Fix bug #194 and warnings of msc code
+	  analysis (possible memory issues) - switched from alloca to cobc's
+	  internal memory handling (cobc_malloc and cobc_free)
+
 2016-01-01 Ron Norman <rjn@inglenet.com>
 
 	* common.c,common.h,coblocal.h,termio.c: 

@@ -100,7 +100,6 @@ am__installdirs = "$(DESTDIR)$(extrasdir)"
 DATA = $(extras_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
 AR = @AR@
 AS = @AS@

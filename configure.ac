@@ -2,9 +2,8 @@
 # Configure template for GNU Cobol
 # Process this file with autoconf to produce a configure script.
 #
-# Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
-# Copyright (C) 2007-2012 Roger While
-# Copyright (C) 2014,2015 Simon Sobisch
+# Copyright (C) 2001-2012, 2014-2016 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
 #
 # This file is part of GNU Cobol.
 #
@@ -174,7 +173,6 @@ AC_MSG_RESULT([$cob_keyw])
 unset cob_keyw
 
 # Checks for library functions.
-AC_FUNC_ALLOCA
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset setlocale fcntl strerror strcasecmp \
 	strchr strrchr strdup strstr strtol gettimeofday localeconv \
