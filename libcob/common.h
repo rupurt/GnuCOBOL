@@ -271,6 +271,7 @@ GLib is licensed under the GNU Lesser General Public License.
 #include <malloc.h>
 #include <io.h>
 #include <fcntl.h>
+#include <time.h>
 
 /* Disable certain warnings */
 /* Deprecated functions */
@@ -285,6 +286,7 @@ GLib is licensed under the GNU Lesser General Public License.
 #define access			_access
 #define popen			_popen
 #define pclose			_pclose
+#define localtime_r(t, s)		localtime_s (s, t)
 
 #define __attribute__(x)
 
