@@ -5215,7 +5215,7 @@ cob_load_config (void)
 					set_config_val((char*)gc_conf[i].default_val,i);
 				}
 			} else {
-				set_config_val((char*)gc_conf[i].default_val,i); /*Set default value */
+				set_config_val((char*)gc_conf[i].default_val,i); /* Set default value */
 			}
 		}
 	}
