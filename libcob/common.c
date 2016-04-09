@@ -426,8 +426,9 @@ cob_exit_common (void)
 				}
 			}
 		}
-		if(cobsetptr->cob_preload_str_set)
+		if (cobsetptr->cob_preload_str_set) {
 			cob_free((void*)(cobsetptr->cob_preload_str_set));
+		}
 		cob_free (cobsetptr);
 		cobsetptr = NULL;
 	}
@@ -4728,7 +4729,7 @@ set_config_val(char *value, int pos)
 		}
 		str = cob_expand_env_string(value);
 		memcpy(data,&str,sizeof(char *));
-		if(data_loc == offsetof(cob_settings,cob_preload_str)) {
+		if (data_loc == offsetof(cob_settings,cob_preload_str)) {
 			cobsetptr->cob_preload_str_set = cob_strdup(str);
 		}
 
@@ -5220,7 +5221,7 @@ cob_load_config (void)
 					set_config_val((char*)gc_conf[i].default_val,i);
 				}
 			} else {
-				set_config_val((char*)gc_conf[i].default_val,i); /*Set default value */
+				set_config_val((char*)gc_conf[i].default_val,i); /* Set default value */
 			}
 		}
 	}
@@ -5414,8 +5415,8 @@ print_runtime_env()
 					} else if ((gc_conf[i].data_type & STS_CNFSET)) {
 						printf("Ovr");
 					} else {
-						printf(_("env"));
-						if(gc_conf[i].data_loc == offsetof(cob_settings,cob_preload_str)
+						printf("env");
+						if (gc_conf[i].data_loc == offsetof(cob_settings,cob_preload_str)
 						&& cobsetptr->cob_preload_str_set != NULL) {
 							printf(": %-*s : ",hdlen,gc_conf[i].env_name);
 							printf("%s\n",cobsetptr->cob_preload_str_set);
