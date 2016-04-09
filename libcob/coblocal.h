@@ -227,6 +227,7 @@ typedef struct __cob_settings {
 	unsigned int	name_convert;
 	char		*cob_preload_str;
 	char		*cob_library_path;
+	char		*cob_preload_str_set;
 
 	/* fileio.c */
 	unsigned int	cob_unix_lf;		/* Use POSIX LF */

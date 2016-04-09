@@ -4,6 +4,11 @@
 	* common.h [_MSC_VER]: added missing defines / include for implementations
 	  of COBPRINTER and COB_CURRENT_DATE
 
+2016-03-15 Ron Norman <rjn@inglenet.com>
+	* runtime.cfg Comments updated
+	  common.c display COB_PRE_LOAD as set and as evaluated
+	  call.c clears COB_PRE_LOAD value before evaluating
+
 2016-03-07 Ron Norman <rjn@inglenet.com>
 
 	* fileio.c fixed EXTFH to save/restore 'opts' value for some
