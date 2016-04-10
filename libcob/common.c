@@ -5430,6 +5430,14 @@ print_runtime_env()
 					} else {
 						printf("    ");
 					}
+					if (gc_conf[i].data_loc == offsetof(cob_settings,cob_preload_str)
+					&& cobsetptr->cob_preload_str_set != NULL) {
+						printf(": %-*s : ",hdlen,
+							gc_conf[i].set_by > 0 ? gc_conf[i].env_name
+							: gc_conf[i].conf_name);
+						printf("%s\n",cobsetptr->cob_preload_str_set);
+						printf("eval");
+					}
 					if (gc_conf[i].set_by > 0) {
 						printf(": %-*s : ", hdlen, gc_conf[i].env_name);
 					} else {
