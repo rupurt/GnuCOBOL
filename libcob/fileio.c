@@ -428,7 +428,7 @@ static struct file_list	*file_cache = NULL;
 static char		*file_open_env = NULL;
 static char		*file_open_name = NULL;
 static char		*file_open_buff = NULL;
-static char		*file_open_io_env = NULL;	/* IO_filename env value */
+static unsigned char	*file_open_io_env = NULL;	/* IO_filename env value */
 
 static char		*runtime_buffer = NULL;
 
@@ -815,14 +815,14 @@ cob_chk_file_env (const char *src)
 	/* Check for IO_filename with file specific options */
 	file_open_io_env = NULL;
 	snprintf (file_open_env, (size_t)COB_FILE_MAX, "%s%s", "IO_", s);
-	if ((file_open_io_env = getenv (file_open_env)) == NULL) {
+	if ((file_open_io_env = (unsigned char*)getenv (file_open_env)) == NULL) {
 		snprintf (file_open_env, (size_t)COB_FILE_MAX, "%s%s", "io_", s);
-		if ((file_open_io_env = getenv (file_open_env)) == NULL) {
+		if ((file_open_io_env = (unsigned char*)getenv (file_open_env)) == NULL) {
 			for (i = 0; file_open_env[i] != 0; ++i) {	/* Try all Upper Case */
 				if(islower((unsigned char)file_open_env[i]))
 					file_open_env[i] = toupper((unsigned char)file_open_env[i]);
 			}
-			file_open_io_env = getenv (file_open_env);
+			file_open_io_env = (unsigned char*)getenv (file_open_env);
 		}
 	}
 

@@ -212,7 +212,7 @@ typedef struct __cob_settings {
 	char		*cob_sys_term;		/* TERM setting from env */
 	char		*cob_sys_type;		/* OSTYPE setting from env */
 	char		*cob_debug_log;
-	char		*cob_date;		/* Date override for testing purposes */
+	unsigned char	*cob_date;		/* Date override for testing purposes */
 	short		cob_cyear;
 	short		cob_cmonth;
 	short		cob_cday;
