@@ -1163,7 +1163,8 @@ cob_rescan_env_vals (void)
 	/* Check for possible environment variables */
 	for (i=0; i < NUM_CONFIG; i++) {
 		if(gc_conf[i].env_name
-		&& (env = getenv(gc_conf[i].env_name)) != NULL) {
+		&& (env = getenv(gc_conf[i].env_name)) != NULL
+		&& *env != 0) {
 			old_type = gc_conf[i].data_type;
 			gc_conf[i].data_type |= STS_ENVSET;
 			if(*env != 0					/* If *env -> Nul then ignore this */
@@ -4544,6 +4545,8 @@ cob_expand_env_string (char *strval)
 						penv = (char*)COB_CONFIG_DIR;
 					} else if(strcmp(ename,"COB_COPY_DIR") == 0) {
 						penv = (char*)COB_COPY_DIR;
+					} else {
+						conf_runtime_error(1, _("Environment variable '%s' is undefined"), ename); 
 					}
 				}
 				if(penv != NULL) {
@@ -4728,9 +4731,14 @@ set_config_val(char *value, int pos)
 			cob_free((void*)str);
 		}
 		str = cob_expand_env_string(value);
-		memcpy(data,&str,sizeof(char *));
-		if (data_loc == offsetof(cob_settings,cob_preload_str)) {
-			cobsetptr->cob_preload_str_set = cob_strdup(str);
+		if(str == NULL
+		|| *str == 0) {
+			conf_runtime_error_value(value, pos);
+		} else {
+			memcpy(data,&str,sizeof(char *));
+			if (data_loc == offsetof(cob_settings,cob_preload_str)) {
+				cobsetptr->cob_preload_str_set = cob_strdup(str);
+			}
 		}
 
 	} else if((data_type & ENV_CHAR)) {	/* 'char' field inline */
