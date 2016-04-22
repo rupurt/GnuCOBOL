@@ -114,6 +114,9 @@ static const struct system_struct	ext_system_table[] = {
 /* Special context set # Special context test */
 
 static const struct cobc_reserved reserved_words[] = {
+  { "ABSENT",			0, 0, ABSENT,			/* IBM RW */
+				0, 0
+  },
   { "ACCEPT",			1, 0, ACCEPT,			/* 2002 */
 				CB_CS_ACCEPT, 0
   },
@@ -1153,6 +1156,9 @@ static const struct cobc_reserved reserved_words[] = {
 				0, 0
   },
   { "NESTED",			0, 0, -1,			/* 2002 */
+				0, 0
+  },
+  { "NEW",			0, 0, NEW,			/* 2002 */
 				0, 0
   },
   { "NEXT",			0, 0, NEXT,			/* 2002 */

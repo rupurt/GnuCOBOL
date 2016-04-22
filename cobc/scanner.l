@@ -513,16 +513,26 @@ H\"[^\"\n]*\" {
 	return BOTTOM;
 }
 
+"LINE"[ ,;\n]+"LIMIT"[ ,;\n] {
+	count_lines (yytext);
+	return LINE_LIMIT;
+}
+
 "WITH"[ ,;\n]+"NO"[ ,;\n]+"ADVANCING" |
 "NO"[ ,;\n]+"ADVANCING" {
 	count_lines (yytext);
 	return NO_ADVANCING;
 }
 
-"ON"[ ,;\n]+"NEXT"[ ,;\n]+"PAGE"[ ,;\n] |
-"NEXT"[ ,;\n]+"PAGE"[ ,;\n] {
+"ON"[ ,;\n]+"NEXT"[ ,;\n]+"PAGE"[ ,;\n]* |
+"NEXT"[ ,;\n]+"PAGE"[ ,;\n]* {
 	count_lines (yytext);
 	return NEXT_PAGE;
+}
+
+"NEXT"[ ,;\n]+"GROUP"[ ,;\n]* {
+	count_lines (yytext);
+	return NEXT_GROUP;
 }
 
 "NOT"[ ,;\n]+"ON"[ ,;\n]+"SIZE"[ ,;\n]+"ERROR"[ ,;\n] |

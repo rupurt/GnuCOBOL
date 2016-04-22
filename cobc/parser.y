@@ -751,6 +751,7 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 
 %token TOKEN_EOF 0 "end of file"
 
+%token ABSENT
 %token ACCEPT
 %token ACCESS
 %token ADD
@@ -1003,6 +1004,7 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token LINAGE_COUNTER		"LINAGE-COUNTER"
 %token LINE
 %token LINE_COUNTER		"LINE-COUNTER"
+%token LINE_LIMIT		"LINE LIMIT"
 %token LINES
 %token LINKAGE
 %token LITERAL			"Literal"
@@ -1034,7 +1036,9 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token NEAREST_EVEN		"NEAREST-EVEN"
 %token NEAREST_TOWARD_ZERO	"NEAREST-TOWARD-ZERO"
 %token NEGATIVE
+%token NEW
 %token NEXT
+%token NEXT_GROUP		"NEXT GROUP"
 %token NEXT_PAGE		"NEXT PAGE"
 %token NO
 %token NO_ECHO			"NO-ECHO"
@@ -3147,9 +3151,8 @@ file_description:
   {
 	if (CB_VALID_TREE (current_file)) {
 		if (CB_VALID_TREE ($2)) {
-			if (current_file->reports) {
-				cb_error (_("RECORD description invalid with REPORT"));
-			} else {
+			/* Do not keep Record if this is really a report */
+			if (!current_file->reports) {
 				finalize_file (current_file, CB_FIELD ($2));
 			}
 		} else if (!current_file->reports) {
@@ -4685,7 +4688,7 @@ control_identifier:
   }
 ;
 
-/* PAGE clause */
+/* PAGE LIMIT clause */
 
 page_limit_clause:
   PAGE _limits page_line_column
@@ -4757,6 +4760,7 @@ page_line_column:
 	} else {
 		current_report->t_lines = $1;
 	}
+	check_repeated ("LINE LIMIT", SYN_CLAUSE_25);
 	if (CB_LITERAL_P ($3)) {
 		current_report->columns = cb_get_int ($3);
 	} else {
@@ -4781,6 +4785,15 @@ page_detail:
 | last_heading
 | last_detail
 | footing_clause
+| LINE_LIMIT _is report_int_ident
+  {
+	check_repeated ("LINE LIMIT", SYN_CLAUSE_25);
+	if (CB_LITERAL_P ($3)) {
+		current_report->columns = cb_get_int ($3);
+	} else {
+		current_report->t_columns = $3;
+	}
+  }
 ;
 
 heading_clause:
@@ -4872,7 +4885,6 @@ report_group_option:
   type_clause
 | next_group_clause
 | line_clause
-| line_clause_next_page
 | picture_clause
 | report_usage_clause
 | sign_clause
@@ -4904,8 +4916,8 @@ type_option:
   {
       current_field->report_flag |= COB_REPORT_PAGE_HEADING;
   }
-| ch_keyword control_heading_final
-| cf_keyword control_footing_final
+| ch_keyword _on_for control_heading_final
+| cf_keyword _on_for control_footing_final
 | detail_keyword
   {
 	if(current_report != NULL) {
@@ -4927,10 +4939,16 @@ control_heading_final:
   {
       current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
   }
-| identifier 
+| identifier
   {
       current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
       current_field->report_control = $1;
+  }
+| identifier OR PAGE
+  {
+      current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
+      current_field->report_control = $1;
+      current_field->report_flag |= COB_REPORT_PAGE;
   }
 | FINAL 
   {
@@ -4951,10 +4969,15 @@ control_footing_final:
   {
       current_field->report_flag |= COB_REPORT_CONTROL_FOOTING_FINAL;
   }
+| ALL
+  {
+      current_field->report_flag |= COB_REPORT_CONTROL_FOOTING;
+      current_field->report_flag |= COB_REPORT_ALL;
+  }
 ;
 
 next_group_clause:
-  NEXT GROUP _is next_group_plus
+  NEXT_GROUP _is next_group_plus
   {
 	check_pic_repeated ("NEXT GROUP", SYN_CLAUSE_17);
   }
@@ -4980,18 +5003,17 @@ next_group_plus:
       current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
       current_field->next_group_line = cb_get_int($2);
   }
-| next_page
+| NEXT_PAGE
   {
       current_field->report_flag |= COB_REPORT_NEXT_GROUP_PAGE;
   }
 ;
 
+/*
 next_page:
-  NEXT PAGE 
-| NEXT_PAGE
-| PAGE
-| NEXT
-;
+  NEXT_PAGE
+| NEXT PAGE
+;*/
 
 sum_clause_list:
   SUM _of report_x_list reset_clause
@@ -5022,11 +5044,65 @@ data_or_final:
 ;
 
 present_when_condition:
-  PRESENT WHEN condition
+  present_absent WHEN condition
   {
 	check_pic_repeated ("PRESENT", SYN_CLAUSE_20);
 	current_field->report_when = $3;
   }
+| present_absent AFTER _new page_or_id
+  {
+	check_pic_repeated ("PRESENT", SYN_CLAUSE_20);
+	current_field->report_flag |= COB_REPORT_PRESENT;
+	current_field->report_flag &= ~COB_REPORT_BEFORE;
+  }
+| present_absent JUSTIFIED AFTER _new PAGE
+  {
+	check_pic_repeated ("PRESENT", SYN_CLAUSE_20);
+	current_field->report_flag |= COB_REPORT_PRESENT;
+	current_field->report_flag &= ~COB_REPORT_BEFORE;
+	current_field->report_flag |= COB_REPORT_PAGE;
+  }
+| present_absent BEFORE _new page_or_id
+  {
+	check_pic_repeated ("PRESENT", SYN_CLAUSE_20);
+	current_field->report_flag |= COB_REPORT_PRESENT;
+	current_field->report_flag |= COB_REPORT_BEFORE;
+  }
+| present_absent JUSTIFIED BEFORE _new PAGE
+  {
+	check_pic_repeated ("PRESENT", SYN_CLAUSE_20);
+	current_field->report_flag |= COB_REPORT_PRESENT;
+	current_field->report_flag |= COB_REPORT_BEFORE;
+	current_field->report_flag |= COB_REPORT_PAGE;
+  }
+;
+
+present_absent:
+  PRESENT
+  {
+	current_field->report_flag |= COB_REPORT_PRESENT;
+  }
+| ABSENT
+  {
+	current_field->report_flag |= COB_REPORT_PRESENT;
+	current_field->report_flag |= COB_REPORT_NEGATE;
+  }
+;
+
+page_or_id:
+| page_or_ids page_or_id
+;
+
+page_or_ids:
+  PAGE
+  {
+	current_field->report_flag |= COB_REPORT_PAGE;
+  }
+| identifier 
+  {
+      current_field->report_control = $1;
+  }
+| OR
 ;
 
 varying_clause:
@@ -5046,11 +5122,19 @@ line_keyword_clause:
 ;
 
 line_clause_options:
-  line_clause_integer 
+| line_clause_option line_clause_options
+;
+
+line_clause_option:
+  line_clause_integer
   {
 	if(current_field->report_line == 0) {
 		cb_warning (_("LINE 0 not implemented"));
 	}
+  }
+| _on NEXT_PAGE
+  {
+      current_field->report_flag |= COB_REPORT_LINE_NEXT_PAGE;
   }
 | PLUS report_integer 
   {
@@ -5106,16 +5190,14 @@ line_clause_integer:
   }
 ;
 
+/*
 line_clause_next_page:
-  NEXT PAGE
-  {
-      current_field->report_flag |= COB_REPORT_LINE_NEXT_PAGE;
-  }
-| ON NEXT PAGE
+  NEXT_PAGE
   {
       current_field->report_flag |= COB_REPORT_LINE_NEXT_PAGE;
   }
 ;
+*/
 
 column_clause:
   col_keyword_clause col_or_plus
@@ -11155,13 +11237,15 @@ _is:		| IS ;
 _is_are:	| IS | ARE ;
 _key:		| KEY ;
 _line_or_lines:	| LINE | LINES ;
-_limits:	| LIMIT _is | LIMITS _are ;
+_limits:	| LIMIT _is_are | LIMITS _is_are ;
 _lines:		| LINES ;
 _mode:		| MODE ;
+_new:		| NEW ;
 _number:	| NUMBER ;
 _numbers:	| NUMBER | NUMBERS ;
 _of:		| OF ;
 _on:		| ON ;
+_on_for:	| ON | FOR ;
 _onoff_status:	| STATUS IS | STATUS | IS ;
 _other:		| OTHER ;
 _procedure:	| PROCEDURE ;
@@ -11198,7 +11282,7 @@ label_option:		STANDARD | OMITTED ;
 line_or_lines:		LINE | LINES ;
 lock_records:		RECORD | RECORDS ;
 object_char_or_word:	CHARACTERS | WORDS ;
-records:		RECORD _is | RECORDS _are ;
+records:		RECORD _is_are | RECORDS _is_are ;
 reel_or_unit:		REEL | UNIT ;
 scroll_line_or_lines:	LINE | LINES ;
 size_or_length:		SIZE | LENGTH ;
@@ -11218,6 +11302,6 @@ ph_keyword:		PAGE HEADING | PH ;
 pf_keyword:		PAGE FOOTING | PF ;
 rh_keyword:		REPORT HEADING | RH ;
 rf_keyword:		REPORT FOOTING | RF ;
-control_keyword:	CONTROL _is | CONTROLS _are ;
+control_keyword:	CONTROL _is_are | CONTROLS _is_are ;
 
 %%

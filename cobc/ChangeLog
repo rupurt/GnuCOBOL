@@ -1,4 +1,11 @@
 
+2016-04-22  Ron Norman
+
+	* parser.y, scanner.l, reserved.c & codegen.c: 
+	  updates to support features of an IBM REPORT WRITER 
+	  LINE LIMIT
+	  PRESENT AFTER & ABSENT AFTER
+
 2016-01-02  Ron Norman
 
 	* In codegen.c, output_index: if subscript is unsigned then

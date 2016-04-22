@@ -1,4 +1,4 @@
-## Copyright (C) 2014-2015 Ron Norman
+## Copyright (C) 2014-2016 Ron Norman
 ## 
 ## This file is part of GNU Cobol.
 ## 
@@ -2472,14 +2472,20 @@ AT_DATA([prog.cob], [
        01  DEPT-HEAD TYPE CONTROL HEADING PRR-DEPARTMENT-NUMBER
            NEXT GROUP +1.
            02  LINE PLUS 1.
-               03 COLUMN 01    PIC X(18) VALUE
-                  'DEPARTMENT NUMBER:'.
+               03  COLUMN 01   PIC X(18) VALUE
+                     'DEPARTMENT NUMBER:'.
                03  COLUMN 21   PIC 9(02) SOURCE PRR-DEPARTMENT-NUMBER.
                03  COLUMN 24   PIC X(15) SOURCE DE-NAME (DE-IX).
       
        01  EMPLOYEE-DETAIL TYPE DETAIL.
            02  LINE +1.
                03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
+               03  COLUMN 30   PIC X(5) VALUE "Hello"
+                               PRESENT AFTER NEW PRR-EMPLOYEE-KEY
+                                              OR PAGE.
+               03  COLUMN 30   PIC X(5) VALUE " ''  "
+                               ABSENT AFTER NEW PRR-EMPLOYEE-KEY
+                                              OR PAGE.
                03  COLUMN 50   PIC 9(04).99 SOURCE PRR-GROSS-PAY.
                03  COLUMN 60   PIC 9(03).99 SOURCE PRR-FICA-WH.
                03  COLUMN 70   PIC 9(03).99 SOURCE PRR-FED-WH.
@@ -2801,9 +2807,9 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 260: Warning: PLUS is ignored on first field of line
-prog.cob: 282: Warning: PLUS is ignored on first field of line
-prog.cob: 304: Warning: PLUS is ignored on first field of line
+AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 266: Warning: PLUS is ignored on first field of line
+prog.cob: 288: Warning: PLUS is ignored on first field of line
+prog.cob: 310: Warning: PLUS is ignored on first field of line
 ])
 
 AT_CHECK([export DD_DATAIN=./inp_data
@@ -2944,18 +2950,25 @@ AT_DATA([prog.cob], [
                05  NUM-COURSES              PIC  9(6).
 
        FD   PRINT-FILE
-             REPORT IS STUDENT-REPORT.
+             BLOCK CONTAINS 0 RECORDS                                     
+             LABEL RECORD STANDARD                                        
+             RECORDING MODE IS F                                          
+             RECORD CONTAINS 132 CHARACTERS  
+            REPORT IS STUDENT-REPORT.
+       01   RW-REC  PIC X(90).
 
        WORKING-STORAGE SECTION.
        01   ARE-THERE-MORE-RECORDS       PIC  XXX   VALUE  "YES".          
 
        REPORT SECTION.
        RD   STUDENT-REPORT
-           PAGE LIMIT 30 LINES
+           PAGE LIMIT 30 
            HEADING 1
            FIRST DETAIL 5
            LAST DETAIL 25
-           FOOTING 28.
+           FOOTING 28
+           LINE LIMIT 90
+           .
        01 HEADING-LINE.
           02 TYPE PAGE HEADING LINE PLUS 1.
             05  COLUMN 1      PIC X(50) VALUE 
@@ -3013,8 +3026,9 @@ AT_DATA([prog.cob], [
            TERMINATE STUDENT-REPORT.
 ])
 
-AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 55: Warning: PLUS is ignored on first field of line
-prog.cob: 57: Warning: PLUS is not recommended with LEFT, RIGHT or CENTER
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 24: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
+prog.cob: 62: Warning: PLUS is ignored on first field of line
+prog.cob: 64: Warning: PLUS is not recommended with LEFT, RIGHT or CENTER
 ])
 
 AT_CHECK([export DD_STUDENT=./inp_data
@@ -3577,7 +3591,16 @@ Dorken, Kevin       35CS Manning, Eric        Waterloo
 Allinson, A R       25EC Manning, Eric        Whistler
 Norman, Michelle    27EC Manning, Donna       Toronto 
 Dorken, Melissa     37EC Manning, Donna       Toronto 
-Norman, Becky       27EC DiMetri, Donna       Toronto 
+Norseman, Ben01     27EC DiMetri, Gary        Toronto 
+Norseman, Ben02     27EC DiMetri, Gary        Toronto 
+Norseman, Ben03     27EC DiMetri, Gary        Toronto 
+Norseman, Ben04     27EC DiMetri, Gary        Toronto 
+Norseman, Ben05     27EC DiMetri, Gary        Toronto 
+Norseman, Ben06     27EC DiMetri, Gary        Toronto 
+Norseman, Ben07     27EC DiMetri, Gary        Toronto 
+Norseman, Ben08     27EC DiMetri, Gary        Toronto 
+Norseman, Ben09     27EC DiMetri, Gary        Toronto 
+Norseman, Ben10     27EC DiMetri, Gary        Toronto 
 ])
 
 AT_DATA([prog.cob], [
@@ -3618,10 +3641,10 @@ AT_DATA([prog.cob], [
        REPORT SECTION.
        RD    CONTROL-BREAK
            CONTROLS ARE MAJOR ADVISOR
-           PAGE LIMIT 50 LINES
+           PAGE LIMIT 25 LINES
            HEADING 1
            FIRST DETAIL 5
-           FOOTING 48.
+           FOOTING 23.
        01  TYPE IS PAGE HEADING.
            05  LINE 1.
                 10  COLUMN 61    PIC X(4) VALUE 'PAGE'.
@@ -3631,7 +3654,7 @@ AT_DATA([prog.cob], [
                        VALUE 'STUDENT ADVISEMENT LIST'.
 
        01  TYPE IS CONTROL HEADING MAJOR.
-           05     LINE 5 ON NEXT PAGE.
+           05     LINE 5 ON NEXT PAGE .
                 10  COLUMN 37    PIC X(5)  VALUE 'MAJOR'.
                 10  COLUMN 44    PIC X(20) SOURCE MAJOR.
 
@@ -3648,6 +3671,10 @@ AT_DATA([prog.cob], [
                 10  COLUMN  3    PIC X(20) SOURCE STUDENT-NAME.
                 10  COLUMN 26    PIC 99    SOURCE COURSE-PTS.
                 10  COLUMN 34    PIC X(15) SOURCE CAMPUS.
+                10  COLUMN 51    PIC X(5) VALUE "Hello"
+                              PRESENT AFTER PAGE OR ADVISOR.
+                10  COLUMN 51    PIC X(5) VALUE '  "  '
+                              ABSENT AFTER PAGE OR ADVISOR.
                 10  COLUMN 60    PIC X(20) SOURCE ADVISOR 
                                        GROUP INDICATE.
 
@@ -3712,43 +3739,18 @@ AT_DATA([reference], [                                                          
 
    STUDENT NAME         PTS      CAMPUS                    ADVISOR
    --------------------------------------------------------------------
-  Norman, Ronald J       25       Waterloo                 Malcolm, Mike
-  Dorken, Keith A        35       Waterloo
+  Norman, Ronald J       25       Waterloo        Hello    Malcolm, Mike
+  Dorken, Keith A        35       Waterloo          "
 
     ADVISOR Malcolm, Mike        TOTAL   2
 
-  Norman, James J        25       Waterloo                 Manning, Eric
-  Dorken, Kevin          35       Waterloo
+  Norman, James J        25       Waterloo        Hello    Manning, Eric
+  Dorken, Kevin          35       Waterloo          "
 
     ADVISOR Manning, Eric        TOTAL   2
 
 
     MAJOR TOTAL        4
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3762,39 +3764,38 @@ AT_DATA([reference], [                                                          
 
    STUDENT NAME         PTS      CAMPUS                    ADVISOR
    --------------------------------------------------------------------
-  Allinson, A R          25       Whistler                 Manning, Eric
+  Allinson, A R          25       Whistler        Hello    Manning, Eric
 
     ADVISOR Manning, Eric        TOTAL   1
 
-  Norman, Michelle       27       Toronto                  Manning, Donna
-  Dorken, Melissa        37       Toronto
+  Norman, Michelle       27       Toronto         Hello    Manning, Donna
+  Dorken, Melissa        37       Toronto           "
 
     ADVISOR Manning, Donna       TOTAL   2
 
-  Norman, Becky          27       Toronto                  DiMetri, Donna
+  Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
+  Norseman, Ben02        27       Toronto           "
+  Norseman, Ben03        27       Toronto           "
+  Norseman, Ben04        27       Toronto           "
+  Norseman, Ben05        27       Toronto           "
+  Norseman, Ben06        27       Toronto           "
 
-    ADVISOR DiMetri, Donna       TOTAL   1
+                                                            PAGE    3
 
+                         STUDENT ADVISEMENT LIST
 
-    MAJOR TOTAL        4
+  Norseman, Ben07        27       Toronto         Hello    DiMetri, Gary
+  Norseman, Ben08        27       Toronto           "
+  Norseman, Ben09        27       Toronto           "
+  Norseman, Ben10        27       Toronto           "
 
-
-         FINAL TOTAL   8
-
-
-
-
-
-
-
-
-
-
+    ADVISOR DiMetri, Gary        TOTAL  10
 
 
+    MAJOR TOTAL       13
 
 
-
+         FINAL TOTAL  17
 
 
 
@@ -4183,6 +4184,7 @@ AT_DATA([prog.cob], [
             03  MRK4  COLUMN +2     PIC X(4).
 
        PROCEDURE DIVISION.
+	   DISPLAY "Test started" UPON PRINTER.
            OPEN OUTPUT RP-FILE
            INITIATE RP
 
@@ -4208,15 +4210,20 @@ AT_DATA([prog.cob], [
 
            TERMINATE rp  
            CLOSE RP-FILE
+	   DISPLAY "Test completed" UPON PRINTER.
 
            STOP RUN .
            END PROGRAM prog.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 49: Warning: 'PRINTER' is not defined in SPECIAL-NAMES
+prog.cob: 75: Warning: 'PRINTER' is not defined in SPECIAL-NAMES
+])
 
 AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+./prog], [0], [Test started
+Test completed
+], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -8644,6 +8651,268 @@ IN150202   20150202                          OR150216          016  ITEM_NUMBER_
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+])
+
+AT_CHECK([diff reference report.txt], [0])
+
+AT_CLEANUP
+
+
+AT_SETUP([Report PRESENT AFTER])
+AT_KEYWORDS([report])
+
+AT_DATA([inp_data],[SAINATH KOTGIRE          30/03/201611029473  20 00100000                          00000100
+UDAY PRATIVADI           30/03/201604547552  20 00100000                          00000200
+MILIND PARDESHI          30/03/201611256856  20 00100000                          00000300
+AJIT PATIL               30/03/201610503086  20 00000500                          00000400
+VINOD KAMBLE             30/03/201615487558  20 00100000                          00000500
+SACHIN TENDUNLKAR        30/03/201614645425  20 00500000                          00000600
+])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+
+           SELECT IN-FILE   ASSIGN TO EXTERNAL INFILE
+                  LINE SEQUENTIAL
+                  FILE STATUS IS WS-INPUT-STATUS.
+
+           SELECT OUT-FILE  ASSIGN TO EXTERNAL OREPORT
+                  LINE SEQUENTIAL
+                  FILE STATUS IS WS-OUTPUT-STATUS.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD  IN-FILE
+           RECORDING MODE IS F
+           BLOCK 0.
+
+       01  IN-REC.
+           05 IN-EMP-NAME                  PIC X(25).
+           05 IN-REPORT-PERIOD             PIC X(10).
+           05 IN-EMP-USERID                PIC X(10).
+           05 IN-BILL-DAYS                 PIC X(3).
+           05 IN-SALARY                    PIC 9(8).
+           05 FILLER                       PIC X(34).
+
+       FD  OUT-FILE
+           RECORDING MODE IS F
+           REPORT IS REPORT1.
+
+       01  REP-REC                         PIC X(100).
+
+       WORKING-STORAGE SECTION.
+       01  WS-FILE-FLAGS.
+           05 WS-INPUT-STATUS              PIC XX.
+              88  WS-INPUT-OK                        VALUE '00'.
+              88  WS-INPUT-EOF                       VALUE '10'.
+           05 WS-OUTPUT-STATUS             PIC XX.
+              88  WS-OUTPUT-OK                       VALUE '00'.
+      *-----------------------------------------------------------*
+      * MISCELLANOUS FIELDS                                       *
+      *-----------------------------------------------------------*
+       01  WS-MISC.
+           05 WS-EMP-NAME                  PIC X(25).
+           05 WS-REPORT-PERIOD             PIC X(10).
+           05 WS-EMP-USERID                PIC X(10).
+           05 WS-BILL-DAYS                 PIC X(3).
+           05 WS-SALARY                    PIC 9(8).
+
+       01  WS-MISC-DATE.
+           05 WS-DATE                      PIC 9(8) VALUE 20160422.
+           05 WS-TIME                      PIC 9(8) VALUE 10550000.
+           05 FILLER REDEFINES WS-TIME.
+              10 WS-HH                     PIC 99.
+              10 WS-MI                     PIC 99.
+              10 WS-SS                     PIC 99.
+              10 WS-HU                     PIC 99.
+
+       REPORT SECTION.
+
+       RD REPORT1
+          PAGE LIMIT IS 65 LINES
+          LINE LIMIT 132
+          HEADING 1
+          CONTROL ARE WS-SALARY.
+
+       01  MAIN-HEADER TYPE IS PAGE HEADING.
+           05 LINE 1.
+              10 COLUMN CENTER 45  PIC X(35)  VALUE
+                 'STARK TECHNOLOGIES MONTHLY REPORT'.
+
+           05 LINE 2.
+              10 COLUMN CENTER 45  PIC X(50)  VALUE ALL '-'.
+
+           05 LINE 3.
+              10 COLUMN 02  PIC X(14)  VALUE 'REPORT PERIOD:'.
+              10 COLUMN 20  PIC 9999/99/99 SOURCE WS-DATE.
+              10 COLUMN 32  PIC 99    SOURCE WS-HH.
+              10 COLUMN 34  PIC X     VALUE ':'.
+              10 COLUMN 35  PIC 99    SOURCE WS-MI.
+
+       01  TYPE IS CONTROL HEADING
+                FOR WS-SALARY OR PAGE.
+           05 LINE PLUS 2 PRESENT AFTER NEW WS-SALARY.
+              10 COLUMN 6   PIC X(9)   VALUE 'EMP NAME:'.
+              10 COLUMN 30  PIC X(13)  VALUE 'EMP USERID:'.
+              10 COLUMN 60  PIC X(13)  VALUE 'BILLING DAYS'.
+              10 COLUMN 80  PIC X(15)  VALUE 'SALARY CREDITED'.
+           05 LINE PLUS 1 PRESENT AFTER NEW WS-SALARY.
+              10 COLUMN 2   PIC X(100)  VALUE ALL '+'.
+
+       01  DETAIL-1 TYPE DETAIL.
+           05 LINE PLUS 1.
+              10 COLUMN 6   PIC X(25)  SOURCE WS-EMP-NAME.
+              10 COLUMN 30  PIC X(08)  SOURCE WS-EMP-USERID.
+              10 COLUMN 60  PIC X(3)   SOURCE WS-BILL-DAYS.
+              10 COLUMN 80  PIC Z(7)9  SOURCE WS-SALARY.
+
+       01  REP-FOOTER TYPE DETAIL.
+           05 LINE PLUS 2.
+              10 COLUMN 2   PIC X(100) VALUE ALL '*'.
+           05 LINE PLUS 1.
+              10 COLUMN 30  PIC X(23)  VALUE 'END OF SALARY REPORT'.
+           05 LINE PLUS 1.
+              10 COLUMN 2   PIC X(100) VALUE ALL '*'.
+
+       PROCEDURE DIVISION.
+
+      *    ACCEPT WS-DATE FROM DATE YYYYMMDD.
+      *    ACCEPT WS-TIME FROM TIME.
+
+           INITIATE REPORT1
+
+      *    GENERATE MAIN-HEADER
+
+           PERFORM 100-OPEN-FILES
+           PERFORM 200-MAIN-PROCESS
+
+           TERMINATE REPORT1
+
+           CLOSE IN-FILE
+           CLOSE OUT-FILE
+           STOP RUN.
+
+       100-OPEN-FILES.
+
+           OPEN INPUT IN-FILE
+
+           IF WS-INPUT-OK
+              CONTINUE
+           ELSE
+              DISPLAY 'ERROR OPENING INFILE FILE.STATUS = '
+                     WS-INPUT-STATUS
+              STOP RUN
+           END-IF
+
+           OPEN OUTPUT OUT-FILE
+
+           IF WS-OUTPUT-OK
+              INITIALIZE REP-REC
+           ELSE
+              DISPLAY 'ERROR OPENING OREPORT FILE.STATUS = '
+                     WS-OUTPUT-STATUS
+              STOP RUN
+           END-IF.
+
+       200-MAIN-PROCESS.
+      *    GENERATE HEADER-1
+
+           PERFORM UNTIL WS-INPUT-EOF
+               READ IN-FILE
+               MOVE IN-REC  TO WS-MISC
+               EVALUATE WS-INPUT-STATUS
+                 WHEN '00'
+                   GENERATE DETAIL-1
+                 WHEN '10'
+                   GENERATE REP-FOOTER
+                 WHEN OTHER
+                   DISPLAY ':ERROR READING INFILE FILE.STATUS = '
+                           WS-INPUT-STATUS
+                   STOP RUN
+               END-EVALUATE
+           END-PERFORM.
+])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [])
+
+AT_CHECK([export DD_INFILE=./inp_data
+export DD_OREPORT=./report.txt
+./prog], [0], [], [])
+
+
+AT_CAPTURE_FILE(./report.txt)
+
+AT_DATA([reference], [                           STARK TECHNOLOGIES MONTHLY REPORT
+                    --------------------------------------------------
+ REPORT PERIOD:    2016/04/22  10:55
+
+     EMP NAME:               EMP USERID:                   BILLING DAYS        SALARY CREDITED
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     SAINATH KOTGIRE         11029473                      20                    100000
+     UDAY PRATIVADI          04547552                      20                    100000
+     MILIND PARDESHI         11256856                      20                    100000
+
+     EMP NAME:               EMP USERID:                   BILLING DAYS        SALARY CREDITED
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     AJIT PATIL              10503086                      20                       500
+
+     EMP NAME:               EMP USERID:                   BILLING DAYS        SALARY CREDITED
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     VINOD KAMBLE            15487558                      20                    100000
+
+     EMP NAME:               EMP USERID:                   BILLING DAYS        SALARY CREDITED
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     SACHIN TENDUNLKAR       14645425                      20                    500000
+
+ ****************************************************************************************************
+                             END OF SALARY REPORT
+ ****************************************************************************************************
 
 
 

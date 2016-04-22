@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
-   Copyright (C) 2013-2015 Ron Norman
+   Copyright (C) 2013-2016 Ron Norman
 
    This file is part of GNU Cobol.
 
@@ -6281,12 +6281,29 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 		&& f->report == r) {
 			output_report_def_fields (0,id,f->children,r,0);
 		} 
-		if (f->report_source || f->report_control) {
+		if (f->report_source || f->report_control || (f->report_flag & COB_REPORT_PRESENT)) {
 			output_local("\t\t/* ");
 			if(f->report_source) {
 				struct cb_field *s = cb_code_field (f->report_source);
 				if(s) output_local("SOURCE %s; ",s->name);
 			} 
+			if((f->report_flag & COB_REPORT_PRESENT)) {
+				output_local("PRESENT ");
+				if((f->report_flag & COB_REPORT_BEFORE)) 
+					output_local("BEFORE ");
+				else
+					output_local("AFTER ");
+				if((f->report_flag & COB_REPORT_ALL)) 
+					output_local("ALL ");
+				if((f->report_flag & COB_REPORT_PAGE)) 
+					output_local("PAGE ");
+				if(f->report_control) {
+					struct cb_field *s = cb_code_field (f->report_control);
+					if((f->report_flag & COB_REPORT_PAGE)) 
+						output_local("OR ");
+					if(s) output_local("%s; ",s->name);
+				}
+			} else
 			if(f->report_control) {
 				struct cb_field *s = cb_code_field (f->report_control);
 				if(s) output_local("CONTROL %s; ",s->name);
@@ -6339,17 +6356,35 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 		cb_tree	value = CB_VALUE (f->values);
 
 		if (CB_TREE_TAG (value) == CB_TAG_LITERAL) {
+			int	i,j;
+			char	*val;
+
 			l = CB_LITERAL (value);
 			if (l->all) {
-				char *val = (char *)calloc(1, f->size + 2);
-				memset(val,l->data[0],f->size);
-				output_local("\"%.*s\",%d,",
-						(int) f->size, val, (int)f->size);
-				free((void*) val);
+				val = (char *)calloc(1, f->size * 2 + 2);
+				if(l->data[0] == '"'
+				|| l->data[0] == '\\') {	/* Fix string for C code */
+					for(i=j=0; j < f->size; j++) {
+						val[i++] = '\\';
+						val[i++] = l->data[0];
+					}
+					val[i] = 0;
+				} else {
+					memset(val,l->data[0],f->size);
+				}
+				output_local("\"%s\",%d,", val, (int)f->size);
 			} else {
-				output_local("\"%.*s\",%d,",
-						(int) l->size, l->data, (int)l->size);
+				val = (char *)calloc(1, l->size * 2 + 2);
+				for(i=j=0; j < l->size; j++) {
+					if(l->data[j] == '"'
+					|| l->data[j] == '\\')	/* Fix string for C code */
+						val[i++] = '\\';
+					val[i++] = l->data[j];
+				}
+				val[i] = 0;
+				output_local("\"%s\",%d,", val, (int)l->size);
 			}
+			free((void*) val);
 		} else {
 			output_local("NULL,0,");	
 		}
