@@ -4,6 +4,7 @@
 	  run_misc.at removed check for 'NEW' as this is now a reserved word
 	  configuration.at updated to match compiler
 	  syn_definition.at updated to expect SYNC RIGHT to pass
+	* intrinsic.c fixed coding error in cob_intr_current_date
 
 2016-04-22  Ron Norman
 	* common.h, reportio.c: 
