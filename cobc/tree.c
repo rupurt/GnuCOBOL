@@ -3165,6 +3165,36 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			cb_error_x (y, _("Invalid expression"));
 			return cb_error_node;
 		}
+		xl = (void*)x;
+		yl = (void*)y;
+		if (CB_REF_OR_FIELD_P (y)
+		&&  CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
+		&&  !CB_FIELD (cb_ref (y))->flag_any_length
+		&&  CB_FIELD (cb_ref (y))->pic
+		&&  CB_FIELD (cb_ref (y))->pic->scale == 0
+		&&  CB_LITERAL_P(x) 
+		&&  xl->scale == 0) {
+			i = 0;
+			while(xl->data[i] != 0) i++;
+			while(i>0 && xl->data[i-1] == ' ') i--;
+			if(i > CB_FIELD (cb_ref (y))->size) {
+				cb_warning_x (y, _("Literal is longer than field"));
+			}
+		} else
+		if (CB_REF_OR_FIELD_P (x)
+		&&  CB_FIELD (cb_ref (x))->usage == CB_USAGE_DISPLAY
+		&&  !CB_FIELD (cb_ref (x))->flag_any_length
+		&&  CB_FIELD (cb_ref (x))->pic
+		&&  CB_FIELD (cb_ref (x))->pic->scale == 0
+		&&  CB_LITERAL_P(y)
+		&&  yl->scale == 0) {
+			i = 0;
+			while(yl->data[i] != 0) i++;
+			while(i>0 && yl->data[i-1] == ' ') i--;
+			if(i > CB_FIELD (cb_ref (x))->size) {
+				cb_warning_x (x, _("Literal is longer than field"));
+			}
+		} else
 		/*
 		 * If this is an operation between two simple integer numerics
 		 * then resolve the value here at compile time

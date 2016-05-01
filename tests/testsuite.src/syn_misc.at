@@ -50,6 +50,49 @@ prog.cob: 15: Warning: Suggest parentheses around AND within OR
 AT_CLEANUP
 
 
+AT_SETUP([Warn Literal size])
+AT_KEYWORDS([numeric])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-LINE-NUMBER PIC 9(3) VALUE ZERO.
+       01 WS-NUMBER      PIC 9(3)V99 VALUE ZERO.
+       01 WS-TEXT        PIC X(5) VALUE 'CAT'.
+       PROCEDURE DIVISION.
+       IF WS-LINE-NUMBER > '123'
+          CONTINUE.
+       IF WS-TEXT > 'DOGGY'
+          CONTINUE.
+       IF WS-NUMBER > 123.999
+          CONTINUE.
+       IF WS-LINE-NUMBER > 1234
+          CONTINUE.
+       IF WS-LINE-NUMBER > '1234'
+          CONTINUE.
+       IF WS-TEXT > 'DOGGY++'
+          CONTINUE.
+       IF WS-TEXT > 3141596
+          CONTINUE.
+       IF 'DOG+CAT' NOT = WS-TEXT
+          CONTINUE.
+       STOP RUN RETURNING 0.
+])
+
+AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [prog.cob: 16: Warning: Literal is longer than field
+prog.cob: 18: Warning: Literal is longer than field
+prog.cob: 20: Warning: Literal is longer than field
+prog.cob: 22: Warning: Literal is longer than field
+prog.cob: 24: Warning: Literal is longer than field
+])
+
+AT_CHECK([./prog], [0], [], [])
+
+AT_CLEANUP
+
+
 AT_SETUP([Missing headers])
 AT_KEYWORDS([misc])
 
