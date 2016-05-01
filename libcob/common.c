@@ -4666,14 +4666,14 @@ set_config_val(char *value, int pos)
 				if (numval < 4001) {
 					numval = numval * 1024 * 1024;
 				} else {
-					numval = 4294967295; /* max. guaranteed value for unsigned long */
+					numval = 4294967294; /* max. guaranteed value for unsigned long */
 				}
 				break;
 			case 'G':
 				if (numval < 4) {
 					numval = numval * 1024 * 1024 * 1024;
 				} else {
-					numval = 4294967295; /* max. guaranteed value for unsigned long */
+					numval = 4294967294; /* max. guaranteed value for unsigned long */
 				}
 				break;
 			}
@@ -4917,6 +4917,18 @@ cb_config_entry (char *buf, int line)
 			value[j++] = buf[i++];
 	}
 	value[j] = 0;
+	if (strcasecmp (keyword, "reset") != 0
+	&&  strcasecmp (keyword, "include") != 0
+	&&  strcasecmp (keyword, "includeif") != 0
+	&&  strcasecmp (keyword, "setenv") != 0
+	&&  strcasecmp (keyword, "unsetenv") != 0) {
+		i = cb_lookup_config(keyword);
+
+		if (i >= NUM_CONFIG) {
+			conf_runtime_error (1,_("Unknown configuration tag '%s'"), keyword);
+			return -1;
+		}
+	}
 	if (strcmp(value, "") == 0) {
 		conf_runtime_error(1, _("WARNING - '%s' without a value - ignored!"), keyword);
 		return 2;

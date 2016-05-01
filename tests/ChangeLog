@@ -1,4 +1,9 @@
 
+2016-05-01 Ron Norman <rjn@inglenet.com>
+	* run_misc.at removed check for 'NEW' as this is now a reserved word
+	  configuration.at updated to match compiler
+	  syn_definition.at updated to expect SYNC RIGHT to pass
+					                                                                 
 2015-10-25  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* testsuite.src/configuration.at: mayor update including runtime

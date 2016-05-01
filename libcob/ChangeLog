@@ -1,6 +1,11 @@
 
-2016-04-22  Ron Norman
+2016-05-01 Ron Norman <rjn@inglenet.com>
+	* common.c fixed incorrect reporting of error for undefined environment variables
+	  run_misc.at removed check for 'NEW' as this is now a reserved word
+	  configuration.at updated to match compiler
+	  syn_definition.at updated to expect SYNC RIGHT to pass
 
+2016-04-22  Ron Norman
 	* common.h, reportio.c: 
 	  updates to support features of an IBM REPORT WRITER 
 	  PRESENT AFTER & ABSENT AFTER

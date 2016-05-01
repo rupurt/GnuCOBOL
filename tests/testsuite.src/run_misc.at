@@ -4025,7 +4025,7 @@ AT_DATA([caller.cob], [
        77  try                         PIC X VALUE "a".
        77  bool                        PIC X VALUE "b".
        77  explicit                    PIC X VALUE "c".
-       77  new                         PIC X VALUE "d".
+      *77  new                         PIC X VALUE "d".
        77  static_cast                 PIC X VALUE "e".
        77  typeid                      PIC X VALUE "f".
        77  catch                       PIC X VALUE "g".
@@ -4087,7 +4087,7 @@ AT_DATA([caller.cob], [
                                  try
                                  bool
                                  explicit
-                                 new
+      *                          new
                                  static_cast
                                  typeid
                                  catch
@@ -4143,7 +4143,7 @@ AT_DATA([caller.cob], [
                                  try
                                  bool
                                  explicit
-                                 new
+      *                          new
                                  static_cast
                                  typeid
                                  catch
@@ -4295,7 +4295,7 @@ AT_DATA([callee2.cob], [
        77  try                         PIC X.
        77  bool                        PIC X.
        77  explicit                    PIC X.
-       77  new                         PIC X.
+      *77  new                         PIC X.
        77  static_cast                 PIC X.
        77  typeid                      PIC X.
        77  catch                       PIC X.
@@ -4332,7 +4332,7 @@ AT_DATA([callee2.cob], [
                                  try
                                  bool
                                  explicit
-                                 new
+      *                          new
                                  static_cast
                                  typeid
                                  catch
@@ -4366,7 +4366,7 @@ AT_DATA([callee2.cob], [
               (try                         NOT = "a") OR
               (bool                        NOT = "b") OR
               (explicit                    NOT = "c") OR
-              (new                         NOT = "d") OR
+      *       (new                         NOT = "d") OR
               (static_cast                 NOT = "e") OR
               (typeid                      NOT = "f") OR
               (catch                       NOT = "g") OR
@@ -4402,7 +4402,7 @@ AT_DATA([callee2.cob], [
                                  try
                                  bool
                                  explicit
-                                 new
+      *                          new
                                  static_cast
                                  typeid
                                  catch
