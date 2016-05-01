@@ -1,9 +1,9 @@
 
 2016-05-01  Ron Norman
-
 	* In tree.c, for binary (arithmetic & relational) operations between integer constants,
 	  resolve the value at compile time and reduce the expression down to the 
 	  computed value
+	* tree.c Also, added checks to validate resolving contant expressions
 
 2016-04-22  Ron Norman
 

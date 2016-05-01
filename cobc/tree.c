@@ -3114,21 +3114,35 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				yval = atoll((const char*)yl->data);
 				switch(op) {
 				case '+':
-					sprintf(result,"%lld",xval + yval);
-					return cb_build_numeric_literal (0, result, 0);
+					if( (xval + yval) >= 0) {
+						sprintf(result,"%lld",xval + yval);
+						return cb_build_numeric_literal (0, result, 0);
+					}
+					break;
 				case '-':
-					sprintf(result,"%lld",xval - yval);
-					return cb_build_numeric_literal (0, result, 0);
+					if( (xval - yval) >= 0) {
+						sprintf(result,"%lld",xval - yval);
+						return cb_build_numeric_literal (0, result, 0);
+					}
+					break;
 				case '*':
-					sprintf(result,"%lld",xval * yval);
-					return cb_build_numeric_literal (0, result, 0);
+					if( (xval * yval) >= 0) {
+						sprintf(result,"%lld",xval * yval);
+						return cb_build_numeric_literal (0, result, 0);
+					}
+					break;
 				case '/':
 					if(yval == 0) {				/* Avoid Divide by ZERO */
 						cb_warning_x (x, _("Divide by constant ZERO"));
 						break;
 					}
-					sprintf(result,"%lld",xval / yval);
-					return cb_build_numeric_literal (0, result, 0);
+					if((xval % yval) == 0) {
+						if( (xval / yval) >= 0) {
+							sprintf(result,"%lld",xval / yval);
+							return cb_build_numeric_literal (0, result, 0);
+						}
+					}
+					break;
 				case '^':
 					if(yval == 0
 					|| xval == 1) {
