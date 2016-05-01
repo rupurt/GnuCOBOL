@@ -1,7 +1,7 @@
 /*
    Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
    Copyright (C) 2007-2012 Roger While
-   Copyright (C) 2013-2015 Ron Norman
+   Copyright (C) 2013-2016 Ron Norman
 
    This file is part of GNU Cobol.
 
@@ -3072,7 +3072,11 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	enum cb_category	category = CB_CATEGORY_UNKNOWN;
 	cob_s64_t			xval,yval;
 	char				result[48];
+	cb_tree				relop;
+	int					i,j;
+	struct cb_literal *xl, *yl;
 
+	relop = cb_any;
 	switch (op) {
 	case '+':
 	case '-':
@@ -3096,7 +3100,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		 */
 		if (CB_NUMERIC_LITERAL_P(x) 
 		&&  CB_NUMERIC_LITERAL_P(y)) {
-			struct cb_literal *xl, *yl;
 			xl = (void*)x;
 			yl = (void*)y;
 			if(xl->llit == 0
@@ -3162,6 +3165,130 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			cb_error_x (y, _("Invalid expression"));
 			return cb_error_node;
 		}
+		/*
+		 * If this is an operation between two simple integer numerics
+		 * then resolve the value here at compile time
+		 */
+		if (CB_NUMERIC_LITERAL_P(x) 
+		&&  CB_NUMERIC_LITERAL_P(y)) {
+			xl = (void*)x;
+			yl = (void*)y;
+			if(xl->llit == 0
+			&& xl->scale == 0
+			&& yl->llit == 0
+			&& yl->scale == 0
+			&& xl->sign == 0
+			&& yl->sign == 0
+			&& xl->all == 0
+			&& yl->all == 0) {
+				xval = atoll((const char*)xl->data);
+				yval = atoll((const char*)yl->data);
+				switch(op) {
+				case '=':
+					if(xval == yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				case '~':
+					if(xval != yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				case '>':
+					if(xval > yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				case '<':
+					if(xval < yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				case ']':
+					if(xval >= yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				case '[':
+					if(xval <= yval)
+						relop = cb_true;
+					else
+						relop = cb_false;
+					break;
+				default:
+					break;
+				}
+			}
+		} else
+		/*
+		 * If this is an operation between two literal strings 
+		 * then resolve the value here at compile time
+		 */
+		if (CB_LITERAL_P(x) 
+		&&  CB_LITERAL_P(y)
+		&& !CB_NUMERIC_LITERAL_P(x) 
+		&& !CB_NUMERIC_LITERAL_P(y)) {
+			xl = (void*)x;
+			yl = (void*)y;
+			for(i=j=0; xl->data[i] != 0 && yl->data[j] != 0; i++,j++) {
+				if(xl->data[i] != yl->data[j])
+					break;
+			}
+			if(xl->data[i] == 0
+			&& yl->data[j] == ' ') {
+				while(yl->data[j] == ' ') j++;
+			} else
+			if(xl->data[i] == ' '
+			&& yl->data[j] == 0) {
+				while(xl->data[i] == ' ') i++;
+			}
+			relop = cb_any;
+			switch(op) {
+			case '=':
+				if(xl->data[i] == yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			case '~':
+				if(xl->data[i] != yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			case '>':
+				if(xl->data[i] > yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			case '<':
+				if(xl->data[i] < yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			case ']':
+				if(xl->data[i] >= yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			case '[':
+				if(xl->data[i] <= yl->data[j])
+					relop = cb_true;
+				else
+					relop = cb_false;
+				break;
+			default:
+				break;
+			}
+		}
 		category = CB_CATEGORY_BOOLEAN;
 		break;
 
@@ -3174,6 +3301,21 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			cb_error_x (x, _("Invalid expression"));
 			return cb_error_node;
 		}
+		if((x == cb_true || x == cb_false)
+		&& (y == cb_true || y == cb_false)) {
+			if(op == '&') {
+				if(x == cb_true && y == cb_true)
+					relop = cb_true;
+				else
+					relop = cb_false;
+			} else
+			if(op == '|') {
+				if(x == cb_true || y == cb_true)
+					relop = cb_true;
+				else
+					relop = cb_false;
+			}
+		}
 		category = CB_CATEGORY_BOOLEAN;
 		break;
 
@@ -3185,6 +3327,15 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	default:
 		cobc_abort_pr (_("Unexpected operator -> %d"), op);
 		COBC_ABORT ();
+	}
+
+	if(relop == cb_true) {
+		cb_warning_x (x, _("Expression is always TRUE"));
+		return cb_true;
+	}
+	if(relop == cb_false) {
+		cb_warning_x (x, _("Expression is always FALSE"));
+		return cb_false;
 	}
 
 	p = make_tree (CB_TAG_BINARY_OP, category, sizeof (struct cb_binary_op));

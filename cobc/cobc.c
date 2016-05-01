@@ -1533,8 +1533,8 @@ cobc_print_version (void)
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
 	puts ("Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida");
 	puts ("Copyright (C) 2006-2012 Roger While");
-	puts ("Copyright (C) 2013-2015 Ron Norman");
-	puts ("Copyright (C) 2009,2010,2012,2014,2015 Simon Sobisch");
+	puts ("Copyright (C) 2013-2016 Ron Norman");
+	puts ("Copyright (C) 2009,2010,2012,2014-2016 Simon Sobisch");
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 	printf (_("Built     %s"), cb_oc_build_stamp);
