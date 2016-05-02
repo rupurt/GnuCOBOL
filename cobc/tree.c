@@ -1554,11 +1554,17 @@ cb_build_system_name (const enum cb_system_name_category category, const int tok
 /* Literal */
 
 cb_tree
-cb_build_numeric_literal (const int sign, const void *data,
-			  const int scale)
+cb_build_numeric_literal (int sign, const void *data, const int scale)
 {
 	struct cb_literal *p;
 
+	if (*(char*)data == '-') {
+		sign = -1;
+		data++;
+	} else if (*(char*)data == '+') {
+		sign = 1;
+		data++;
+	}
 	p = build_literal (CB_CATEGORY_NUMERIC, data, strlen (data));
 	p->sign = (short)sign;
 	p->scale = scale;
@@ -3106,30 +3112,24 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			&& xl->scale == 0
 			&& yl->llit == 0
 			&& yl->scale == 0
-			&& xl->sign == 0
-			&& yl->sign == 0
 			&& xl->all == 0
 			&& yl->all == 0) {
 				xval = atoll((const char*)xl->data);
+				if(xl->sign == -1) xval = -xval;
 				yval = atoll((const char*)yl->data);
+				if(yl->sign == -1) yval = -yval;
 				switch(op) {
 				case '+':
-					if( (xval + yval) >= 0) {
-						sprintf(result,"%lld",xval + yval);
-						return cb_build_numeric_literal (0, result, 0);
-					}
+					sprintf(result,"%lld",xval + yval);
+					return cb_build_numeric_literal (0, result, 0);
 					break;
 				case '-':
-					if( (xval - yval) >= 0) {
-						sprintf(result,"%lld",xval - yval);
-						return cb_build_numeric_literal (0, result, 0);
-					}
+					sprintf(result,"%lld",xval - yval);
+					return cb_build_numeric_literal (0, result, 0);
 					break;
 				case '*':
-					if( (xval * yval) >= 0) {
-						sprintf(result,"%lld",xval * yval);
-						return cb_build_numeric_literal (0, result, 0);
-					}
+					sprintf(result,"%lld",xval * yval);
+					return cb_build_numeric_literal (0, result, 0);
 					break;
 				case '/':
 					if(yval == 0) {				/* Avoid Divide by ZERO */
@@ -3137,10 +3137,8 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						break;
 					}
 					if((xval % yval) == 0) {
-						if( (xval / yval) >= 0) {
-							sprintf(result,"%lld",xval / yval);
-							return cb_build_numeric_literal (0, result, 0);
-						}
+						sprintf(result,"%lld",xval / yval);
+						return cb_build_numeric_literal (0, result, 0);
 					}
 					break;
 				case '^':
@@ -3187,10 +3185,15 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_FIELD (cb_ref (y))->pic
 		&&  CB_FIELD (cb_ref (y))->pic->scale == 0
 		&&  CB_LITERAL_P(x) 
+		&&  xl->all == 0
 		&&  xl->scale == 0) {
 			i = 0;
 			while(xl->data[i] != 0) i++;
 			while(i>0 && xl->data[i-1] == ' ') i--;
+			if(CB_FIELD (cb_ref (y))->pic->category == CB_CATEGORY_NUMERIC
+			|| CB_FIELD (cb_ref (y))->pic->category == CB_CATEGORY_NUMERIC_EDITED) {
+				for(j=0; xl->data[j] == '0'; j++,i--);
+			}
 			if(i > CB_FIELD (cb_ref (y))->size) {
 				cb_warning_x (y, _("Literal is longer than field"));
 			}
@@ -3201,10 +3204,15 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_FIELD (cb_ref (x))->pic
 		&&  CB_FIELD (cb_ref (x))->pic->scale == 0
 		&&  CB_LITERAL_P(y)
+		&&  yl->all == 0
 		&&  yl->scale == 0) {
 			i = 0;
 			while(yl->data[i] != 0) i++;
 			while(i>0 && yl->data[i-1] == ' ') i--;
+			if(CB_FIELD (cb_ref (x))->pic->category == CB_CATEGORY_NUMERIC
+			|| CB_FIELD (cb_ref (x))->pic->category == CB_CATEGORY_NUMERIC_EDITED) {
+				for(j=0; yl->data[j] == '0'; j++,i--);
+			}
 			if(i > CB_FIELD (cb_ref (x))->size) {
 				cb_warning_x (x, _("Literal is longer than field"));
 			}
