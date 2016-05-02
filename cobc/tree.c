@@ -1557,15 +1557,16 @@ cb_tree
 cb_build_numeric_literal (int sign, const void *data, const int scale)
 {
 	struct cb_literal *p;
+	char	*sdata = (char*)data;
 
-	if (*(char*)data == '-') {
+	if (*sdata == '-') {
 		sign = -1;
-		data++;
-	} else if (*(char*)data == '+') {
+		sdata++;
+	} else if (*sdata == '+') {
 		sign = 1;
-		data++;
+		sdata++;
 	}
-	p = build_literal (CB_CATEGORY_NUMERIC, data, strlen (data));
+	p = build_literal (CB_CATEGORY_NUMERIC, (void*)sdata, strlen (sdata));
 	p->sign = (short)sign;
 	p->scale = scale;
 	return CB_TREE (p);
