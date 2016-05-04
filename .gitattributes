@@ -19,6 +19,17 @@ bin/Makefile.in -text
 bin/cob-config.in -text
 bin/cobcrun.1 -text
 bin/cobcrun.c -text
+build_aux/ChangeLog -text
+build_aux/compile -text
+build_aux/config.guess -text
+build_aux/config.rpath -text
+build_aux/config.sub -text
+build_aux/depcomp -text
+build_aux/install-sh -text
+build_aux/ltmain.sh -text
+build_aux/mdate-sh -text
+build_aux/missing -text
+build_aux/mkinstalldirs -text
 build_windows/README -text
 build_windows/config.h.bdb.win -text
 build_windows/config.h.vb.win -text
@@ -137,11 +148,7 @@ cobc/tree.c -text
 cobc/tree.h -text
 cobc/typeck.c -text
 cobc/warning.def -text
-/compile -text
-/config.guess -text
 /config.h.in -text
-/config.rpath -text
-/config.sub -text
 config/ChangeLog -text
 config/Makefile.am -text
 config/Makefile.in -text
@@ -163,7 +170,6 @@ copy/Makefile.in -text
 copy/screenio.cpy -text
 copy/sqlca.cpy -text
 copy/sqlda.cpy -text
-/depcomp -text
 doc/ChangeLog -text
 doc/Makefile.am -text
 doc/Makefile.in -text
@@ -187,7 +193,6 @@ extras/Makefile.am -text
 extras/Makefile.in -text
 extras/README -text
 /gnu-cobol.spec -text
-/install-sh -text
 lib/ChangeLog -text
 lib/Makefile.am -text
 lib/Makefile.in -text
@@ -213,7 +218,6 @@ libcob/screenio.c -text
 libcob/strings.c -text
 libcob/system.def -text
 libcob/termio.c -text
-/ltmain.sh -text
 m4/codeset.m4 -text
 m4/gettext.m4 -text
 m4/iconv.m4 -text
@@ -229,8 +233,6 @@ m4/lt~obsolete.m4 -text
 m4/nls.m4 -text
 m4/po.m4 -text
 m4/progtest.m4 -text
-/missing -text
-/mkinstalldirs -text
 po/ChangeLog -text
 po/LINGUAS -text
 po/Makefile.in.in -text

@@ -1,4 +1,10 @@
 
+2015-07-10  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* general: moved additional build-scripts to build_aux,
+	  regenerated all Makefiles
+	* configure.ac: added AC_CONFIG_AUX_DIR([build_aux])
+
 2016-01-30  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* configure.ac: removed AC_FUNC_ALLOCA
