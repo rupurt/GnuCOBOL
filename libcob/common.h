@@ -287,6 +287,9 @@ GLib is licensed under the GNU Lesser General Public License.
 #define popen			_popen
 #define pclose			_pclose
 #define localtime_r(t, s)		localtime_s (s, t)
+#if defined COB_USE_VC2013_OR_GREATER
+#define timezone			_timezone
+#endif
 
 #define __attribute__(x)
 
