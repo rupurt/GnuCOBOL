@@ -56,15 +56,6 @@ build_windows/vc14/Win32
 build_windows/vc14/dist
 build_windows/vc14/ia64
 build_windows/vc14/x64
-build_windows/vc7/*.bak
-build_windows/vc7/*.ncb
-build_windows/vc7/*.sdf
-build_windows/vc7/*.suo
-build_windows/vc7/*.user
-build_windows/vc7/Win32
-build_windows/vc7/dist
-build_windows/vc7/ia64
-build_windows/vc7/x64
 build_windows/vc8/*.bak
 build_windows/vc8/*.ncb
 build_windows/vc8/*.sdf

@@ -84,10 +84,6 @@ build_windows/vc14/libcob.vcxproj -text
 build_windows/vc14/libcob.vcxproj.filters -text
 build_windows/vc14/libsupport.vcxproj -text
 build_windows/vc14/libsupport.vcxproj.filters -text
-build_windows/vc7/GnuCOBOL.sln -text
-build_windows/vc7/cobc.vcproj -text
-build_windows/vc7/cobcrun.vcproj -text
-build_windows/vc7/libcob.vcproj -text
 build_windows/vc8/GnuCOBOL.sln -text
 build_windows/vc8/cobc.vcproj -text
 build_windows/vc8/cobc.vcproj.user -text
