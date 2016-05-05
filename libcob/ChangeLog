@@ -6,6 +6,8 @@
 	  configuration.at: updated to match compiler
 	  syn_definition.at: updated to expect SYNC RIGHT to pass
 	* intrinsic.c: fixed coding error in cob_intr_current_date
+	* common.h [_MSC_VER]: adding alias for setenv/unsetenv fixing small memory
+	  leak for calls of (putenv) - _MSC duplicates the string, POSIX does not
 
 2016-04-22  Ron Norman
 
