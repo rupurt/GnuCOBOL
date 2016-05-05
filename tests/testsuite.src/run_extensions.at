@@ -117,7 +117,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], 
 [prog.cob: 5: Warning: Expression is always FALSE
 prog.cob: 5: Warning: Expression is always TRUE
-prog.cob: 6: Warning: Expression is always TRUE 
+prog.cob: 5: Warning: Expression is always TRUE 
 ])
 AT_CHECK([./prog], [0], [OK])
 
@@ -2052,8 +2052,8 @@ prog.cob: 23: Warning: Size of 'FIRST-VARIANT-B' larger than size of 'FIRST-DATA
 prog.cob: 25: Warning: Size of 'FIRST-VARIANT-C' larger than size of 'FIRST-DATA'
 prog.cob: 31: Warning: Size of 'SECOND-VARIANT-A' larger than size of 'SECOND-HEADER'
 prog.cob: 33: Warning: Size of 'SECOND-VARIANT-B' larger than size of 'SECOND-HEADER'
-prog.cob: 62: Warning: Expression is always FALSE
-prog.cob: 65: Warning: Expression is always FALSE
+prog.cob: 61: Warning: Expression is always FALSE
+prog.cob: 64: Warning: Expression is always FALSE
 ])
 AT_CHECK([./prog], [0])
 
