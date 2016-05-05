@@ -61,6 +61,8 @@ AT_DATA([prog.cob], [
        01 WS-LINE-NUMBER PIC 9(3) VALUE ZERO.
        01 WS-NUMBER      PIC 9(3)V99 VALUE ZERO.
        01 WS-TEXT        PIC X(5) VALUE 'CAT'.
+       78 CONST1         VALUE 'CAT     '.
+       01 CONST2         CONSTANT AS 00000001234.
        PROCEDURE DIVISION.
        IF WS-LINE-NUMBER > '123'
           CONTINUE.
@@ -78,14 +80,35 @@ AT_DATA([prog.cob], [
           CONTINUE.
        IF 'DOG+CAT' NOT = WS-TEXT
           CONTINUE.
+       IF WS-TEXT = 'CAT+DOG'
+          CONTINUE.
+       EVALUATE TRUE
+          WHEN 'DOG+CAT' = WS-TEXT
+             CONTINUE
+          WHEN CONST1 = 'CAT+DOG'
+             CONTINUE
+          WHEN CONST1 = 'CAT'
+             CONTINUE
+          WHEN CONST2 = 1234
+             CONTINUE
+       END-EVALUATE
        STOP RUN RETURNING 0.
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [prog.cob: 16: Warning: Literal is longer than field
-prog.cob: 18: Warning: Literal is longer than field
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 18: Warning: Literal is longer than field
 prog.cob: 20: Warning: Literal is longer than field
 prog.cob: 22: Warning: Literal is longer than field
 prog.cob: 24: Warning: Literal is longer than field
+prog.cob: 26: Warning: Literal is longer than field
+prog.cob: 26: Warning: Expression is always TRUE
+prog.cob: 28: Warning: Literal is longer than field
+prog.cob: 28: Warning: Expression is always FALSE
+prog.cob: 31: Warning: Literal is longer than field
+prog.cob: 31: Warning: Expression is always FALSE
+prog.cob: 33: Warning: Expression is always FALSE
+prog.cob: 35: Warning: Expression is always TRUE
+prog.cob: 37: Warning: Expression is always TRUE
 ])
 
 AT_CHECK([./prog], [0], [], [])

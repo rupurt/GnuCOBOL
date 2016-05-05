@@ -292,6 +292,10 @@ GLib is licensed under the GNU Lesser General Public License.
 #define timezone			_timezone
 #endif
 
+#if !COB_USE_VC2013_OR_GREATER
+#define atoll			_atoi64
+#endif
+
 #define __attribute__(x)
 
 #ifdef	S_ISDIR

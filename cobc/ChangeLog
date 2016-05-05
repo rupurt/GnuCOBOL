@@ -1,9 +1,16 @@
 
+2016-05-03  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* warning.def, tree.c: added cb_warn_constant_expr for warnings added
+	  by Ron Norman on 2016-05-01
+	* tree.c: resolve the value at compile time if literal size differs
+	  and checks are for = or !=
+
 2016-05-01  Ron Norman
 
-	* In tree.c, for binary (arithmetic & relational) operations between integer constants,
-	  resolve the value at compile time and reduce the expression down to the 
-	  computed value
+	* In tree.c, for binary (arithmetic & relational) operations between
+	  integer constants, resolve the value at compile time and reduce the
+	  expression down to the computed value
 	* tree.c Also, added checks to validate resolving contant expressions
 
 2016-04-22  Ron Norman

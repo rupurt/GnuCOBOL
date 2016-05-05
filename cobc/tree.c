@@ -3189,15 +3189,23 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_LITERAL_P(x) 
 		&&  xl->all == 0
 		&&  xl->scale == 0) {
-			i = 0;
-			while(xl->data[i] != 0) i++;
-			while(i>0 && xl->data[i-1] == ' ') i--;
+			for(i = strlen((const char *)xl->data); i>0 && xl->data[i-1] == ' '; i--);
 			if(CB_FIELD (cb_ref (y))->pic->category == CB_CATEGORY_NUMERIC
 			|| CB_FIELD (cb_ref (y))->pic->category == CB_CATEGORY_NUMERIC_EDITED) {
 				for(j=0; xl->data[j] == '0'; j++,i--);
 			}
-			if(i > CB_FIELD (cb_ref (y))->size) {
-				cb_warning_x (y, _("Literal is longer than field"));
+			if (i > CB_FIELD (cb_ref (y))->size) {
+				if (cb_warn_constant_expr) {
+					cb_warning_x (x, _("Literal is longer than field"));
+				}
+				switch(op) {
+				case '=':
+					relop = cb_false;
+					break;
+				case '~':
+					relop = cb_true;
+					break;
+				}
 			}
 		} else
 		if (CB_REF_OR_FIELD_P (x)
@@ -3208,15 +3216,23 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_LITERAL_P(y)
 		&&  yl->all == 0
 		&&  yl->scale == 0) {
-			i = 0;
-			while(yl->data[i] != 0) i++;
-			while(i>0 && yl->data[i-1] == ' ') i--;
+			for(i = strlen((const char *)yl->data); i>0 && yl->data[i-1] == ' '; i--)
 			if(CB_FIELD (cb_ref (x))->pic->category == CB_CATEGORY_NUMERIC
 			|| CB_FIELD (cb_ref (x))->pic->category == CB_CATEGORY_NUMERIC_EDITED) {
 				for(j=0; yl->data[j] == '0'; j++,i--);
 			}
-			if(i > CB_FIELD (cb_ref (x))->size) {
-				cb_warning_x (x, _("Literal is longer than field"));
+			if (i > CB_FIELD (cb_ref (x))->size) {
+				if (cb_warn_constant_expr) {
+					cb_warning_x (x, _("Literal is longer than field"));
+				}
+				switch(op) {
+				case '=':
+					relop = cb_false;
+					break;
+				case '~':
+					relop = cb_true;
+					break;
+				}
 			}
 		} else
 		/*
@@ -3275,6 +3291,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_false;
 					break;
 				default:
+					/* never happens */
 					break;
 				}
 			}
@@ -3301,7 +3318,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			&& yl->data[j] == 0) {
 				while(xl->data[i] == ' ') i++;
 			}
-			relop = cb_any;
 			switch(op) {
 			case '=':
 				if(xl->data[i] == yl->data[j])
@@ -3340,10 +3356,10 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_false;
 				break;
 			default:
+				/* never happens */
 				break;
 			}
 		}
-		category = CB_CATEGORY_BOOLEAN;
 		break;
 
 	case '!':
@@ -3383,12 +3399,18 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		COBC_ABORT ();
 	}
 
-	if(relop == cb_true) {
-		cb_warning_x (x, _("Expression is always TRUE"));
+	if (relop == cb_true) {
+		if (cb_warn_constant_expr) {
+			cb_warning_x (x, _("Expression is always TRUE"));
+		}
+		category = CB_CATEGORY_BOOLEAN;
 		return cb_true;
 	}
-	if(relop == cb_false) {
-		cb_warning_x (x, _("Expression is always FALSE"));
+	if (relop == cb_false) {
+		if (cb_warn_constant_expr) {
+			cb_warning_x (x, _("Expression is always FALSE"));
+		}
+		category = CB_CATEGORY_BOOLEAN;
 		return cb_false;
 	}
 
