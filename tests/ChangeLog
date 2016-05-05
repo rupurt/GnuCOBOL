@@ -1,9 +1,24 @@
 
 2016-05-01 Ron Norman <rjn@inglenet.com>
+
 	* run_misc.at removed check for 'NEW' as this is now a reserved word
 	  configuration.at updated to match compiler
 	  syn_definition.at updated to expect SYNC RIGHT to pass
-					                                                                 
+
+2016-01-12  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* Makefile.am: added targets "test" (running ANSI testsuite) and
+	  "checkall" (running both GnuCOBOL and ANSI testsuite)
+
+2015-11-01  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* general: skip tests that need a curses build if not available
+	* general: use new internal shell function _return_path for resolving paths
+	  (necessary for use of paths in testsuite when testing non-cygwin builds
+	  with cygwin)
+	* atlocal_win: set tests to skip (via COB_HAS_ISAM / COB_HAS_CURSES)
+	  depending on available features (parsing cobc --info)
+
 2015-10-25  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* testsuite.src/configuration.at: mayor update including runtime
@@ -31,6 +46,11 @@
 	* moved tests for checking compiler configuration from
 	  testsuite.src/syn_misc.at to testsuite.src/configuration.at, updated
 	  tests and added new ones
+
+2015-02-11  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* cobol85/Makefile.am: added target for decompressing newcob.val.Z and
+	  download it
 
 2014-12-01  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

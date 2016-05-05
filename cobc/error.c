@@ -1,22 +1,21 @@
 /*
-   Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
-   Copyright (C) 2007-2012 Roger While
-   Copyright (C) 2014-2015 Simon Sobisch
+   Copyright (C) 2001-2012, 2014-2016 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch
 
-   This file is part of GNU Cobol.
+   This file is part of GnuCOBOL.
 
-   The GNU Cobol compiler is free software: you can redistribute it
+   The GnuCOBOL compiler is free software: you can redistribute it
    and/or modify it under the terms of the GNU General Public License
    as published by the Free Software Foundation, either version 3 of the
    License, or (at your option) any later version.
 
-   GNU Cobol is distributed in the hope that it will be useful,
+   GnuCOBOL is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+   along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -289,6 +288,7 @@ undefined_error (cb_tree x)
 	}
 	r = CB_REFERENCE (x);
 	snprintf (errnamebuff, (size_t)COB_NORMAL_MAX, "'%s'", CB_NAME (x));
+	errnamebuff[COB_NORMAL_MAX] = 0;
 	for (c = r->chain; c; c = CB_REFERENCE (c)->chain) {
 		strcat (errnamebuff, " in '");
 		strcat (errnamebuff, CB_NAME (c));
@@ -317,6 +317,7 @@ ambiguous_error (cb_tree x)
 		}
 		/* Display error the first time */
 		snprintf (errnamebuff, (size_t)COB_NORMAL_MAX, "'%s'", CB_NAME (x));
+		errnamebuff[COB_NORMAL_MAX] = 0;
 		for (l = CB_REFERENCE (x)->chain; l; l = CB_REFERENCE (l)->chain) {
 			strcat (errnamebuff, " in '");
 			strcat (errnamebuff, CB_NAME (l));
@@ -330,6 +331,7 @@ ambiguous_error (cb_tree x)
 			y = CB_VALUE (l);
 			snprintf (errnamebuff, (size_t)COB_NORMAL_MAX,
 				  "'%s' ", w->name);
+			errnamebuff[COB_NORMAL_MAX] = 0;
 			switch (CB_TREE_TAG (y)) {
 			case CB_TAG_FIELD:
 				for (p = CB_FIELD (y)->parent; p; p = p->parent) {
@@ -351,7 +353,7 @@ ambiguous_error (cb_tree x)
 				break;
 			}
 			strcat (errnamebuff, _("defined here"));
-			cb_error_x (y, errnamebuff);
+			cb_error_x (y, "%s", errnamebuff);
 		}
 	}
 }

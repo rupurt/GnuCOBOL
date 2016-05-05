@@ -1,21 +1,21 @@
 /*
-   Copyright (C) 2001,2002,2003,2004,2005,2006,2007 Keisuke Nishida
-   Copyright (C) 2007-2012 Roger While
+   Copyright (C) 2001-2012, 2014-2015 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch
 
-   This file is part of GNU Cobol.
+   This file is part of GnuCOBOL.
 
-   The GNU Cobol compiler is free software: you can redistribute it
+   The GnuCOBOL compiler is free software: you can redistribute it
    and/or modify it under the terms of the GNU General Public License
    as published by the Free Software Foundation, either version 3 of the
    License, or (at your option) any later version.
 
-   GNU Cobol is distributed in the hope that it will be useful,
+   GnuCOBOL is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+   along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -835,6 +835,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 	/* Locate and open COPY file */
 	if (lib) {
 		snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s/%s", lib, name);
+		plexbuff1[COB_SMALL_MAX] = 0;
 		s = plexbuff1;
 	} else {
 		s = name;
@@ -847,6 +848,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 
 	for (el = cb_extension_list; el; el = el->next) {
 		snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%s", s, el->text);
+		plexbuff2[COB_SMALL_MAX] = 0;
 		if (access (plexbuff2, R_OK) == 0) {
 			return ppopen (plexbuff2, replace_list);
 		}
@@ -857,6 +859,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 			for (el = cb_extension_list; el; el = el->next) {
 				snprintf (plexbuff2, (size_t)COB_SMALL_MAX,
 					  "%s/%s%s", il->text, name, el->text);
+				plexbuff2[COB_SMALL_MAX] = 0;
 				if (access (plexbuff2, R_OK) == 0) {
 					return ppopen (plexbuff2, replace_list);
 				}
@@ -870,7 +873,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 void
 ppparse_error (const char *msg)
 {
-	cb_plex_error (newline_count, msg);
+	cb_plex_error (newline_count, "%s", msg);
 }
 
 void
@@ -1535,7 +1538,8 @@ ppecho (const char *text, const cob_u32_t alt_space, const int textlen)
 		}
 		if (lno == NULL) {
 			/* Match */
-			if (r->lead_trail == CB_REPLACE_TRAILING) {
+			if (r->lead_trail == CB_REPLACE_TRAILING
+				&& save_queue /* <- silence warnings */) {
 				/* Non-matched part of original text */
 				fprintf (ppout, "%*.*s", (int)size2, (int)size2,
 					 save_queue->text);
@@ -1552,7 +1556,8 @@ ppecho (const char *text, const cob_u32_t alt_space, const int textlen)
 					check_listing (lno->text, 0);
 				}
 			}
-			if (r->lead_trail == CB_REPLACE_LEADING) {
+			if (r->lead_trail == CB_REPLACE_LEADING
+				&& save_queue /* <- silence warnings */) {
 				/* Non-matched part of original text */
 				fputs (save_queue->text + size, ppout);
 				if (cb_listing_file) {

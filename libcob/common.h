@@ -1,21 +1,21 @@
 /*
-Copyright (C) 2002,2003,2004,2005,2006,2007 Keisuke Nishida
-Copyright (C) 2007-2012 Roger While
+   Copyright (C) 2002-2016 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
-This file is part of GNU Cobol.
+   This file is part of GnuCOBOL.
 
-The GNU Cobol runtime library is free software: you can redistribute it
-and/or modify it under the terms of the GNU Lesser General Public License
-as published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+   The GnuCOBOL runtime library is free software: you can redistribute it
+   and/or modify it under the terms of the GNU Lesser General Public License
+   as published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
 
-GNU Cobol is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+   GnuCOBOL is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU Lesser General Public License
+   along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef COB_COMMON_H
@@ -491,19 +491,19 @@ GLib is licensed under the GNU Lesser General Public License.
 
 
 #if	defined(_MSC_VER) || defined(__WATCOMC__) || defined(__BORLANDC__)
-#define PATHSEPC ';'
-#define PATHSEPS ";"
+#define PATHSEP_CHAR (char) ';'
+#define PATHSEP_STR (char *) ";"
 #else
-#define PATHSEPC ':'
-#define PATHSEPS ":"
+#define PATHSEP_CHAR (char) ':'
+#define PATHSEP_STR (char *) ":"
 #endif
 
 #ifndef	_WIN32
-#define SLASH_INT	'/'
-#define SLASH_STR	"/"
+#define SLASH_CHAR	(char) '/'
+#define SLASH_STR	(char *) "/"
 #else
-#define SLASH_INT	'\\'
-#define SLASH_STR	"\\"
+#define SLASH_CHAR	(char) '\\'
+#define SLASH_STR	(char *) "\\"
 #endif
 
 /* End compiler stuff */
@@ -1427,6 +1427,7 @@ DECLNORET COB_EXPIMP void	cob_stop_run(const int) COB_A_NORETURN;
 DECLNORET COB_EXPIMP void	cob_fatal_error(const int) COB_A_NORETURN;
 
 COB_EXPIMP void	*cob_malloc(const size_t) COB_A_MALLOC;
+COB_EXPIMP void	*cob_realloc			(void *, const size_t, const size_t) COB_A_MALLOC;
 COB_EXPIMP void	cob_free(void *);
 COB_EXPIMP void	*cob_fast_malloc(const size_t) COB_A_MALLOC;
 COB_EXPIMP void	*cob_cache_malloc(const size_t) COB_A_MALLOC;

@@ -1,23 +1,23 @@
 #
 # Makefile gnucobol/tests/cobol85
 #
-# Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
-# Copyright (C) 2008-2012 Roger While
+# Copyright (C) 2003-2012, 2015 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
-# This file is part of GNU Cobol.
+# This file is part of GnuCOBOL.
 #
-# The GNU Cobol compiler is free software: you can redistribute it
+# The GnuCOBOL compiler is free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# GNU Cobol is distributed in the hope that it will be useful,
+# GnuCOBOL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+# along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
 #
 #MODULES = CM DB IC IF IX NC OB RL RW SG SM SQ ST
@@ -68,6 +68,20 @@ if COB_MAKE_IX
 else
 	diff $(srcdir)/summarynoix.txt summary.log
 endif
+
+newcob.val:
+	if ! test -f "newcob.val"; then \
+	   if ! test -f "newcob.val.Z"; then \
+	      wget "http://www.itl.nist.gov/div897/ctg/suites/newcob.val.Z"; \
+	   fi; \
+	   if test -f "newcob.val.Z"; then \
+	      gunzip newcob.val.Z || gzip -d newcob.val.Z || uncompress newcob.val.Z; \
+	   fi; \
+	   if ! test -f "newcob.val"; then \
+	      echo "newcob.val missing, automatic download and uncompress did not work"; \
+	      exit 1; \
+	   fi; \
+	fi
 
 clean-local:
 	rm -rf copy copyalt $(MODULES) EXEC85 summary.log EXEC85.cob

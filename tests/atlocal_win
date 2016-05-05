@@ -1,24 +1,23 @@
 #
 # atlocal gnucobol/tests
 #
-# Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
-# Copyright (C) 2008-2012 Roger While
-# Copyright (C) 2014,2015 Simon Sobisch
+# Copyright (C) 2003-2012, 2014-2015 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
-# This file is part of GNU Cobol.
+# This file is part of GnuCOBOL.
 #
-# The GNU Cobol compiler is free software: you can redistribute it
+# The GnuCOBOL compiler is free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# GNU Cobol is distributed in the hope that it will be useful,
+# GnuCOBOL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+# along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
 # CC="gcc -std=gnu99"
 
@@ -26,7 +25,7 @@ COB_SRC_PATH="$(cd .. ; pwd)"
 COB_WIN_BUILDPATH="$COB_SRC_PATH/build_windows/Win32/release"
 
 COB_BIGENDIAN="no"
-COB_HAS_ISAM="yes"
+
 COBC="cobc"
 COBCRUN="cobcrun"
 
@@ -47,23 +46,43 @@ PATH="$COB_WIN_BUILDPATH:${PATH}"
 export PATH
 
 # unset all environmental vars that are used by libcob
-for cobenv in $("$COBCRUN" --runtime-env 2>/dev/null | grep COB_ | cut -d: -f2); do unset $cobenv; done
-
-export COB_CONFIG_DIR="$COB_SRC_PATH/config"
-export COB_RUNTIME_CONFIG="${COB_CONFIG_DIR}/runtime_empty.cfg"
-export COB_COPY_DIR="$COB_SRC_PATH/copy"
-export COB_LIBRARY_PATH="$COB_WIN_BUILDPATH:$COB_LIBRARY_PATH"
-export COB_UNIX_LF=YES
-export COB_MSG_FORMAT=GCC
-export COB_HAS_ISAM
-export LC_ALL=C
-
-# For later reference
-#export COB_CONFIG_DIR=$(echo "$COB_SRC_PATH/config" | sed 's/\//\\/g' | sed 's/^\\\([a-z]\)\\/\1:\\/g')
-#export COB_COPY_DIR=$(echo "$COB_SRC_PATH/copy" | sed 's/\//\\/g' | sed 's/^\\\([a-z]\)\\/\1:\\/g')
+for cobenv in $($COBCRUN --runtime-env 2>/dev/null | grep COB_ | cut -d: -f2); do unset $cobenv; done
 
 # For running the testsuite in Cygwin with non-Cygwin binaries (for example Visual C builds)
-# (not needed for running the testsuite with MSYS)
-#export COB_CONFIG_DIR=$(cygpath -aw "$COB_CONFIG_DIR")
-#export COB_COPY_DIR=$(cygpath -aw "$COB_COPY_DIR")
-#export COB_LIBRARY_PATH=$(cygpath -pw "$COB_LIBRARY_PATH")
+# (not needed for running the testsuite with MSYS as this translates the path)
+_return_path () {
+	# For later reference only
+	#echo "$1" | sed 's/\//\\/g' | sed 's/^\\\([a-z]\)\\/\1:\\/g')
+	if test "$OSTYPE" = "cygwin"; then
+	   cygpath -pw "$1"
+	else
+	   echo "$1"
+	fi
+}
+
+export COB_CONFIG_DIR="$(_return_path "$COB_SRC_PATH/config")"
+export COB_RUNTIME_CONFIG="$(_return_path "$COB_SRC_PATH/config/runtime_empty.cfg")"
+export COB_COPY_DIR="$(_return_path "$COB_SRC_PATH/copy")"
+export COB_LIBRARY_PATH="$(_return_path "$COB_WIN_BUILDPATH"):$(_return_path ":$COB_LIBRARY_PATH")"
+export COB_UNIX_LF=YES
+export COB_MSG_FORMAT=GCC
+export LC_ALL=C
+
+
+
+if test $($COBC --info | grep -i -c "ISAM .*:.*not available") = 0; then
+   COB_HAS_ISAM="yes"
+else
+   COB_HAS_ISAM="no"
+fi
+export COB_HAS_ISAM
+
+COB_HAS_CURSES="no"
+if test "$OSTYPE" != "cygwin"; then
+   # using non-cygwin builds with pdcurses result in
+   # "Redirection is not supported"
+   if test $($COBC --info | grep -i -c "screen .*: .*curses") = 1; then
+      COB_HAS_CURSES="yes"
+   fi
+fi
+export COB_HAS_CURSES

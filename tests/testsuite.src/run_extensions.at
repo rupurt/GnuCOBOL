@@ -1,23 +1,22 @@
-## Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
-## Copyright (C) 2007-2012 Roger While
-## Copyright (C) 2014 Simon Sobisch
-## 
-## This file is part of GNU Cobol.
-## 
-## The GNU Cobol compiler is free software: you can redistribute it
+## Copyright (C) 2003-2012, 2014-2015 Free Software Foundation, Inc.
+## Written by Keisuke Nishida, Roger While, Simon Sobisch
+##
+## This file is part of GnuCOBOL.
+##
+## The GnuCOBOL compiler is free software: you can redistribute it
 ## and/or modify it under the terms of the GNU General Public License
 ## as published by the Free Software Foundation, either version 3 of the
 ## License, or (at your option) any later version.
-## 
-## GNU Cobol is distributed in the hope that it will be useful,
+##
+## GnuCOBOL is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
-## along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+## along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
-### GNU Cobol Test Suite
+### GnuCOBOL Test Suite
 
 ### Non-standard extensions
 
@@ -62,8 +61,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_MODULE dump.c], [0], , [])
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE_MODULE dump.c], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [00001234
 00004660
@@ -91,7 +90,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [00074565
 16777215
@@ -115,7 +114,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , 
+AT_CHECK([$COMPILE prog.cob], [0], [], 
 [prog.cob: 5: Warning: Expression is always FALSE
 prog.cob: 5: Warning: Expression is always TRUE
 prog.cob: 6: Warning: Expression is always TRUE 
@@ -170,7 +169,7 @@ AT_DATA([prog.cob], [
          END-IF.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -209,7 +208,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -265,7 +264,7 @@ AT_DATA([prog.cob], [
            END-DISPLAY.
 ])
 
-AT_CHECK([$COMPILE -std=mvs -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mvs -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0], [123456:34:56])
 
 AT_CLEANUP
@@ -324,7 +323,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -std=mf -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mf -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [18181    22        333
 1818  3    22      111
@@ -386,7 +385,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -std=mf -fodoslide -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mf -fodoslide -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [0606122333
 1010  3  22111
@@ -451,7 +450,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -std=mf -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mf -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [33331    22        333            444
 3333  3    22      111            000
@@ -516,7 +515,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -std=mf -fodoslide -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mf -fodoslide prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [0909122333444
 1313  3  22111000
@@ -570,7 +569,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -std=mf prog.cob], [0], , [])
+AT_CHECK([$COMPILE -std=mf prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -589,7 +588,7 @@ AT_DATA([prog.cob], [
         01 ALPHA-FIELD         PIC X(4).
 
         01 NON-INTEGER           PIC 9(2)V99   VALUE 12.89 .
-        01 NON-INTEGER-2         PIC 9(2)V99   
+        01 NON-INTEGER-2         PIC 9(2)V99
                                      USAGE BINARY VALUE 12.89 .
         01 NON-INTEGER-3         PIC 9(2)V99
                                       USAGE PACKED-DECIMAL VALUE 12.89 .
@@ -702,8 +701,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_MODULE setfilename.c], [0], , [])
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE_MODULE setfilename.c], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 AT_CHECK([test -e TESTFILE], [0])
 
@@ -763,11 +762,11 @@ AT_DATA([caller.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_MODULE A@B.cob], [0], , [])
-AT_CHECK([$COMPILE_MODULE A@%:@B.cob], [0], , [])
-AT_CHECK([$COMPILE_MODULE A-B.cob], [0], , [])
-AT_CHECK([$COMPILE_MODULE A_B.cob], [0], , [])
-AT_CHECK([$COMPILE -o caller caller.cob], [0], , [])
+AT_CHECK([$COMPILE_MODULE A@B.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE A@%:@B.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE A-B.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE A_B.cob], [0], [], [])
+AT_CHECK([$COMPILE -o caller caller.cob], [0], [], [])
 
 AT_CHECK([./caller], [0], [P1P2P3P4])
 
@@ -777,39 +776,39 @@ AT_SETUP([CALL / GOBACK with LOCAL-STORAGE])
 AT_KEYWORDS([extensions])
 
 # Testcase introduced when Bug #91 occured.
-# Will fail if memory is freed which was 
+# Will fail if memory is freed which was
 # allocated by mpir/gmp.
 AT_DATA([prog_a.cob], [
-		IDENTIFICATION DIVISION. 
+		IDENTIFICATION DIVISION.
 		PROGRAM-ID. prog_a.
 		DATA DIVISION.
 		WORKING-STORAGE SECTION.
 		77  WS-STRINGA   PIC X(10).
-		PROCEDURE DIVISION.       
+		PROCEDURE DIVISION.
 		    MOVE  "hi there"   TO WS-STRINGA
-		    CALL  "prog_b"  USING WS-STRINGA      
-		    DISPLAY "back in prog_a"  
+		    CALL  "prog_b"  USING WS-STRINGA
+		    DISPLAY "back in prog_a"
 		    GOBACK.
 ])
 
 AT_DATA([prog_b.cob], [
-		IDENTIFICATION DIVISION. 
+		IDENTIFICATION DIVISION.
 		PROGRAM-ID. prog_b.
 		DATA DIVISION.
-		WORKING-STORAGE SECTION. 
+		WORKING-STORAGE SECTION.
 		77  WS-STRINGB   PIC X(10).
 		77  WS-CALLSB    PIC 9(03).
 		LOCAL-STORAGE SECTION.
-		77  LS-STRING  PIC X(10). 
+		77  LS-STRING  PIC X(10).
 		LINKAGE SECTION.
-		77  LK-STRING  PIC X(10). 
-		
-		PROCEDURE DIVISION  USING  LK-STRING. 
-		    DISPLAY "entered prog_b"           
-		    ADD   1  TO  WS-CALLSB 
-		    MOVE  LK-STRING TO WS-STRINGB     
-		    MOVE  LK-STRING TO LS-STRING    
-		    DISPLAY "exiting prog_b"      
+		77  LK-STRING  PIC X(10).
+
+		PROCEDURE DIVISION  USING  LK-STRING.
+		    DISPLAY "entered prog_b"
+		    ADD   1  TO  WS-CALLSB
+		    MOVE  LK-STRING TO WS-STRINGB
+		    MOVE  LK-STRING TO LS-STRING
+		    DISPLAY "exiting prog_b"
 		    GOBACK.
 ])
 
@@ -875,7 +874,7 @@ AT_DATA([prog.cob], [
        END PROGRAM PROG.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -897,7 +896,7 @@ AT_DATA([prog.cob], [
        END PROGRAM caller.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -919,7 +918,7 @@ AT_DATA([prog.cob], [
        END PROGRAM caller.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -o prog prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
@@ -1017,7 +1016,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], [], [])
 AT_CHECK([DD_FILENAME="x" ./prog], [0])
 AT_CHECK([test -f "x"], [0])
 AT_CHECK([dd_FILENAME="y" ./prog], [0])
@@ -1054,7 +1053,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], [], [])
 AT_CHECK([DIR="." ./prog], [0])
 AT_CHECK([test -f "./FILENAME" && rm -f "./FILENAME"], [0])
 
@@ -1085,7 +1084,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE -conf=test.conf -o prog prog.cob], [0], [], [])
 AT_CHECK([COB_FILE_PATH=".." ./prog], [0])
 AT_CHECK([test -f "../FILENAMEX" && rm -f "../FILENAMEX"], [0])
 
@@ -1135,8 +1134,8 @@ AT_DATA([caller.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE caller.cob], [0], , [])
-AT_CHECK([$COMPILE_MODULE callee.cob], [0], , [])
+AT_CHECK([$COMPILE caller.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE callee.cob], [0], [], [])
 AT_CHECK([./caller], [0],
 [+000000000
 +000000001

@@ -1,21 +1,21 @@
 /*
-   Copyright (C) 2004-2012 Roger While
-   Copyright (C) 2012,2014,2015 Simon Sobisch
+   Copyright (C) 2004-2012, 2014-2016 Free Software Foundation, Inc.
+   Written by Roger While, Simon Sobisch
 
-   This file is part of GNU Cobol.
+   This file is part of GnuCOBOL.
 
-   The GNU Cobol compiler is free software: you can redistribute it
+   The GnuCOBOL compiler is free software: you can redistribute it
    and/or modify it under the terms of the GNU General Public License
    as published by the Free Software Foundation, either version 3 of the
    License, or (at your option) any later version.
 
-   GNU Cobol is distributed in the hope that it will be useful,
+   GnuCOBOL is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+   along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include	"config.h"
@@ -64,28 +64,32 @@ static const struct option long_options[] = {
 static void
 cobcrun_print_version (void)
 {
-	int	year;
-	int	day;
-	char	buff[64];
+	char	cob_build_stamp[COB_MINI_BUFF];
 	char	month[64];
+	int status, day, year;
 
-	memset (buff, 0, sizeof(buff));
+	/* Set up build time stamp */
+	memset (cob_build_stamp, 0, (size_t)COB_MINI_BUFF);
 	memset (month, 0, sizeof(month));
 	day = 0;
 	year = 0;
-	sscanf (__DATE__, "%s %d %d", month, &day, &year);
-	if (day && year) {
-		sprintf (buff, "%s %2.2d %4.4d %s", month, day, year, __TIME__);
+	status = sscanf (__DATE__, "%s %d %d", month, &day, &year);
+	if (status == 3) {
+		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
+			  "%s %2.2d %4.4d %s", month, day, year, __TIME__);
 	} else {
-		sprintf (buff, "%s %s", __DATE__, __TIME__);
+		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
+			  "%s %s", __DATE__, __TIME__);
 	}
+
 	printf ("cobcrun (%s) %s.%d\n",
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	puts ("Copyright (C) 2004-2012 Roger While");
-	puts ("Copyright (C) 2012,2014,2015 Simon Sobisch");
-	puts (_("This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
-	printf (_("Built     %s"), buff);
+	puts ("Copyright (C) 2016 Free Software Foundation, Inc.");
+	puts (_("License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>"));
+	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
+	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
+	printf (_("Written by %s\n"), "Roger While, Simon Sobisch");
+	printf (_("Built     %s"), cob_build_stamp);
 	putchar ('\n');
 	printf (_("Packaged  %s"), COB_TAR_DATE);
 	putchar ('\n');
@@ -94,24 +98,26 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 static void
 cobcrun_print_usage (char * prog)
 {
-	printf (_("Usage: %s [options] PROGRAM [param ...]"), prog);
+	puts (_("COBOL driver program for GnuCOBOL modules"));
+	putchar ('\n');
+	printf (_("usage: %s [options] PROGRAM [parameter ...]"), prog);
 	putchar ('\n');
 	printf (_("  or:  %s options"), prog);
 	putchar ('\n');
 	putchar ('\n');
-	printf (_("COBOL driver program for %s modules"), PACKAGE_NAME);
-	putchar ('\n');
-	putchar ('\n');
 	puts (_("Options:"));
-	puts (_("  -h, -help                   Display this help and exit"));
-	puts (_("  -V, -version                Display cobcrun and runtime version"));
-	puts (_("  -i, -info                   Display runtime information (build/environment)"));
-	puts (_("  -c <file>, -config=<file>   Set runtime configuration from <file>"));
-	puts (_("  -r, -runtime-env            Display current runtime configuration"));
-	puts (_("                              This will show all settings and how they were set."));
-	puts (_("                              Possible options are runtime configuration file,"));
-	puts (_("                              environment (marked by 'env' when only set this way or"));
-	puts (_("                              by 'Ovr' if this overrides the runtime setting) or default"));
+	puts (_("  -h, -help             display this help and exit"));
+	puts (_("  -V, -version          display cobcrun and runtime version and exit"));
+	puts (_("  -i, -info             display runtime information (build/environment)"));
+	puts (_("  -c <file>, -config=<file>   set runtime configuration from <file>"));
+	puts (_("  -r, -runtime-env      display current runtime configuration\n"
+	        "                        (value and origin for all settings)"));
+	putchar ('\n');
+	printf (_("Report bugs to: %s or\n"
+			  "use the preferred issue tracker via home page"), "bug-gnucobol@gnu.org");
+	putchar ('\n');
+	puts (_("GnuCOBOL home page: <http://www.gnu.org/software/gnucobol/>"));
+	puts (_("General help using GNU software: <http://www.gnu.org/gethelp/>"));
 }
 
 /* Set current argument from getopt as environment value */
@@ -159,7 +165,7 @@ process_command_line (int argc, char *argv[])
 		case 'C':
 			/* --config=<file> */
 			if (strlen (cob_optarg) > COB_SMALL_MAX) {
-				fputs (_("Invalid configuration file name"), stderr);
+				fputs (_("invalid configuration file name"), stderr);
 				putc ('\n', stderr);
 				fflush (stderr);
 				exit (1);

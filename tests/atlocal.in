@@ -1,28 +1,28 @@
 #
 # atlocal gnucobol/tests
 #
-# Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
-# Copyright (C) 2008-2012 Roger While
-# Copyright (C) 2014,2015 Simon Sobisch
+# Copyright (C) 2003-2012, 2014-2015 Free Software Foundation, Inc.
+# Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
-# This file is part of GNU Cobol.
+# This file is part of GnuCOBOL.
 #
-# The GNU Cobol compiler is free software: you can redistribute it
+# The GnuCOBOL compiler is free software: you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 #
-# GNU Cobol is distributed in the hope that it will be useful,
+# GnuCOBOL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+# along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
 # CC="@CC@"
 COB_BIGENDIAN="@COB_BIGENDIAN@"
 COB_HAS_ISAM="@COB_HAS_ISAM@"
+COB_HAS_CURSES="@COB_HAS_CURSES@"
 COBC="${abs_top_builddir}/cobc/cobc"
 COBCRUN="${abs_top_builddir}/bin/cobcrun"
 
@@ -42,6 +42,11 @@ PATHSEP=":"
 # unset all environmental vars that are used by libcob
 for cobenv in $($COBCRUN --runtime-env 2>/dev/null | grep COB_ | cut -d: -f2); do unset $cobenv; done
 
+# For running the testsuite in Cygwin with non-Cygwin binaries we need a wrapper function
+_return_path () {
+	echo "$1"
+}
+
 PATH="${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${abs_top_builddir}/libcob/.libs:${PATH}"
 export PATH
 export COB_CFLAGS="-I${abs_top_srcdir} -I${abs_top_srcdir}/libcob @COB_CFLAGS@"
@@ -57,4 +62,5 @@ export LIBPATH="${abs_top_builddir}/libcob/.libs:$LIBPATH"
 export COB_LIBRARY_PATH="${abs_top_builddir}/extras:$COB_LIBRARY_PATH"
 export COB_UNIX_LF=YES
 export COB_HAS_ISAM
+export COB_HAS_CURSES
 export LC_ALL=C

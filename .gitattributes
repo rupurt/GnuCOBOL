@@ -39,7 +39,7 @@ build_windows/set_env_vs.bat -text
 build_windows/set_env_vs_dist.bat -text
 build_windows/set_env_vs_dist_x64.bat -text
 build_windows/set_env_vs_x64.bat -text
-build_windows/vc10/GNU[!!-~]Cobol.sln -text
+build_windows/vc10/GnuCOBOL.sln -text
 build_windows/vc10/cobc.vcxproj -text
 build_windows/vc10/cobc.vcxproj.filters -text
 build_windows/vc10/cobc.vcxproj.user -text
@@ -54,7 +54,7 @@ build_windows/vc10/libcob.vcxproj.user -text
 build_windows/vc10/libsupport.vcxproj -text
 build_windows/vc10/libsupport.vcxproj.filters -text
 build_windows/vc10/libsupport.vcxproj.user -text
-build_windows/vc11/GNU[!!-~]Cobol.sln -text
+build_windows/vc11/GnuCOBOL.sln -text
 build_windows/vc11/cobc.vcxproj -text
 build_windows/vc11/cobc.vcxproj.filters -text
 build_windows/vc11/cobc.vcxproj.user -text
@@ -69,7 +69,7 @@ build_windows/vc11/libcob.vcxproj.user -text
 build_windows/vc11/libsupport.vcxproj -text
 build_windows/vc11/libsupport.vcxproj.filters -text
 build_windows/vc11/libsupport.vcxproj.user -text
-build_windows/vc12/GNU[!!-~]Cobol.sln -text
+build_windows/vc12/GnuCOBOL.sln -text
 build_windows/vc12/cobc.vcxproj -text
 build_windows/vc12/cobc.vcxproj.filters -text
 build_windows/vc12/cobcrun.vcxproj -text
@@ -80,7 +80,7 @@ build_windows/vc12/libcob.vcxproj -text
 build_windows/vc12/libcob.vcxproj.filters -text
 build_windows/vc12/libsupport.vcxproj -text
 build_windows/vc12/libsupport.vcxproj.filters -text
-build_windows/vc14/GNU[!!-~]Cobol.sln -text
+build_windows/vc14/GnuCOBOL.sln -text
 build_windows/vc14/cobc.vcxproj -text
 build_windows/vc14/cobc.vcxproj.filters -text
 build_windows/vc14/cobcrun.vcxproj -text
@@ -91,13 +91,13 @@ build_windows/vc14/libcob.vcxproj -text
 build_windows/vc14/libcob.vcxproj.filters -text
 build_windows/vc14/libsupport.vcxproj -text
 build_windows/vc14/libsupport.vcxproj.filters -text
-build_windows/vc7/GNU[!!-~]Cobol.sln -text
+build_windows/vc7/GnuCOBOL.sln -text
 build_windows/vc7/cobc.vcproj -text
 build_windows/vc7/cobcrun.vcproj -text
 build_windows/vc7/config.h -text
 build_windows/vc7/defaults.h -text
 build_windows/vc7/libcob.vcproj -text
-build_windows/vc8/GNU[!!-~]Cobol.sln -text
+build_windows/vc8/GnuCOBOL.sln -text
 build_windows/vc8/cobc.vcproj -text
 build_windows/vc8/cobc.vcproj.user -text
 build_windows/vc8/cobcrun.vcproj -text
@@ -106,7 +106,7 @@ build_windows/vc8/config.h -text
 build_windows/vc8/defaults.h -text
 build_windows/vc8/libcob.vcproj -text
 build_windows/vc8/libcob.vcproj.user -text
-build_windows/vc9/GNU[!!-~]Cobol.sln -text
+build_windows/vc9/GnuCOBOL.sln -text
 build_windows/vc9/cobc.vcproj -text
 build_windows/vc9/cobc.vcproj.user -text
 build_windows/vc9/cobcrun.vcproj -text
@@ -155,6 +155,7 @@ config/Makefile.in -text
 config/acu.conf -text
 config/bs2000.conf -text
 config/cobol2002.conf -text
+config/cobol2014.conf -text
 config/cobol85.conf -text
 config/default.conf -text
 config/ibm.conf -text
@@ -173,14 +174,16 @@ copy/sqlda.cpy -text
 doc/ChangeLog -text
 doc/Makefile.am -text
 doc/Makefile.in -text
+doc/cbchelp.tex -text
 doc/cbconf.tex -text
 doc/cbhelp.tex -text
-doc/cbinfo.tex -text
 doc/cbintr.tex -text
 doc/cbmnem.tex -text
 doc/cbrese.tex -text
+doc/cbrunt.tex -text
 doc/cbsyst.tex -text
 doc/cobcinfo.sh -text
+doc/fdl.texi -text
 doc/gnucobol.info -text
 doc/gnucobol.pdf -text
 doc/gnucobol.texi -text

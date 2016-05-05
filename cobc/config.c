@@ -1,22 +1,21 @@
 /*
-   Copyright (C) 2003,2004,2005,2006,2007 Keisuke Nishida
-   Copyright (C) 2007-2012 Roger While
-   Copyright (C) 2014-2015 Simon Sobisch
+   Copyright (C) 2003-2012, 2014-2016 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch
 
-   This file is part of GNU Cobol.
+   This file is part of GnuCOBOL.
 
-   The GNU Cobol compiler is free software: you can redistribute it
+   The GnuCOBOL compiler is free software: you can redistribute it
    and/or modify it under the terms of the GNU General Public License
    as published by the Free Software Foundation, either version 3 of the
    License, or (at your option) any later version.
 
-   GNU Cobol is distributed in the hope that it will be useful,
+   GnuCOBOL is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with GNU Cobol.  If not, see <http://www.gnu.org/licenses/>.
+   along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -323,7 +322,7 @@ cb_load_conf_file (const char *conf_file, int isoptional)
 	int			i, line;
 	char			buff[COB_SMALL_BUFF];
 
-	for (i=0; conf_file[i] != 0 && conf_file[i] != SLASH_INT; i++);
+	for (i=0; conf_file[i] != 0 && conf_file[i] != SLASH_CHAR; i++);
 	if (conf_file[i] == 0) {			/* Just a name, No directory */
 		if (access(conf_file, F_OK) != 0) {	/* and file does not exist */
 			/* check for path of previous configuration file (for includes) */
@@ -336,10 +335,10 @@ cb_load_conf_file (const char *conf_file, int isoptional)
 			filename[0] = 0;
 			if (c && c->name) {
 				strcpy(buff, conf_includes->name);
-				for (i = strlen(buff); i != 0 && buff[i] != SLASH_INT; i--);
+				for (i = strlen(buff); i != 0 && buff[i] != SLASH_CHAR; i--);
 				if (i != 0) {
 					buff[i] = 0;
-					snprintf(filename, (size_t)COB_NORMAL_MAX, "%s%s%s", buff, SLASH_STR, conf_file);
+					snprintf(filename, (size_t)COB_NORMAL_MAX, "%s%c%s", buff, SLASH_CHAR, conf_file);
 					if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
 						conf_file = filename;		/* Prefix last directory */
 					} else {
@@ -349,7 +348,8 @@ cb_load_conf_file (const char *conf_file, int isoptional)
 			}
 			if (filename[0] == 0) {
 				/* check for COB_CONFIG_DIR (use default if not in environment) */
-				snprintf (filename, (size_t)COB_NORMAL_MAX, "%s%s%s", cob_config_dir, SLASH_STR, conf_file);
+				snprintf (filename, (size_t)COB_NORMAL_MAX, "%s%c%s", cob_config_dir, SLASH_CHAR, conf_file);
+				filename[COB_NORMAL_MAX] = 0;
 				if (access(filename, F_OK) == 0) {	/* and prefixed file exist */
 					conf_file = filename;		/* Prefix COB_CONFIG_DIR */
 				}
@@ -360,7 +360,7 @@ cb_load_conf_file (const char *conf_file, int isoptional)
 	/* check for recursion */
 	c = cc = conf_includes;
 	while (c != NULL) {
-		if (strcmp(c->name, conf_file) == 0) {
+		if (c->name /* <- silence warnings */ && strcmp(c->name, conf_file) == 0) {
 			configuration_error (1, conf_file, 0, _("Recursive inclusion"));
 			return -2;
 		}
@@ -451,7 +451,7 @@ cb_load_conf (const char *fname, const int prefix_dir)
 	/* Get the name for the configuration file */
 	if (prefix_dir) {
 		snprintf (buff, (size_t)COB_NORMAL_MAX,
-			  "%s%s%s", cob_config_dir, SLASH_STR, fname);
+			  "%s%c%s", cob_config_dir, SLASH_CHAR, fname);
 		name = buff;
 	} else {
 		name = fname;

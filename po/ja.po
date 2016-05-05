@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenCOBOL 0.13\n"
 "Report-Msgid-Bugs-To: open-cobol-list@lists.sourceforge.net\n"
-"POT-Creation-Date: 2015-04-13 10:16+0200\n"
+"POT-Creation-Date: 2016-05-05 10:11+0000\n"
 "PO-Revision-Date: 2004-08-01 23:55+0900\n"
 "Last-Translator: Keisuke Nishida <knishida@coboler.com>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
@@ -19,745 +19,771 @@ msgstr ""
 "X-Poedit-Language: Japanese\n"
 "X-Poedit-Basepath: ..\n"
 
-#: cobc/cobc.c:83
+#: cobc/cobc.c:84
 #, fuzzy, c-format
 msgid "Invalid %s parameter"
 msgstr "不当な MOVE 文です"
 
-#: cobc/cobc.c:601
+#: cobc/cobc.c:602
 msgid "Too many errors - Aborting compilation"
 msgstr ""
 
-#: cobc/cobc.c:608
+#: cobc/cobc.c:609
 #, fuzzy, c-format
 msgid "%s:%d Internal compiler error"
 msgstr "永続ファイルエラーです"
 
-#: cobc/cobc.c:622
+#: cobc/cobc.c:623
 #, fuzzy, c-format
 msgid "%s:%d Invalid cast from '%s' type %s to type %s"
 msgstr "%s: 節 `%s':\n"
 
-#: cobc/cobc.c:649 cobc/cobc.c:708 cobc/cobc.c:746 cobc/cobc.c:810
-#: cobc/cobc.c:848 cobc/cobc.c:912
+#: cobc/cobc.c:650 cobc/cobc.c:709 cobc/cobc.c:747 cobc/cobc.c:816
+#: cobc/cobc.c:854 cobc/cobc.c:923
 #, c-format
 msgid "Cannot allocate %d bytes of memory - Aborting"
 msgstr ""
 
-#: cobc/cobc.c:661 cobc/cobc.c:676 cobc/cobc.c:727 cobc/cobc.c:829
-#: cobc/cobc.c:930 cobc/cobc.c:947 cobc/cobc.c:1284 libcob/common.c:1554
+#: cobc/cobc.c:662 cobc/cobc.c:677 cobc/cobc.c:728 cobc/cobc.c:835
+#: cobc/cobc.c:941 cobc/cobc.c:958 cobc/cobc.c:1295 libcob/common.c:1685
 #, c-format
 msgid "Call to %s with NULL pointer"
 msgstr ""
 
-#: cobc/cobc.c:693
+#: cobc/cobc.c:694
 #, c-format
 msgid "Cannot reallocate %d bytes of memory - Aborting"
 msgstr ""
 
-#: cobc/cobc.c:761 cobc/cobc.c:863
+#: cobc/cobc.c:762 cobc/cobc.c:869
 msgid "Attempt to reallocate non-allocated memory - Aborting"
 msgstr ""
 
-#: cobc/cobc.c:1054
+#: cobc/cobc.c:793 cobc/cobc.c:900
+#, c-format
+msgid "Call to %s with invalid pointer, as it is missing in list"
+msgstr ""
+
+#: cobc/cobc.c:1065
 #, c-format
 msgid "Warning - Assuming literal for unquoted '%s'"
 msgstr ""
 
-#: cobc/cobc.c:1093
+#: cobc/cobc.c:1104
 msgid " - Length is < 1 or > 31"
 msgstr ""
 
-#: cobc/cobc.c:1096
+#: cobc/cobc.c:1107
 msgid " - Name cannot begin with space or underscore"
 msgstr ""
 
-#: cobc/cobc.c:1099
+#: cobc/cobc.c:1110
 msgid " - Name cannot begin with 'cob_' or 'COB_'"
 msgstr ""
 
-#: cobc/cobc.c:1102
+#: cobc/cobc.c:1113
 msgid " - Name duplicates a 'C' keyword"
 msgstr ""
 
-#: cobc/cobc.c:1105
+#: cobc/cobc.c:1116
 msgid " - Name cannot contain a directory separator"
 msgstr ""
 
-#: cobc/cobc.c:1113
+#: cobc/cobc.c:1124
 #, fuzzy, c-format
 msgid "Invalid file base name '%s'%s"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/cobc.c:1118
+#: cobc/cobc.c:1129
 #, fuzzy, c-format
 msgid "Invalid ENTRY '%s'%s"
 msgstr "不当な X 定数です: %s"
 
-#: cobc/cobc.c:1122
+#: cobc/cobc.c:1133
 #, fuzzy, c-format
 msgid "Invalid PROGRAM-ID '%s'%s"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/cobc.c:1125
+#: cobc/cobc.c:1136
 #, fuzzy, c-format
 msgid "Unknown name error '%s'%s"
 msgstr "原因不明のファイルエラーです"
 
-#: cobc/cobc.c:1224 cobc/error.c:106 cobc/error.c:134 cobc/error.c:189
+#: cobc/cobc.c:1235 cobc/error.c:107 cobc/error.c:135 cobc/error.c:204
 msgid "Error: "
 msgstr ""
 
-#: cobc/cobc.c:1248
+#: cobc/cobc.c:1259
 #, fuzzy, c-format
 msgid "Duplicate define '%s' - Ignoring"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/cobc.c:1328
+#: cobc/cobc.c:1339
 msgid "Parameter buffer size exceeded"
 msgstr ""
 
-#: cobc/cobc.c:1363
+#: cobc/cobc.c:1375
 #, c-format
 msgid "Warning - Could not move temporary file to %s"
 msgstr ""
 
-#: cobc/cobc.c:1476
+#: cobc/cobc.c:1490
 #, c-format
 msgid "Aborting compile of %s at line %d"
 msgstr ""
 
-#: cobc/cobc.c:1536 libcob/common.c:4399 bin/cobcrun.c:81
+#: cobc/cobc.c:1547 bin/cobcrun.c:88
+msgid ""
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>"
+msgstr ""
+
+#: cobc/cobc.c:1548 libcob/common.c:5312 bin/cobcrun.c:89
 msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
 msgstr ""
 
-#: cobc/cobc.c:1538 libcob/common.c:4401 bin/cobcrun.c:83
+#: cobc/cobc.c:1550 libcob/common.c:5314 bin/cobcrun.c:91
+#, c-format
+msgid "Written by %s\n"
+msgstr ""
+
+#: cobc/cobc.c:1551 libcob/common.c:5315 bin/cobcrun.c:92
 #, c-format
 msgid "Built     %s"
 msgstr ""
 
-#: cobc/cobc.c:1540 libcob/common.c:4403 bin/cobcrun.c:85
+#: cobc/cobc.c:1553 libcob/common.c:5317 bin/cobcrun.c:94
 #, c-format
 msgid "Packaged  %s"
 msgstr ""
 
-#: cobc/cobc.c:1542 libcob/common.c:4424
+#: cobc/cobc.c:1555 libcob/common.c:5338
 #, c-format
 msgid "C version %s%s"
 msgstr ""
 
-#: cobc/cobc.c:1554
+#: cobc/cobc.c:1567
 msgid "Executing:"
 msgstr ""
 
-#: cobc/cobc.c:1591 cobc/cobc.c:1592 libcob/common.c:4160 libcob/common.c:4161
+#: cobc/cobc.c:1604 cobc/cobc.c:1605 libcob/common.c:4482 libcob/common.c:4483
 msgid "env"
 msgstr ""
 
-#: cobc/cobc.c:1626 libcob/common.c:4416
-msgid "Build information"
+#: cobc/cobc.c:1639
+msgid "build information"
 msgstr ""
 
-#: cobc/cobc.c:1627 libcob/common.c:4417
-msgid "Build environment"
+#: cobc/cobc.c:1640
+msgid "build environment"
 msgstr ""
 
-#: cobc/cobc.c:1634 libcob/common.c:4426
-msgid "GNU Cobol information"
+#: cobc/cobc.c:1647 libcob/common.c:5341
+msgid "GnuCOBOL information"
 msgstr ""
 
-#: cobc/cobc.c:1680 cobc/cobc.c:1682 libcob/common.c:4436 libcob/common.c:4438
+#: cobc/cobc.c:1693 cobc/cobc.c:1695 libcob/common.c:5350 libcob/common.c:5352
 msgid "Dynamic loading"
 msgstr ""
 
-#: cobc/cobc.c:1680 libcob/common.c:4436
+#: cobc/cobc.c:1693 libcob/common.c:5350
 msgid "System"
 msgstr ""
 
-#: cobc/cobc.c:1682 libcob/common.c:4438
+#: cobc/cobc.c:1695 libcob/common.c:5352
 msgid "Libtool"
 msgstr ""
 
-#: cobc/cobc.c:1686 libcob/common.c:4442
+#: cobc/cobc.c:1699 libcob/common.c:5356
 msgid "Enabled"
 msgstr ""
 
-#: cobc/cobc.c:1688 libcob/common.c:4444
+#: cobc/cobc.c:1701 libcob/common.c:5358
 msgid "Disabled"
 msgstr ""
 
-#: cobc/cobc.c:1693 libcob/common.c:4448
+#: cobc/cobc.c:1706 libcob/common.c:5362
 msgid "yes"
 msgstr ""
 
-#: cobc/cobc.c:1695 libcob/common.c:4450
+#: cobc/cobc.c:1708 libcob/common.c:5364
 msgid "no"
 msgstr ""
 
-#: cobc/cobc.c:1699 libcob/common.c:4454
+#: cobc/cobc.c:1712 libcob/common.c:5368
 msgid "8 bytes"
 msgstr ""
 
-#: cobc/cobc.c:1701 libcob/common.c:4456
+#: cobc/cobc.c:1714 libcob/common.c:5370
 msgid "4 bytes"
 msgstr ""
 
-#: cobc/cobc.c:1704 libcob/common.c:4459
+#: cobc/cobc.c:1717 libcob/common.c:5373
 msgid "Extended screen I/O"
 msgstr ""
 
-#: cobc/cobc.c:1707 libcob/common.c:4462
+#: cobc/cobc.c:1720 libcob/common.c:5376
 msgid "Variable format"
 msgstr ""
 
-#: cobc/cobc.c:1713 cobc/cobc.c:1715 libcob/common.c:4468 libcob/common.c:4470
+#: cobc/cobc.c:1726 cobc/cobc.c:1728 libcob/common.c:5382 libcob/common.c:5384
 msgid "Sequential handler"
 msgstr ""
 
-#: cobc/cobc.c:1713 cobc/cobc.c:1719 libcob/common.c:4468 libcob/common.c:4474
+#: cobc/cobc.c:1726 cobc/cobc.c:1732 libcob/common.c:5382 libcob/common.c:5388
 msgid "External"
 msgstr ""
 
-#: cobc/cobc.c:1715 libcob/common.c:4470
+#: cobc/cobc.c:1728 libcob/common.c:5384
 msgid "Internal"
 msgstr ""
 
-#: cobc/cobc.c:1719 cobc/cobc.c:1721 cobc/cobc.c:1723 cobc/cobc.c:1725
-#: cobc/cobc.c:1727 cobc/cobc.c:1729 libcob/common.c:4474 libcob/common.c:4476
-#: libcob/common.c:4478 libcob/common.c:4480 libcob/common.c:4482
-#: libcob/common.c:4484
+#: cobc/cobc.c:1732 cobc/cobc.c:1734 cobc/cobc.c:1736 cobc/cobc.c:1738
+#: cobc/cobc.c:1740 cobc/cobc.c:1742 libcob/common.c:5388 libcob/common.c:5390
+#: libcob/common.c:5392 libcob/common.c:5394 libcob/common.c:5396
+#: libcob/common.c:5398
 msgid "ISAM handler"
 msgstr ""
 
-#: cobc/cobc.c:1729 libcob/common.c:4484
+#: cobc/cobc.c:1742 libcob/common.c:5398
 msgid "Not available"
 msgstr ""
 
-#: cobc/cobc.c:1750
+#: cobc/cobc.c:1752
 msgid "- NOT set with -Wall"
 msgstr ""
 
-#: cobc/cobc.c:1777
+#: cobc/cobc.c:1779
+msgid "GnuCOBOL compiler for most COBOL dialects with lots of extensions"
+msgstr ""
+
+#: cobc/cobc.c:1781
 #, c-format
-msgid "Usage: %s [options]... file..."
+msgid "usage: %s [options]... file..."
 msgstr ""
 
-#: cobc/cobc.c:1780
-#, c-format
-msgid "%s compiler for most COBOL dialects with lots of extensions"
+#: cobc/cobc.c:1784
+msgid "options:"
 msgstr ""
 
-#: cobc/cobc.c:1783 bin/cobcrun.c:100
-msgid "Options:"
-msgstr ""
-
-#: cobc/cobc.c:1784 bin/cobcrun.c:101
-msgid "  -h, -help             Display this help and exit"
-msgstr ""
-
-#: cobc/cobc.c:1785
-msgid "  -V, -version          Display compiler version"
+#: cobc/cobc.c:1785 bin/cobcrun.c:109
+msgid "  -h, -help             display this help and exit"
 msgstr ""
 
 #: cobc/cobc.c:1786
-msgid ""
-"  -i, -info             Display compiler information (build/environment)"
+msgid "  -V, -version          display compiler version and exit"
 msgstr ""
 
 #: cobc/cobc.c:1787
-msgid "  -v                    Display the commands invoked by the compiler"
+msgid ""
+"  -i, -info             display compiler information (build/environment)"
 msgstr ""
 
 #: cobc/cobc.c:1788
-msgid "  -x                    Build an executable program"
+msgid "  -v, -verbose          display the commands invoked by the compiler"
 msgstr ""
 
 #: cobc/cobc.c:1789
-msgid "  -m                    Build a dynamically loadable module (default)"
-msgstr ""
-
-#: cobc/cobc.c:1790
-msgid "  -std=<dialect>        Warnings/features for a specific dialect:"
+msgid ""
+"  -vv                   display compiler version and the commands\n"
+"                        invoked by the compiler"
 msgstr ""
 
 #: cobc/cobc.c:1791
-msgid "                          cobol2002   COBOL 2002"
+msgid "  -x                    build an executable program"
 msgstr ""
 
 #: cobc/cobc.c:1792
-msgid "                          cobol85     COBOL 85"
+msgid "  -m                    build a dynamically loadable module (default)"
 msgstr ""
 
 #: cobc/cobc.c:1793
-msgid "                          ibm         IBM Compatible"
+msgid "  -j                    run job, after build"
 msgstr ""
 
 #: cobc/cobc.c:1794
-msgid "                          mvs         MVS Compatible"
-msgstr ""
-
-#: cobc/cobc.c:1795
-msgid "                          bs2000      BS2000 Compatible"
-msgstr ""
-
-#: cobc/cobc.c:1796
-msgid "                          mf          Micro Focus Compatible"
-msgstr ""
-
-#: cobc/cobc.c:1797
-msgid "                          acu         ACUCOBOL-GT Compatible"
-msgstr ""
-
-#: cobc/cobc.c:1798
-msgid "                          default     When not specified"
+msgid ""
+"  -std=<dialect>        warnings/features for a specific dialect\n"
+"                        <dialect> can be one of:\n"
+"                        cobol2014, cobol2002, cobol85, default,\n"
+"                        ibm, mvs, bs2000, mf, acu;\n"
+"                        see configuration files in directory config"
 msgstr ""
 
 #: cobc/cobc.c:1799
-msgid "                        See config/default.conf and config/*.conf"
+msgid "  -F, -free             use free source format"
 msgstr ""
 
 #: cobc/cobc.c:1800
-msgid "  -free                 Use free source format"
+msgid "  -free                 use free source format"
 msgstr ""
 
 #: cobc/cobc.c:1801
-msgid "  -fixed                Use fixed source format (default)"
+msgid "  -fixed                use fixed source format (default)"
 msgstr ""
 
 #: cobc/cobc.c:1802
-msgid "  -O, -O2, -Os          Enable optimization"
+msgid "  -O, -O2, -Os          enable optimization"
 msgstr ""
 
 #: cobc/cobc.c:1803
-msgid "  -g                    Enable C compiler debug / stack check / trace"
+msgid "  -g                    enable C compiler debug / stack check / trace"
 msgstr ""
 
 #: cobc/cobc.c:1804
-msgid "  -debug                Enable all run-time error checking"
+msgid "  -d, -debug            enable all run-time error checking"
 msgstr ""
 
 #: cobc/cobc.c:1805
-msgid "  -o <file>             Place the output into <file>"
+msgid "  -o <file>             place the output into <file>"
 msgstr ""
 
 #: cobc/cobc.c:1806
-msgid "  -b                    Combine all input files into a single"
-msgstr ""
-
-#: cobc/cobc.c:1807
-msgid "                        dynamically loadable module"
+msgid ""
+"  -b                    combine all input files into a single\n"
+"                        dynamically loadable module"
 msgstr ""
 
 #: cobc/cobc.c:1808
-msgid "  -E                    Preprocess only; do not compile or link"
+msgid "  -E                    preprocess only; do not compile or link"
 msgstr ""
 
 #: cobc/cobc.c:1809
-msgid "  -C                    Translation only; convert COBOL to C"
+msgid "  -C                    translation only; convert COBOL to C"
 msgstr ""
 
 #: cobc/cobc.c:1810
-msgid "  -S                    Compile only; output assembly file"
+msgid "  -S                    compile only; output assembly file"
 msgstr ""
 
 #: cobc/cobc.c:1811
-msgid "  -c                    Compile and assemble, but do not link"
+msgid "  -c                    compile and assemble, but do not link"
 msgstr ""
 
 #: cobc/cobc.c:1812
-msgid "  -P(=<dir or file>)    Generate preprocessed program listing (.lst)"
+msgid "  -P(=<dir or file>)    generate preprocessed program listing (.lst)"
 msgstr ""
 
 #: cobc/cobc.c:1813
-msgid "  -Xref                 Generate cross reference through 'cobxref'"
-msgstr ""
-
-#: cobc/cobc.c:1814
-msgid "                        (V. Coen's 'cobxref' must be in path)"
+msgid ""
+"  -Xref                 generate cross reference through 'cobxref'\n"
+"                        (V. Coen's 'cobxref' must be in path)"
 msgstr ""
 
 #: cobc/cobc.c:1815
-msgid "  -I <directory>        Add <directory> to copy/include search path"
+msgid "  -I <directory>        add <directory> to copy/include search path"
 msgstr ""
 
 #: cobc/cobc.c:1816
-msgid "  -L <directory>        Add <directory> to library search path"
+msgid "  -L <directory>        add <directory> to library search path"
 msgstr ""
 
 #: cobc/cobc.c:1817
-msgid "  -l <lib>              Link the library <lib>"
+msgid "  -l <lib>              link the library <lib>"
 msgstr ""
 
 #: cobc/cobc.c:1818
-msgid "  -A <options>          Add <options> to the C compile phase"
+msgid "  -A <options>          add <options> to the C compile phase"
 msgstr ""
 
 #: cobc/cobc.c:1819
-msgid "  -Q <options>          Add <options> to the C link phase"
+msgid "  -Q <options>          add <options> to the C link phase"
 msgstr ""
 
 #: cobc/cobc.c:1820
-msgid "  -D <define>           DEFINE <define> to the COBOL compiler"
+msgid "  -D <define>           define <define> for COBOL compilation"
 msgstr ""
 
 #: cobc/cobc.c:1821
-msgid "  -K <entry>            Generate CALL to <entry> as static"
+msgid "  -K <entry>            generate CALL to <entry> as static"
 msgstr ""
 
 #: cobc/cobc.c:1822
-msgid "  -conf=<file>          User defined dialect configuration - See -std="
+msgid "  -conf=<file>          user defined dialect configuration - See -std="
 msgstr ""
 
 #: cobc/cobc.c:1823
-msgid "  -cb_conf=tag:value    Override configuration entry"
+msgid "  -cb_conf=<tag:value>  override configuration entry"
 msgstr ""
 
 #: cobc/cobc.c:1824
-msgid "  -list-reserved        Display reserved words"
+msgid "  -list-reserved        display reserved words"
 msgstr ""
 
 #: cobc/cobc.c:1825
-msgid "  -list-intrinsics      Display intrinsic functions"
-msgstr ""
+#, fuzzy
+msgid "  -list-intrinsics      display intrinsic functions"
+msgstr "`%s' は整数ではありません"
 
 #: cobc/cobc.c:1826
-msgid "  -list-mnemonics       Display mnemonic names"
+msgid "  -list-mnemonics       display mnemonic names"
 msgstr ""
 
 #: cobc/cobc.c:1827
-msgid "  -list-system          Display system routines"
+msgid "  -list-system          display system routines"
 msgstr ""
 
 #: cobc/cobc.c:1828
-msgid "  -save-temps(=<dir>)   Save intermediate files"
-msgstr ""
-
-#: cobc/cobc.c:1829
-msgid "                        - Default : current directory"
+msgid ""
+"  -save-temps(=<dir>)   save intermediate files\n"
+"                        - default: current directory"
 msgstr ""
 
 #: cobc/cobc.c:1830
-msgid "  -ext <extension>      Add default file extension"
+msgid "  -ext <extension>      add default file extension"
 msgstr ""
 
 #: cobc/cobc.c:1834
-msgid "  -W                    Enable ALL warnings"
+msgid "  -W                    enable ALL warnings"
 msgstr ""
 
 #: cobc/cobc.c:1835
-msgid "  -Wall                 Enable all warnings except as noted below"
+msgid "  -Wall                 enable all warnings except as noted below"
 msgstr ""
 
-#: cobc/cobc.c:1868
+#: cobc/cobc.c:1865
+#, c-format
+msgid ""
+"Report bugs to: %s or\n"
+"use the preferred issue tracker via home page."
+msgstr ""
+
+#: cobc/cobc.c:1868 bin/cobcrun.c:119
+msgid "GnuCOBOL home page: <http://www.gnu.org/software/gnucobol/>"
+msgstr ""
+
+#: cobc/cobc.c:1869 bin/cobcrun.c:120
+msgid "General help using GNU software: <http://www.gnu.org/gethelp/>"
+msgstr ""
+
+#: cobc/cobc.c:1876
 msgid "Only one of options 'E', 'S', 'C', 'c' may be specified"
 msgstr ""
 
-#: cobc/cobc.c:1874
+#: cobc/cobc.c:1882
 msgid "Only one of options 'm', 'x', 'b' may be specified"
 msgstr ""
 
-#: cobc/cobc.c:1892
+#: cobc/cobc.c:1900
 #, fuzzy, c-format
 msgid "'%s' is not an intrinsic function"
 msgstr "`%s' は整数ではありません"
 
-#: cobc/cobc.c:2058
+#: cobc/cobc.c:2067
 #, fuzzy
 msgid "Invalid output file name"
 msgstr "不当な入力ストリームです"
 
-#: cobc/cobc.c:2100
+#: cobc/cobc.c:2109
 #, fuzzy, c-format
 msgid "Invalid option -std=%s"
 msgstr "不当なオプションです -std=%s\n"
 
-#: cobc/cobc.c:2141
+#: cobc/cobc.c:2146
 #, c-format
 msgid "Warning - '%s' is not a directory, defaulting to current directory"
 msgstr ""
 
-#: cobc/cobc.c:2173
+#: cobc/cobc.c:2178
 #, c-format
 msgid "Warning - assuming '%s' is a DEFINE - did you intend to use -debug?"
 msgstr ""
 
-#: cobc/cobc.c:2370
+#: cobc/cobc.c:2379
 #, fuzzy
 msgid "Invalid option detected"
 msgstr "不当なオプションです -std=%s\n"
 
-#: cobc/cobc.c:2385
+#: cobc/cobc.c:2393
+msgid "All runtime checks are enabled"
+msgstr ""
+
+#: cobc/cobc.c:2410
 msgid "Failed to load the initial config file"
 msgstr ""
 
-#: cobc/cobc.c:2406
+#: cobc/cobc.c:2431
 #, fuzzy, c-format
 msgid "Invalid tab-width value - %d"
 msgstr "不当な行連結です"
 
-#: cobc/cobc.c:2412
+#: cobc/cobc.c:2437
 #, c-format
 msgid "Invalid text-column value - %d"
 msgstr ""
 
-#: cobc/cobc.c:2563
+#: cobc/cobc.c:2542 cobc/cobc.c:3762 cobc/cobc.c:3860 cobc/codegen.c:3324
+#, fuzzy, c-format
+msgid "Call to '%s' with invalid parameter '%s'"
+msgstr "`%s' は部分参照できません"
+
+#: cobc/cobc.c:2602
 #, fuzzy
 msgid "Invalid file name parameter"
 msgstr "不当な VALUE 句です"
 
-#: cobc/cobc.c:2854
+#: cobc/cobc.c:2893
 #, c-format
 msgid "Unknown option ignored:\t%s"
 msgstr ""
 
-#: cobc/cobc.c:2912 cobc/cobc.c:2967 cobc/cobc.c:3106 cobc/cobc.c:3207
-#: cobc/cobc.c:3234 cobc/cobc.c:3286
+#: cobc/cobc.c:2951 cobc/cobc.c:3006 cobc/cobc.c:3145 cobc/cobc.c:3247
+#: cobc/cobc.c:3274 cobc/cobc.c:3326
 msgid "Return status:"
 msgstr ""
 
-#: cobc/cobc.c:3144
+#: cobc/cobc.c:3183
 msgid "Preprocessing:"
 msgstr ""
 
-#: cobc/cobc.c:3212
+#: cobc/cobc.c:3252
 msgid "'cobxref' execution unsuccessful"
 msgstr ""
 
-#: cobc/cobc.c:3216 cobc/cobc.c:3219
+#: cobc/cobc.c:3256 cobc/cobc.c:3259
 #, c-format
 msgid "Check that 'cobxref' is in %s"
 msgstr ""
 
-#: cobc/cobc.c:3223
+#: cobc/cobc.c:3263
 msgid "No listing produced"
 msgstr ""
 
-#: cobc/cobc.c:3268
+#: cobc/cobc.c:3308
 msgid "Parsing:"
 msgstr ""
 
-#: cobc/cobc.c:3325
+#: cobc/cobc.c:3365
 msgid "Translating:"
 msgstr ""
 
-#: cobc/cobc.c:4208
+#: cobc/cobc.c:4263
 msgid "No input files"
 msgstr ""
 
-#: cobc/cobc.c:4302
+#: cobc/cobc.c:4357
 #, fuzzy, c-format
 msgid "%s option invalid in this combination"
 msgstr "不当な行連結です"
 
-#: cobc/cobc.c:4325
+#: cobc/cobc.c:4380
 msgid "Command line:"
 msgstr ""
 
-#: cobc/codegen.c:616 cobc/codegen.c:2609 cobc/codegen.c:7350
-#: cobc/codegen.c:7765
+#: cobc/codegen.c:638 cobc/codegen.c:2661 cobc/codegen.c:7562
+#: cobc/codegen.c:7977
 msgid "Unexpected CONSTANT item"
 msgstr ""
 
-#: cobc/codegen.c:774 cobc/codegen.c:849 cobc/codegen.c:1095
-#: cobc/codegen.c:1191 cobc/codegen.c:1548 cobc/codegen.c:1790
-#: cobc/codegen.c:2216 cobc/codegen.c:2579 cobc/codegen.c:5492
-#: cobc/tree.c:2201 cobc/typeck.c:3288 cobc/typeck.c:6460
+#: cobc/codegen.c:796 cobc/codegen.c:874 cobc/codegen.c:1122
+#: cobc/codegen.c:1218 cobc/codegen.c:1587 cobc/codegen.c:1829
+#: cobc/codegen.c:2268 cobc/codegen.c:2631 cobc/codegen.c:5572
+#: cobc/tree.c:2224 cobc/typeck.c:3301 cobc/typeck.c:6507
 #, fuzzy, c-format
 msgid "Unexpected tree tag %d"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:1362 cobc/codegen.c:1624 cobc/codegen.c:5245
+#: cobc/codegen.c:1401 cobc/codegen.c:1663 cobc/codegen.c:5311
 #, fuzzy, c-format
 msgid "Unexpected cast type %d"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:1974 cobc/codegen.c:2562
+#: cobc/codegen.c:2026 cobc/codegen.c:2614
 #, c-format
 msgid "Internal statement stack depth exceeded -> %d"
 msgstr ""
 
-#: cobc/codegen.c:2425
+#: cobc/codegen.c:2477
 #, fuzzy, c-format
 msgid "Unexpected function %s"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:2484
+#: cobc/codegen.c:2536
 #, fuzzy
 msgid "Unexpected constant"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:3102
+#: cobc/codegen.c:3154
 #, c-format
 msgid "Unexpected tree category %d"
 msgstr ""
 
-#: cobc/codegen.c:3449 cobc/codegen.c:3479
+#: cobc/codegen.c:3508 cobc/codegen.c:3538
 #, fuzzy
 msgid "Unexpected size"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:5047
+#: cobc/codegen.c:5113
 msgid "Unexpected error_node parameter"
 msgstr ""
 
-#: cobc/codegen.c:5263
+#: cobc/codegen.c:5329
 #, fuzzy, c-format
 msgid "Unexpected tree type %d"
 msgstr "不当な数字定数です"
 
-#: cobc/codegen.c:5945
+#: cobc/codegen.c:6079
 #, c-format
 msgid "Line %d Nested OCCURS in report not Implemented"
 msgstr ""
 
-#: cobc/codegen.c:8702 cobc/reserved.c:2536 libcob/common.c:4717
-#: libcob/common.c:4801
+#: cobc/codegen.c:8915 cobc/reserved.c:2542 libcob/common.c:5815
 msgid "Unknown"
 msgstr ""
 
-#: cobc/codeoptim.c:2654
+#: cobc/codeoptim.c:2655
 #, fuzzy
 msgid "Unexpected optimization value"
 msgstr "不当な数字定数です"
 
-#: cobc/config.c:116
+#: cobc/config.c:122 libcob/common.c:1782
 #, fuzzy, c-format
 msgid "Invalid value '%s' for configuration tag '%s'"
 msgstr "%s: 節 `%s':\n"
 
-#: cobc/config.c:123
+#: cobc/config.c:123 libcob/common.c:4679 libcob/common.c:4750
+#, c-format
+msgid "should be one of the following values: %s"
+msgstr ""
+
+#: cobc/config.c:130
 #, c-format
 msgid "Unsupported value '%s' for configuration tag '%s'"
 msgstr ""
 
-#: cobc/config.c:151
+#: cobc/config.c:158
 #, fuzzy, c-format
-msgid "Invalid configuration '%s'"
+msgid "Invalid configuration tag '%s'"
 msgstr "不当な行連結です"
 
-#: cobc/config.c:163
+#: cobc/config.c:170 libcob/common.c:4960 libcob/common.c:5057
+#: libcob/common.c:5084
 #, fuzzy, c-format
 msgid "Unknown configuration tag '%s'"
 msgstr "そのような文はありません `%s'"
 
-#: cobc/config.c:242
+#: cobc/config.c:257
 #, fuzzy, c-format
 msgid "'%s' not supported with -cb_conf"
 msgstr "`%s' は実装されていません"
 
-#: cobc/config.c:291
+#: cobc/config.c:307
 #, fuzzy, c-format
 msgid "Invalid type for '%s'"
 msgstr "%s: 節 `%s':\n"
 
-#: cobc/config.c:326 cobc/pplex.l:771 cobc/pplex.l:775 cobc/pplex.l:866
+#: cobc/config.c:364 libcob/common.c:5160
+msgid "Recursive inclusion"
+msgstr ""
+
+#: cobc/config.c:385 cobc/pplex.l:771 cobc/pplex.l:775 cobc/pplex.l:869
+#: libcob/common.c:5169
 msgid "No such file or directory"
 msgstr ""
 
-#: cobc/config.c:366
-msgid "Only one include in configuration files allowed"
+#: cobc/config.c:419 libcob/common.c:5211
+msgid "Configuration file was included here"
 msgstr ""
 
-#: cobc/config.c:379
+#: cobc/config.c:470
 #, fuzzy, c-format
-msgid "No definition of '%s'"
+msgid "\tNo definition of '%s'"
 msgstr "`%s' が再定義されています"
 
-#: cobc/error.c:59
+#: cobc/error.c:60
 #, fuzzy
 msgid "In section"
 msgstr "%s: 節 `%s':\n"
 
-#: cobc/error.c:68
+#: cobc/error.c:69
 #, fuzzy
 msgid "In paragraph"
 msgstr "%s: 段落 `%s':\n"
 
-#: cobc/error.c:91 cobc/error.c:123 cobc/error.c:178
+#: cobc/error.c:92 cobc/error.c:124 cobc/error.c:193
 msgid "Warning: "
 msgstr ""
 
-#: cobc/error.c:149
+#: cobc/error.c:150 libcob/common.c:1792
 msgid "Configuration Error"
 msgstr ""
 
-#: cobc/error.c:206
+#: cobc/error.c:221
 #, c-format
 msgid "%s is archaic in %s"
 msgstr "%s は %s では古い仕様です"
 
-#: cobc/error.c:211
+#: cobc/error.c:226
 #, c-format
 msgid "%s is obsolete in %s"
 msgstr "%s は %s では廃要素です"
 
-#: cobc/error.c:218
+#: cobc/error.c:233
 #, c-format
 msgid "%s ignored"
 msgstr "%s を無視します"
 
-#: cobc/error.c:224
+#: cobc/error.c:239
 #, fuzzy, c-format
 msgid "%s does not conform to %s"
 msgstr "%s は %s に準拠していません"
 
-#: cobc/error.c:238 cobc/error.c:252
+#: cobc/error.c:253 cobc/error.c:267
 #, fuzzy, c-format
 msgid "Redefinition of '%s'"
 msgstr "`%s' が再定義されています"
 
-#: cobc/error.c:241 cobc/error.c:261
+#: cobc/error.c:256 cobc/error.c:276
 #, fuzzy, c-format
 msgid "'%s' previously defined here"
 msgstr "`%s' はここで定義されました"
 
-#: cobc/error.c:282 cobc/error.c:284
+#: cobc/error.c:298 cobc/error.c:300
 #, fuzzy, c-format
 msgid "%s is not defined"
 msgstr "%s は未定義です"
 
-#: cobc/error.c:309
+#: cobc/error.c:326
 #, c-format
 msgid "%s ambiguous; need qualification"
 msgstr "%s は多重定義されています。一意に修飾して下さい"
 
-#: cobc/error.c:337
+#: cobc/error.c:355
 msgid "defined here"
 msgstr "はここで定義されました"
 
-#: cobc/error.c:346
+#: cobc/error.c:364
 #, fuzzy, c-format
 msgid "Group item '%s' cannot have %s clause"
 msgstr "グループ項目 `%s' は %s 句を持つことが出来ません"
 
-#: cobc/error.c:359
+#: cobc/error.c:377
 #, fuzzy, c-format
 msgid "Constant item '%s' cannot have a %s clause"
 msgstr "グループ項目 `%s' は %s 句を持つことが出来ません"
 
-#: cobc/error.c:362
+#: cobc/error.c:380
 #, fuzzy, c-format
 msgid "Level %02d item '%s' cannot have a %s clause"
 msgstr "レベル %02d 項目 `%s' は %s 句を持つことが出来ません"
 
-#: cobc/error.c:377
+#: cobc/error.c:395
 #, fuzzy, c-format
 msgid "Constant item '%s' requires a %s clause"
 msgstr "レベル %02d 項目 `%s' には %s 句が必要です"
 
-#: cobc/error.c:380
+#: cobc/error.c:398
 #, fuzzy, c-format
 msgid "Level %02d item '%s' requires a %s clause"
 msgstr "レベル %02d 項目 `%s' には %s 句が必要です"
 
-#: cobc/error.c:395
+#: cobc/error.c:413
 #, fuzzy, c-format
 msgid "Constant item '%s' can only have a %s clause"
 msgstr "レベル %02d 項目 `%s' は %s 句を持つことが出来ません"
 
-#: cobc/error.c:398
+#: cobc/error.c:416
 #, fuzzy, c-format
 msgid "Level %02d item '%s' can only have a %s clause"
 msgstr "レベル %02d 項目 `%s' は %s 句を持つことが出来ません"
@@ -772,1011 +798,1049 @@ msgstr "不当なレベル番号です `%s'"
 msgid "Level number must begin with 01 or 77"
 msgstr "レベル番号は 01 か 77 で始まらなければなりません"
 
-#: cobc/field.c:213 cobc/field.c:229
+#: cobc/field.c:214 cobc/field.c:230
 #, fuzzy, c-format
 msgid "No previous data item of level %02d"
 msgstr "レベル %02d のデータ項目が前にありません"
 
-#: cobc/field.c:262
+#: cobc/field.c:263
 #, fuzzy, c-format
 msgid "'%s' cannot be qualified here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/field.c:268
+#: cobc/field.c:269
 #, fuzzy, c-format
 msgid "'%s' cannot be subscripted here"
 msgstr "`%s' は添字付け出来ません"
 
-#: cobc/field.c:280
+#: cobc/field.c:281
 #, fuzzy, c-format
 msgid "'%s' is not defined in '%s'"
 msgstr "`%s' は `%s' の中で定義されていません"
 
-#: cobc/field.c:301
+#: cobc/field.c:302
 #, fuzzy
 msgid "Level number of REDEFINES entries must be identical"
 msgstr "REDEFINES 句の項目は同じレベル番号でなければなりません"
 
-#: cobc/field.c:305
+#: cobc/field.c:306
 #, fuzzy
 msgid "Level number of REDEFINES entry cannot be 66 or 88"
 msgstr "REDEFINES 句の項目はレベル番号 66 または 88 であってはなりません"
 
-#: cobc/field.c:310
+#: cobc/field.c:311
 #, fuzzy, c-format
 msgid "'%s' not the original definition"
 msgstr "`%s' は最初の定義ではありません"
 
-#: cobc/field.c:325
+#: cobc/field.c:326
 msgid "BLANK ZERO not compatible with USAGE"
 msgstr ""
 
-#: cobc/field.c:328
+#: cobc/field.c:329
 msgid "SIGN clause not compatible with USAGE"
 msgstr ""
 
-#: cobc/field.c:403 cobc/field.c:408
+#: cobc/field.c:404 cobc/field.c:409
 #, fuzzy, c-format
 msgid "PICTURE clause required for '%s'"
 msgstr "`%s' には PICTURE 句が必要です"
 
-#: cobc/field.c:413
+#: cobc/field.c:414
 #, fuzzy, c-format
 msgid "A non-numeric literal is expected for '%s'"
 msgstr "文字列が必要です"
 
-#: cobc/field.c:419
+#: cobc/field.c:420
 #, c-format
 msgid "Defining implicit picture size %d for '%s'"
 msgstr ""
 
-#: cobc/field.c:447
+#: cobc/field.c:448
 #, c-format
 msgid "'%s' ANY LENGTH only allowed in LINKAGE"
 msgstr ""
 
-#: cobc/field.c:451
+#: cobc/field.c:452
 #, c-format
 msgid "'%s' ANY LENGTH must be 01 level"
 msgstr ""
 
-#: cobc/field.c:455
+#: cobc/field.c:456
 #, fuzzy, c-format
 msgid "'%s' ANY LENGTH can not be BASED/EXTERNAL"
 msgstr "`%s' は BLANK WHEN ZERO を持つことが出来ません"
 
-#: cobc/field.c:460 cobc/field.c:475
+#: cobc/field.c:461 cobc/field.c:476
 #, fuzzy, c-format
 msgid "'%s' ANY LENGTH has invalid definition"
 msgstr "`%s' は最初の定義ではありません"
 
-#: cobc/field.c:470
+#: cobc/field.c:471
 #, fuzzy, c-format
 msgid "'%s' ANY LENGTH must have a PICTURE"
 msgstr "`%s' は OCCURS DEPENDING を持つことが出来ません"
 
-#: cobc/field.c:486
+#: cobc/field.c:487
 #, fuzzy, c-format
 msgid "'%s' 77 level not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/field.c:491
+#: cobc/field.c:492
 #, c-format
 msgid "'%s' EXTERNAL must be specified at 01/77 level"
 msgstr ""
 
-#: cobc/field.c:495
+#: cobc/field.c:496
 #, c-format
 msgid "'%s' EXTERNAL can only be specified in WORKING-STORAGE section"
 msgstr ""
 
-#: cobc/field.c:499
+#: cobc/field.c:500
 #, c-format
 msgid "'%s' EXTERNAL and BASED are mutually exclusive"
 msgstr ""
 
-#: cobc/field.c:502
+#: cobc/field.c:503
 #, c-format
 msgid "'%s' EXTERNAL not allowed with REDEFINES"
 msgstr ""
 
-#: cobc/field.c:509
+#: cobc/field.c:510
 #, fuzzy, c-format
 msgid "'%s' BASED not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/field.c:512
+#: cobc/field.c:513
 #, c-format
 msgid "'%s' BASED not allowed with REDEFINES"
 msgstr ""
 
-#: cobc/field.c:515
+#: cobc/field.c:516
 #, fuzzy, c-format
 msgid "'%s' BASED only allowed at the 01 and 77 levels"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/field.c:548
+#: cobc/field.c:549
 #, fuzzy, c-format
 msgid "'%s' cannot have the OCCURS clause due to '%s'"
 msgstr "`%s' は `%s' のため OCCURS 句を持つことが出来ません"
 
-#: cobc/field.c:563
+#: cobc/field.c:564
 #, fuzzy, c-format
 msgid "The original definition '%s' should not have OCCURS"
 msgstr "`%s' の元の定義には OCCURS を付けてはなりません"
 
-#: cobc/field.c:570
+#: cobc/field.c:571
 msgid "REDEFINES must follow the original definition"
 msgstr "REDEFINES 句は参照元の項目の直後になければなりません"
 
-#: cobc/field.c:577
+#: cobc/field.c:578
 #, fuzzy, c-format
 msgid "'%s' cannot be variable length"
 msgstr "`%s' は可変長に出来ません"
 
-#: cobc/field.c:581
+#: cobc/field.c:582
 #, fuzzy, c-format
 msgid "The original definition '%s' cannot be variable length"
 msgstr "`%s' の元の定義は可変長であってはなりません"
 
-#: cobc/field.c:602
+#: cobc/field.c:603
 #, fuzzy, c-format
 msgid "SCREEN group item '%s' has invalid clause"
 msgstr "グループ項目 `%s' は %s 句を持つことが出来ません"
 
-#: cobc/field.c:652
+#: cobc/field.c:653
 #, fuzzy, c-format
 msgid "'%s' cannot have PICTURE clause"
 msgstr "`%s' は PICTURE 句を持つことが出来ません"
 
-#: cobc/field.c:718 cobc/field.c:724 cobc/field.c:737
+#: cobc/field.c:719 cobc/field.c:725 cobc/field.c:738
 #, c-format
 msgid "'%s' PICTURE clause not compatible with USAGE"
 msgstr ""
 
-#: cobc/field.c:727
+#: cobc/field.c:728
 #, c-format
 msgid "'%s' COMP-6 with sign - Changing to COMP-3"
 msgstr ""
 
-#: cobc/field.c:769
+#: cobc/field.c:770
 #, fuzzy, c-format
 msgid "'%s' cannot have JUSTIFIED RIGHT"
 msgstr "`%s' は JUSTIFIED RIGHT を持つことが出来ません"
 
-#: cobc/field.c:828
+#: cobc/field.c:829
 #, fuzzy, c-format
 msgid "'%s' cannot have BLANK WHEN ZERO"
 msgstr "`%s' は BLANK WHEN ZERO を持つことが出来ません"
 
-#: cobc/field.c:836
+#: cobc/field.c:837
 #, fuzzy
 msgid "Only level 88 item may have multiple values"
 msgstr "複数の値はレベル 88 項目のみに許されます"
 
-#: cobc/field.c:842
+#: cobc/field.c:845
+#, fuzzy
+msgid "Entries under REDEFINES should not have a VALUE clause"
+msgstr "REDEFINES に含まれる項目は VALUE 句を持つことが出来ません"
+
+#: cobc/field.c:847
 #, fuzzy
 msgid "Entries under REDEFINES cannot have a VALUE clause"
 msgstr "REDEFINES に含まれる項目は VALUE 句を持つことが出来ません"
 
-#: cobc/field.c:845
+#: cobc/field.c:851
 msgid "Initial VALUE clause ignored for EXTERNAL item"
 msgstr ""
 
-#: cobc/field.c:1129
+#: cobc/field.c:1149
+msgid "OCCURS and multi COLUMNs is not allowed"
+msgstr ""
+
+#: cobc/field.c:1176
 #, c-format
 msgid "Ignoring SYNCHRONIZED for group item '%s'"
 msgstr ""
 
-#: cobc/field.c:1144 cobc/field.c:1157 cobc/field.c:1342 cobc/field.c:1345
+#: cobc/field.c:1191 cobc/field.c:1204 cobc/field.c:1389 cobc/field.c:1392
 #, fuzzy, c-format
 msgid "Size of '%s' larger than size of '%s'"
 msgstr "`%s' のサイズが `%s' のサイズを越えています"
 
-#: cobc/field.c:1232 cobc/field.c:1286
+#: cobc/field.c:1277 cobc/field.c:1333
 #, fuzzy, c-format
 msgid "'%s' cannot be larger than %d bytes"
 msgstr "18 桁を越える数字項目は許されません"
 
-#: cobc/field.c:1267 cobc/field.c:1275
+#: cobc/field.c:1314 cobc/field.c:1322
 #, fuzzy, c-format
 msgid "'%s' binary field cannot be larger than %d digits"
 msgstr "18 桁を越える数字項目は許されません"
 
-#: cobc/field.c:1330
+#: cobc/field.c:1377
 #, fuzzy, c-format
 msgid "Unexpected USAGE - %d"
 msgstr "不当な数字定数です"
 
-#: cobc/field.c:1440
+#: cobc/field.c:1495
 msgid "Literal type does not match data type"
 msgstr ""
 
 #: cobc/flag.def:37
 msgid ""
-"Define PERFORM stack size\n"
-"\t\t\t- Default : 255"
+"define PERFORM stack size\n"
+"\t\t\t- default: 255"
 msgstr ""
 
 #: cobc/flag.def:40
 msgid ""
-"Define cutoff depth for IF statements\n"
-"\t\t\t- Default : 3"
+"define cutoff depth for IF statements\n"
+"\t\t\t- default: 3"
 msgstr ""
 
 #: cobc/flag.def:43
 msgid ""
-"Define display sign representation\n"
-"\t\t\t- ASCII or EBCDIC (Default : machine native)"
+"define display sign representation\n"
+"\t\t\t- ASCII or EBCDIC (default: machine native)"
 msgstr ""
 
 #: cobc/flag.def:46
 msgid ""
-"Fold COPY subject to value\n"
-"\t\t\t- UPPER or LOWER (Default : no transformation)"
+"fold COPY subject to value\n"
+"\t\t\t- UPPER or LOWER (default: no transformation)"
 msgstr ""
 
 #: cobc/flag.def:49
 msgid ""
-"Fold PROGRAM-ID, CALL, CANCEL subject to value\n"
-"\t\t\t- UPPER or LOWER (Default : no transformation)"
+"fold PROGRAM-ID, CALL, CANCEL subject to value\n"
+"\t\t\t- UPPER or LOWER (default: no transformation)"
 msgstr ""
 
 #: cobc/flag.def:52
 msgid ""
-"Initialize fields without VALUE to decimal value\n"
-"\t\t\t- 0 to 255 (Default : initialize to picture)"
+"initialize fields without VALUE to decimal value\n"
+"\t\t\t- 0 to 255 (default: initialize to picture)"
 msgstr ""
 
-#: cobc/flag.def:57
+#: cobc/flag.def:55
+msgid "Call user written EXTFH interface module for I/O"
+msgstr ""
+
+#: cobc/flag.def:60
 msgid ""
-"Intrinsics to be used without FUNCTION keyword\n"
-"\t\t\t- ALL or intrinsic function name (,name,...)"
+"intrinsics to be used without FUNCTION keyword\n"
+"\t\t\t- ALL or intrinsic function name(,name,...)"
 msgstr ""
-
-#: cobc/flag.def:63
-msgid "Output static function calls for the CALL statement"
-msgstr "CALL 文で静的関数呼び出しを行なう"
 
 #: cobc/flag.def:66
-msgid "Generate computed goto C statements"
-msgstr ""
+#, fuzzy
+msgid "output static function calls for the CALL statement"
+msgstr "CALL 文で静的関数呼び出しを行なう"
 
 #: cobc/flag.def:69
-msgid "Use restricted ASCII to EBCDIC translate"
+msgid "generate computed goto C statements"
 msgstr ""
 
 #: cobc/flag.def:72
-msgid "Generate extra braces in generated C code"
+msgid "use restricted ASCII to EBCDIC translate"
 msgstr ""
 
 #: cobc/flag.def:75
-msgid "Attempt correction of invalid numeric display items"
+msgid "generate extra braces in generated C code"
 msgstr ""
 
 #: cobc/flag.def:78
-msgid "PERFORM stack allocated on heap"
+msgid "attempt correction of invalid numeric display items"
 msgstr ""
 
-#: cobc/flag.def:82
-msgid ""
-"Generate trace code\n"
-"\t\t\t- Executed SECTION/PARAGRAPH"
+#: cobc/flag.def:81
+msgid "PERFORM stack allocated on heap"
 msgstr ""
 
 #: cobc/flag.def:85
 msgid ""
-"Generate trace code\n"
-"\t\t\t- Executed SECTION/PARAGRAPH/STATEMENTS\n"
-"\t\t\t- Turned on by -debug"
+"generate trace code\n"
+"\t\t\t- executed SECTION/PARAGRAPH"
 msgstr ""
 
 #: cobc/flag.def:88
-msgid "Syntax error checking only; don't emit any output"
-msgstr "文法チェックのみ。何も出力しない"
+msgid ""
+"generate trace code\n"
+"\t\t\t- executed SECTION/PARAGRAPH/STATEMENTS\n"
+"\t\t\t- turned on by -debug"
+msgstr ""
 
 #: cobc/flag.def:91
 #, fuzzy
+msgid "syntax error checking only; don't emit any output"
+msgstr "文法チェックのみ。何も出力しない"
+
+#: cobc/flag.def:94
+#, fuzzy
 msgid ""
-"Enable debugging lines\n"
+"enable debugging lines\n"
 "\t\t\t- 'D' in indicator column or floating >>D"
 msgstr "デバッグ行を有効にする"
 
-#: cobc/flag.def:94
-msgid ""
-"Generate source location code\n"
-"\t\t\t- Turned on by -debug/-g/-ftraceall"
-msgstr ""
-
 #: cobc/flag.def:97
-msgid "Automatic initialization of the Cobol runtime system"
+msgid ""
+"generate source location code\n"
+"\t\t\t- turned on by -debug/-g/-ftraceall"
 msgstr ""
 
 #: cobc/flag.def:100
-msgid ""
-"PERFORM stack checking\n"
-"\t\t\t- Turned on by -debug or -g"
+msgid "automatic initialization of the COBOL runtime system"
 msgstr ""
 
 #: cobc/flag.def:103
 msgid ""
-"Allow syntax extensions\n"
-"\t\t\t- eg. Switch name SW1, etc."
+"PERFORM stack checking\n"
+"\t\t\t- turned on by -debug or -g"
 msgstr ""
 
 #: cobc/flag.def:106
 msgid ""
-"Use AFTER 1 for WRITE of LINE SEQUENTIAL\n"
-"\t\t\t- Default : BEFORE 1"
+"allow syntax extensions\n"
+"\t\t\t- eg. switch name SW1, etc."
 msgstr ""
 
 #: cobc/flag.def:109
+msgid ""
+"use AFTER 1 for WRITE of LINE SEQUENTIAL\n"
+"\t\t\t- default: BEFORE 1"
+msgstr ""
+
+#: cobc/flag.def:112
 msgid ""
 "'*' or '/' in column 1 treated as comment\n"
 "\t\t\t- FIXED format only"
 msgstr ""
 
-#: cobc/flag.def:112
+#: cobc/flag.def:115
 msgid ""
 "'$' in indicator area treated as '*',\n"
 "\t\t\t'|' treated as floating comment"
 msgstr ""
 
-#: cobc/flag.def:115
-msgid ""
-"Allow numeric field overflow\n"
-"\t\t\t- Non-ANSI behaviour"
-msgstr ""
-
 #: cobc/flag.def:118
 msgid ""
-"Adjust items following OCCURS DEPENDING\n"
-"\t\t\t- Requires implicit/explicit relaxed syntax"
+"allow numeric field overflow\n"
+"\t\t\t- non-ANSI behaviour"
 msgstr ""
 
 #: cobc/flag.def:121
 msgid ""
-"Use a single quote (apostrophe) for QUOTE\n"
-"\t\t\t- Default : double quote"
+"adjust items following OCCURS DEPENDING\n"
+"\t\t\t- requires implicit/explicit relaxed syntax"
 msgstr ""
 
 #: cobc/flag.def:124
-msgid "Check recursive program call"
+msgid ""
+"use a single quote (apostrophe) for QUOTE\n"
+"\t\t\t- default: double quote"
 msgstr ""
 
 #: cobc/flag.def:127
-msgid ""
-"Relax syntax checking\n"
-"\t\t\t- eg. REDEFINES position"
+msgid "check recursive program call"
 msgstr ""
 
 #: cobc/flag.def:130
 msgid ""
-"Treat all files as OPTIONAL\n"
+"relax syntax checking\n"
+"\t\t\t- eg. REDEFINES position"
+msgstr ""
+
+#: cobc/flag.def:133
+msgid ""
+"treat all files as OPTIONAL\n"
 "\t\t\t- unless NOT OPTIONAL specified"
 msgstr ""
 
-#: cobc/parser.y:45
+#: cobc/flag.def:136
+msgid ""
+"Handle COMP fields like Micro Focus IBMCOMP\n"
+"\t\t\t- binary-size: 2-4-8 & synchronized-clause: ok"
+msgstr ""
+
+#: cobc/flag.def:139
+msgid "Sequential & Relative files will match Micro Focus format"
+msgstr ""
+
+#: cobc/parser.y:44
 #, fuzzy, c-format
 msgid "'%s' not implemented"
 msgstr "`%s' は実装されていません"
 
-#: cobc/parser.y:225
+#: cobc/parser.y:224
 #, fuzzy, c-format
 msgid "Unreachable statement '%s'"
 msgstr "不当な MOVE 文です"
 
-#: cobc/parser.y:301
+#: cobc/parser.y:300
 #, fuzzy, c-format
 msgid "'%s' not level 01 or 77"
 msgstr "`%s' はレベル 01 か 77 でなければなりません"
 
-#: cobc/parser.y:305
+#: cobc/parser.y:304
 #, c-format
 msgid "'%s' is not in LINKAGE SECTION"
 msgstr ""
 
-#: cobc/parser.y:308
+#: cobc/parser.y:307
 #, fuzzy, c-format
 msgid "'%s' can not be BASED/EXTERNAL"
 msgstr "`%s' は BLANK WHEN ZERO を持つことが出来ません"
 
-#: cobc/parser.y:313
+#: cobc/parser.y:312
 #, c-format
 msgid "'%s' is not in WORKING-STORAGE SECTION"
 msgstr ""
 
-#: cobc/parser.y:320
+#: cobc/parser.y:319
 #, c-format
 msgid "'%s' REDEFINES field not allowed here"
 msgstr ""
 
-#: cobc/parser.y:344
+#: cobc/parser.y:343
 #, c-format
 msgid "LINKAGE item '%s' is not a PROCEDURE USING parameter"
 msgstr ""
 
-#: cobc/parser.y:355
+#: cobc/parser.y:354
 #, c-format
 msgid "'%s' USING item duplicates RETURNING item"
 msgstr ""
 
-#: cobc/parser.y:364
+#: cobc/parser.y:363
 #, c-format
 msgid "ENTRY '%s' duplicated"
 msgstr ""
 
-#: cobc/parser.y:377
+#: cobc/parser.y:376
 #, c-format
 msgid "Maximum nested program depth exceeded (%d)"
 msgstr ""
 
-#: cobc/parser.y:393 cobc/parser.y:406
+#: cobc/parser.y:392 cobc/parser.y:405
 #, c-format
 msgid "%s statement not terminated by END-%s"
 msgstr "%s 文が END-%s で終わっていません"
 
-#: cobc/parser.y:454
+#: cobc/parser.y:453
 msgid "USE statement invalid for SORT file"
 msgstr ""
 
-#: cobc/parser.y:550 cobc/parser.y:552 cobc/parser.y:564 cobc/parser.y:566
-#: cobc/parser.y:578 cobc/parser.y:580 cobc/parser.y:592 cobc/parser.y:594
+#: cobc/parser.y:549 cobc/parser.y:551 cobc/parser.y:563 cobc/parser.y:565
+#: cobc/parser.y:577 cobc/parser.y:579 cobc/parser.y:591 cobc/parser.y:593
 #, fuzzy, c-format
 msgid "Duplicate %s clause"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/parser.y:714
+#: cobc/parser.y:713
 #, c-format
 msgid "%s header missing - assumed"
 msgstr ""
 
-#: cobc/parser.y:716
+#: cobc/parser.y:715
 #, c-format
 msgid "%s header missing"
 msgstr ""
 
-#: cobc/parser.y:1388
+#: cobc/parser.y:1391
 msgid "Multiple PROGRAM-ID's without matching END PROGRAM"
 msgstr ""
 
-#: cobc/parser.y:1391
+#: cobc/parser.y:1394
 msgid "Executable requested but no program found"
 msgstr ""
 
-#: cobc/parser.y:1485
+#: cobc/parser.y:1488
 #, c-format
 msgid "END PROGRAM '%s' is different to PROGRAM-ID '%s'"
 msgstr ""
 
-#: cobc/parser.y:1514
+#: cobc/parser.y:1517
 #, c-format
 msgid "END FUNCTION '%s' is different to FUNCTION-ID '%s'"
 msgstr ""
 
-#: cobc/parser.y:1649 cobc/parser.y:1658
+#: cobc/parser.y:1652 cobc/parser.y:1661
 msgid "COMMON may only be used in a contained program"
 msgstr ""
 
-#: cobc/parser.y:1697 cobc/parser.y:1919 cobc/parser.y:1963 cobc/parser.y:2046
-#: cobc/parser.y:2168 cobc/parser.y:2264 cobc/parser.y:2315 cobc/parser.y:2339
-#: cobc/parser.y:2430 cobc/parser.y:2449 cobc/parser.y:2465 cobc/parser.y:2483
-#: cobc/parser.y:2501 cobc/parser.y:2518 cobc/parser.y:4549
+#: cobc/parser.y:1700 cobc/parser.y:1922 cobc/parser.y:1966 cobc/parser.y:2049
+#: cobc/parser.y:2171 cobc/parser.y:2267 cobc/parser.y:2318 cobc/parser.y:2342
+#: cobc/parser.y:2433 cobc/parser.y:2452 cobc/parser.y:2468 cobc/parser.y:2486
+#: cobc/parser.y:2504 cobc/parser.y:2521 cobc/parser.y:4553
 #, fuzzy, c-format
 msgid "%s not allowed in nested programs"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:1723
+#: cobc/parser.y:1726
 msgid "Phrases in non-standard order"
 msgstr ""
 
-#: cobc/parser.y:1801
+#: cobc/parser.y:1804
 #, fuzzy
 msgid "Duplicate CLASSIFICATION clause"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/parser.y:1968
+#: cobc/parser.y:1971
 #, fuzzy, c-format
 msgid "Invalid system-name '%s'"
 msgstr "不当なシステム名です `%s'"
 
-#: cobc/parser.y:1980
+#: cobc/parser.y:1983
 #, fuzzy
 msgid "Invalid CRT clause"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:1990
+#: cobc/parser.y:1993
 #, fuzzy
 msgid "Invalid special names clause"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:2216
+#: cobc/parser.y:2219
 #, fuzzy
 msgid "Invalid SYMBOLIC clause"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:2290 cobc/parser.y:2294
+#: cobc/parser.y:2293 cobc/parser.y:2297
 msgid "CLASS literal with THRU must have size 1"
 msgstr ""
 
-#: cobc/parser.y:2347 cobc/parser.y:2398
+#: cobc/parser.y:2350 cobc/parser.y:2401
 #, fuzzy, c-format
 msgid "Invalid currency sign '%s'"
 msgstr "不当な通貨記号です `%s'"
 
-#: cobc/parser.y:3151
-msgid "RECORD description invalid with REPORT"
-msgstr ""
-
-#: cobc/parser.y:3156
+#: cobc/parser.y:3158
 msgid "RECORD description missing or invalid"
 msgstr ""
 
-#: cobc/parser.y:3209 cobc/parser.y:3219
+#: cobc/parser.y:3211 cobc/parser.y:3221
 msgid "File cannot have both EXTERNAL and GLOBAL clauses"
 msgstr ""
 
-#: cobc/parser.y:3223 cobc/parser.y:3741 cobc/parser.y:3985 cobc/parser.y:7150
-#: cobc/parser.y:9293
+#: cobc/parser.y:3225 cobc/parser.y:3743 cobc/parser.y:3987 cobc/parser.y:7278
+#: cobc/parser.y:9421
 #, c-format
 msgid "%s is invalid in a user FUNCTION"
 msgstr ""
 
-#: cobc/parser.y:3262 cobc/parser.y:3284
+#: cobc/parser.y:3264 cobc/parser.y:3286
 msgid "RECORD clause ignored for LINE SEQUENTIAL"
 msgstr ""
 
-#: cobc/parser.y:3268 cobc/parser.y:3307 cobc/parser.y:3337
+#: cobc/parser.y:3270 cobc/parser.y:3309 cobc/parser.y:3339
 #, fuzzy
 msgid "RECORD clause invalid"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:3272 cobc/parser.y:3299 cobc/parser.y:3329
+#: cobc/parser.y:3274 cobc/parser.y:3301 cobc/parser.y:3331
 #, fuzzy, c-format
 msgid "RECORD size exceeds maximum allowed (%d)"
 msgstr "レコード長が短か過ぎます `%s'"
 
-#: cobc/parser.y:3419
+#: cobc/parser.y:3421
 msgid "LINAGE clause with wrong file type"
 msgstr ""
 
-#: cobc/parser.y:3487
+#: cobc/parser.y:3489
 #, fuzzy
 msgid "CODE-SET clause invalid for file type"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:3490
+#: cobc/parser.y:3492
 #, fuzzy, c-format
 msgid "Alphabet-name is expected '%s'"
 msgstr "アルファベット名が必要です `%s'"
 
-#: cobc/parser.y:3501 cobc/parser.y:3512
+#: cobc/parser.y:3503 cobc/parser.y:3514
 #, c-format
 msgid "Ignoring CODE-SET '%s'"
 msgstr ""
 
-#: cobc/parser.y:3534
+#: cobc/parser.y:3536
 #, fuzzy
 msgid "REPORT clause with wrong file type"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:3668 cobc/parser.y:5268
+#: cobc/parser.y:3670 cobc/parser.y:5396
 msgid "Item requires a data name"
 msgstr ""
 
-#: cobc/parser.y:3847
+#: cobc/parser.y:3849
 msgid "CONSTANT item not at 01 level"
 msgstr ""
 
-#: cobc/parser.y:3914
+#: cobc/parser.y:3916
 #, fuzzy
 msgid "REDEFINES clause should follow entry-name"
 msgstr "REDEFINES 句は項目名の直後になければなりません"
 
-#: cobc/parser.y:3916
+#: cobc/parser.y:3918
 msgid "REDEFINES clause must follow entry-name"
 msgstr "REDEFINES 句は項目名の直後になければなりません"
 
-#: cobc/parser.y:3937 cobc/parser.y:3987 cobc/parser.y:4431
+#: cobc/parser.y:3939 cobc/parser.y:3989 cobc/parser.y:4435
 #, fuzzy, c-format
 msgid "%s not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:3939 cobc/parser.y:3977 cobc/parser.y:4433
+#: cobc/parser.y:3941 cobc/parser.y:3979 cobc/parser.y:4437
 #, fuzzy, c-format
 msgid "%s only allowed at 01/77 level"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:3941 cobc/parser.y:3979 cobc/parser.y:4435
+#: cobc/parser.y:3943 cobc/parser.y:3981 cobc/parser.y:4439
 #, fuzzy, c-format
 msgid "%s requires a data name"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/parser.y:3944 cobc/parser.y:3947 cobc/parser.y:3949 cobc/parser.y:3951
-#: cobc/parser.y:3982 cobc/parser.y:4253 cobc/parser.y:4255 cobc/parser.y:4271
-#: cobc/parser.y:4273 cobc/parser.y:4437 cobc/parser.y:4439 cobc/parser.y:4441
-#: cobc/parser.y:4443 cobc/parser.y:4523 cobc/parser.y:4532 cobc/parser.y:8002
-#: cobc/parser.y:8023
+#: cobc/parser.y:3946 cobc/parser.y:3949 cobc/parser.y:3951 cobc/parser.y:3953
+#: cobc/parser.y:3984 cobc/parser.y:4255 cobc/parser.y:4257 cobc/parser.y:4273
+#: cobc/parser.y:4275 cobc/parser.y:4441 cobc/parser.y:4443 cobc/parser.y:4445
+#: cobc/parser.y:4447 cobc/parser.y:4527 cobc/parser.y:4536 cobc/parser.y:8130
+#: cobc/parser.y:8151
 #, c-format
 msgid "%s and %s are mutually exclusive"
 msgstr ""
 
-#: cobc/parser.y:4221 cobc/parser.y:4249 cobc/parser.y:4267
+#: cobc/parser.y:4223 cobc/parser.y:4251 cobc/parser.y:4269
 #, c-format
 msgid "Maximum OCCURS depth exceeded (%d)"
 msgstr ""
 
-#: cobc/parser.y:4475
+#: cobc/parser.y:4479
 msgid "FALSE clause only allowed for 88 level"
 msgstr ""
 
-#: cobc/parser.y:4491 cobc/parser.y:4504 cobc/parser.y:4507
+#: cobc/parser.y:4495 cobc/parser.y:4508 cobc/parser.y:4511
 msgid "RENAMES may not reference a level 01 or > 50"
 msgstr ""
 
-#: cobc/parser.y:4641
+#: cobc/parser.y:4645
 #, fuzzy
 msgid "GLOBAL is not allowed with RD"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:4734 cobc/parser.y:4744 cobc/parser.y:4754
+#: cobc/parser.y:4738 cobc/parser.y:4748 cobc/parser.y:4758
 msgid "PAGE LIMIT lines > 999"
 msgstr ""
 
-#: cobc/parser.y:5050
+#: cobc/parser.y:5131
 #, fuzzy
 msgid "LINE 0 not implemented"
 msgstr "`%s' は実装されていません"
 
-#: cobc/parser.y:5061 cobc/parser.y:5076 cobc/parser.y:5099
-#: cobc/parser.y:10636
+#: cobc/parser.y:5146 cobc/parser.y:5161 cobc/parser.y:5184
+#: cobc/parser.y:10764
 #, fuzzy
 msgid "Positive Integer value expected"
 msgstr "数値が必要です"
 
-#: cobc/parser.y:5065 cobc/parser.y:5080
+#: cobc/parser.y:5150 cobc/parser.y:5165
 #, fuzzy
 msgid "LINE PLUS 0 not implemented"
 msgstr "`%s' は実装されていません"
 
-#: cobc/parser.y:5165
+#: cobc/parser.y:5208
+msgid "PLUS is not recommended with LEFT, RIGHT or CENTER"
+msgstr ""
+
+#: cobc/parser.y:5210
+#, fuzzy
+msgid "PLUS is not allowed with LEFT, RIGHT or CENTER"
+msgstr "`%s' は修飾出来ません"
+
+#: cobc/parser.y:5248 cobc/parser.y:5277
+msgid "PLUS is ignored on first field of line"
+msgstr ""
+
+#: cobc/parser.y:5286
 #, fuzzy
 msgid "Invalid COLUMN integer; Must be > 0"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:5272
+#: cobc/parser.y:5290
+msgid "COLUMN numbers should increase"
+msgstr ""
+
+#: cobc/parser.y:5400
 msgid "INITIAL specified on non-input field"
 msgstr ""
 
-#: cobc/parser.y:5492
+#: cobc/parser.y:5620
 #, fuzzy
 msgid "GLOBAL is not allowed with screen items"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:5512
+#: cobc/parser.y:5640
 msgid "Executable program requested but PROCEDURE/ENTRY has USING clause"
 msgstr ""
 
-#: cobc/parser.y:5581 cobc/parser.y:5598 cobc/parser.y:6580
+#: cobc/parser.y:5709 cobc/parser.y:5726 cobc/parser.y:6708
 #, fuzzy, c-format
 msgid "Number of parameters exceeds maximum %d"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/parser.y:5590
+#: cobc/parser.y:5718
 msgid "CHAINING invalid in user FUNCTION"
 msgstr ""
 
-#: cobc/parser.y:5628 cobc/parser.y:6636 cobc/parser.y:6645
+#: cobc/parser.y:5756 cobc/parser.y:6764 cobc/parser.y:6773
 #, fuzzy, c-format
 msgid "%s not allowed in CHAINED programs"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:5640 cobc/parser.y:5648 cobc/parser.y:5656 cobc/parser.y:5666
-#: cobc/parser.y:5695
+#: cobc/parser.y:5768 cobc/parser.y:5776 cobc/parser.y:5784 cobc/parser.y:5794
+#: cobc/parser.y:5823
 msgid "SIZE only allowed for BY VALUE items"
 msgstr ""
 
-#: cobc/parser.y:5668 cobc/parser.y:5685 cobc/parser.y:5697 cobc/parser.y:5714
+#: cobc/parser.y:5796 cobc/parser.y:5813 cobc/parser.y:5825 cobc/parser.y:5842
 #, fuzzy
 msgid "Invalid value for SIZE"
 msgstr "不当な行連結です"
 
-#: cobc/parser.y:5726
+#: cobc/parser.y:5854
 msgid "OPTIONAL only allowed for BY REFERENCE items"
 msgstr ""
 
-#: cobc/parser.y:5735
+#: cobc/parser.y:5863
 #, fuzzy
 msgid "RETURNING clause is required for a FUNCTION"
 msgstr "%s 句がファイル `%s' に必要です"
 
-#: cobc/parser.y:5750
+#: cobc/parser.y:5878
 msgid "RETURNING item must have level 01"
 msgstr ""
 
-#: cobc/parser.y:5752
+#: cobc/parser.y:5880
 #, fuzzy
 msgid "RETURNING item should not have OCCURS"
 msgstr "`%s' の元の定義には OCCURS を付けてはなりません"
 
-#: cobc/parser.y:5754
+#: cobc/parser.y:5882
 msgid "RETURNING item should not be in LOCAL-STORAGE"
 msgstr ""
 
-#: cobc/parser.y:5946
+#: cobc/parser.y:6074
 #, fuzzy, c-format
 msgid "Unknown statement '%s'"
 msgstr "そのような文はありません `%s'"
 
-#: cobc/parser.y:5960
+#: cobc/parser.y:6088
 msgid "SECTION segment invalid within DECLARATIVE"
 msgstr ""
 
-#: cobc/parser.y:6282 cobc/parser.y:7027
+#: cobc/parser.y:6410 cobc/parser.y:7155
 msgid "Ignoring CONVERSION"
 msgstr ""
 
-#: cobc/parser.y:6461
+#: cobc/parser.y:6589
 msgid "ALLOCATE CHARACTERS requires RETURNING clause"
 msgstr ""
 
-#: cobc/parser.y:6524
+#: cobc/parser.y:6652
 msgid "Recursive program call - assuming RECURSIVE attribute"
 msgstr ""
 
-#: cobc/parser.y:6554 cobc/typeck.c:8542
+#: cobc/parser.y:6682 cobc/typeck.c:8633
 #, fuzzy
 msgid "Invalid mnemonic name"
 msgstr "不当なニーモニックです"
 
-#: cobc/parser.y:6598
+#: cobc/parser.y:6726
 msgid "OMITTED only allowed with BY REFERENCE"
 msgstr ""
 
-#: cobc/parser.y:6611
+#: cobc/parser.y:6739
 #, fuzzy
 msgid "Invalid file name reference"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:6615
+#: cobc/parser.y:6743
 msgid "BY CONTENT assumed for alphanumeric item"
 msgstr ""
 
-#: cobc/parser.y:6672
+#: cobc/parser.y:6800
 msgid "RETURNING item must have level 01 or 77"
 msgstr ""
 
-#: cobc/parser.y:6676
+#: cobc/parser.y:6804
 msgid "RETURNING item is neither in LINKAGE SECTION nor is it BASED"
 msgstr ""
 
-#: cobc/parser.y:7148 cobc/parser.y:9461
+#: cobc/parser.y:7276 cobc/parser.y:9589
 #, fuzzy, c-format
 msgid "%s is invalid in nested program"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:7168 cobc/parser.y:7206 cobc/parser.y:7217 cobc/parser.y:7228
+#: cobc/parser.y:7296 cobc/parser.y:7334 cobc/parser.y:7345 cobc/parser.y:7356
 #, c-format
 msgid "Maximum evaluate depth exceeded (%d)"
 msgstr ""
 
-#: cobc/parser.y:7333
+#: cobc/parser.y:7461
 #, fuzzy
 msgid "Invalid THROUGH usage"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:7396
+#: cobc/parser.y:7524
 msgid "EXIT PROGRAM is not allowed within a USE GLOBAL procedure"
 msgstr ""
 
-#: cobc/parser.y:7400
+#: cobc/parser.y:7528
 msgid "EXIT PROGRAM only allowed within a PROGRAM type"
 msgstr ""
 
-#: cobc/parser.y:7417
+#: cobc/parser.y:7545
 msgid "EXIT FUNCTION is not allowed within a USE GLOBAL procedure"
 msgstr ""
 
-#: cobc/parser.y:7421
+#: cobc/parser.y:7549
 msgid "EXIT FUNCTION only allowed within a FUNCTION type"
 msgstr ""
 
-#: cobc/parser.y:7435 cobc/parser.y:7457
+#: cobc/parser.y:7563 cobc/parser.y:7585
 msgid "EXIT PERFORM is only valid with inline PERFORM"
 msgstr ""
 
-#: cobc/parser.y:7478
+#: cobc/parser.y:7606
 msgid "EXIT SECTION is only valid with an active SECTION"
 msgstr ""
 
-#: cobc/parser.y:7498
+#: cobc/parser.y:7626
 msgid "EXIT PARAGRAPH is only valid with an active PARAGRAPH"
 msgstr ""
 
-#: cobc/parser.y:7885
+#: cobc/parser.y:8013
 msgid "INSPECT missing a keyword"
 msgstr ""
 
-#: cobc/parser.y:8205 cobc/parser.y:8213 cobc/parser.y:8221
+#: cobc/parser.y:8333 cobc/parser.y:8341 cobc/parser.y:8349
 #, c-format
 msgid "PERFORM VARYING '%s' (Line %d of %s) is not a numeric field"
 msgstr ""
 
-#: cobc/parser.y:8253 cobc/typeck.c:7556 cobc/typeck.c:8454
+#: cobc/parser.y:8381 cobc/typeck.c:7617 cobc/typeck.c:8525
 msgid "LOCK clause invalid with file LOCK AUTOMATIC"
 msgstr ""
 
-#: cobc/parser.y:8258
+#: cobc/parser.y:8386
 #, fuzzy
 msgid "KEY clause invalid with this file type"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:8263 cobc/typeck.c:7552 cobc/typeck.c:8450
+#: cobc/parser.y:8391 cobc/typeck.c:7613 cobc/typeck.c:8521
 msgid "INVALID KEY clause invalid with this file type"
 msgstr ""
 
-#: cobc/parser.y:8696
+#: cobc/parser.y:8824
 msgid "File sort requires KEY phrase"
 msgstr ""
 
-#: cobc/parser.y:8698 cobc/typeck.c:8069
+#: cobc/parser.y:8826 cobc/typeck.c:8135
 msgid "Table sort without keys not implemented yet"
 msgstr ""
 
-#: cobc/parser.y:8763
+#: cobc/parser.y:8891
 msgid "File sort requires USING or INPUT PROCEDURE"
 msgstr ""
 
-#: cobc/parser.y:8770
+#: cobc/parser.y:8898
 msgid "USING invalid with table SORT"
 msgstr ""
 
-#: cobc/parser.y:8780
+#: cobc/parser.y:8908
 msgid "INPUT PROCEDURE invalid with table SORT"
 msgstr ""
 
-#: cobc/parser.y:8782
+#: cobc/parser.y:8910
 msgid "INPUT PROCEDURE invalid with MERGE"
 msgstr ""
 
-#: cobc/parser.y:8794
+#: cobc/parser.y:8922
 msgid "File sort requires GIVING or OUTPUT PROCEDURE"
 msgstr ""
 
-#: cobc/parser.y:8801
+#: cobc/parser.y:8929
 msgid "GIVING invalid with table SORT"
 msgstr ""
 
-#: cobc/parser.y:8811
+#: cobc/parser.y:8939
 msgid "OUTPUT PROCEDURE invalid with table SORT"
 msgstr ""
 
-#: cobc/parser.y:8837
+#: cobc/parser.y:8965
 #, fuzzy
 msgid "SIZE/LENGTH invalid here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:8890
+#: cobc/parser.y:9018
 msgid "NOT EQUAL condition disallowed on START statement"
 msgstr ""
 
-#: cobc/parser.y:9072
+#: cobc/parser.y:9200
 msgid "SUPPRESS statement must be within DECLARATIVES"
 msgstr ""
 
-#: cobc/parser.y:9147
+#: cobc/parser.y:9275
 #, fuzzy
 msgid "UNLOCK invalid for SORT files"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:9264 cobc/parser.y:9341
+#: cobc/parser.y:9392 cobc/parser.y:9469
 msgid "USE statement must be within DECLARATIVES"
 msgstr ""
 
-#: cobc/parser.y:9266
+#: cobc/parser.y:9394
 msgid "SECTION header missing before USE statement"
 msgstr ""
 
-#: cobc/parser.y:9343
+#: cobc/parser.y:9471
 msgid "USE DEBUGGING not supported in contained program"
 msgstr ""
 
-#: cobc/parser.y:9422
+#: cobc/parser.y:9550
 msgid "Duplicate USE DEBUGGING ON ALL PROCEDURES"
 msgstr ""
 
-#: cobc/parser.y:9436
+#: cobc/parser.y:9564
 #, fuzzy
 msgid "Invalid target for DEBUGGING ALL"
 msgstr "不当な行連結です"
 
-#: cobc/parser.y:9492
+#: cobc/parser.y:9620
 #, fuzzy, c-format
 msgid "'%s' is not a report group"
 msgstr "`%s' はファイル名ではありません"
 
-#: cobc/parser.y:9953
+#: cobc/parser.y:10081
 #, fuzzy
 msgid "LINAGE-COUNTER must be qualified here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:9956
+#: cobc/parser.y:10084
 #, fuzzy
 msgid "Invalid LINAGE-COUNTER usage"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:9967 cobc/parser.y:10098
+#: cobc/parser.y:10095 cobc/parser.y:10226
 #, fuzzy, c-format
 msgid "'%s' is not a file name"
 msgstr "`%s' はファイル名ではありません"
 
-#: cobc/parser.y:9978
+#: cobc/parser.y:10106
 #, fuzzy
 msgid "LINE-COUNTER must be qualified here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:9981
+#: cobc/parser.y:10109
 #, fuzzy
 msgid "Invalid LINE-COUNTER usage"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:9992 cobc/parser.y:10017
+#: cobc/parser.y:10120 cobc/parser.y:10145
 #, fuzzy, c-format
 msgid "'%s' is not a report name"
 msgstr "`%s' はファイル名ではありません"
 
-#: cobc/parser.y:10003
+#: cobc/parser.y:10131
 #, fuzzy
 msgid "PAGE-COUNTER must be qualified here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/parser.y:10006
+#: cobc/parser.y:10134
 #, fuzzy
 msgid "Invalid PAGE-COUNTER usage"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:10056
+#: cobc/parser.y:10184
 #, fuzzy, c-format
 msgid "'%s' not indexed"
 msgstr "`%s' には INDEXED BY が必要です"
 
-#: cobc/parser.y:10057
+#: cobc/parser.y:10185
 #, fuzzy, c-format
 msgid "'%s' defined here"
 msgstr "`%s' はここで定義されました"
 
-#: cobc/parser.y:10080
+#: cobc/parser.y:10208
 #, c-format
 msgid "Multiple reference to '%s' "
 msgstr ""
 
-#: cobc/parser.y:10139
+#: cobc/parser.y:10267
 #, fuzzy, c-format
 msgid "'%s' is not a valid report name"
 msgstr "`%s' はファイル名ではありません"
 
-#: cobc/parser.y:10340
+#: cobc/parser.y:10468
 #, fuzzy
 msgid "Invalid mnemonic identifier"
 msgstr "不当なニーモニックです"
 
-#: cobc/parser.y:10593 cobc/parser.y:10596 cobc/parser.y:10610
-#: cobc/parser.y:10613 cobc/parser.y:10633 cobc/parser.y:10661
+#: cobc/parser.y:10721 cobc/parser.y:10724 cobc/parser.y:10738
+#: cobc/parser.y:10741 cobc/parser.y:10761 cobc/parser.y:10789
 #, fuzzy
 msgid "Integer value expected"
 msgstr "数値が必要です"
 
-#: cobc/parser.y:10618
+#: cobc/parser.y:10746
 #, fuzzy
 msgid "Invalid SYMBOLIC integer"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:10641
+#: cobc/parser.y:10769
 #, fuzzy
 msgid "Invalid integer"
 msgstr "不当な VALUE 句です"
 
-#: cobc/parser.y:10665
+#: cobc/parser.y:10793
 #, fuzzy
 msgid "Invalid CLASS value"
 msgstr "不当な VALUE 句です"
@@ -1813,62 +1877,62 @@ msgstr "PROCESS 文は無視されます"
 msgid "Dangling IF/ELSE directive"
 msgstr ""
 
-#: cobc/pplex.l:916
+#: cobc/pplex.l:919
 #, c-format
 msgid "Directive nest depth exceeded - %d"
 msgstr ""
 
-#: cobc/pplex.l:933
+#: cobc/pplex.l:936
 msgid "ELSE directive without matching IF/ELIF"
 msgstr ""
 
-#: cobc/pplex.l:949
+#: cobc/pplex.l:952
 msgid "END-IF directive without matching IF/ELIF/ELSE"
 msgstr ""
 
-#: cobc/pplex.l:965
+#: cobc/pplex.l:968
 msgid "ELIF directive without matching IF/ELIF"
 msgstr ""
 
-#: cobc/pplex.l:986
+#: cobc/pplex.l:989
 #, fuzzy, c-format
 msgid "Invalid internal case - %u"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/pplex.l:1025
+#: cobc/pplex.l:1028
 msgid "Buffer overrun - Too much continuation lines"
 msgstr ""
 
-#: cobc/pplex.l:1113 cobc/pplex.l:1121
+#: cobc/pplex.l:1116 cobc/pplex.l:1124
 #, fuzzy
 msgid "Line not terminated by a newline"
 msgstr "ファイルが改行で終わっていません"
 
-#: cobc/pplex.l:1116 cobc/pplex.l:1124
+#: cobc/pplex.l:1119 cobc/pplex.l:1127
 #, c-format
 msgid "Source text exceeds %d bytes, will be truncated"
 msgstr ""
 
-#: cobc/pplex.l:1238
+#: cobc/pplex.l:1241
 #, fuzzy
 msgid "Invalid continuation in comment entry"
 msgstr "不当な行連結です"
 
-#: cobc/pplex.l:1260
+#: cobc/pplex.l:1263
 #, fuzzy, c-format
 msgid "Invalid indicator '%c' at column 7"
 msgstr "7 桁目が不当な指示子です `%c'"
 
-#: cobc/pplex.l:1306 cobc/pplex.l:1317
+#: cobc/pplex.l:1309 cobc/pplex.l:1320
 #, fuzzy
 msgid "Invalid line continuation"
 msgstr "不当な行連結です"
 
-#: cobc/pplex.l:1325
+#: cobc/pplex.l:1328
 msgid "Continuation character expected"
 msgstr ""
 
-#: cobc/pplex.l:1391
+#: cobc/pplex.l:1394
 #, fuzzy, c-format
 msgid "Source text after column %d"
 msgstr "ソース行が %d 桁を越えています"
@@ -1898,1538 +1962,1635 @@ msgstr "不当な VALUE 句です"
 msgid "%s directive not yet implemented"
 msgstr "`%s' は実装されていません"
 
-#: cobc/reserved.c:2527
+#: cobc/reserved.c:2533
 msgid "Device name"
 msgstr ""
 
-#: cobc/reserved.c:2530
+#: cobc/reserved.c:2536
 msgid "Switch name"
 msgstr ""
 
-#: cobc/reserved.c:2533
+#: cobc/reserved.c:2539
 msgid "Feature name"
 msgstr ""
 
-#: cobc/reserved.c:2594
+#: cobc/reserved.c:2600
 #, c-format
 msgid "'%s' reserved word, but not supported"
 msgstr ""
 
-#: cobc/reserved.c:2671
+#: cobc/reserved.c:2677
 #, c-format
 msgid "Reserved Words\t\t\tImplemented (Y/N)"
 msgstr ""
 
-#: cobc/reserved.c:2690
+#: cobc/reserved.c:2696
 msgid "N (85 obsolete)"
 msgstr ""
 
-#: cobc/reserved.c:2693
+#: cobc/reserved.c:2699
 msgid "Y (Context sensitive)"
 msgstr ""
 
-#: cobc/reserved.c:2695 cobc/reserved.c:2751
+#: cobc/reserved.c:2701 cobc/reserved.c:2757
 msgid "Y"
 msgstr ""
 
-#: cobc/reserved.c:2699
+#: cobc/reserved.c:2705
 msgid "N (Context sensitive)"
 msgstr ""
 
-#: cobc/reserved.c:2701 cobc/reserved.c:2753
+#: cobc/reserved.c:2707 cobc/reserved.c:2759
 msgid "N"
 msgstr ""
 
-#: cobc/reserved.c:2707
+#: cobc/reserved.c:2713
 msgid "Extra (obsolete) context sensitive words"
 msgstr ""
 
-#: cobc/reserved.c:2716
+#: cobc/reserved.c:2722
 msgid "Extra internal registers\tDefinition"
 msgstr ""
 
-#: cobc/reserved.c:2733
+#: cobc/reserved.c:2739
 msgid "Intrinsic Function\t\tImplemented\tParameters"
 msgstr ""
 
-#: cobc/reserved.c:2773
+#: cobc/reserved.c:2779
 #, fuzzy
 msgid "Mnemonic names"
 msgstr "不当なニーモニックです"
 
-#: cobc/reserved.c:2784
+#: cobc/reserved.c:2790
 msgid "Extended mnemonic names (with -fsyntax-extension)"
 msgstr ""
 
-#: cobc/scanner.l:766
+#: cobc/scanner.l:776
 #, fuzzy, c-format
 msgid "Word length exceeds maximum of %d characters - '%s'"
 msgstr "レコード長が短か過ぎます `%s'"
 
-#: cobc/scanner.l:769
+#: cobc/scanner.l:779 cobc/scanner.l:782
 #, fuzzy, c-format
 msgid "Word length exceeds %d characters - '%s'"
 msgstr "レコード長が短か過ぎます `%s'"
 
-#: cobc/scanner.l:863
+#: cobc/scanner.l:876
 #, c-format
 msgid "A constant may not be used here - '%s'"
 msgstr ""
 
-#: cobc/scanner.l:968
+#: cobc/scanner.l:981
 #, c-format
 msgid "Invalid symbol: %s - Skipping word"
 msgstr ""
 
-#: cobc/scanner.l:1076
+#: cobc/scanner.l:1089
 #, fuzzy
 msgid "Alphanumeric literal has zero length"
 msgstr "文字列が必要です"
 
-#: cobc/scanner.l:1077
+#: cobc/scanner.l:1090
 msgid "A SPACE will be assumed"
 msgstr ""
 
-#: cobc/scanner.l:1129 cobc/scanner.l:1195
+#: cobc/scanner.l:1142 cobc/scanner.l:1208
 #, fuzzy, c-format
 msgid "Invalid %c literal: %s"
 msgstr "不当な X 定数です: %s"
 
-#: cobc/scanner.l:1223 cobc/scanner.l:1227 cobc/scanner.l:1231
+#: cobc/scanner.l:1236 cobc/scanner.l:1240 cobc/scanner.l:1244
 #, fuzzy
 msgid "Invalid numeric literal"
 msgstr "不当な数字定数です"
 
-#: cobc/scanner.l:1282 cobc/scanner.l:1288 cobc/scanner.l:1291
-#: cobc/scanner.l:1295 cobc/scanner.l:1299
+#: cobc/scanner.l:1299 cobc/scanner.l:1305 cobc/scanner.l:1308
+#: cobc/scanner.l:1312 cobc/scanner.l:1316
 #, fuzzy
 msgid "Invalid floating-point literal"
 msgstr "不当な数字定数です"
 
-#: cobc/scanner.l:1555
+#: cobc/scanner.l:1572
 #, fuzzy, c-format
 msgid "Invalid CONSTANT - %s"
 msgstr "不当な数字定数です"
 
-#: cobc/scanner.l:1565
+#: cobc/scanner.l:1582
 #, c-format
 msgid "Invalid alphanumeric CONSTANT - %s"
 msgstr ""
 
-#: cobc/scanner.l:1569
+#: cobc/scanner.l:1586
 #, c-format
 msgid "Empty alphanumeric CONSTANT - %s"
 msgstr ""
 
-#: cobc/scanner.l:1588 cobc/scanner.l:1596 cobc/scanner.l:1601
+#: cobc/scanner.l:1605 cobc/scanner.l:1613 cobc/scanner.l:1618
 #, fuzzy, c-format
 msgid "Invalid numeric CONSTANT - %s"
 msgstr "不当な数字定数です"
 
-#: cobc/tree.c:211
+#: cobc/tree.c:213
 #, fuzzy, c-format
 msgid "%s clause is required for file '%s'"
 msgstr "%s 句がファイル `%s' に必要です"
 
-#: cobc/tree.c:215
+#: cobc/tree.c:217
 #, fuzzy, c-format
 msgid "%s clause is invalid for file '%s' (file type)"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/tree.c:219
+#: cobc/tree.c:221
 #, fuzzy, c-format
 msgid "%s clause is invalid for file '%s'"
 msgstr "%s 句がファイル `%s' に必要です"
 
-#: cobc/tree.c:297
+#: cobc/tree.c:299
 msgid "Internal error node"
 msgstr ""
 
-#: cobc/tree.c:299
+#: cobc/tree.c:301
 #, fuzzy
 msgid "Unknown constant"
 msgstr "そのような文はありません `%s'"
 
-#: cobc/tree.c:413
+#: cobc/tree.c:415
 #, fuzzy, c-format
 msgid "<Unexpected tree tag %d>"
 msgstr "不当な数字定数です"
 
-#: cobc/tree.c:438
+#: cobc/tree.c:440
 #, fuzzy, c-format
 msgid "FUNCTION %s has invalid/not supported arguments - Tag %d"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:552
+#: cobc/tree.c:554
 #, fuzzy, c-format
 msgid "Invalid date/time function - '%d'"
 msgstr "不当な PICTURE 定義です"
 
-#: cobc/tree.c:611
+#: cobc/tree.c:613
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has invalid date/time format"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:616
+#: cobc/tree.c:618
 #, fuzzy, c-format
 msgid "FUNCTION '%s' does not have an offset time"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:620
+#: cobc/tree.c:622
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has format in variable"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:695
+#: cobc/tree.c:697
 #, fuzzy, c-format
 msgid "Unexpected cast type -> %d"
 msgstr "不当な数字定数です"
 
-#: cobc/tree.c:750
+#: cobc/tree.c:755
 #, c-format
 msgid "Unknown tree tag %d Category %d"
 msgstr ""
 
-#: cobc/tree.c:816
+#: cobc/tree.c:824
 #, c-format
 msgid "Unexpected numeric usage -> %d"
 msgstr ""
 
-#: cobc/tree.c:827
+#: cobc/tree.c:835
 #, fuzzy, c-format
 msgid "Unexpected category -> %d"
 msgstr "不当な数字定数です"
 
-#: cobc/tree.c:1006
+#: cobc/tree.c:1014
 msgid "NULL passed to cb_get_int - Aborting"
 msgstr ""
 
-#: cobc/tree.c:1011 cobc/tree.c:1054
+#: cobc/tree.c:1019 cobc/tree.c:1062
 #, fuzzy
 msgid "Invalid literal cast - Aborting"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/tree.c:1029 cobc/tree.c:1066 cobc/tree.c:1076 cobc/tree.c:1108
-#: cobc/tree.c:1113
+#: cobc/tree.c:1037 cobc/tree.c:1074 cobc/tree.c:1084 cobc/tree.c:1116
+#: cobc/tree.c:1121
 #, fuzzy
 msgid "Numeric literal exceeds limit - Aborting"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/tree.c:1521
+#: cobc/tree.c:1530
 #, fuzzy
 msgid "Invalid LOCALE literal"
 msgstr "不当な X 定数です: %s"
 
-#: cobc/tree.c:2016
+#: cobc/tree.c:2032
 #, fuzzy, c-format
 msgid "Numeric field cannot be larger than %d digits"
 msgstr "18 桁を越える数字項目は許されません"
 
-#: cobc/tree.c:2045
+#: cobc/tree.c:2061
 #, fuzzy, c-format
 msgid "Invalid picture string - '%s'"
 msgstr "不当な PICTURE 定義です"
 
-#: cobc/tree.c:2417 cobc/tree.c:2429
+#: cobc/tree.c:2440 cobc/tree.c:2452
 #, c-format
 msgid "NO DETAIL line defined in report %s"
 msgstr ""
 
-#: cobc/tree.c:2431
+#: cobc/tree.c:2454
 msgid "PAGE LIMIT FIRST DETAIL should be >= HEADING"
 msgstr ""
 
-#: cobc/tree.c:2434
+#: cobc/tree.c:2457
 msgid "PAGE LIMIT FOOTING should be >= HEADING"
 msgstr ""
 
-#: cobc/tree.c:2436
+#: cobc/tree.c:2459
 msgid "PAGE LIMIT LAST DETAIL should be >= FIRST DETAIL"
 msgstr ""
 
-#: cobc/tree.c:2438
+#: cobc/tree.c:2461
 msgid "PAGE LIMIT FOOTING should be >= LAST DETAIL"
 msgstr ""
 
-#: cobc/tree.c:2440
+#: cobc/tree.c:2463
 msgid "PAGE LIMIT LINES should be >= FOOTING"
 msgstr ""
 
-#: cobc/tree.c:2639 cobc/tree.c:2674
+#: cobc/tree.c:2666 cobc/tree.c:2701
 #, fuzzy, c-format
 msgid "Invalid KEY item '%s'"
 msgstr "不当な X 定数です: %s"
 
-#: cobc/tree.c:2692
+#: cobc/tree.c:2719
 #, fuzzy, c-format
 msgid "Record size too small '%s' (%d)"
 msgstr "レコード長が短か過ぎます `%s'"
 
-#: cobc/tree.c:2698
+#: cobc/tree.c:2725
 #, fuzzy, c-format
 msgid "Record size too large '%s' (%d)"
 msgstr "レコード長が長過ぎます `%s'"
 
-#: cobc/tree.c:2726
+#: cobc/tree.c:2753
 #, fuzzy, c-format
 msgid "Record size exceeds maximum allowed (%d) - File '%s'"
 msgstr "レコード長が短か過ぎます `%s'"
 
-#: cobc/tree.c:3084 cobc/tree.c:3089 cobc/tree.c:3101 cobc/typeck.c:3052
-#: cobc/typeck.c:3057 cobc/typeck.c:3062 cobc/typeck.c:3686 cobc/typeck.c:3706
-#: cobc/typeck.c:3803
+#: cobc/tree.c:3138
+#, fuzzy
+msgid "Divide by constant ZERO"
+msgstr "不当な数字定数です"
+
+#: cobc/tree.c:3174 cobc/tree.c:3179 cobc/tree.c:3355 cobc/typeck.c:3065
+#: cobc/typeck.c:3070 cobc/typeck.c:3075 cobc/typeck.c:3699 cobc/typeck.c:3719
+#: cobc/typeck.c:3816
 #, fuzzy
 msgid "Invalid expression"
 msgstr "不当な式です"
 
-#: cobc/tree.c:3113
+#: cobc/tree.c:3200 cobc/tree.c:3219
+msgid "Literal is longer than field"
+msgstr ""
+
+#: cobc/tree.c:3382
 #, fuzzy, c-format
 msgid "Unexpected operator -> %d"
 msgstr "不当な数字定数です"
 
-#: cobc/tree.c:3486 cobc/tree.c:3492 cobc/tree.c:3525 cobc/tree.c:3530
+#: cobc/tree.c:3387
+msgid "Expression is always TRUE"
+msgstr ""
+
+#: cobc/tree.c:3391
+msgid "Expression is always FALSE"
+msgstr ""
+
+#: cobc/tree.c:3764 cobc/tree.c:3770 cobc/tree.c:3803 cobc/tree.c:3808
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has invalid reference modification"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:3503 cobc/tree.c:3699
+#: cobc/tree.c:3781 cobc/tree.c:3977
 #, fuzzy, c-format
 msgid "FUNCTION '%s' unknown"
 msgstr "`%s' は実装されていません"
 
-#: cobc/tree.c:3507
+#: cobc/tree.c:3785
 #, fuzzy, c-format
 msgid "FUNCTION '%s' not implemented"
 msgstr "`%s' は実装されていません"
 
-#: cobc/tree.c:3514 cobc/tree.c:3686
+#: cobc/tree.c:3792 cobc/tree.c:3964
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has wrong number of arguments"
 msgstr "WHEN 句の引数の数が不当です"
 
-#: cobc/tree.c:3520
+#: cobc/tree.c:3798
 #, fuzzy, c-format
 msgid "FUNCTION '%s' can not have reference modification"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:3584 cobc/tree.c:3645 cobc/tree.c:3651
+#: cobc/tree.c:3862 cobc/tree.c:3923 cobc/tree.c:3929
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has invalid parameter"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/tree.c:3692
+#: cobc/tree.c:3970
 #, fuzzy, c-format
 msgid "FUNCTION '%s' has invalid first parameter"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/typeck.c:565
+#: cobc/typeck.c:564
 #, fuzzy
 msgid "Invalid use of 88 level item"
 msgstr "不当な式です"
 
-#: cobc/typeck.c:607
+#: cobc/typeck.c:606
 #, fuzzy, c-format
 msgid "'%s' is not group name"
 msgstr "`%s' は集団項目ではありません"
 
-#: cobc/typeck.c:624
+#: cobc/typeck.c:630
 #, fuzzy, c-format
 msgid "'%s' is not a numeric name"
 msgstr "`%s' は数字項目ではありません"
 
-#: cobc/typeck.c:642
+#: cobc/typeck.c:655
 #, fuzzy, c-format
 msgid "'%s' is not numeric or numeric-edited name"
 msgstr "`%s' は数字項目、もしくは数字編集項目ではありません"
 
-#: cobc/typeck.c:682
+#: cobc/typeck.c:695
 #, fuzzy, c-format
 msgid "'%s' is Alpha, instead of a numeric value"
 msgstr "`%s' は数値ではありません"
 
-#: cobc/typeck.c:685
+#: cobc/typeck.c:698
 #, fuzzy, c-format
 msgid "'%s' is Alpha Edited, instead of a numeric value"
 msgstr "`%s' は数値ではありません"
 
-#: cobc/typeck.c:696
+#: cobc/typeck.c:709
 #, fuzzy, c-format
 msgid "'%s' is not a numeric value"
 msgstr "`%s' は数値ではありません"
 
-#: cobc/typeck.c:746
+#: cobc/typeck.c:759
 #, fuzzy, c-format
 msgid "'%s' is not an integer value"
 msgstr "`%s' は整数ではありません"
 
-#: cobc/typeck.c:750
+#: cobc/typeck.c:763
 msgid "A positive numeric integer is required here"
 msgstr ""
 
-#: cobc/typeck.c:835
+#: cobc/typeck.c:848
 #, c-format
 msgid "System routine\t\t\tParameters"
 msgstr ""
 
-#: cobc/typeck.c:1211
+#: cobc/typeck.c:1224
 msgid "ON/OFF usage requires a SWITCH name"
 msgstr ""
 
-#: cobc/typeck.c:1298
+#: cobc/typeck.c:1311
 #, c-format
 msgid "ASSIGN interpreted as %s"
 msgstr ""
 
-#: cobc/typeck.c:1362 cobc/typeck.c:1490
+#: cobc/typeck.c:1375 cobc/typeck.c:1503
 #, c-format
 msgid "Subscripts missing for '%s' - Defaulting to 1"
 msgstr ""
 
-#: cobc/typeck.c:1375 cobc/typeck.c:1437
+#: cobc/typeck.c:1388 cobc/typeck.c:1450
 #, fuzzy, c-format
 msgid "'%s' cannot be reference modified"
 msgstr "`%s' は部分参照できません"
 
-#: cobc/typeck.c:1385 cobc/typeck.c:1433 cobc/typeck.c:1627
+#: cobc/typeck.c:1398 cobc/typeck.c:1446 cobc/typeck.c:1640
 #, fuzzy, c-format
 msgid "'%s' cannot be subscripted"
 msgstr "`%s' は添字付け出来ません"
 
-#: cobc/typeck.c:1388 cobc/typeck.c:1630
+#: cobc/typeck.c:1401 cobc/typeck.c:1643
 #, fuzzy, c-format
 msgid "'%s' requires 1 subscript"
 msgstr "`%s' は 1 つの添字を必要とします"
 
-#: cobc/typeck.c:1391 cobc/typeck.c:1633
+#: cobc/typeck.c:1404 cobc/typeck.c:1646
 #, fuzzy, c-format
 msgid "'%s' requires %d subscripts"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: cobc/typeck.c:1474
+#: cobc/typeck.c:1487
 #, fuzzy, c-format
 msgid "'%s' has no OCCURS clause"
 msgstr "`%s' は PICTURE 句を持つことが出来ません"
 
-#: cobc/typeck.c:1522 libcob/common.c:2433
+#: cobc/typeck.c:1535 libcob/common.c:2620
 #, fuzzy, c-format
 msgid "Subscript of '%s' out of bounds: %d"
 msgstr "'%s' の添字が範囲を超えています: %d"
 
-#: cobc/typeck.c:1579 cobc/typeck.c:1589 libcob/common.c:2445
+#: cobc/typeck.c:1592 cobc/typeck.c:1602 libcob/common.c:2632
 #, fuzzy, c-format
 msgid "Offset of '%s' out of bounds: %d"
 msgstr "'%s' の開始位置が範囲を超えています: %d"
 
-#: cobc/typeck.c:1583 cobc/typeck.c:1593 libcob/common.c:2452
+#: cobc/typeck.c:1596 cobc/typeck.c:1606 libcob/common.c:2639
 #, fuzzy, c-format
 msgid "Length of '%s' out of bounds: %d"
 msgstr "'%s' の長さが範囲を超えています: %d"
 
-#: cobc/typeck.c:1692
+#: cobc/typeck.c:1705
 #, fuzzy
 msgid "Reference modification not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:1700
+#: cobc/typeck.c:1713
 #, fuzzy
 msgid "ANY LENGTH item not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:1704
+#: cobc/typeck.c:1717
 #, fuzzy
 msgid "88 level item not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:1708
+#: cobc/typeck.c:1721
 #, fuzzy
 msgid "Variable length item not allowed here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:1815
+#: cobc/typeck.c:1828
 #, fuzzy, c-format
 msgid "'%s' is not an alphabet name"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/typeck.c:2046
+#: cobc/typeck.c:2059
 #, c-format
 msgid "Duplicate character values in alphabet '%s'"
 msgstr ""
 
-#: cobc/typeck.c:2050
+#: cobc/typeck.c:2063
 #, fuzzy, c-format
 msgid "Invalid character values in alphabet '%s'"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/typeck.c:2104
+#: cobc/typeck.c:2117
 #, fuzzy
 msgid "Invalid ALPHABET name"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:2159 cobc/typeck.c:2163
+#: cobc/typeck.c:2172 cobc/typeck.c:2176
 #, fuzzy, c-format
 msgid "Duplicate values in class '%s'"
 msgstr "不当なレベル番号です `%s'"
 
-#: cobc/typeck.c:2179
+#: cobc/typeck.c:2192
 #, fuzzy, c-format
 msgid "'%s' is not a locale name"
 msgstr "`%s' はファイル名ではありません"
 
-#: cobc/typeck.c:2360
+#: cobc/typeck.c:2373
 #, c-format
 msgid "'%s' will be implicitly defined"
 msgstr ""
 
-#: cobc/typeck.c:2377
+#: cobc/typeck.c:2390
 #, c-format
 msgid "ASSIGN data item '%s' invalid"
 msgstr ""
 
-#: cobc/typeck.c:2388
+#: cobc/typeck.c:2401
 #, c-format
 msgid "'%s' CURSOR is not 4 or 6 characters long"
 msgstr ""
 
-#: cobc/typeck.c:2398
+#: cobc/typeck.c:2411
 #, c-format
 msgid "'%s' CRT STATUS is not 4 characters long"
 msgstr ""
 
-#: cobc/typeck.c:2440
+#: cobc/typeck.c:2453
 #, fuzzy, c-format
 msgid "'%s' ODO field item invalid here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:2446
+#: cobc/typeck.c:2459
 #, fuzzy, c-format
 msgid "'%s' cannot have OCCURS DEPENDING"
 msgstr "`%s' は OCCURS DEPENDING を持つことが出来ません"
 
-#: cobc/typeck.c:2457
+#: cobc/typeck.c:2470
 #, c-format
 msgid "'%s' ODO item must have GLOBAL attribute"
 msgstr ""
 
-#: cobc/typeck.c:2479
+#: cobc/typeck.c:2492
 msgid "RECORD DEPENDING item must be in WORKING/LOCAL/LINKAGE section"
 msgstr ""
 
-#: cobc/typeck.c:2484
+#: cobc/typeck.c:2497
 msgid "Invalid RECORD DEPENDING item"
 msgstr ""
 
-#: cobc/typeck.c:2518 cobc/typeck.c:2521
+#: cobc/typeck.c:2531 cobc/typeck.c:2534
 #, fuzzy, c-format
 msgid "'%s' is not in DECLARATIVES"
 msgstr "`%s' は SPECIAL-NAMES で定義されていません"
 
-#: cobc/typeck.c:2528
+#: cobc/typeck.c:2541
 #, c-format
 msgid "Invalid reference to '%s' (In DECLARATIVES)"
 msgstr ""
 
-#: cobc/typeck.c:2535
+#: cobc/typeck.c:2548
 #, fuzzy, c-format
 msgid "'%s' not a procedure name"
 msgstr "`%s' は手続き名ではありません"
 
-#: cobc/typeck.c:2554
+#: cobc/typeck.c:2567
 #, c-format
 msgid "'%s' - DEBUGGING target invalid with ALL PROCEDURES"
 msgstr ""
 
-#: cobc/typeck.c:2558
+#: cobc/typeck.c:2571
 #, fuzzy, c-format
 msgid "'%s' - DEBUGGING target invalid"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/typeck.c:2573
+#: cobc/typeck.c:2586
 #, fuzzy, c-format
 msgid "'%s' is not a valid DEBUGGING target"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/typeck.c:2613
+#: cobc/typeck.c:2626
 #, fuzzy, c-format
 msgid "'%s' is not an alterable paragraph"
 msgstr "`%s' は整数ではありません"
 
-#: cobc/typeck.c:2794
+#: cobc/typeck.c:2807
 #, fuzzy
 msgid "Suggest parentheses around AND within OR"
 msgstr "OR に隣接する AND には括弧が推奨されます"
 
-#: cobc/typeck.c:3169
+#: cobc/typeck.c:3182
 #, c-format
 msgid "Internal decimal structure size exceeded - %d"
 msgstr ""
 
-#: cobc/typeck.c:3172
+#: cobc/typeck.c:3185
 msgid ""
 "Try to minimize the number of parenthesis or split into multiple "
 "computations."
 msgstr ""
 
-#: cobc/typeck.c:3211
+#: cobc/typeck.c:3224
 #, fuzzy, c-format
 msgid "Unexpected operation %d"
 msgstr "不当な数字定数です"
 
-#: cobc/typeck.c:3231
+#: cobc/typeck.c:3244
 #, fuzzy
 msgid "Unexpected constant expansion"
 msgstr "不当な数字定数です"
 
-#: cobc/typeck.c:4073 cobc/typeck.c:4126
+#: cobc/typeck.c:4086 cobc/typeck.c:4139
 msgid "No CORRESPONDING items found"
 msgstr ""
 
-#: cobc/typeck.c:4258
+#: cobc/typeck.c:4271
 #, fuzzy
 msgid "Invalid PROMPT literal"
 msgstr "不当な X 定数です: %s"
 
-#: cobc/typeck.c:4263
+#: cobc/typeck.c:4276
 #, fuzzy
 msgid "Invalid PROMPT identifier"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:4486 cobc/typeck.c:4513
+#: cobc/typeck.c:4499 cobc/typeck.c:4526
 #, fuzzy, c-format
 msgid "Invalid input device '%s'"
 msgstr "`%s' は不当な入力ストリームです"
 
-#: cobc/typeck.c:4508 cobc/typeck.c:4519 cobc/typeck.c:5185 cobc/typeck.c:5190
-#: cobc/typeck.c:5199
+#: cobc/typeck.c:4521 cobc/typeck.c:4532 cobc/typeck.c:5215 cobc/typeck.c:5220
+#: cobc/typeck.c:5225 cobc/typeck.c:5234
 #, fuzzy, c-format
 msgid "'%s' is not defined in SPECIAL-NAMES"
 msgstr "`%s' は SPECIAL-NAMES で定義されていません"
 
-#: cobc/typeck.c:4548
+#: cobc/typeck.c:4561
 msgid "Target of ALLOCATE is not a BASED item"
 msgstr ""
 
-#: cobc/typeck.c:4556
+#: cobc/typeck.c:4569
 msgid "Target of RETURNING is not a data pointer"
 msgstr ""
 
-#: cobc/typeck.c:4563
+#: cobc/typeck.c:4576
 msgid "The CHARACTERS field of ALLOCATE must be numeric"
 msgstr ""
 
-#: cobc/typeck.c:4576
+#: cobc/typeck.c:4589
 msgid "INITIALIZED TO item is not alphanumeric"
 msgstr ""
 
-#: cobc/typeck.c:4628
+#: cobc/typeck.c:4641
 msgid "Only alphanumeric FUNCTION types are allowed here"
 msgstr ""
 
-#: cobc/typeck.c:4636
+#: cobc/typeck.c:4649
 #, fuzzy
 msgid "Invalid RETURNING field"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:4657
+#: cobc/typeck.c:4670
 msgid "STDCALL not available on this platform"
 msgstr ""
 
-#: cobc/typeck.c:4663
+#: cobc/typeck.c:4676
 msgid "STDCALL used on 64-bit Windows platform"
 msgstr ""
 
-#: cobc/typeck.c:4669
+#: cobc/typeck.c:4682
 msgid "STATIC CALL convention requires a literal program name"
 msgstr ""
 
-#: cobc/typeck.c:4685
+#: cobc/typeck.c:4698
 #, fuzzy
 msgid "Numeric literal is negative"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/typeck.c:4762
+#: cobc/typeck.c:4775
 #, fuzzy
 msgid "Numeric literal exceeds size limits"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/typeck.c:4768
+#: cobc/typeck.c:4781
 msgid "Figurative constant invalid here"
 msgstr ""
 
-#: cobc/typeck.c:4776
+#: cobc/typeck.c:4789
 #, fuzzy, c-format
 msgid "'%s' is not a valid data name"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/typeck.c:4782
+#: cobc/typeck.c:4795
 #, fuzzy, c-format
 msgid "'%s' ANY LENGTH item not passed BY REFERENCE"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:4789
+#: cobc/typeck.c:4802
 #, fuzzy, c-format
 msgid "'%s' is not a 01 or 77 level item"
 msgstr "`%s' はレベル 01 か 77 でなければなりません"
 
-#: cobc/typeck.c:4812
+#: cobc/typeck.c:4825
 #, fuzzy, c-format
 msgid "Wrong number of CALL parameters for '%s'"
 msgstr "WHEN 句の引数の数が不当です"
 
-#: cobc/typeck.c:4862 cobc/typeck.c:4913 cobc/typeck.c:4917 cobc/typeck.c:4945
-#: cobc/typeck.c:7279 cobc/typeck.c:7284 cobc/typeck.c:7419 cobc/typeck.c:7542
-#: cobc/typeck.c:7546 cobc/typeck.c:8249 cobc/typeck.c:8445
+#: cobc/typeck.c:4875 cobc/typeck.c:4931 cobc/typeck.c:4935 cobc/typeck.c:4939
+#: cobc/typeck.c:4972 cobc/typeck.c:7326 cobc/typeck.c:7466 cobc/typeck.c:7607
+#: cobc/typeck.c:8315 cobc/typeck.c:8516
 #, fuzzy, c-format
 msgid "%s not allowed on %s files"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:5055
+#: cobc/typeck.c:5082
 #, c-format
 msgid "'%s' is an invalid type for DISPLAY operand"
 msgstr ""
 
-#: cobc/typeck.c:5060
+#: cobc/typeck.c:5087
 msgid "Invalid type for DISPLAY operand"
 msgstr ""
 
-#: cobc/typeck.c:5163
+#: cobc/typeck.c:5193
 #, fuzzy
 msgid "Invalid output device"
 msgstr "不当な入力ストリームです"
 
-#: cobc/typeck.c:5194
+#: cobc/typeck.c:5229
 #, fuzzy, c-format
 msgid "'%s' is not an output device"
 msgstr "`%s' は数字項目ではありません"
 
-#: cobc/typeck.c:5281
+#: cobc/typeck.c:5316
 #, fuzzy
 msgid "Invalid use of 88 level in WHEN expression"
 msgstr "不当な式です"
 
-#: cobc/typeck.c:5341
+#: cobc/typeck.c:5376
 #, fuzzy
 msgid "Wrong number of WHEN parameters"
 msgstr "WHEN 句の引数の数が不当です"
 
-#: cobc/typeck.c:5410 cobc/typeck.c:5422
+#: cobc/typeck.c:5445 cobc/typeck.c:5457
 #, fuzzy, c-format
 msgid "Target %d of FREE is not a BASED data item"
 msgstr "SET 出来るのは INDEXED か POINTER だけです"
 
-#: cobc/typeck.c:5428
+#: cobc/typeck.c:5463
 #, fuzzy, c-format
 msgid "Target %d of FREE must be a data pointer"
 msgstr "SET 出来るのは INDEXED か POINTER だけです"
 
-#: cobc/typeck.c:5452
+#: cobc/typeck.c:5487
 #, fuzzy
 msgid "GO TO with multiple procedure-names"
 msgstr "GO TO に複数の手続き名が指定されています"
 
-#: cobc/typeck.c:5595 cobc/typeck.c:5598
+#: cobc/typeck.c:5544
+#, fuzzy
+msgid "Invalid INITIALIZE statement"
+msgstr "不当な MOVE 文です"
+
+#: cobc/typeck.c:5638 cobc/typeck.c:5641
 #, c-format
 msgid "%s operands differ in size"
 msgstr ""
 
-#: cobc/typeck.c:5621 cobc/typeck.c:5640 cobc/typeck.c:5643
+#: cobc/typeck.c:5664 cobc/typeck.c:5683 cobc/typeck.c:5686
 #, fuzzy, c-format
 msgid "Invalid target for %s"
 msgstr "%s: 節 `%s':\n"
 
-#: cobc/typeck.c:5666
+#: cobc/typeck.c:5709
 #, fuzzy
 msgid "Data name expected before CHARACTERS"
 msgstr "CHARACTERS の前にデータ名が必要です"
 
-#: cobc/typeck.c:5677
+#: cobc/typeck.c:5720
 #, fuzzy
 msgid "Data name expected before ALL"
 msgstr "ALL の前にデータ名が必要です<"
 
-#: cobc/typeck.c:5688
+#: cobc/typeck.c:5731
 #, fuzzy
 msgid "Data name expected before LEADING"
 msgstr "LEADING の前にデータ名が必要です<"
 
-#: cobc/typeck.c:5699
+#: cobc/typeck.c:5742
 #, fuzzy
 msgid "Data name expected before TRAILING"
 msgstr "LEADING の前にデータ名が必要です<"
 
-#: cobc/typeck.c:5709
+#: cobc/typeck.c:5752
 #, fuzzy, c-format
 msgid "ALL, LEADING or TRAILING expected before '%s'"
 msgstr "`%s' の前に ALL または LEADINGが必要です"
 
-#: cobc/typeck.c:5719
+#: cobc/typeck.c:5762
 msgid "Operand has wrong size"
 msgstr ""
 
-#: cobc/typeck.c:5785
+#: cobc/typeck.c:5828
 #, c-format
 msgid "Internal register '%s' defined as BINARY-LONG"
 msgstr ""
 
-#: cobc/typeck.c:5788 cobc/typeck.c:5791 cobc/typeck.c:5794 cobc/typeck.c:5797
-#: cobc/typeck.c:5800 cobc/typeck.c:5803 cobc/typeck.c:5806 cobc/typeck.c:5809
-#: cobc/typeck.c:5812
+#: cobc/typeck.c:5831 cobc/typeck.c:5834 cobc/typeck.c:5837 cobc/typeck.c:5840
+#: cobc/typeck.c:5843 cobc/typeck.c:5846 cobc/typeck.c:5849 cobc/typeck.c:5852
+#: cobc/typeck.c:5855
 #, fuzzy, c-format
 msgid "'%s' defined here as USAGE %s"
 msgstr "`%s' はここで PIC %s として定義されました"
 
-#: cobc/typeck.c:5815
+#: cobc/typeck.c:5858
 #, fuzzy, c-format
 msgid "'%s' defined here as PIC %s"
 msgstr "`%s' はここで PIC %s として定義されました"
 
-#: cobc/typeck.c:5818
+#: cobc/typeck.c:5861
 #, fuzzy, c-format
 msgid "'%s' defined here as a group of length %d"
 msgstr "`%s' はここで大きさ %d のグループとして定義されています"
 
-#: cobc/typeck.c:5960
+#: cobc/typeck.c:6003
 msgid "Overlapping MOVE may produce unpredictable results"
 msgstr ""
 
-#: cobc/typeck.c:5995
+#: cobc/typeck.c:6038
 #, fuzzy
 msgid "Invalid destination for MOVE"
 msgstr "不当な行連結です"
 
-#: cobc/typeck.c:6016 cobc/typeck.c:6028
+#: cobc/typeck.c:6059 cobc/typeck.c:6071
 msgid "Source is non-numeric - substituting zero"
 msgstr ""
 
-#: cobc/typeck.c:6113
+#: cobc/typeck.c:6160
 msgid "Numeric move to ALPHABETIC"
 msgstr ""
 
-#: cobc/typeck.c:6127
+#: cobc/typeck.c:6174
 #, fuzzy
 msgid "Data item not signed"
 msgstr "データ項目に符号がありません"
 
-#: cobc/typeck.c:6131
+#: cobc/typeck.c:6178
 #, fuzzy
 msgid "Ignoring sign"
 msgstr "マイナス符号は無視されます"
 
-#: cobc/typeck.c:6449
+#: cobc/typeck.c:6496
 msgid "Invalid source for MOVE"
 msgstr ""
 
-#: cobc/typeck.c:6468
+#: cobc/typeck.c:6515
 #, fuzzy
 msgid "Invalid VALUE clause"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:6470
+#: cobc/typeck.c:6517
 #, fuzzy
 msgid "Invalid MOVE statement"
 msgstr "不当な MOVE 文です"
 
-#: cobc/typeck.c:6476
+#: cobc/typeck.c:6523
 #, fuzzy
 msgid "Invalid VALUE clause - literal exceeds data size"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/typeck.c:6480
+#: cobc/typeck.c:6527
 #, fuzzy
 msgid "Numeric literal exceeds data size"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/typeck.c:6489
+#: cobc/typeck.c:6536
 #, fuzzy
 msgid "Move non-integer to alphanumeric"
 msgstr "非整数から英数字項目への MOVE は出来ません"
 
-#: cobc/typeck.c:6495
+#: cobc/typeck.c:6542
 #, fuzzy
 msgid "Numeric value is expected"
 msgstr "数値が必要です"
 
-#: cobc/typeck.c:6500
+#: cobc/typeck.c:6547
 #, fuzzy
 msgid "Alphanumeric value is expected"
 msgstr "文字列が必要です"
 
-#: cobc/typeck.c:6505
+#: cobc/typeck.c:6552
 #, fuzzy
 msgid "Value does not fit the picture string"
 msgstr "値が PICTURE に合致しません"
 
-#: cobc/typeck.c:6510
+#: cobc/typeck.c:6557
 #, fuzzy
 msgid "Value size exceeds data size"
 msgstr "値の大きさが項目の大きさを越えています"
 
-#: cobc/typeck.c:6515
+#: cobc/typeck.c:6562
 msgid "Sending field larger than receiving field"
 msgstr ""
 
-#: cobc/typeck.c:6520
+#: cobc/typeck.c:6567
 msgid "Some digits may be truncated"
 msgstr ""
 
-#: cobc/typeck.c:7248
+#: cobc/typeck.c:7295
 #, fuzzy, c-format
 msgid "Invalid MOVE target - %s"
 msgstr "不当な MOVE 文です"
 
-#: cobc/typeck.c:7432
+#: cobc/typeck.c:7479
 #, fuzzy
 msgid "READ PREVIOUS not allowed for this file type"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:7440
+#: cobc/typeck.c:7487
 msgid "KEY ignored with sequential READ"
 msgstr "順読み込みの READ であるため KEY は無視されます"
 
-#: cobc/typeck.c:7523 cobc/typeck.c:7595 cobc/typeck.c:8428
+#: cobc/typeck.c:7588 cobc/typeck.c:7661 cobc/typeck.c:8499
 #, fuzzy, c-format
 msgid "%s requires a record name as subject"
 msgstr "`%s' はアルファベット名ではありません"
 
-#: cobc/typeck.c:7528 cobc/typeck.c:7601 cobc/typeck.c:8433
+#: cobc/typeck.c:7593 cobc/typeck.c:7667 cobc/typeck.c:8504
 #, c-format
 msgid "%s subject does not refer to a record name"
 msgstr ""
 
-#: cobc/typeck.c:7607
+#: cobc/typeck.c:7673
 #, fuzzy
 msgid "RELEASE not allowed on this record item"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:7690 cobc/typeck.c:7711 cobc/typeck.c:7718
+#: cobc/typeck.c:7756 cobc/typeck.c:7777 cobc/typeck.c:7784
 #, fuzzy
 msgid "Invalid SEARCH ALL condition"
 msgstr "SEARCH ALL の条件式が不当です"
 
-#: cobc/typeck.c:7848
+#: cobc/typeck.c:7914
 #, fuzzy
 msgid "The targets of SET must be either indexes or pointers"
 msgstr "SET 出来るのは INDEXED か POINTER だけです"
 
-#: cobc/typeck.c:7860 cobc/typeck.c:7864
+#: cobc/typeck.c:7926 cobc/typeck.c:7930
 msgid "SET targets must be PROGRAM-POINTER"
 msgstr ""
 
-#: cobc/typeck.c:7880
+#: cobc/typeck.c:7946
 #, fuzzy, c-format
 msgid "The address of '%s' cannot be changed"
 msgstr "`%s' のアドレスは変更できません"
 
-#: cobc/typeck.c:7900
+#: cobc/typeck.c:7966
 #, c-format
 msgid "SET target is invalid - '%s'"
 msgstr ""
 
-#: cobc/typeck.c:7955 cobc/typeck.c:7960 cobc/typeck.c:7987 cobc/typeck.c:7992
+#: cobc/typeck.c:8021 cobc/typeck.c:8026 cobc/typeck.c:8053 cobc/typeck.c:8058
 #, fuzzy
 msgid "Invalid SET statement"
 msgstr "不当な MOVE 文です"
 
-#: cobc/typeck.c:7996
+#: cobc/typeck.c:8062
 #, fuzzy
 msgid "Field does not have FALSE clause"
 msgstr "REDEFINES に含まれる項目は VALUE 句を持つことが出来ません"
 
-#: cobc/typeck.c:8018
+#: cobc/typeck.c:8084
 msgid "SET ATTRIBUTE requires a screen item as subject"
 msgstr ""
 
-#: cobc/typeck.c:8024
+#: cobc/typeck.c:8090
 msgid "SET ATTRIBUTE subject does not refer to a screen item"
 msgstr ""
 
-#: cobc/typeck.c:8053
+#: cobc/typeck.c:8119
 #, fuzzy
 msgid "Invalid SORT filename"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:8097
+#: cobc/typeck.c:8163
 #, fuzzy
 msgid "Invalid SORT USING parameter"
 msgstr "不当な MOVE 文です"
 
-#: cobc/typeck.c:8126
+#: cobc/typeck.c:8192
 #, fuzzy
 msgid "Invalid SORT GIVING parameter"
 msgstr "不当な MOVE 文です"
 
-#: cobc/typeck.c:8172 cobc/typeck.c:8199 cobc/typeck.c:8219
+#: cobc/typeck.c:8238 cobc/typeck.c:8265 cobc/typeck.c:8285
 #, fuzzy
 msgid "Invalid key item"
 msgstr "不当な VALUE 句です"
 
-#: cobc/typeck.c:8254
+#: cobc/typeck.c:8320
 msgid "LENGTH/SIZE clause only allowed on INDEXED files"
 msgstr ""
 
-#: cobc/typeck.c:8259
+#: cobc/typeck.c:8325
 #, fuzzy
 msgid "START not allowed with ACCESS MODE RANDOM"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:8457
+#: cobc/typeck.c:8528
 #, fuzzy
 msgid "LOCK clause invalid here"
 msgstr "`%s' は修飾出来ません"
 
-#: cobc/typeck.c:8707
+#: cobc/typeck.c:8798
 msgid "Data item is not part of a report"
 msgstr ""
 
-#: cobc/typeck.c:8733
+#: cobc/typeck.c:8824
 msgid "Improper use of SUPPRESS PRINTING "
 msgstr ""
 
 #: cobc/warning.def:28
-msgid "Warn if obsolete features are used"
+#, fuzzy
+msgid "warn if obsolete features are used"
 msgstr "廃要素が使われていれば警告する"
 
 #: cobc/warning.def:31
-msgid "Warn if archaic features are used"
+#, fuzzy
+msgid "warn if archaic features are used"
 msgstr "古い仕様が使われていれば警告する"
 
 #: cobc/warning.def:34
 #, fuzzy
-msgid "Warn incompatible redefinition of data items"
+msgid "warn incompatible redefinition of data items"
 msgstr "データ項目の再定義を警告する"
 
 #: cobc/warning.def:37
-msgid "Warn inconsistent constant"
+#, fuzzy
+msgid "warn inconsistent constant"
 msgstr "不適切な定数を警告する"
 
 #: cobc/warning.def:40
-msgid "Warn overlapping MOVE items"
+msgid "warn overlapping MOVE items"
 msgstr ""
 
 #: cobc/warning.def:43
 #, fuzzy
-msgid "Warn lack of parentheses around AND within OR"
+msgid "warn lack of parentheses around AND within OR"
 msgstr "OR と AND が括弧なしで並んでいれば警告する"
 
 #: cobc/warning.def:46
-msgid "Warn type mismatch strictly"
+#, fuzzy
+msgid "warn type mismatch strictly"
 msgstr "タイプの不適合を厳密に警告する"
 
 #: cobc/warning.def:49
 #, fuzzy
-msgid "Warn implicitly defined data items"
+msgid "warn implicitly defined data items"
 msgstr "データ項目の再定義を警告する"
 
 #: cobc/warning.def:52
-msgid "Warn CORRESPONDING with no matching items"
+msgid "warn CORRESPONDING with no matching items"
 msgstr ""
 
 #: cobc/warning.def:55
-msgid "Warn EXTERNAL item with VALUE clause"
+msgid "warn EXTERNAL item with VALUE clause"
 msgstr ""
 
 #: cobc/warning.def:58
-msgid "Warn non 01/77 items for CALL params"
+msgid "warn non 01/77 items for CALL params"
 msgstr ""
 
 #: cobc/warning.def:61
 #, fuzzy
-msgid "Warn text after column 72, FIXED format"
+msgid "warn text after column 72, FIXED format"
 msgstr "72 桁を越えるテキストを警告する"
 
 #: cobc/warning.def:64
 #, fuzzy
-msgid "Warn lack of scope terminator END-XXX"
+msgid "warn lack of scope terminator END-XXX"
 msgstr "終止符(END-XXX)がなければ警告する"
 
 #: cobc/warning.def:67
-msgid "Warn possible field truncation"
+msgid "warn possible field truncation"
 msgstr ""
 
 #: cobc/warning.def:70
-msgid "Warn dangling LINKAGE items"
+msgid "warn dangling LINKAGE items"
 msgstr ""
 
 #: cobc/warning.def:73
-msgid "Warn unreachable statements"
-msgstr ""
+#, fuzzy
+msgid "warn unreachable statements"
+msgstr "不当な MOVE 文です"
 
 #: libcob/call.c:89
 #, c-format
 msgid "LoadLibrary/GetProcAddress error %d"
 msgstr ""
 
-#: libcob/call.c:758 libcob/call.c:809
+#: libcob/call.c:750 libcob/call.c:802
 #, fuzzy
 msgid "Cannot find module"
 msgstr "モジュールが見付かりません `%s'"
 
-#: libcob/call.c:773 libcob/call.c:802
+#: libcob/call.c:765 libcob/call.c:795
 #, fuzzy
 msgid "Cannot find entry point"
 msgstr "モジュールが見付かりません `%s'"
 
-#: libcob/call.c:876
+#: libcob/call.c:869
 #, fuzzy
 msgid "Indeterminable error in resolve of COBOL CALL"
 msgstr "永続ファイルエラーです"
 
-#: libcob/call.c:957
+#: libcob/call.c:950
 #, fuzzy, c-format
 msgid "User FUNCTION '%s' not found"
 msgstr "'%s' の開始位置が範囲を超えています: %d"
 
-#: libcob/call.c:1031 libcob/call.c:1101 libcob/call.c:1147 libcob/call.c:1173
+#: libcob/call.c:1024 libcob/call.c:1094 libcob/call.c:1140 libcob/call.c:1166
 #, c-format
 msgid "NULL parameter passed to '%s'"
 msgstr ""
 
-#: libcob/call.c:1097
+#: libcob/call.c:1090
 #, fuzzy, c-format
 msgid "Invalid number of arguments to '%s'"
 msgstr "WHEN 句の引数の数が不当です"
 
-#: libcob/call.c:1151
+#: libcob/call.c:1144
 msgid "Multiple call to 'cob_setjmp'"
 msgstr ""
 
-#: libcob/call.c:1177
+#: libcob/call.c:1170
 msgid "Call to 'cob_longjmp' with no prior 'cob_setjmp'"
 msgstr ""
 
-#: libcob/cobgetopt.c:494
+#: libcob/cobgetopt.c:491
 #, c-format
 msgid "%s: option '%s' is ambiguous; possibilities:"
 msgstr ""
 
-#: libcob/cobgetopt.c:529
+#: libcob/cobgetopt.c:532
 #, fuzzy, c-format
 msgid "%s: option '--%s' doesn't allow an argument"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:536
+#: libcob/cobgetopt.c:539
 #, fuzzy, c-format
 msgid "%s: option '%c%s' doesn't allow an argument"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:556
+#: libcob/cobgetopt.c:559
 #, fuzzy, c-format
 msgid "%s: option '--%s' requires an argument"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:588
+#: libcob/cobgetopt.c:591
 #, fuzzy, c-format
 msgid "%s: unrecognized option '--%s'"
 msgstr "不当なオプションです -std=%s\n"
 
-#: libcob/cobgetopt.c:595
+#: libcob/cobgetopt.c:598
 #, fuzzy, c-format
 msgid "%s: unrecognized option '%c%s'"
 msgstr "不当なオプションです -std=%s\n"
 
-#: libcob/cobgetopt.c:624
+#: libcob/cobgetopt.c:627
 #, fuzzy, c-format
 msgid "%s: invalid option -- %c"
 msgstr "不当なオプションです -std=%s\n"
 
-#: libcob/cobgetopt.c:655 libcob/cobgetopt.c:796
+#: libcob/cobgetopt.c:658 libcob/cobgetopt.c:799
 #, fuzzy, c-format
 msgid "%s: option requires an argument -- %c"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:705
+#: libcob/cobgetopt.c:708
 #, fuzzy, c-format
 msgid "%s: option '-W %s' is ambiguous"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:727
+#: libcob/cobgetopt.c:730
 #, fuzzy, c-format
 msgid "%s: option '-W %s' doesn't allow an argument"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/cobgetopt.c:745
+#: libcob/cobgetopt.c:748
 #, fuzzy, c-format
-msgid "%s: option `%s' requires an argument"
+msgid "%s: option '%s' requires an argument"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/common.c:441
+#: libcob/common.c:575
 #, c-format
 msgid "Attempt to reference unallocated memory"
 msgstr ""
 
-#: libcob/common.c:443 libcob/common.c:446
+#: libcob/common.c:577 libcob/common.c:580
 #, c-format
 msgid "Caught Signal"
 msgstr ""
 
-#: libcob/common.c:449
+#: libcob/common.c:583
 #, c-format
 msgid "Signal %s"
 msgstr ""
 
-#: libcob/common.c:454
+#: libcob/common.c:588
 #, c-format
 msgid "Abnormal termination - File contents may be incorrect"
 msgstr ""
 
-#: libcob/common.c:1486
+#: libcob/common.c:1614
 msgid "Malloc error"
 msgstr ""
 
-#: libcob/common.c:1522 libcob/common.c:1529
+#: libcob/common.c:1653 libcob/common.c:1660
 #, fuzzy
 msgid "cob_init() has not been called"
 msgstr "cob_resolve() の前に cob_init() を呼ばなければなりません"
 
-#: libcob/common.c:1526
+#: libcob/common.c:1657
 msgid "Attempt to CANCEL active program"
 msgstr ""
 
-#: libcob/common.c:1532
+#: libcob/common.c:1663
 msgid "Codegen error - Please report this"
 msgstr ""
 
-#: libcob/common.c:1535
+#: libcob/common.c:1666
 msgid "Recursive call of chained program"
 msgstr ""
 
-#: libcob/common.c:1538
+#: libcob/common.c:1669
 msgid "Stack overflow, possible PERFORM depth exceeded"
 msgstr ""
 
-#: libcob/common.c:1541
+#: libcob/common.c:1672
 msgid "Invalid entry/exit in GLOBAL USE procedure"
 msgstr ""
 
-#: libcob/common.c:1544
+#: libcob/common.c:1675
 msgid "Unable to allocate memory"
 msgstr ""
 
-#: libcob/common.c:1547
+#: libcob/common.c:1678
 #, fuzzy
 msgid "Invalid entry into module"
 msgstr "不当な VALUE 句です"
 
-#: libcob/common.c:1550
+#: libcob/common.c:1681
 #, c-format
 msgid "Invalid recursive COBOL CALL to '%s'"
 msgstr ""
 
-#: libcob/common.c:1561
+#: libcob/common.c:1692
 #, fuzzy
 msgid "End of file"
 msgstr "ファイルの終わりです"
 
-#: libcob/common.c:1564
+#: libcob/common.c:1695
 #, fuzzy
 msgid "Key out of range"
 msgstr "キーの範囲が不当です"
 
-#: libcob/common.c:1567
+#: libcob/common.c:1698
 #, fuzzy
 msgid "Key order not ascending"
 msgstr "キーが昇順ではありません"
 
-#: libcob/common.c:1570
+#: libcob/common.c:1701
 #, fuzzy
 msgid "Record key already exists"
 msgstr "レコードキーが既に存在します"
 
-#: libcob/common.c:1573
+#: libcob/common.c:1704
 #, fuzzy
 msgid "Record key does not exist"
 msgstr "レコードキーが存在しません"
 
-#: libcob/common.c:1576
+#: libcob/common.c:1707
 #, fuzzy
 msgid "Permanent file error"
 msgstr "永続ファイルエラーです"
 
-#: libcob/common.c:1579
+#: libcob/common.c:1710
 #, fuzzy
 msgid "File does not exist"
 msgstr "ファイルが存在しません"
 
-#: libcob/common.c:1582
+#: libcob/common.c:1713
 #, fuzzy
 msgid "Permission denied"
 msgstr "利用許可がありません"
 
-#: libcob/common.c:1585
+#: libcob/common.c:1716
 #, fuzzy
 msgid "File already open"
 msgstr "ファイルは既に開いています"
 
-#: libcob/common.c:1588
+#: libcob/common.c:1719
 #, fuzzy
 msgid "File not open"
 msgstr "ファイルが開いていません"
 
-#: libcob/common.c:1591
+#: libcob/common.c:1722
 msgid "READ must be executed first"
 msgstr "READ を先に実行しなければなりません"
 
-#: libcob/common.c:1594
+#: libcob/common.c:1725
 #, fuzzy
 msgid "Record overflow"
 msgstr "レコードの領域を超えています"
 
-#: libcob/common.c:1597
+#: libcob/common.c:1728
 #, fuzzy
 msgid "Failed to READ"
 msgstr "読み込みに失敗しました"
 
-#: libcob/common.c:1600
+#: libcob/common.c:1731
 #, fuzzy
 msgid "READ/START not allowed"
 msgstr "READ、START は許可されません"
 
-#: libcob/common.c:1603
+#: libcob/common.c:1734
 msgid "WRITE not allowed"
 msgstr "WRITE は許可されません"
 
-#: libcob/common.c:1606
+#: libcob/common.c:1737
 #, fuzzy
 msgid "DELETE/REWRITE not allowed"
 msgstr "DELETE、REWRITE は許可されません"
 
-#: libcob/common.c:1609
+#: libcob/common.c:1740
 msgid "Record locked by another file connector"
 msgstr ""
 
-#: libcob/common.c:1612
+#: libcob/common.c:1743
 #, fuzzy
 msgid "LINAGE values invalid"
 msgstr "`%s' は修飾出来ません"
 
-#: libcob/common.c:1615
+#: libcob/common.c:1746
 msgid "File sharing conflict"
 msgstr ""
 
-#: libcob/common.c:1618
+#: libcob/common.c:1749
 msgid "Runtime library is not configured for this operation"
 msgstr ""
 
-#: libcob/common.c:1621
+#: libcob/common.c:1752
 #, fuzzy
 msgid "Unknown file error"
 msgstr "原因不明のファイルエラーです"
 
-#: libcob/common.c:1627
+#: libcob/common.c:1758
 #, c-format
 msgid "%s (Status = %02d) File : '%s'"
 msgstr ""
 
-#: libcob/common.c:1632
+#: libcob/common.c:1763
 msgid "Attempt to use non-implemented function"
 msgstr ""
 
-#: libcob/common.c:1635
+#: libcob/common.c:1766
 #, fuzzy, c-format
 msgid "Unknown failure : %d"
 msgstr "原因不明のファイルエラーです"
 
-#: libcob/common.c:1752
+#: libcob/common.c:1804
+msgid "environment variables"
+msgstr ""
+
+#: libcob/common.c:1939
 msgid "Error - Version mismatch"
 msgstr ""
 
-#: libcob/common.c:1753
+#: libcob/common.c:1940
 #, c-format
 msgid "%s has version/patch level %s/%d"
 msgstr ""
 
-#: libcob/common.c:1755
+#: libcob/common.c:1942
 #, c-format
 msgid "Library has version/patch level %s/%d"
 msgstr ""
 
-#: libcob/common.c:1765
+#: libcob/common.c:1952
 #, fuzzy, c-format
 msgid "CALL to %s requires %d parameters"
 msgstr "`%s' は %d つの添字を必要とします"
 
-#: libcob/common.c:2383
+#: libcob/common.c:2570
 #, c-format
 msgid "BASED/LINKAGE item '%s' has NULL address"
 msgstr ""
 
-#: libcob/common.c:2408
+#: libcob/common.c:2595
 #, fuzzy, c-format
 msgid "'%s' not numeric: '%s'"
 msgstr "`%s' は数字ではありません: `%s'"
 
-#: libcob/common.c:2421
+#: libcob/common.c:2608
 #, fuzzy, c-format
 msgid "OCCURS DEPENDING ON '%s' out of bounds: %d"
 msgstr "OCCURS DEPENDING ON `%s' が範囲を越えています: %d"
 
-#: libcob/common.c:2466
+#: libcob/common.c:2653
 #, c-format
 msgid ""
 "EXTERNAL item '%s' previously allocated with size %d, requested size is %d"
 msgstr ""
 
-#: libcob/common.c:3126
+#: libcob/common.c:2873 libcob/common.c:2877
+#, fuzzy, c-format
+msgid "COB_CURRENT_DATE '%s' is invalid"
+msgstr "`%s' は修飾出来ません"
+
+#: libcob/common.c:3446
 msgid "'cobcommandline' - Runtime has not been initialized"
 msgstr ""
 
-#: libcob/common.c:3271
+#: libcob/common.c:3591
 #, c-format
 msgid "Parameter to SYSTEM call is larger than %d characters"
 msgstr ""
 
-#: libcob/common.c:3719
+#: libcob/common.c:4039
 msgid "Call to CBL_OC_GETOPT with wrong longoption size."
 msgstr ""
 
-#: libcob/common.c:3724
+#: libcob/common.c:4044
 msgid "Call to CBL_OC_GETOPT with missing longind."
 msgstr ""
 
-#: libcob/common.c:4180
+#: libcob/common.c:4502
 msgid " (default)"
 msgstr ""
 
-#: libcob/common.c:4194
-msgid "Memory allocation failure"
+#: libcob/common.c:4581
+#, c-format
+msgid "Environment variable '%s' is undefined"
 msgstr ""
 
-#: libcob/common.c:4229
-msgid "GNU Cobol runtime environment"
+#: libcob/common.c:4716
+#, c-format
+msgid "minimum value: %lu"
 msgstr ""
 
-#: libcob/common.c:4231
-msgid "All values were resolved from current environment."
+#: libcob/common.c:4722
+#, c-format
+msgid "maximum value: %lu"
 msgstr ""
 
-#: libcob/common.c:4238
-msgid "No"
+#: libcob/common.c:4965 libcob/common.c:5011
+#, c-format
+msgid "WARNING - '%s' without a value - ignored!"
 msgstr ""
 
-#: libcob/common.c:4239
-msgid "not set"
+#: libcob/common.c:4990
+#, c-format
+msgid "WARNING - '%s %s' without a value - ignored!"
 msgstr ""
 
-#: libcob/common.c:4243
-msgid "Handling of CALLs"
+#: libcob/common.c:5311
+msgid ""
+"License LGPLv3+: GNU LGPL version 3 or later <http://gnu.org/licenses/lgpl."
+"html>"
 msgstr ""
 
-#: libcob/common.c:4264
-msgid "File I/O"
+#: libcob/common.c:5330
+msgid "Build information"
 msgstr ""
 
-#: libcob/common.c:4295 libcob/common.c:4298
-msgid "0 (default), [2-byte record-length] [0000] [record-data]"
+#: libcob/common.c:5331
+msgid "Build environment"
 msgstr ""
 
-#: libcob/common.c:4307
-msgid "Locale Properties"
+#: libcob/common.c:5410
+msgid "runtime environment"
 msgstr ""
 
-#: libcob/common.c:4317
-msgid "Screen I/O"
+#: libcob/common.c:5412
+msgid "via"
 msgstr ""
 
-#: libcob/common.c:4348
-msgid "Miscellaneous"
+#: libcob/common.c:5520 libcob/common.c:5522
+#, c-format
+msgid "(set by %s)"
 msgstr ""
 
-#: libcob/common.c:4357
-msgid "stderr (default)"
+#: libcob/common.c:5530
+#, c-format
+msgid "(reset)"
 msgstr ""
 
-#: libcob/common.c:4881
+#: libcob/common.c:5532
+#, c-format
+msgid "(default)"
+msgstr ""
+
+#: libcob/common.c:5538
+msgid "... removed from environment"
+msgstr ""
+
+#: libcob/common.c:5847
+#, c-format
+msgid "cob_set_runtime_option called with unknown option: %d"
+msgstr ""
+
+#: libcob/common.c:5867
+#, c-format
+msgid "cob_get_runtime_option called with unknown option: %d"
+msgstr ""
+
+#: libcob/common.c:5946
 #, c-format
 msgid "Error '%s opening COB_DEBUG_LOG '%s'"
 msgstr ""
 
-#: libcob/common.c:4886
+#: libcob/common.c:5951
 msgid "Compiler was not built with --enable-debug-log so ignore COB_DEBUG_LOG"
 msgstr ""
 
-#: libcob/fileio.c:2470
+#: libcob/fileio.c:1544
+#, c-format
+msgid "ERROR FILE %s has record size %d exceeds %d in program"
+msgstr ""
+
+#: libcob/fileio.c:3407
 #, c-format
 msgid "BDB error: %s"
 msgstr ""
 
-#: libcob/fileio.c:2479
+#: libcob/fileio.c:3416
 #, c-format
 msgid "BDB error: %s %s"
 msgstr ""
 
-#: libcob/fileio.c:2495 libcob/fileio.c:2515
+#: libcob/fileio.c:3432 libcob/fileio.c:3452
 #, c-format
 msgid "Cannot join BDB environment (%s), error: %d %s"
 msgstr ""
 
-#: libcob/fileio.c:5364
+#: libcob/fileio.c:5754
+#, c-format
+msgid "ERROR FILE %s does not match current version; Recompile the program"
+msgstr ""
+
+#: libcob/fileio.c:6328
 #, c-format
 msgid "WARNING - Call to CBL_OPEN_FILE with wrong access mode: %d"
 msgstr ""
 
-#: libcob/fileio.c:5439
+#: libcob/fileio.c:6403
 #, c-format
 msgid "WARNING - Call to CBL_CREATE_FILE with wrong file_lock: %d"
 msgstr ""
 
-#: libcob/fileio.c:5444
+#: libcob/fileio.c:6408
 #, c-format
 msgid "WARNING - Call to CBL_CREATE_FILE with wrong file_dev: %d"
 msgstr ""
 
-#: libcob/fileio.c:5648 libcob/fileio.c:5902
+#: libcob/fileio.c:6612 libcob/fileio.c:6866
 #, c-format
 msgid "'%s' - File detail area is too short"
 msgstr ""
 
-#: libcob/fileio.c:6124
+#: libcob/fileio.c:7088
 msgid "SORT is unable to acquire temporary file"
 msgstr ""
 
-#: libcob/fileio.c:6685
+#: libcob/fileio.c:7649
 #, c-format
 msgid "WARNING - Implicit CLOSE of %s ('%s')"
 msgstr ""
 
-#: libcob/screenio.c:507
+#: libcob/screenio.c:494
 msgid "Failed to initialize curses"
 msgstr ""
 
-#: libcob/termio.c:67 libcob/termio.c:106
+#: libcob/termio.c:68 libcob/termio.c:107
 msgid "(Not representable)"
 msgstr ""
 
-#: bin/cobcrun.c:92
-#, c-format
-msgid "Usage: %s PROGRAM [param ...]"
+#: bin/cobcrun.c:101
+msgid "COBOL driver program for GnuCOBOL modules"
 msgstr ""
 
-#: bin/cobcrun.c:94
+#: bin/cobcrun.c:103
+#, c-format
+msgid "usage: %s [options] PROGRAM [parameter ...]"
+msgstr ""
+
+#: bin/cobcrun.c:105
 #, c-format
 msgid "  or:  %s options"
 msgstr ""
 
-#: bin/cobcrun.c:97
-#, c-format
-msgid "COBOL driver program for %s modules"
+#: bin/cobcrun.c:108
+msgid "Options:"
 msgstr ""
 
-#: bin/cobcrun.c:102
-msgid "  -V, -version          Display runtime version"
+#: bin/cobcrun.c:110
+msgid "  -V, -version          display cobcrun and runtime version and exit"
 msgstr ""
 
-#: bin/cobcrun.c:103
-msgid "  -i, -info             Display runtime information (build/environment)"
+#: bin/cobcrun.c:111
+msgid "  -i, -info             display runtime information (build/environment)"
 msgstr ""
 
-#: bin/cobcrun.c:104
+#: bin/cobcrun.c:112
+msgid "  -c <file>, -config=<file>   set runtime configuration from <file>"
+msgstr ""
+
+#: bin/cobcrun.c:113
 msgid ""
-"  -r, -runtime-env             Display runtime information (build/"
-"environment)"
+"  -r, -runtime-env      display current runtime configuration\n"
+"                        (value and origin for all settings)"
 msgstr ""
 
-#: bin/cobcrun.c:181
+#: bin/cobcrun.c:116
+#, c-format
+msgid ""
+"Report bugs to: %s or\n"
+"use the preferred issue tracker via home page"
+msgstr ""
+
+#: bin/cobcrun.c:168
+#, fuzzy
+msgid "invalid configuration file name"
+msgstr "不当な行連結です"
+
+#: bin/cobcrun.c:225
 msgid "PROGRAM name exceeds 31 characters"
 msgstr ""
+
+#, fuzzy
+#~ msgid "%s: option `%s' requires an argument"
+#~ msgstr "`%s' は %d つの添字を必要とします"
 
 #, fuzzy
 #~ msgid "Invalid PAGE clause"
@@ -3613,10 +3774,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "%s:%d: Invalid line\n"
 #~ msgstr "不当な VALUE 句です"
-
-#, fuzzy
-#~ msgid "ENTRY '%s' invalid"
-#~ msgstr "`%s' は修飾出来ません"
 
 #, fuzzy
 #~ msgid "Invalid WHEN expression"
