@@ -128,6 +128,7 @@ struct cb_statement		*current_statement = NULL;
 struct cb_label			*current_section = NULL;
 struct cb_label			*current_paragraph = NULL;
 char				*cobc_glob_line = NULL;
+int				cb_exp_line = 0;
 
 cb_tree				cobc_printer_node = NULL;
 int				functions_are_all = 0;
@@ -9943,6 +9944,7 @@ expr:
 partial_expr:
   {
 	current_expr = NULL;
+	cb_exp_line = cb_source_line;
   }
   expr_tokens
   {

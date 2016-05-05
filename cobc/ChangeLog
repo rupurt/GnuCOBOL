@@ -103,6 +103,16 @@
 
 	* parser.y: fixed so unstring works with identifier/literal/function
 
+2015-05-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* config.c: new options "includeif" to include only if file exists
+	  (implemented according to runtime configuration by Ron Norman)
+
+2015-05-07  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* parser.y, typeck.c, cobc.h: give correct error position (cb_source_file
+	  + new cb_exp_line) for expression errors
+
 2015-04-28  Ron Norman
 
 	* codegen.c: now emits extern <function prototype> ();
@@ -147,11 +157,6 @@
 	  defined then an internal one is created. This was required as 
 	  parts of fileio.c expect there to be a key field for RELATIVE 
 	  files to hold the record number being processed.
-
-2015-05-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
-
-	* config.c: new options "includeif" to include only if file exists
-	  (implemented according to runtime configuration by Ron Norman)
 
 2015-04-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
