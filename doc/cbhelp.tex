@@ -1,7 +1,7 @@
 @verbatim
 GnuCOBOL compiler for most COBOL dialects with lots of extensions
 
-usage: /mnt/d/Programme/Entwicklung/GnuCOBOL/gnu-cobol-reportwriter_mergeonly/cobc/.libs/lt-cobc [options]... file...
+usage: /mnt/d/Programme/Entwicklung/GnuCOBOL/gnu-cobol-reportwriter_clean/cobc/.libs/lt-cobc [options]... file...
 
 options:
   -h, -help             display this help and exit
@@ -63,6 +63,7 @@ options:
   -Wimplicit-define     warn implicitly defined data items
   -Wcorresponding       warn CORRESPONDING with no matching items
   -Wexternal-value      warn EXTERNAL item with VALUE clause
+  -Wconstant-expression Warn expressions that always resolve to true/false
   -Wcall-params         warn non 01/77 items for CALL params
 			- NOT set with -Wall
   -Wcolumn-overflow     warn text after column 72, FIXED format

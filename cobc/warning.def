@@ -55,7 +55,7 @@ CB_WARNDEF (cb_warn_external_val, "external-value",
 	    _("warn EXTERNAL item with VALUE clause"))
 
 CB_WARNDEF (cb_warn_constant_expr, "constant-expression",
-	    _("Warn expressions that always resolves to true/false"))
+	    _("Warn expressions that always resolve to true/false"))
 
 CB_NOWARNDEF (cb_warn_call_params, "call-params",
 	    _("warn non 01/77 items for CALL params"))

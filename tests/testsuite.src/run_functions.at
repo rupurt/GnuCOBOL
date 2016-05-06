@@ -758,19 +758,29 @@ AT_DATA([prog.cob], [
            END-IF
 
            MOVE FUNCTION FORMATTED-DATETIME
-                    ("YYYYDDDThhmmss.sssssssssZ", 1, 45296.789012345)
+                    ("YYYYDDDThhmmss+hhmm", 1, 45296)
                TO str
-           IF str <> "1601001T123456.789012345Z"
+           IF str <> "1601001T123456+0000"
                DISPLAY "Test 4 failed: " str END-DISPLAY
+           END-IF
+
+           *> Test underflow to next day due to offset
+           MOVE FUNCTION FORMATTED-DATETIME
+                    ("YYYYDDDThhmmss.sssssssssZ", 150846, 0,
+                     1)
+               TO str
+           IF str <> "2013365T235900.000000000Z"
+               DISPLAY "Test 5 failed: " str END-DISPLAY
            END-IF
 
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION FORMATTED-DATETIME with ref modding])
 AT_KEYWORDS([functions])
@@ -778,19 +788,25 @@ AT_KEYWORDS([functions])
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  str          PIC X(04).
        PROCEDURE        DIVISION.
-           DISPLAY FUNCTION FORMATTED-DATETIME
+           MOVE FUNCTION FORMATTED-DATETIME
                ("YYYYMMDDThhmmss", 1, 1) (3:4)
-           END-DISPLAY
+             TO STR
+           IF STR NOT = '0101'
+              DISPLAY STR
+              END-DISPLAY
+           END-IF
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0],
-[0101
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION FORMATTED-TIME])
 AT_KEYWORDS([functions])
@@ -813,12 +829,13 @@ AT_DATA([prog.cob], [
                DISPLAY "Test 2 failed: " str END-DISPLAY
            END-IF
 
-           MOVE FUNCTION FORMATTED-TIME ( "hhmmssZ", 45296 ) TO str
-           IF str <> "123456Z"
+           MOVE FUNCTION FORMATTED-TIME ( "hhmmssZ", 86399, -1 ) TO str
+           IF str <> "000059Z"
                DISPLAY "Test 3 failed: " str END-DISPLAY
            END-IF
 
-           MOVE FUNCTION FORMATTED-TIME ( "hh:mm:ssZ", 45296 ) TO str
+           MOVE FUNCTION FORMATTED-TIME ( "hh:mm:ssZ", 45296)
+               TO str
            IF str <> "12:34:56Z"
                DISPLAY "Test 4 failed: " str END-DISPLAY
            END-IF
@@ -828,13 +845,13 @@ AT_DATA([prog.cob], [
                DISPLAY "Test 5 failed: " str END-DISPLAY
            END-IF
 
-           MOVE FUNCTION FORMATTED-TIME ( "hh:mm:ss.ssZ", 45296.78 )
+           MOVE FUNCTION FORMATTED-TIME ( "hh:mm:ss.ssZ", 0, 120)
                TO str
-           IF str <> "12:34:56.78Z"
+           IF str <> "22:00:00.00Z"
                DISPLAY "Test 6 failed: " str END-DISPLAY
            END-IF
 
-           MOVE FUNCTION FORMATTED-TIME ( "hhmmss+hhmm", 45296, 0 )
+           MOVE FUNCTION FORMATTED-TIME ( "hhmmss+hhmm", 45296)
                TO str
            IF str <> "123456+0000"
                DISPLAY "Test 7 failed: " str END-DISPLAY
@@ -857,7 +874,7 @@ AT_DATA([prog.cob], [
                TO str
            IF str <> SPACES
                   OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 59"
+                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 60"
                DISPLAY "Test 10 failed: " str END-DISPLAY
            END-IF
 
@@ -865,17 +882,18 @@ AT_DATA([prog.cob], [
                TO str
            IF str <> SPACES
                   OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 67"
+                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 68"
                DISPLAY "Test 11 failed: " str END-DISPLAY
            END-IF
 
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION FORMATTED-TIME DP.COMMA])
 AT_KEYWORDS([functions])
@@ -902,10 +920,11 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION FORMATTED-TIME with ref modding])
 AT_KEYWORDS([functions])
@@ -913,16 +932,21 @@ AT_KEYWORDS([functions])
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  str          PIC X(04).
        PROCEDURE        DIVISION.
-           DISPLAY FUNCTION FORMATTED-TIME ("hhmmss", 45296) (3:4)
-           END-DISPLAY
+           MOVE FUNCTION FORMATTED-TIME ("hhmmss", 45296) (3:4)
+             TO STR
+           IF STR NOT = '3456'
+              DISPLAY STR
+              END-DISPLAY
+           END-IF
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0],
-[3456
-])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -1752,6 +1776,7 @@ AT_CHECK([./prog], [0], [OK])
 
 AT_CLEANUP
 
+
 AT_SETUP([FUNCTION NUMERIC-DECIMAL-POINT])
 AT_KEYWORDS([functions])
 
@@ -1769,10 +1794,11 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0], [OK])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [OK], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION NUMERIC-THOUSANDS-SEPARATOR])
 AT_KEYWORDS([functions])
@@ -1791,10 +1817,11 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0], [OK])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [OK], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION NUMVAL])
 AT_KEYWORDS([functions])
@@ -1821,10 +1848,11 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION NUMVAL-C])
 AT_KEYWORDS([functions])
@@ -1835,7 +1863,7 @@ AT_DATA([prog.cob], [
        DATA             DIVISION.
        WORKING-STORAGE  SECTION.
        01  X1  PIC   X(14) VALUE " % -9876.1234 ".
-       01  X2  PIC   X(20) VALUE " % 19876.1234 DB".
+       01  X2  PIC   X(20) VALUE " % 19,876.1234 DB".
        01  N   PIC   s9(5)v9(5).
        PROCEDURE        DIVISION.
            MOVE FUNCTION NUMVAL-C ( X1 , "%" ) TO N
@@ -1851,10 +1879,41 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
-AT_CHECK([./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
+
+AT_SETUP([FUNCTION NUMVAL-C DP.COMMA])
+AT_KEYWORDS([functions])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       ENVIRONMENT      DIVISION.
+       CONFIGURATION    SECTION.
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA
+           .
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  X1  PIC   X(20) VALUE " % 19.876,1234 DB".
+       01  N   PIC   s9(5)v9(5).
+       PROCEDURE        DIVISION.
+           MOVE FUNCTION NUMVAL-C ( X1 , "%" ) TO N
+           IF N NOT = -19876,1234
+              DISPLAY N
+              END-DISPLAY
+           END-IF
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
+
+AT_CLEANUP
+
 
 AT_SETUP([FUNCTION NUMVAL-F])
 AT_KEYWORDS([functions])
@@ -1871,12 +1930,13 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [-000001234
 ])
 
 AT_CLEANUP
+
 
 AT_SETUP([FUNCTION ORD])
 AT_KEYWORDS([functions])
@@ -3313,7 +3373,7 @@ AT_DATA([prog.cob], [
                   OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
                   OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 11"
                DISPLAY "Test 1 failed" END-DISPLAY
-           END-IF       
+           END-IF
 
            IF FUNCTION FORMATTED-DATE (invalid-date-format, 1) <> SPACES
                   OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
@@ -3372,73 +3432,45 @@ AT_CHECK([./prog], [0])
 AT_CLEANUP
 
 
-AT_SETUP([Formatted funcs w/ invalid variable format])
-AT_KEYWORDS([functions])
+AT_SETUP([FORMATTED-(DATE)TIME with SYSTEM-OFFSET])
+AT_KEYWORDS([functions FORMATTED-TIME FORMATTED-DATETIME extensions])
+
+AT_SKIP_IF([test "$COB_HAS_UTC_OFFSET" = "no"])
 
 AT_DATA([prog.cob], [
-       IDENTIFICATION   DIVISION.
-       PROGRAM-ID.      prog.
-       DATA             DIVISION.
-       WORKING-STORAGE  SECTION.
-       01  invalid-date-format          PIC X(10) VALUE "yyyymmdd".
-       01  invalid-datetime-format      PIC X(17)
-                                        VALUE "yyyymmddtHHMMSS".
-       01  invalid-time-format          PIC X(6) VALUE "HHMMSS".
-       PROCEDURE        DIVISION.
-           IF FUNCTION FORMATTED-CURRENT-DATE
-                           (invalid-date-format) <> SPACES
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 11"
-               DISPLAY "Test 1 failed" END-DISPLAY
-           END-IF       
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.     prog.
+       DATA            DIVISION.
+       WORKING-STORAGE SECTION.
+       01  str         PIC X(30).
+       77  val         pic 9(02).
 
-           IF FUNCTION FORMATTED-DATE (invalid-date-format, 1) <> SPACES
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 18"
-               DISPLAY "Test 2 failed" END-DISPLAY
+       PROCEDURE DIVISION.
+           MOVE FUNCTION FORMATTED-DATETIME
+                    ("YYYYDDDThhmmss+hhmm", 1, 45296, SYSTEM-OFFSET)
+               TO str
+           MOVE FUNCTION TEST-FORMATTED-DATETIME
+                   ("YYYYDDDThhmmss+hhmm", str) TO val
+           IF val not = 0
+               DISPLAY "Test 1 failed: " str ' - ' val END-DISPLAY
            END-IF
 
-           IF FUNCTION FORMATTED-DATETIME
-                           (invalid-datetime-format, 1, 1) <> SPACES
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 24"
-               DISPLAY "Test 3 failed" END-DISPLAY
+           MOVE FUNCTION FORMATTED-TIME
+                    ("hhmmss.ssZ", 45296, SYSTEM-OFFSET)
+               TO str
+           MOVE FUNCTION TEST-FORMATTED-DATETIME
+                   ("hhmmss.ssZ", str) TO val
+           IF val not = 0
+               DISPLAY "Test 2 failed: " str ' - ' val END-DISPLAY
            END-IF
-
-           IF FUNCTION FORMATTED-TIME (invalid-time-format, 1) <> SPACES
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 31"
-               DISPLAY "Test 4 failed" END-DISPLAY
-           END-IF
-
-           IF FUNCTION INTEGER-OF-FORMATTED-DATE
-                           (invalid-date-format, 1) <> ZERO
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 37"
-               DISPLAY "Test 5 failed" END-DISPLAY
-           END-IF
-
-           IF FUNCTION SECONDS-FROM-FORMATTED-TIME
-                           (invalid-time-format, 1) <> ZERO
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 44"
-               DISPLAY "Test 6 failed" END-DISPLAY
-           END-IF
-
-           IF FUNCTION TEST-FORMATTED-DATETIME
-                           (invalid-datetime-format, 1) <> ZERO
-                  OR FUNCTION EXCEPTION-STATUS <> "EC-ARGUMENT-FUNCTION"
-                  OR FUNCTION EXCEPTION-LOCATION <> "prog; ; 51"
-               DISPLAY "Test 7 failed" END-DISPLAY
-           END-IF
-
-           STOP RUN.
+           .
 ])
 
-AT_CHECK([$COMPILE -o prog prog.cob], [0], , ignore)
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0])
 
 AT_CLEANUP
+
 
 AT_SETUP([Intrinsics without FUNCTION keyword (1)])
 AT_KEYWORDS([functions])

@@ -5,9 +5,7 @@
 	  run_misc.at: removed check for 'NEW' as this is now a reserved word
 	  configuration.at: updated to match compiler
 	  syn_definition.at: updated to expect SYNC RIGHT to pass
-	* intrinsic.c: fixed coding error in cob_intr_current_date
-	* common.h [_MSC_VER]: adding alias for setenv/unsetenv fixing small memory
-	  leak for calls of (putenv) - _MSC duplicates the string, POSIX does not
+	* intrinsic.c (cob_intr_current_date): fixed size error
 
 2016-04-22  Ron Norman
 
@@ -17,6 +15,11 @@
 2016-04-16 Ron Norman <rjn@inglenet.com>
 
 	* common.c: report error for undefined environment variables
+
+2016-03-23  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c (numval): added missing NUMVAL-C-specific code I missed in
+	  r793, causing bug #218.
 
 2016-03-15  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
@@ -29,6 +32,19 @@
 	  common.c display COB_PRE_LOAD as set and as evaluated
 	  call.c clears COB_PRE_LOAD value before evaluating
 
+2016-03-13  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* intrinsic.c (locale_time): consolidation still used sizeof(buff) after
+	  buff changed from char [] to char *, fixed by introducing LOCTIME_BUFSIZE
+	* intrinsic.c (cob_intr_lcl_time_from_secs) re-added missing exception
+
+2016-03-12  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: consolidated copy-and-pasted code in numerous functions,
+	  including: SUBSTITUTE(-CASE), NUMVAL(-C), VARIANCE and
+	  LOCALE-TIME(-FROM-SECONDS).
+	* intrinsic.c: renamed "xqtyear" variables to "current_year".
+
 2016-03-07 Ron Norman <rjn@inglenet.com>
 
 	* fileio.c fixed EXTFH to save/restore 'opts' value for some
@@ -38,6 +54,15 @@
 2016-02-01 Ron Norman <rjn@inglenet.com>
 
 	* fileio.c fixed to call cob_set_exception for the EXTFH interface
+
+2016-01-31  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* intrinsic.c (split_around_t): fixed stack overflow occuring in wrong
+	  date/datetime format strings for FUNCTION TEST-FORMATTED-DATETIME
+	* intrinsic.c: changed definition of string lengths for date/time
+	  according to existing ones (COB_xyz_BUFF)
+	* common.h [_MSC_VER]: adding alias for setenv/unsetenv fixing small memory
+	  leak for calls of (putenv) - _MSC duplicates the string, POSIX does not
 
 2016-01-30  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
@@ -59,6 +84,36 @@
 	  added cob_set_runtime_option routine to allow TRACE and/or DISPLAY
 	  UPON PRINTER output to be redirected to a specific (FILE*)
 
+2015-12-24  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: added SYSTEM-OFFSET and support for unknown offsets for
+	  FORMATTED-(DATE)TIME.
+
+2015-12-07  Edward Hart <edward.dan.hart@gmail.com>
+
+	* common.c (cob_get_current_date_and_time): fixed bug where offset_known
+	  was not set to 1 on Unix systems.
+
+2015-12-07  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: fixed bug #170 - added detection of whether offset_known
+	  is true or not - and added detection of EC-IMP-UTC-UNKNOWN exception.
+	* exception.def: added EC-IMP-UTC-UNKNOWN.
+
+2015-12-05  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: added support for optional offset parameter for
+	  FORMATTED-(DATE)TIME functions (defaults to zero).
+
+2015-12-03  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: fixed bug #169 - added correct implementation of times
+	  ending with Z (i.e. to return the UTC time).
+
+2015-11-08  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* intrinsic.c (cob_intr_current_date): bug #164 - offset for CURRENT-DATE
+
 2015-10-24  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* common.c (conf_runtime_error): add function for configuration specific
@@ -78,28 +133,22 @@
 
 	* common.c: added code to report additional environment settings
 
-2015-05-14  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+2015-10-06  Edward Hart <edward.dan.hart@gmail.com>
 
-	* common.c (cb_config_entry): remove redundant aliases !copy/(un)set/!anything
-	* common.c: add ACUCOBOL configuration aliases LOGICAL_CANCELS
-	  (= !COB_PHYSICAL_CANCEL) and STRIP_TRAILING_SPACES (= !COB_LS_FIXED)
+	* intrinsic.c: fixed bug #158 - fixed TEST-FORMATTED-DATETIME rejecting
+	  October (month #10). Also fixed unreported bug where
+	  TEST-FORMATTED-DATETIME rejected dates followed by whitespace.
 
 2015-09-21  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* common.h: cast PATHSEPC PATHSEPS SLASH_INT SLASH_STR with appropriate type
 	  and rename the first three to PATHSEP_CHAR PATHSEP_STR SLASH_CHAR
 
-2015-05-12  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
-
-	* common.c (cob_load_config_file, cob_load_config): respect environment
-	  COB_CONFIG_DIR when loading runtime configuration
-
-2015-05-12  Ron Norman <rjn@inglenet.com> 
-
 2015-09-16  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c fixed coding error related to support for EXTFH
 	  It was returning the index number as 1 relative instead of 0 relative
+
 2015-09-21  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* call.c (cob_init_call): Don't add the current directory "." to resolve_path
@@ -112,18 +161,27 @@
 	  All ACCEPT FROM DATE, DAY, TIME will the use the value defined
 	  rather than the current system time.
 	  This will be a useful feature for application testing.
-
-2015-07-07  Ron Norman
-
 	* DISPLAY ... UPON PRINTER can be redirected via
 	  the env var COBPRINTER similar to what Micro Focus supports
 	  cob_display will do a popen of whatever COBPRINTER is defined
 	  In addtion COB_DISPLAY_PRINTER can be used as a file name and
 	  cob_display will do an fopen "a" and append to that file
-	  termio.c, common.c changed 
-	* fileio.c fixed to avoid core dump when COB_SYNC and using BDB
+	  termio.c, common.c changed
 	* common.c (cob_expand_env_string): copy SPACE, LR, CR, HT, VT as spaces,
 	  the first implementation dropped them completely
+	* fileio.c fixed to avoid core dump when COB_SYNC and using BDB
+
+2015-06-24  Edward Hart <edward.dan.hart@gmail.com>
+
+	* intrinsic.c: bug #140 - changed pow to int_pow to avoid rounding
+	  errors. On MinGW, pow (10, 8) rounded to 9999999 instead of 10000000,
+	  for example.
+
+2015-05-14  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* common.c (cb_config_entry): remove redundant aliases !copy/(un)set/!anything
+	* common.c: add ACUCOBOL configuration aliases LOGICAL_CANCELS
+	  (= !COB_PHYSICAL_CANCEL) and STRIP_TRAILING_SPACES (= !COB_LS_FIXED)
 
 2015-05-14  Ron Norman
 
@@ -135,6 +193,16 @@
 
 	* common.c, changed to be more specific about acceptable values for
 	  runtime boolean options
+
+2015-05-12  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* common.c (cob_load_config_file, cob_load_config): respect environment
+	  COB_CONFIG_DIR when loading runtime configuration
+
+2015-05-11  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* intrinsic.c (cob_intr_current_date): return field with size of 21
+	  and without trailing NULL
 
 2015-04-30  Ron Norman
 
@@ -202,7 +270,7 @@
 	* fileio.c: use COB_FILE_MODE as permission for all cases where
 	  files are possibly created (fixes bug #126)
 
-2015-03-14  Ron Norman <rjn@inglenet.com> 
+2015-03-14  Ron Norman <rjn@inglenet.com>
 
 	* common.c: new code for table driven processing of runtime.cfg
 	  (runtime configuration) file and environment variables
@@ -239,6 +307,7 @@
 	* cobgetopt.c (cob_getopt_long_long): List all ambiguous possibilities,
 	  applied patch of Ulrich Drepper (see glibc's BZ #7101 - 2011-05-15)
 	* cobgetopt.c: removed \n from msgids, converted all backtick to apostrophe
+
 2015-02-26  Edward Hart <edward.dan.hart@gmail.com>
 
 	* screenio.c: fixed buffer overflow in screen section ACCEPT
@@ -282,11 +351,11 @@
 
 2015-01-12  Sergey Kashyrin <ska@kiska.net>
 
-	* intrinsic.c : Fix for Bug #120 - Function CURRENT-DATE
+	* intrinsic.c: Fix for Bug #120 - Function CURRENT-DATE
 
 2014-12-11  Ron Norman (rjn@inglenet.com)
-	* reportio.c,  Corrected to handle processing of a single DETAIL line
-	        It had been incorrectly processing all DETAIL lines of report
+	* reportio.c: Corrected to handle processing of a single DETAIL line
+	  It had been incorrectly processing all DETAIL lines of report
 
 2014-12-11  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
@@ -313,11 +382,11 @@
 
 2014-09-12  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
-	* numeric.c, intrinsic.c, common.h : use cob_gmp_free in intrinsics, too
+	* numeric.c, intrinsic.c, common.h: use cob_gmp_free in intrinsics, too
 
 2014-09-09  Philipp Böhme  <phi.boehme@googlemail.com>
 
-	* numeric.c : new static function cob_gmp_free
+	* numeric.c: new static function cob_gmp_free
 	* numeric.c (cob_decimal_set_double, cob_decimal_get_packed,
 	  cob_decimal_get_display): use cob_gmp_free() to free memory allocated in
 	  mpir/gmp
@@ -342,7 +411,7 @@
 
 2014-08-05  Louis Krupp <lkrupp@users.sf.net>
 
-	* screenio.c : compilation fails if configured without curses (bug #90)
+	* screenio.c: compilation fails if configured without curses (bug #90)
 
 2014-07-09  Philipp Böhme <phi.boehme@googlemail.com>
 
@@ -371,35 +440,35 @@
 
 2014-05-20  Philipp Böhme <phi.boehme@googlemail.com>
 
-	* call.c : inverted preload list for WIN32 builds
-	* common.c, move.c, screenio.c, fileio.c : Set runtime switch
+	* call.c: inverted preload list for WIN32 builds
+	* common.c, move.c, screenio.c, fileio.c: Set runtime switch
 	  from environment to true on "1", "Y", "YES", "TRUE", "ON"
 
 2014-05-13  Ron Norman <rjn@inglenet.com>
 
-	* numeric.c : added cob_cmp_float with tolerance for equality comparison
+	* numeric.c: added cob_cmp_float with tolerance for equality comparison
 
 2014-05-07  Ron Norman <rjn@inglenet.com>
 
-	* move.c : replaced memcpy by memmove
+	* move.c: replaced memcpy by memmove
 
 2014-05-06  Philipp Böhme <phi.boehme@googlemail.com>
 
-	* common.c, common.h : Added print_runtime_env showing all environment values
+	* common.c, common.h: Added print_runtime_env showing all environment values
 	  along with resolved variables used in libcob
 	  New string helper functions: cob_int_to_string, cob_strcat, cob_strjoin,
 	  cob_int_to_formatted_bytestring
-	* call.c : Remove duplicates when resolving COB_LIBRARY_PATH
+	* call.c: Remove duplicates when resolving COB_LIBRARY_PATH
 
 2014-04-25  Ron Norman <rjn@inglenet.com>
 
-	* move.c : fixed bug in cob_move_fp_to_fp()
-	* numeric.c : Fixed errors in cob_add_int() when computing with floats.
+	* move.c: fixed bug in cob_move_fp_to_fp()
+	* numeric.c: Fixed errors in cob_add_int() when computing with floats.
 
 2014-04-14  Philipp Böhme <phi.boehme@googlemail.com>
 
-	* common.c, common.h, system.def : Added cob_sys_getopt_long_long
-	* makefile.am : Added cobgetopt.c, cobgetopt.h
+	* common.c, common.h, system.def: Added cob_sys_getopt_long_long
+	* makefile.am: Added cobgetopt.c, cobgetopt.h
 
 2014-03-10  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
@@ -407,16 +476,16 @@
 
 2014-03-03  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
-	* common.c, common.h : Rewriting cob_sig_handler, printing caught signal to
+	* common.c, common.h: Rewriting cob_sig_handler, printing caught signal to
 	  stderr, adding cob_reg_sighnd for registration of external signal handling
 
 2014-01-17  Ron Norman <rjn@inglenet.com>
 
-	* intrinsic.c  - Change cob_intr_random to correctly compute RANDOM number
+	* intrinsic.c: Change cob_intr_random to correctly compute RANDOM number
 
-2013-12-26  Luke Bryan <cobcoder@users.sourceforge.net>
+2013-12-26  Luke Smith <cobcoder@users.sourceforge.net>
 
-	* strings.c : Fix Unstring delimited by all delimiter size > 1 issue,
+	* strings.c: Fix Unstring delimited by all delimiter size > 1 issue,
 	  see bug #54.
 
 2013-11-18  Ron Norman
@@ -425,7 +494,7 @@
 
 2013-??-??  Sergey Kashyrin <ska@kiska.net>
 
-	* fileio.c : Bugfix in cob_sys_copy_file (now using file_open_buff)
+	* fileio.c: Bugfix in cob_sys_copy_file (now using file_open_buff)
 
 201?-??-??  Sergey Kashyrin <ska@kiska.net>
 
@@ -433,7 +502,7 @@
 
 2010-09-03  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
-	* screenio.c : Added cob_convert_key for converting keys according to used
+	* screenio.c: Added cob_convert_key for converting keys according to used
 	  libraries (especially fix for PDCurses + numpad support)
 
 2010-06-28  Roger While <simrw@sim-basis.de>
@@ -1620,10 +1689,12 @@
 	* move.c: Fix regression for NIST suite
 
 2004-11-04  Bernard Giroud <bgiroud@opencobol.org>
+
 	* numeric.c (cob_decimal_get_binary): reverted:
 	  NIST test suite is no mre working.
 
 2004-11-02  Bernard Giroud <bgiroud@opencobol.org>
+
 	* numeric.c (cob_decimal_get_binary) :
 	  Worked around what I consider a bug in Gmp for getting
 	  a long signed value.

@@ -286,6 +286,7 @@ COB_FIX_LIB = @COB_FIX_LIB@
 COB_FIX_LIBTOOL = @COB_FIX_LIBTOOL@
 COB_HAS_CURSES = @COB_HAS_CURSES@
 COB_HAS_ISAM = @COB_HAS_ISAM@
+COB_HAS_UTC_OFFSET = @COB_HAS_UTC_OFFSET@
 COB_KEYWORD_INLINE = @COB_KEYWORD_INLINE@
 COB_LDFLAGS = @COB_LDFLAGS@
 COB_LIBRARY_PATH = @COB_LIBRARY_PATH@
@@ -977,9 +978,6 @@ dist-hook:
 	touch $(distdir)/cobc/parser.c
 	touch $(distdir)/cobc/pplex.c
 	touch $(distdir)/cobc/scanner.c
-	touch $(distdir)/tests/testsuite
-	touch $(distdir)/doc/gnucobol.info
-	touch $(distdir)/doc/gnucobol.pdf
 #	touch $(distdir)/libcob/libcob.3
 
 defaults.h: Makefile.am $(top_builddir)/config.status

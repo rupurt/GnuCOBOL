@@ -445,8 +445,8 @@ if test "x$COB_GMP_LIB" = "x"; then
 fi
 
 AC_MSG_CHECKING([matching GMP version])
-COB_GMP_LIB_MAJOR=$(echo $COB_GMP_LIB | cut -d. -f1)
-COB_GMP_LIB_MINOR=$(echo $COB_GMP_LIB | cut -d. -f2)
+COB_GMP_LIB_MAJOR=$(echo "$COB_GMP_LIB" | cut -d. -f1)
+COB_GMP_LIB_MINOR=$(echo "$COB_GMP_LIB" | cut -d. -f2)
 
 if test "$COB_GMP_HEADER" == "$COB_GMP_LIB_MAJOR.$COB_GMP_LIB_MINOR"; then
 	AC_MSG_RESULT([yes ($COB_GMP_HEADER)])
@@ -713,11 +713,11 @@ if test "$with_db" = "yes"; then
 		AC_MSG_ERROR([Unable to extract Berkeley DB version information])
 	fi
 	AC_MSG_CHECKING([for Berkeley DB db.h version >= 4.1])
-	COB_BDB_HEADER_MAJOR=$(echo $COB_BDB_HEADER | cut -d. -f1)
+	COB_BDB_HEADER_MAJOR=$(echo "$COB_BDB_HEADER" | cut -d. -f1)
 	if test $COB_BDB_HEADER_MAJOR -gt 4; then
 		AC_MSG_RESULT([yes ($COB_BDB_HEADER)])
 	else
-		COB_BDB_HEADER_MINOR=$(echo $COB_BDB_HEADER | cut -d. -f2)
+		COB_BDB_HEADER_MINOR=$(echo "$COB_BDB_HEADER" | cut -d. -f2)
 		if test $COB_BDB_HEADER_MAJOR -eq 4 -a $COB_BDB_HEADER_MINOR -ge 1; then
 			AC_MSG_RESULT([yes ($COB_BDB_HEADER)])
 		else
@@ -1095,7 +1095,7 @@ unset MYOCLIBS
 
 # Generate the output
 
-AM_CONDITIONAL([COB_MAKE_IX], [test $COB_HAS_ISAM = yes])
+AM_CONDITIONAL([COB_MAKE_IX], [test "$COB_HAS_ISAM" = yes])
 
 AC_DEFINE_UNQUOTED([COB_EXPORT_DYN], ["$COB_EXPORT_DYN"])
 AC_DEFINE_UNQUOTED([COB_PIC_FLAGS], ["$COB_PIC_FLAGS"])
@@ -1125,6 +1125,13 @@ AC_SUBST([COB_FIX_LIBTOOL])
 AC_SUBST([COB_KEYWORD_INLINE])
 AC_SUBST([COB_HAS_ISAM])
 AC_SUBST([COB_HAS_CURSES])
+if test "$COB_STRFTIME" = "no" -a "$COB_TIMEZONE" = "no"
+then
+	COB_HAS_UTC_OFFSET="no"
+else
+	COB_HAS_UTC_OFFSET="yes"
+fi
+AC_SUBST([COB_HAS_UTC_OFFSET])
 AC_SUBST([COB_PATCH_LEVEL], [$with_patch_level])
 
 AC_CONFIG_FILES([bin/cob-config Makefile libcob/Makefile lib/Makefile
@@ -1198,3 +1205,7 @@ else
   AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
 fi
 unset DEFINE_DL
+if test "$COB_HAS_UTC_OFFSET" = "no"; then
+  AC_MSG_WARN([ Could not find strftime or timezone. FORMATTED-CURRENT-DATE, FORMATTED-DATE])
+  AC_MSG_WARN([and FORMATTED-DATETIME may not work.])
+fi

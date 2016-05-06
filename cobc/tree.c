@@ -576,14 +576,15 @@ offset_time_format (const char *format)
 {
 	char	decimal_point = current_program->decimal_point;
 
-        if (cob_valid_time_format (format, decimal_point)
+	if (cob_valid_time_format (format, decimal_point)
 	    || cob_valid_datetime_format (format, decimal_point)) {
-		/* Only offset time formats contain a '+'. */
-		return strchr (format, '+') !=  NULL;
+		/* Only offset time formats contain '+' or 'Z'. */
+		return strchr (format, '+') !=	NULL
+			|| strchr (format, 'Z') != NULL;
 	} else {
 		return 0;
 	}
-}	
+}
 
 static int
 offset_arg_param_num (const enum cb_intr_enum intr)
@@ -609,7 +610,7 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 
 	data = try_get_constant_data (arg);
 	if (data != NULL) {
-		if(!valid_format (intr->intr_enum, data)) {
+		if (!valid_format (intr->intr_enum, data)) {
 			cb_error_x (tree, _("FUNCTION '%s' has invalid date/time format"),
 				    intr->name);
 			error_found = 1;
@@ -624,6 +625,118 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 	}
 
 	return !error_found;
+}
+
+static cb_tree
+get_last_elt (cb_tree l)
+{
+	while (CB_CHAIN (l)) {
+		l = CB_CHAIN (l);
+	}
+	return l;
+}
+
+#if !defined (COB_STRFTIME) && !defined (COB_TIMEZONE)
+static void
+warn_cannot_get_utc (const cb_tree tree, const enum cb_intr_enum intr,
+			cb_tree args)
+{
+	const char	*data = try_get_constant_data (CB_VALUE (args));
+	int		is_variable_format = data == NULL;
+	int		is_constant_utc_format
+		= data != NULL && strchr (data, 'Z') != NULL;
+	int		is_formatted_current_date
+		= intr == CB_INTR_FORMATTED_CURRENT_DATE;
+	cb_tree		last_arg = get_last_elt (args);
+	int	        has_system_offset_arg
+		= (intr == CB_INTR_FORMATTED_DATETIME
+		   || intr == CB_INTR_FORMATTED_TIME)
+		  && last_arg->tag == CB_TAG_INTEGER
+		  && ((struct cb_integer *) last_arg)->val == 1;
+        #define ERR_MSG _("Cannot find the UTC offset on this system")
+
+	if (!is_formatted_current_date && !has_system_offset_arg) {
+		return;
+	}
+	
+	if (is_variable_format) {
+		cb_warning_x (tree, ERR_MSG);
+	} else if (is_constant_utc_format) {
+		cb_error_x (tree, ERR_MSG);
+	}
+
+        #undef ERR_MSG
+}
+#endif
+
+static int
+get_data_from_const (cb_tree const_val, unsigned char **data)
+{
+	if (const_val == cb_space) {
+		*data = (unsigned char *)" ";
+	} else if (const_val == cb_zero) {
+		*data = (unsigned char *)"0";
+	} else if (const_val == cb_quote) {
+		if (cb_flag_apostrophe) {
+			*data = (unsigned char *)"'";
+		} else {
+			*data = (unsigned char *)"\"";
+		}
+	} else if (const_val == cb_norm_low) {
+		*data = (unsigned char *)"\0";
+	} else if (const_val == cb_norm_high) {
+		*data = (unsigned char *)"\255";
+	} else if (const_val == cb_null) {
+		*data = (unsigned char *)"\0";
+	} else {
+		return 1;
+	}
+
+	return 0;
+}
+
+static int
+get_data_and_size_from_lit (cb_tree x, unsigned char **data, size_t *size)
+{
+	if (CB_LITERAL_P (x)) {
+		*data = CB_LITERAL (x)->data;
+		*size = CB_LITERAL (x)->size;
+	} else if (CB_CONST_P (x)) {
+		*size = 1;
+		if (get_data_from_const (x, data)) {
+			return 1;
+		}
+	} else {
+		return 1;
+	}
+
+	return 0;
+}
+
+static struct cb_literal *
+concat_literals (const cb_tree left, const cb_tree right)
+{
+	struct cb_literal	*p;
+	unsigned char		*ldata;
+	unsigned char		*rdata;
+	size_t			lsize;
+	size_t			rsize;
+
+	if (get_data_and_size_from_lit (left, &ldata, &lsize)) {
+		return NULL;
+	}
+	if (get_data_and_size_from_lit (right, &rdata, &rsize)) {
+		return NULL;
+	}
+
+	p = make_tree (CB_TAG_LITERAL, left->category, sizeof (struct cb_literal));
+	p->data = cobc_parse_malloc (lsize + rsize + 1U);
+	p->size = lsize + rsize;
+
+	memcpy (p->data, ldata, lsize);
+	memcpy (p->data + lsize, rdata, rsize);
+
+	return p;
 }
 
 /* Global functions */
@@ -1178,16 +1291,10 @@ cb_build_list (cb_tree purpose, cb_tree value, cb_tree chain)
 cb_tree
 cb_list_append (cb_tree l1, cb_tree l2)
 {
-	cb_tree	l;
-
 	if (l1 == NULL) {
 		return l2;
 	}
-	l = l1;
-	while (CB_CHAIN (l)) {
-		l = CB_CHAIN (l);
-	}
-	CB_CHAIN (l) = l2;
+	CB_CHAIN (get_last_elt (l1)) = l2;
 	return l1;
 }
 
@@ -3811,18 +3918,27 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 			    cbp->name);
 		return cb_error_node;
 	}
-	if ((cbp->args >= 0 && numargs != cbp->args) ||
-	    (cbp->args < 0 && numargs < cbp->min_args)) {
-		cb_error_x (name,
-			    _("FUNCTION '%s' has wrong number of arguments"),
-			    cbp->name);
-		return cb_error_node;
+	if ((cbp->args == -1)) {
+		if (numargs < cbp->min_args) {
+			cb_error_x (name,
+				_ ("FUNCTION '%s' has wrong number of arguments"),
+				cbp->name);
+			return cb_error_node;
+		}
+	} else {
+		if (numargs > cbp->args || numargs < cbp->min_args) {
+			cb_error_x (name,
+					_("FUNCTION '%s' has wrong number of arguments"),
+					cbp->name);
+			return cb_error_node;
+		}
 	}
 	if (refmod) {
 		if (!cbp->refmod) {
 			cb_error_x (name, _("FUNCTION '%s' can not have reference modification"), cbp->name);
 			return cb_error_node;
 		}
+		/* TODO: better check needed, see typeck.c (cb_build_identifier) */
 		if (CB_LITERAL_P(CB_PAIR_X(refmod)) &&
 		    cb_get_int (CB_PAIR_X(refmod)) < 1) {
 			cb_error_x (name, _("FUNCTION '%s' has invalid reference modification"), cbp->name);
@@ -3839,6 +3955,9 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 		if (!valid_const_date_time_args (name, cbp, args)) {
 			return cb_error_node;
 		}
+#if !defined (COB_STRFTIME) && !defined (COB_TIMEZONE)
+		warn_cannot_get_utc (name, cbp->intr_enum, args);
+#endif
 	}
 
 	switch (cbp->intr_enum) {
