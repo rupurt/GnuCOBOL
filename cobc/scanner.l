@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2001-2012, 2014-2015 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch
+   Copyright (C) 2014,2015 Simon Sobisch
 
    This file is part of GnuCOBOL.
 
@@ -662,100 +663,37 @@ H\"[^\"\n]*\" {
 	/* Ignore */
 }
 
-"SWITCH"[ ]+"0" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('0');
-	} else {
-		yylval = cb_build_reference ("SWITCH-0");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
+"SWITCH"[ ]+([0-9][0-9]?|[A-Z])[ ,;\n] {
+	/* ACUCOBOL extension: switch-names with space and with letter */
+	char suffix[3] = "";
+	char name[10] = "";
 
-"SWITCH"[ ]+"1" {
+	unput (yytext[yyleng-1]); /* unput seperator */
 	if (cobc_in_procedure) {
+		 /* unput characters */
 		yylval = cb_build_reference ("SWITCH");
-		unput ('1');
+		if (isdigit((unsigned char)yytext[yyleng-3])) {
+			unput (yytext[yyleng-2]);
+			unput (yytext[yyleng-3]);
+		} else {
+			unput (yytext[yyleng-2]);
+		}
 	} else {
-		yylval = cb_build_reference ("SWITCH-1");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"2" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('2');
-	} else {
-		yylval = cb_build_reference ("SWITCH-2");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"3" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('3');
-	} else {
-		yylval = cb_build_reference ("SWITCH-3");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"4" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('4');
-	} else {
-		yylval = cb_build_reference ("SWITCH-4");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"5" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('5');
-	} else {
-		yylval = cb_build_reference ("SWITCH-5");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"6" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('6');
-	} else {
-		yylval = cb_build_reference ("SWITCH-6");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"7" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('7');
-	} else {
-		yylval = cb_build_reference ("SWITCH-7");
-	}
-	SET_LOCATION (yylval);
-	return WORD;
-}
-
-"SWITCH"[ ]+"8" {
-	if (cobc_in_procedure) {
-		yylval = cb_build_reference ("SWITCH");
-		unput ('8');
-	} else {
-		yylval = cb_build_reference ("SWITCH-8");
+		 /* we need to return a single word, reverted later in parser.y */
+		if (yytext[yyleng-3] == ' ' && isdigit((unsigned char)yytext[yyleng-2])) {
+			/* SWITCH 0  to SWITCH 9 */
+			suffix[0] = yytext[yyleng-2];
+		} else if (isdigit((unsigned char)yytext[yyleng-3])) {
+			/* SWITCH 00 to SWITCH 99 */ 
+			suffix[0] = yytext[yyleng-3];
+			suffix[1] = yytext[yyleng-2];
+		} else {
+			suffix[0] = yytext[yyleng-2];
+		}
+		strncpy(name, yytext, 6);
+		strcat(name, "_");
+		strcat(name, suffix);
+		yylval = cb_build_reference (name);
 	}
 	SET_LOCATION (yylval);
 	return WORD;

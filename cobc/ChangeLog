@@ -128,6 +128,14 @@
 
 	* parser.y: fixed so unstring works with identifier/literal/function
 
+2015-05-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* parser.y: bug #136 added check for duplicate on/off clauses for switches
+	* reserved.c, tree.h: fr #65 added more switches "SWITCH-16" to "SWITCH-36"
+	* parser.y, reserved.c, scanner.l: fr #65 better support for ACUCOBOL
+	  extension "SWITCH 1" to "SWITCH 26", added alias SWITCH [A-Z],
+	  allow this extension only with -fsyntax-extension
+
 2015-05-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* config.c: new options "includeif" to include only if file exists
@@ -135,8 +143,8 @@
 
 2015-05-07  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
-	* parser.y, typeck.c, cobc.h: give correct error position (cb_source_file
-	  + new cb_exp_line) for expression errors
+	* parser.y, typeck.c, cobc.h: bug #135 - give correct error position
+	  (cb_source_file + new cb_exp_line) for expression errors
 
 2015-04-28  Ron Norman
 

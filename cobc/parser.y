@@ -1961,16 +1961,25 @@ special_name:
 mnemonic_name_clause:
   WORD
   {
+	char system_name[16];
 	check_headers_present (COBC_HD_ENVIRONMENT_DIVISION,
 			       COBC_HD_CONFIGURATION_SECTION,
 			       COBC_HD_SPECIAL_NAMES, 0);
+	check_duplicate = 0;
 	if (current_program->nested_level) {
 		cb_error (_("%s not allowed in nested programs"), "SPECIAL-NAMES");
 		save_tree = NULL;
 	} else {
-		save_tree = lookup_system_name (CB_NAME ($1));
+		/* get system name and revert word-combination of scanner.l,
+		   if necessary (e.g. SWITCH A <--> SWITCH_A) */
+		strncpy(system_name, CB_NAME ($1), 15);
+		if (system_name [6] == '_') {
+			system_name [6] = ' ';
+		}
+		/* lookup system name */
+		save_tree = lookup_system_name (system_name);
 		if (!save_tree) {
-			cb_error_x ($1, _("Invalid system-name '%s'"), CB_NAME ($1));
+			cb_error_x ($1, _("Invalid system-name '%s'"), system_name);
 		}
 	}
   }
@@ -2024,6 +2033,11 @@ on_off_clauses:
 	/* cb_define_switch_name checks param validity */
 	x = cb_define_switch_name ($3, save_tree, $1 == cb_int1);
 	if (x) {
+		if ($1 == cb_int1) {
+			check_repeated ("ON", SYN_CLAUSE_1);
+		} else {
+			check_repeated ("OFF", SYN_CLAUSE_2);
+		}
 		CB_CHAIN_PAIR (current_program->mnemonic_spec_list, $3, x);
 	}
   }
@@ -2034,6 +2048,11 @@ on_off_clauses:
 	/* cb_define_switch_name checks param validity */
 	x = cb_define_switch_name ($4, save_tree, $2 == cb_int1);
 	if (x) {
+		if ($2 == cb_int1) {
+			check_repeated ("ON", SYN_CLAUSE_1);
+		} else {
+			check_repeated ("OFF", SYN_CLAUSE_2);
+		}
 		CB_CHAIN_PAIR (current_program->mnemonic_spec_list, $4, x);
 	}
   }
