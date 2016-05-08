@@ -3,6 +3,8 @@
 
 	* tree.c: give correct error position (cb_source_file + cb_exp_line)
 	  for expression warnings (did not work with constants before)
+	* pplex.l: bug #102 - added check for contination line without literal
+	  or word to continue.
 
 2016-05-03  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
@@ -44,6 +46,11 @@
 	* cobc.c (line_contains) [_MSC_VER]: only return if all patterns matched
 	* Makefile.am: included a move for manual post-fix of sources generated
 	  by flex (otherwise the #line directives use the intermediate tmp file)
+
+2016-01-08  Edward Hart <edward.dan.hart@gmail.com>
+
+	* pplex.l, config.def: reverted [r605]. Marked continuation of COBOL
+	  words as archaic in standard-conforming implementations.
 
 2015-12-24  Edward Hart <edward.dan.hart@gmail.com>
 

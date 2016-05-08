@@ -1241,6 +1241,8 @@ start:
 					_("Invalid continuation in comment entry"));
 			newline_count++;
 			goto start;
+		} else if (!need_continuation) {
+			cb_verify (cb_word_continuation, _("Continuation of COBOL words"));
 		}
 		continuation = 1;
 		break;
@@ -1625,7 +1627,7 @@ check_comments (const char *keyword, const char *text)
 {
 	/* Treated as comments when in Identification Division */
 	if (comment_allowed) {
-		cb_verify (cb_author_paragraph, keyword);
+		cb_verify (cb_comment_paragraphs, keyword);
 		/* Skip comments until the end of line */
 		within_comment = 1;
 		skip_to_eol ();
