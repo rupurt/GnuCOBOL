@@ -126,6 +126,10 @@
 	  parser.y, typeck.c & tree.h changed for this in the compiler
 	  termio.c, common.c changed in the runtime
 
+2015-07-05  Edward Hart <edward.dan.hart@gmail.com>
+
+	* typeck.c: added TALLY special register (Wish List #34).
+
 2015-07-02  Ron Norman
 
 	* Fixes to tree.c, tree,h typeck.c field.c codegen.c to correctly
@@ -134,6 +138,11 @@
 2015-06-29  Ron Norman
 
 	* parser.y: fixed so unstring works with identifier/literal/function
+
+2015-06-12  Edward Hart <edward.dan.hart@gmail.com>
+
+	* codegen.c: bug #78 - changed location of initialization of
+	  local-storage items.
 
 2015-05-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
