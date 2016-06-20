@@ -669,6 +669,7 @@ warn_cannot_get_utc (const cb_tree tree, const enum cb_intr_enum intr,
 }
 #endif
 
+#if 0 /* Unused routines */
 static int
 get_data_from_const (cb_tree const_val, unsigned char **data)
 {
@@ -738,6 +739,7 @@ concat_literals (const cb_tree left, const cb_tree right)
 
 	return p;
 }
+#endif
 
 /* Global functions */
 
