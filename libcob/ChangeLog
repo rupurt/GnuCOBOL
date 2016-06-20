@@ -1,4 +1,12 @@
 
+2016-06-20 Ron Norman <rjn@inglenet.com>
+
+	* common.h: added some COB_CHAR_xxx to define some characters
+	* fileio.c: for LINE SEQUENTIAL files with COB_LS_VALIDATE = true
+	    changed bad data error from 30 to 34
+	    Also allow some characters thru such as BS, FF, TAB, ESC, SI
+	    No data validation is done for LINE ADVANCING output files
+
 2016-05-01 Ron Norman <rjn@inglenet.com>
 
 	* common.c: fixed incorrect reporting of error for undefined environment variables
