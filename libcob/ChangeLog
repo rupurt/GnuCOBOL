@@ -1,6 +1,16 @@
 
 2016-06-20 Ron Norman <rjn@inglenet.com>
 
+	* coblocal.h, common.c: identify config variables which accept
+	  a path list and any which only accept a single directory/file
+	  are checked for the PATH_SEP character and error is given if
+	  that has been used by mistake. Example:
+
+	  Invalid value '/home/rjn:/tmp' for configuration tag 'COB_TRACE_FILE';
+	       should not contain ':'
+
+2016-06-20 Ron Norman <rjn@inglenet.com>
+
 	* common.h: added some COB_CHAR_xxx to define some characters
 	* fileio.c: for LINE SEQUENTIAL files with COB_LS_VALIDATE = true
 	    changed bad data error from 30 to 34

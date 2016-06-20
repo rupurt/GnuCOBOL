@@ -258,7 +258,7 @@ static struct config_tbl gc_conf[] = {
 	{"default_cancel_mode","cancel_mode",	NULL,	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
 	{"COB_PRE_LOAD","pre_load",		NULL,	NULL,GRP_CALL,ENV_STR,SETPOS(cob_preload_str)},
 	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT|ENV_ENUMVAL,SETPOS(cob_beep_value)},
-	{"COB_DEBUG_LOG","debug_log",		NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_debug_log)},
+	{"COB_DEBUG_LOG","debug_log",		NULL,	NULL,GRP_HIDE,ENV_FILE,SETPOS(cob_debug_log)},
 	{"COB_COL_JUST_LRC","col_just_lrc",	"true",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_col_just_lrc)},
 	{"COB_DISABLE_WARNINGS","disable_warnings","0",	NULL,GRP_MISC,ENV_BOOL|ENV_NOT,SETPOS(cob_display_warn)},
 	{"COB_ENV_MANGLE","env_mangle",		"0",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_env_mangle)},
@@ -267,7 +267,7 @@ static struct config_tbl gc_conf[] = {
 	{"COB_SCREEN_EXCEPTIONS","screen_exceptions","0",NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_extended_status)},
 	{"COB_SET_TRACE","set_trace",		"0",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_line_trace)},
 	{"COB_TIMEOUT_SCALE","timeout_scale",	"0",	timeopts,GRP_SCREEN,ENV_INT,SETPOS(cob_timeout_scale)},
-	{"COB_TRACE_FILE","trace_file",		NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_trace_filename)},
+	{"COB_TRACE_FILE","trace_file",		NULL,	NULL,GRP_MISC,ENV_FILE,SETPOS(cob_trace_filename)},
 #ifdef  _WIN32
 	{"COB_UNIX_LF","unix_lf",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_unix_lf)},
 #endif
@@ -298,11 +298,11 @@ static struct config_tbl gc_conf[] = {
 	{"COB_SORT_MEMORY","sort_memory",	"128M",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_memory),(1024*1024),4294967294 /* max. guaranteed - 1 */},
 	{"COB_SYNC","sync",			"false",syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
 #ifdef  WITH_DB
-	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_PATH,SETPOS(bdb_home)},
+	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_FILE,SETPOS(bdb_home)},
 #endif
 	{"COB_LEGACY","legacy",			NULL,	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_legacy)},
 	{"COBPRINTER","printer",		NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_printer)},
-	{"COB_DISPLAY_PRINTER","display_printer",NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_display_print)},
+	{"COB_DISPLAY_PRINTER","display_printer",NULL,	NULL,GRP_SCREEN,ENV_FILE,SETPOS(cob_display_print)},
 	{"COB_CURRENT_DATE","current_date",	NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_date)},
 	{"COB_DATE","date",			NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_date)},
 	{NULL,NULL,0,0}
@@ -415,6 +415,7 @@ cob_exit_common (void)
 		/* Free all strings pointed to by cobsetptr */
 		for (i=0; i < NUM_CONFIG; i++) {
 			if ((gc_conf[i].data_type & ENV_STR)
+			||  (gc_conf[i].data_type & ENV_FILE)
 			||  (gc_conf[i].data_type & ENV_PATH)) {	/* String/Path to be stored as a string */
 				data = (void*)((char *)cobsetptr + gc_conf[i].data_loc);
 				memcpy(&str,data,sizeof(char *));
@@ -4758,6 +4759,7 @@ set_config_val(char *value, int pos)
 		}
 
 	} else if((data_type & ENV_STR)
+		||(data_type & ENV_FILE)
 		||(data_type & ENV_PATH)) {	/* String/Path to be stored as a string */
 		memcpy(&str,data,sizeof(char *));
 		if (str != NULL) {
@@ -4768,6 +4770,12 @@ set_config_val(char *value, int pos)
 		|| *str == 0) {
 			conf_runtime_error_value(value, pos);
 		} else {
+			if((data_type & ENV_FILE)
+			&& strchr(str,PATHSEP_CHAR) != NULL) {
+				conf_runtime_error_value(value, pos);
+				conf_runtime_error(1, _("should not contain '%c'"),PATHSEP_CHAR);
+				return 1;
+			}
 			memcpy(data,&str,sizeof(char *));
 			if (data_loc == offsetof(cob_settings,cob_preload_str)) {
 				cobsetptr->cob_preload_str_set = cob_strdup(str);
@@ -4859,6 +4867,13 @@ get_config_val(char *value, int pos, char *orgvalue)
 
 	} else if((data_type & ENV_STR)) {	/* String stored as a string */
 		memcpy(&str,data,sizeof(char *));
+		if(str == NULL)
+			sprintf(value,"%s","not set");
+		else
+			sprintf(value,"'%s'",str);
+
+	} else if((data_type & ENV_FILE)) {	/* File/path stored as a string */
+		memcpy(&str,data,sizeof(char *));
 		if(data_loc == offsetof(cob_settings,cob_display_print)
 		&& cobsetptr->external_display_print_file) 
 			strcpy(value,"set by cob_set_runtime_option");
@@ -4870,7 +4885,7 @@ get_config_val(char *value, int pos, char *orgvalue)
 		if(str == NULL)
 			sprintf(value,"%s","not set");
 		else
-			sprintf(value,"'%s'",str);
+			sprintf(value,"%s",str);
 
 	} else if((data_type & ENV_PATH)) {	/* Path stored as a string */
 		memcpy(&str,data,sizeof(char *));
@@ -5064,8 +5079,9 @@ cb_config_entry (char *buf, int line)
 		gc_conf[i].config_num = cobsetptr->cob_config_cur - 1;
 		if(gc_conf[i].default_val) {
 			set_config_val((char*)gc_conf[i].default_val,i);
-		} else if ((gc_conf[i].data_type & ENV_STR)
-		      ||  (gc_conf[i].data_type & ENV_PATH)) {	/* String/Path stored as a string */
+		} else  if((gc_conf[i].data_type & ENV_STR)
+			|| (gc_conf[i].data_type & ENV_FILE)
+		      	|| (gc_conf[i].data_type & ENV_PATH)) {	/* String/Path stored as a string */
 			data = (void*)((char *)cobsetptr + gc_conf[i].data_loc);
 			memcpy(&str,data,sizeof(char *));
 			if( str != NULL) {
