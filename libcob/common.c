@@ -5256,6 +5256,11 @@ cob_load_config (void)
 	if ((env = getenv ("COB_RUNTIME_CONFIG")) != NULL && env[0]) {
 		strcpy (conf_file, env);
 		isoptional = 0;			/* If declared then it is NOT optional */
+		if(strchr(conf_file,PATHSEP_CHAR) != NULL) {
+			conf_runtime_error(0, _("Invalid value '%s' for configuration tag '%s'"), conf_file, "COB_RUNTIME_CONFIG");
+			conf_runtime_error(1, _("should not contain '%c'"),PATHSEP_CHAR);
+			return -1;
+		}
 	} else {
 		/* check for COB_CONFIG_DIR (use default if not in environment) */
 		if ((env = getenv("COB_CONFIG_DIR")) != NULL && env[0]) {
@@ -5264,6 +5269,11 @@ cob_load_config (void)
 			snprintf (conf_file, (size_t)COB_MEDIUM_MAX, "%s%s%s", COB_CONFIG_DIR, SLASH_STR, "runtime.cfg");
 		}
 		isoptional = 1;			/* If not present, then just use env vars */
+		if(strchr(conf_file,PATHSEP_CHAR) != NULL) {
+			conf_runtime_error(0, _("Invalid value '%s' for configuration tag '%s'"), conf_file, "COB_CONFIG_DIR");
+			conf_runtime_error(1, _("should not contain '%c'"),PATHSEP_CHAR);
+			return -1;
+		}
 	}
 
 	sprintf (varseq_dflt, "%d", WITH_VARSEQ);		/* Default comes from config.h */
