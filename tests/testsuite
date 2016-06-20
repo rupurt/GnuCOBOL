@@ -632,8 +632,8 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 20;configuration.at:429;runtime configuration: recursive include;configuration misc;
 21;configuration.at:458;runtime configuration: environment priority;configuration misc;
 22;configuration.at:470;runtime configuration: entries;configuration misc;
-23;configuration.at:499;runtime configuration: conf missing;configuration misc;
-24;configuration.at:519;runtime configuration: conf optional;configuration misc;
+23;configuration.at:502;runtime configuration: conf missing;configuration misc;
+24;configuration.at:522;runtime configuration: conf optional;configuration misc;
 25;syn_copy.at:21;COPY: within comment;copy;
 26;syn_copy.at:49;COPY: file not found;copy;
 27;syn_copy.at:69;COPY: replacement order;copy;
@@ -4048,13 +4048,14 @@ load_case  insensitive
 varseq_format big
 sort_chunk 4K
 sort_memory 4G # too big by some byte
+trace_file /home/rjn:/tmp
 _ATEOF
 
 
 # conf entries must be clean
 { set +x
-$as_echo "$at_srcdir/configuration.at:483: \$COBCRUN -c defunc.cfg --runtime-env"
-at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:483"
+$as_echo "$at_srcdir/configuration.at:484: \$COBCRUN -c defunc.cfg --runtime-env"
+at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:484"
 ( $at_check_trace; $COBCRUN -c defunc.cfg --runtime-env
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -4069,10 +4070,12 @@ defunc.cfg: 5: Invalid value 'big' for configuration tag 'varseq_format';
 	should be one of the following values: 0, 1, 2, 3, mf, gc, b4, b32, l4, l32
 defunc.cfg: 6: Invalid value '4K' for configuration tag 'sort_chunk';
 	minimum value: 131072
+defunc.cfg: 8: Invalid value '/home/rjn:/tmp' for configuration tag 'trace_file';
+	should not contain ':'
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:483"
+at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:484"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -4083,7 +4086,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_22
 #AT_START_23
-at_fn_group_banner 23 'configuration.at:499' \
+at_fn_group_banner 23 'configuration.at:502' \
   "runtime configuration: conf missing" "            " 1
 at_xfail=no
 (
@@ -4099,8 +4102,8 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/configuration.at:506: \$COBCRUN -c notthere.cfg --runtime-env"
-at_fn_check_prepare_dynamic "$COBCRUN -c notthere.cfg --runtime-env" "configuration.at:506"
+$as_echo "$at_srcdir/configuration.at:509: \$COBCRUN -c notthere.cfg --runtime-env"
+at_fn_check_prepare_dynamic "$COBCRUN -c notthere.cfg --runtime-env" "configuration.at:509"
 ( $at_check_trace; $COBCRUN -c notthere.cfg --runtime-env
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -4110,13 +4113,13 @@ notthere.cfg: No such file or directory
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:506"
+at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:509"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/configuration.at:510: \$COBCRUN -c defunc.cfg --runtime-env"
-at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:510"
+$as_echo "$at_srcdir/configuration.at:513: \$COBCRUN -c defunc.cfg --runtime-env"
+at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:513"
 ( $at_check_trace; $COBCRUN -c defunc.cfg --runtime-env
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -4127,7 +4130,7 @@ defunc.cfg: 2: Configuration file was included here
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:510"
+at_fn_check_status 1 $at_status "$at_srcdir/configuration.at:513"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -4138,7 +4141,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_23
 #AT_START_24
-at_fn_group_banner 24 'configuration.at:519' \
+at_fn_group_banner 24 'configuration.at:522' \
   "runtime configuration: conf optional" "           " 1
 at_xfail=no
 (
@@ -4155,15 +4158,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/configuration.at:527: \$COBCRUN -c defunc.cfg --runtime-env"
-at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:527"
+$as_echo "$at_srcdir/configuration.at:530: \$COBCRUN -c defunc.cfg --runtime-env"
+at_fn_check_prepare_dynamic "$COBCRUN -c defunc.cfg --runtime-env" "configuration.at:530"
 ( $at_check_trace; $COBCRUN -c defunc.cfg --runtime-env
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 echo stdout:; cat "$at_stdout"
-at_fn_check_status 0 $at_status "$at_srcdir/configuration.at:527"
+at_fn_check_status 0 $at_status "$at_srcdir/configuration.at:530"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
