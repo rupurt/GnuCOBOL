@@ -1,4 +1,9 @@
 
+2016-06-21  Ron Norman <rjn@inglenet.com>
+
+	* error.c, print_error fixed to verify 'file' is NOT NULL before using
+	* cobc.c added checks for some env vars having PATHSEP_CHAR in them
+
 2016-05-05  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* tree.c: give correct error position (cb_source_file + cb_exp_line)

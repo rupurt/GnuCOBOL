@@ -530,3 +530,20 @@ includeif "notthere.cfg"
 AT_CHECK([$COBCRUN -c defunc.cfg --runtime-env], [0], ignore, [])
 
 AT_CLEANUP
+
+AT_SETUP([COB_CONFIG_DIR test])
+AT_KEYWORDS([environment variable])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       PROCEDURE        DIVISION.
+           STOP RUN.
+])
+
+AT_CHECK([export COB_CONFIG_DIR=/home/rjn:/tmp; $COMPILE prog.cob], [99], [], 
+[Error: Environment 'COB_CONFIG_DIR' is '/home/rjn:/tmp'. Should not contain ':'
+])
+
+AT_CLEANUP
+
