@@ -279,6 +279,7 @@ tests/testsuite.src/data_binary.at -text
 tests/testsuite.src/data_display.at -text
 tests/testsuite.src/data_packed.at -text
 tests/testsuite.src/data_pointer.at -text
+tests/testsuite.src/listings.at -text
 tests/testsuite.src/numeric-display.cob -text
 tests/testsuite.src/numeric-dump.cob -text
 tests/testsuite.src/run_accept.at -text
