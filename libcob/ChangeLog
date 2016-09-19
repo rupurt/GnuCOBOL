@@ -1,4 +1,7 @@
 
+2016-09-19 Ron Norman <rjn@inglenet.com>
+	* numeric.c: added cob_decimal_clear
+	
 2016-06-20 Ron Norman <rjn@inglenet.com>
 
 	* coblocal.h, common.c: identify config variables which accept

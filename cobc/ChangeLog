@@ -1,4 +1,9 @@
 
+2016-09-19  Ron Norman <rjn@inglenet.com>
+
+	* codgen.c, tree.c, tree.h added code to optimize handling of 
+	  'decimal constants' in expressions
+
 2016-06-21  Ron Norman <rjn@inglenet.com>
 
 	* error.c, print_error fixed to verify 'file' is NOT NULL before using

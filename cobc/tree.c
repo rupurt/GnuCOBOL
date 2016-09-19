@@ -1786,6 +1786,19 @@ cb_build_decimal (const int id)
 	return CB_TREE (p);
 }
 
+/* Decimal Literal */
+
+cb_tree
+cb_build_decimal_literal (const int id)
+{
+	struct cb_decimal *p;
+
+	p = make_tree (CB_TAG_DECIMAL_LITERAL, CB_CATEGORY_NUMERIC,
+		       sizeof (struct cb_decimal));
+	p->id = id;
+	return CB_TREE (p);
+}
+
 /* Picture */
 
 struct cb_picture *

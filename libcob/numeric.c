@@ -325,6 +325,15 @@ cob_decimal_init (cob_decimal *d)
 }
 
 void
+cob_decimal_clear (cob_decimal *d)
+{
+	if(d) {
+		mpz_clear (d->value);
+		d->scale = 0;
+	}
+}
+
+void
 cob_decimal_set_llint (cob_decimal *d, const cob_s64_t n)
 {
 #ifdef	COB_LI_IS_LL
