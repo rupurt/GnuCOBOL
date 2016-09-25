@@ -1428,7 +1428,7 @@ struct cobjmp_buf {
 COB_EXPIMP void print_info(void);
 COB_EXPIMP void print_version(void);
 COB_EXPIMP int cob_load_config(void);
-COB_EXPIMP void print_runtime_env(void);
+COB_EXPIMP void print_runtime_conf(void);
 
 char* cob_int_to_string(int, char*);
 char* cob_int_to_formatted_bytestring(int, char*);

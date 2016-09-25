@@ -1,5 +1,6 @@
 
 2016-09-19 Ron Norman <rjn@inglenet.com>
+
 	* numeric.c: added cob_decimal_clear
 	
 2016-06-20 Ron Norman <rjn@inglenet.com>
@@ -19,6 +20,10 @@
 	    changed bad data error from 30 to 34
 	    Also allow some characters thru such as BS, FF, TAB, ESC, SI
 	    No data validation is done for LINE ADVANCING output files
+
+2016-06-18  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c, common.h: FR #126: renamed (runtime_env) to (runtime_conf)
 
 2016-05-01 Ron Norman <rjn@inglenet.com>
 
