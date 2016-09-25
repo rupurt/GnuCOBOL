@@ -106,6 +106,10 @@
 	* tree.c (offset_time_format): fixed bug #169 - require datetime
 	  functions with Z format to take an offset parameter.
 
+2015-11-25  Sergey Kashyrin <ska@kiska.net>  Fix for Bug #157
+
+	* codegen.c: cast program-pointer to unsigned char * and not to void *
+
 2015-10-28  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* scanner.l: maximum word-length always resulted in error if -W[all]
