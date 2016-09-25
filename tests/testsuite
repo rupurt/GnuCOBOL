@@ -678,7 +678,7 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 66;syn_subscripts.at:112;Subscript bounds with ODO (upper);runsubscripts subscripts;
 67;syn_subscripts.at:138;Subscripted item requires OCCURS clause;subscripts;
 68;syn_subscripts.at:163;Number of subscripts;subscripts;
-69;syn_subscripts.at:201;Number of subscripts (relaxed syntax);subscripts;
+69;syn_subscripts.at:199;Number of subscripts (relaxed syntax);subscripts;
 70;syn_occurs.at:28;OCCURS with level 01, 66, 77, and 88;occurs;
 71;syn_occurs.at:60;OCCURS with variable-occurrence data item;occurs;
 72;syn_occurs.at:98;Nested OCCURS clause;occurs;
@@ -6491,9 +6491,7 @@ at_fn_check_prepare_dynamic "$COMPILE_ONLY prog.cob" "syn_subscripts.at:190"
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
-echo >>"$at_stderr"; $as_echo "prog.cob: 9: Warning: 01/77 OCCURS used
-prog.cob: 9: Warning: 01/77 OCCURS used
-prog.cob: 10: Error: 'X' requires 1 subscript
+echo >>"$at_stderr"; $as_echo "prog.cob: 10: Error: 'X' requires 1 subscript
 prog.cob: 14: Error: 'X' requires 1 subscript
 prog.cob: 16: Error: 'Y' requires 2 subscripts
 prog.cob: 20: Error: 'Y' requires 2 subscripts
@@ -6511,7 +6509,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_68
 #AT_START_69
-at_fn_group_banner 69 'syn_subscripts.at:201' \
+at_fn_group_banner 69 'syn_subscripts.at:199' \
   "Number of subscripts (relaxed syntax)" "          " 2
 at_xfail=no
 (
@@ -6547,8 +6545,8 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/syn_subscripts.at:228: \$COMPILE_ONLY -frelax-syntax prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE_ONLY -frelax-syntax prog.cob" "syn_subscripts.at:228"
+$as_echo "$at_srcdir/syn_subscripts.at:226: \$COMPILE_ONLY -frelax-syntax prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE_ONLY -frelax-syntax prog.cob" "syn_subscripts.at:226"
 ( $at_check_trace; $COMPILE_ONLY -frelax-syntax prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -6562,7 +6560,7 @@ prog.cob: 20: Error: 'Y' requires 2 subscripts
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 1 $at_status "$at_srcdir/syn_subscripts.at:228"
+at_fn_check_status 1 $at_status "$at_srcdir/syn_subscripts.at:226"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
