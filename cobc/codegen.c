@@ -108,10 +108,16 @@ struct field_list {
 struct call_list {
 	struct call_list	*next;
 	const char		*callname;
-	int			return_type;
+};
+
 #define COB_RETURN_INT		0
 #define COB_RETURN_ADDRESS_OF	1
 #define COB_RETURN_NULL		2
+struct static_call_list {
+	struct static_call_list	*next;
+	const char		*callname;
+	int			convention;
+	int			return_type;
 };
 
 struct base_list {
@@ -129,7 +135,7 @@ static struct field_list	*field_cache = NULL;
 static struct field_list	*local_field_cache = NULL;
 static struct call_list		*call_cache = NULL;
 static struct call_list		*func_call_cache = NULL;
-static struct call_list		*static_call_cache = NULL;
+static struct static_call_list		*static_call_cache = NULL;
 static struct base_list		*base_cache = NULL;
 static struct base_list		*globext_cache = NULL;
 static struct base_list		*local_base_cache = NULL;
@@ -275,20 +281,51 @@ lookup_func_call (const char *p)
 }
 
 static void
-lookup_static_call (const char *p, int return_type)
+lookup_static_call (const char *p, int convention, int return_type)
 {
-	struct call_list *clp;
+	struct static_call_list *sclp;
 
-	for (clp = static_call_cache; clp; clp = clp->next) {
-		if (strcmp (p, clp->callname) == 0) {
+	for (sclp = static_call_cache; sclp; sclp = sclp->next) {
+		if (strcmp (p, sclp->callname) == 0) {
 			return;
 		}
 	}
-	clp = cobc_parse_malloc (sizeof (struct call_list));
-	clp->callname = p;
-	clp->next = static_call_cache;
-	static_call_cache = clp;
-	clp->return_type = return_type;
+	sclp = cobc_parse_malloc (sizeof (struct static_call_list));
+	sclp->callname = p;
+	sclp->convention = convention;
+	sclp->return_type = return_type;
+	sclp->next = static_call_cache;
+	static_call_cache = sclp;
+}
+
+static struct call_list *
+call_list_reverse (struct call_list *p)
+{
+	struct call_list	*next;
+	struct call_list	*last;
+
+	last = NULL;
+	for (; p; p = next) {
+		next = p->next;
+		p->next = last;
+		last = p;
+	}
+	return last;
+}
+
+static struct static_call_list *
+static_call_list_reverse (struct static_call_list *p)
+{
+	struct static_call_list	*next;
+	struct static_call_list	*last;
+
+	last = NULL;
+	for (; p; p = next) {
+		next = p->next;
+		p->next = last;
+		last = p;
+	}
+	return last;
 }
 
 static struct attr_list *
@@ -4099,11 +4136,11 @@ output_call (struct cb_call *p)
 			} else {
 				output ("%s", callp);
 				if (p->call_returning == cb_null) {
-					lookup_static_call (callp, COB_RETURN_NULL);
+					lookup_static_call (callp, p->convention, COB_RETURN_NULL);
 				} else if(retptr == 1) {
-					lookup_static_call (callp, COB_RETURN_ADDRESS_OF);
+					lookup_static_call (callp, p->convention, COB_RETURN_ADDRESS_OF);
 				} else {
-					lookup_static_call (callp, COB_RETURN_INT);
+					lookup_static_call (callp, p->convention, COB_RETURN_INT);
 				}
 			}
 		}
@@ -8849,6 +8886,7 @@ codegen (struct cb_program *prog, const int nested)
 	struct field_list	*k;
 	struct string_list	*stp;
 	struct call_list	*clp;
+	struct static_call_list	*sclp;
 	struct base_list	*blp;
 	struct cb_file		*f;
 	unsigned char		*s;
@@ -8860,6 +8898,7 @@ codegen (struct cb_program *prog, const int nested)
 	cb_tree			l1;
 	cb_tree			l2;
 	const char		*prevprog;
+	const char		*convention_modifier;
 	struct tm		*loctime;
 	cob_u32_t		inc;
 	int			i;
@@ -9117,24 +9156,32 @@ codegen (struct cb_program *prog, const int nested)
 	if (needs_unifunc) {
 		output_local ("cob_call_union\t\tcob_unifunc;\n");
 	}
+	call_cache = call_list_reverse (call_cache);
 	for (clp = call_cache; clp; clp = clp->next) {
 		output_local ("static cob_call_union\tcall_%s;\n",
 			      clp->callname);
 	}
+	func_call_cache = call_list_reverse (func_call_cache);
 	for (clp = func_call_cache; clp; clp = clp->next) {
 		output_local ("static cob_call_union\tfunc_%s;\n",
 			      clp->callname);
 	}
-	if(static_call_cache)
+	if (static_call_cache) {
+		static_call_cache = static_call_list_reverse (static_call_cache);
 		output_local ("/* Define external subroutines being called statically */\n");
-	for (clp = static_call_cache; clp; clp = clp->next) {
-		if(clp->return_type == COB_RETURN_NULL) {
-			output_local ("extern void %s ();\n",clp->callname);
-		} else
-		if(clp->return_type == COB_RETURN_ADDRESS_OF) {
-			output_local ("extern void * %s ();\n",clp->callname);
-		} else {
-			output_local ("extern int %s ();\n",clp->callname);
+		for (sclp = static_call_cache; sclp; sclp = sclp->next) {
+			if (sclp->convention & CB_CONV_STDCALL) {
+				convention_modifier = "__stdcall ";
+			} else {
+				convention_modifier = "";
+			}
+			if (sclp->return_type == COB_RETURN_NULL) {
+				output_local ("extern void %s%s ();\n", convention_modifier, sclp->callname);
+			} else if (sclp->return_type == COB_RETURN_ADDRESS_OF) {
+				output_local ("extern void * %s%s ();\n", convention_modifier, sclp->callname);
+			} else {
+				output_local ("extern int %s%s ();\n", convention_modifier, sclp->callname);
+			}
 		}
 	}
 	needs_unifunc = 0;
