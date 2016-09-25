@@ -29,18 +29,16 @@ COBCRUN="${abs_top_builddir}/bin/cobcrun"
 TEMPLATE="${abs_srcdir}/testsuite.src"
 
 FLAGS="-debug -Wall ${COBOL_FLAGS}"
-STD="-std=cobol2002"
-COMPILE="${COBC} -x ${STD} ${FLAGS}"
-COMPILE_ONLY="${COBC} -fsyntax-only ${STD} ${FLAGS}"
-COMPILE_ONLY_WITHOUTSTD="${COBC} -fsyntax-only ${FLAGS}"
-COMPILE_MODULE="${COBC} -m ${FLAGS} ${STD}"
+COMPILE="${COBC} -x ${FLAGS}"
+COMPILE_ONLY="${COBC} -fsyntax-only ${FLAGS}"
+COMPILE_MODULE="${COBC} -m ${FLAGS}"
 
 OBJECT_EXT="@COB_OBJECT_EXT@"
 
 PATHSEP=":"
 
-# unset all environmental vars that are used by libcob
-for cobenv in $($COBCRUN --runtime-env 2>/dev/null | grep COB_ | cut -d: -f2); do unset $cobenv; done
+# unset all environment variables that are used in libcob for runtime configuration
+for cobenv in $($COBCRUN --runtime-conf | grep COB_ | cut -d: -f2); do unset $cobenv; done
 
 # For running the testsuite in Cygwin with non-Cygwin binaries we need a wrapper function
 _return_path () {

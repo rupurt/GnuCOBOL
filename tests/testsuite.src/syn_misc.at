@@ -495,7 +495,7 @@ AT_DATA([prog2.cob], [
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob: 7: Error: 'MY-CRT-STATUS' is not defined
 ])
-AT_CHECK([$COMPILE_ONLY prog2.cob], [0])
+AT_CHECK([$COMPILE_ONLY prog2.cob], [0], [], [])
 
 AT_CLEANUP
 
@@ -724,7 +724,7 @@ AT_DATA([prog.cob], [
 ])
 
 # AT_DATA workaround via sed:
-AT_CHECK([sed -e 's/_$//' prog.cob > prog.sed && mv prog.sed prog.cob], [0])
+AT_CHECK([sed -e 's/_$//' prog.cob > prog.sed && mv prog.sed prog.cob], [0], [], [])
 
 AT_CHECK([$COMPILE_ONLY -fixed -W prog.cob], [0], [],
 [prog.cob: 7: Warning: Source text exceeds 512 bytes, will be truncated
@@ -1285,7 +1285,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY -std=default prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob: 538: Error: Buffer overrun - Too much continuation lines
 ])
 
@@ -1782,7 +1782,7 @@ prog2.cob: In paragraph 'SOME-SPECIAL-PAR-WITH-LENGTH-58C-WHO-NEEDS-THAT-LONG-NA
 prog2.cob: 21: Warning: Word length exceeds 45 characters - 'SOME-SPECIAL-VAL-WITH-LENGTH-58C-WHO-NEEDS-THAT-LONG-NAMES'
 ])
 
-AT_CHECK([$COBC -fsyntax-only -free -W -cb_conf=word-length:60 -frelax-syntax prog2.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY -free -W -cb_conf=word-length:60 -frelax-syntax prog2.cob], [0], [], [])
 
 AT_CHECK([$COBC -fsyntax-only -free -frelax-syntax prog2.cob], [0], [], [])
 

@@ -1,5 +1,10 @@
 
-2016-05-01 Ron Norman <rjn@inglenet.com>
+2016-09-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* atlocal.in, atlocal_win : fix unset of environment variables
+	  that are used in libcob for runtime configuration; bug #319
+
+2016-05-01  Ron Norman <rjn@inglenet.com>
 
 	* run_misc.at removed check for 'NEW' as this is now a reserved word
 	  configuration.at updated to match compiler
@@ -9,6 +14,17 @@
 
 	* Makefile.am: added targets "test" (running ANSI testsuite) and
 	  "checkall" (running both GnuCOBOL and ANSI testsuite)
+
+2015-12-23  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* general: remove -std=cobol2002 for compiling (effectively using default),
+	  checked with cobol2014 where checking for standard behaviour,
+	  used -cb_conf when checking single compiler configurations instead
+	  of creating+using a test.conf or loading a completely different -std,
+	  check stdout+stderr where missing, removed the ifdef for __INTEL_COMPILER
+	  as this is included via libcob.h now
+	* configuration.at: check for all standard configurations -std to
+	  be usable
 
 2015-11-01  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

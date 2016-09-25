@@ -81,8 +81,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -113,7 +112,7 @@ PF
 RF
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -163,8 +162,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -183,7 +181,7 @@ AT_DATA([reference], [
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -233,8 +231,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -253,7 +250,7 @@ AT_DATA([reference], [
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -315,15 +312,14 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
 
 AT_DATA([reference], [])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -375,8 +371,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -445,8 +440,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -636,9 +630,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -776,7 +768,7 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -991,9 +983,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -1131,7 +1121,7 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -1363,9 +1353,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -1503,7 +1491,7 @@ CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -1730,9 +1718,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -1805,7 +1791,7 @@ CUST. NO.     CUST. NAME                          ITEM COST                DISCT
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -2083,9 +2069,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -2223,7 +2207,7 @@ AT_DATA([reference], [                          D I S T R I C T   S A L E S   R 
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -2808,14 +2792,13 @@ AT_DATA([prog.cob], [
       
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 266: Warning: PLUS is ignored on first field of line
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 266: Warning: PLUS is ignored on first field of line
 prog.cob: 288: Warning: PLUS is ignored on first field of line
 prog.cob: 310: Warning: PLUS is ignored on first field of line
 ])
 
-AT_CHECK([export DD_DATAIN=./inp_data
-export DD_SYSPRINT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DATAIN="./inp_data" DD_SYSPRINT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -2909,7 +2892,7 @@ Lo  05 ADMINISTRATIVE                $1,915.00  11%     $112.03  11%     $485.83
                                     $17,208.00 100%   $1,006.78 100%   $2,456.42 100%      $80.00 100%    $13,843.92 100%
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -3027,14 +3010,13 @@ AT_DATA([prog.cob], [
            TERMINATE STUDENT-REPORT.
 ])
 
-AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 24: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
+AT_CHECK([$COMPILE -std=mf prog.cob], [0], [],
+[prog.cob: 24: Warning: LABEL RECORDS is obsolete in Micro Focus COBOL
 prog.cob: 62: Warning: PLUS is ignored on first field of line
 prog.cob: 64: Warning: PLUS is not recommended with LEFT, RIGHT or CENTER
 ])
 
-AT_CHECK([export DD_STUDENT=./inp_data
-export DD_REPORT1=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_STUDENT="./inp_data" DD_REPORT1="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3185,9 +3167,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_STUDENT=./inp_data
-export DD_REPORT1=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_STUDENT="./inp_data" DD_REPORT1="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3224,7 +3204,7 @@ AT_DATA([reference], [
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -3456,9 +3436,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_CUSTORD=./inp_data
-export DD_REPORT2=./report.txt
-./prog], [0], [Report test 2 at 14301275
+AT_CHECK([DD_CUSTORD="./inp_data" DD_REPORT2="./report.txt" ./prog], [0],
+[Report test 2 at 14301275
 Report test 2 completed
 ], [])
 
@@ -3577,7 +3556,7 @@ AT_DATA([reference], [                                           CUSTOMER ORDER 
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -3725,9 +3704,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_STUDREC=./inp_data
-export DD_REPORT3=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_STUDREC="./inp_data" DD_REPORT3="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -3808,7 +3785,7 @@ AT_DATA([reference], [                                                          
 
 ])
 
-AT_CHECK([diff reference report.txt], [0])
+AT_CHECK([diff reference report.txt], [0], [], [])
 
 AT_CLEANUP
 
@@ -3918,9 +3895,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_INVFILE=./inp_data
-export DD_REPORT4=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_INVFILE="./inp_data" DD_REPORT4="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -4076,8 +4051,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_DUPDTL=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_DUPDTL="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -4211,18 +4185,19 @@ AT_DATA([prog.cob], [
 
            TERMINATE rp  
            CLOSE RP-FILE
-	   DISPLAY "Test completed" UPON PRINTER.
+           DISPLAY "Test completed" UPON PRINTER.
 
            STOP RUN .
            END PROGRAM prog.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 49: Warning: 'PRINTER' is not defined in SPECIAL-NAMES
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 49: Warning: 'PRINTER' is not defined in SPECIAL-NAMES
 prog.cob: 75: Warning: 'PRINTER' is not defined in SPECIAL-NAMES
 ])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [Test started
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0],
+[Test started
 Test completed
 ], [])
 
@@ -4295,8 +4270,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [prog.cob: 34: libcob: ERROR INITIATE rp was already done
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [],
+[prog.cob: 34: libcob: ERROR INITIATE rp was already done
 ])
 
 
@@ -4358,8 +4333,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_PRINTOUT=./report.txt
-./prog], [0], [], [prog.cob: 31: libcob: ERROR GENERATE rp but No INITIATE was done
+AT_CHECK([DD_PRINTOUT="./report.txt" ./prog], [0], [],
+[prog.cob: 31: libcob: ERROR GENERATE rp but No INITIATE was done
 prog.cob: 34: libcob: ERROR GENERATE rp but No INITIATE was done
 prog.cob: 36: libcob: ERROR TERMINATE rp but No INITIATE was done
 ])
@@ -4665,9 +4640,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_TEMPFILE=./inp_data
-export DD_REPORTFILE=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_TEMPFILE="./inp_data" DD_REPORTFILE="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
@@ -8880,11 +8853,9 @@ AT_DATA([prog.cob], [
            END-PERFORM.
 ])
 
-AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([export DD_INFILE=./inp_data
-export DD_OREPORT=./report.txt
-./prog], [0], [], [])
+AT_CHECK([DD_INFILE="./inp_data" DD_OREPORT="./report.txt" ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./report.txt)
