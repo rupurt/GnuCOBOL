@@ -159,7 +159,7 @@ tests/cobol85/SQ
 tests/cobol85/ST
 tests/cobol85/copy
 tests/cobol85/copyalt
-tests/cobol85/newcob.val
+tests/cobol85/newcob.val*
 tests/testsuite.dir
 tests/testsuite.log
 tests/testsuite.src/Makefile
