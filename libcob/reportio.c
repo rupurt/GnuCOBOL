@@ -702,10 +702,10 @@ saveLineCounter(cob_report *r)
 }
 
 /*
- * Search LINE for Control field 
+ * Search one LINE for Control field 
  */
 static void
-line_control_chg(cob_report *r, cob_report_line *l, cob_field *f)
+line_control_one(cob_report *r, cob_report_line *l, cob_field *f)
 {
 	cob_report_field *rf;
 	cob_report_control	*rc;
@@ -747,13 +747,19 @@ line_control_chg(cob_report *r, cob_report_line *l, cob_field *f)
 			} 
 		}
 	}
-	if(l->child != NULL) {
+}
+
+/*
+ * Search Report for Control field 
+ */
+static void
+line_control_chg(cob_report *r, cob_report_line *l, cob_field *f)
+{
+	line_control_one(r,l,f);
+	if(l->child)
 		line_control_chg(r,l->child,f);
-	}
-	while(l->sister) {
-		l = l->sister;
-		line_control_chg(r,l,f);
-	}
+	if(l->sister)
+		line_control_chg(r,l->sister,f);
 }
 
 /*
@@ -1558,6 +1564,7 @@ cob_report_generate(cob_report *r, cob_report_line *l, int ctl)
 		/* 
 		 * First GENERATE of the report
 		 */
+		DEBUG_LOG("rw",("Process First GENERATE\n"));
 		report_line_type(r,r->first_line,COB_REPORT_HEADING);
 		do_page_heading(r);
 		/* do CONTROL Headings */
@@ -1583,6 +1590,7 @@ PrintFirstHeading:
 			cob_move (rc->f,rc->val);	/* Save current field data */
 			rc->data_change = FALSE;
 		}
+		DEBUG_LOG("rw",("Finished First GENERATE\n"));
 
 	} else {
 

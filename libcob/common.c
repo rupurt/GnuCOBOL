@@ -136,6 +136,7 @@ static const cob_field_attr	const_alpha_attr =
 				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
 static char			*cob_local_env = NULL;
+static int			cob_debug_log_time = 0;
 static int			current_arg = 0;
 static unsigned char		*commlnptr = NULL;
 static size_t			commlncnt = 0;
@@ -5936,7 +5937,7 @@ cob_debug_open(const char *debug_env)
 					val[j++] = debug_env[i];
 				val[j] = 0;
 				if(toupper(val[0]) == 'T')
-					cob_debug_level = 3;
+					cob_debug_log_time = cob_debug_level = 3;
 				else if(toupper(val[0]) == 'W')
 					cob_debug_level = 2;
 				else if(toupper(val[0]) == 'N')
@@ -6011,6 +6012,8 @@ cob_debug_logger(const char *fmt, ...)
 {
 	va_list		ap;
 	int		ln;
+	struct cob_time time;
+
 	if(cob_debug_file == NULL) 
 		return 0;
 	if(*fmt == '~') {			/* Force line# out again to log file */
@@ -6019,6 +6022,11 @@ cob_debug_logger(const char *fmt, ...)
 		cob_debug_hdr = 1;
 	}
 	if(cob_debug_hdr) {
+		if(cob_debug_log_time) {
+			time = cob_get_current_date_and_time ();
+			fprintf(cob_debug_file,"%02d:%02d:%02d.%02d ", time.hour, time.minute,
+							time.second, time.nanosecond / 10000000);
+		}     
 		if(cob_debug_mod)
 			fprintf(cob_debug_file,"%-3s:",cob_debug_mod);
 		if(cob_source_file)

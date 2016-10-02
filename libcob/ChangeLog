@@ -1,4 +1,8 @@
 
+2016-10-02 Ron Norman <rjn@inglenet.com>
+	* common.c: report time in COB_DEBUG_LOG for performance test
+	* reportio.c: fixed scan for changed fields to be faster
+	
 2016-09-19 Ron Norman <rjn@inglenet.com>
 
 	* numeric.c: added cob_decimal_clear
