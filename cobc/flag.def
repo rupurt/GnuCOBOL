@@ -138,3 +138,6 @@ CB_FLAG (cb_mf_ibm_comp, 1, "ibmcomp",
 CB_FLAG (cb_mf_files, 1, "mf-files",
 	 _("Sequential & Relative files will match Micro Focus format"))
 
+CB_FLAG (cb_flag_arithmetic_osvs, 1, "arithmetic-osvs",
+	 _("Round down number of decimals in intermediate results\n\t\t\t = number of decimals in final result field\n\t\t\t- default: no rounding, More accurate "))
+

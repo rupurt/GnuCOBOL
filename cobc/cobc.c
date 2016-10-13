@@ -1944,6 +1944,7 @@ process_command_line (const int argc, char **argv)
 	int			sub_ret;
 
 	cb_mf_ibm_comp = -1;
+	cb_flag_arithmetic_osvs = -1;
 #ifdef _WIN32
 	/* Translate command line arguments from WIN to UNIX style */
 	argnum = 1;
@@ -2480,6 +2481,12 @@ process_command_line (const int argc, char **argv)
 	} else if(cb_mf_ibm_comp == 1) {	/* IBMCOMP */
 		cb_binary_size = CB_BINARY_SIZE_2_4_8;
 		cb_synchronized_clause = CB_OK;
+	}
+
+	if(cb_flag_arithmetic_osvs == 1) {	/* -f arithmetic-osvs overrides stdxxx.conf */
+		cb_arithmetic_osvs = 1;
+	} else if(cb_flag_arithmetic_osvs == 0) {
+		cb_arithmetic_osvs = 0;
 	}
 
 	return cob_optind;

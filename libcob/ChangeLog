@@ -1,4 +1,7 @@
 
+2016-10-13 Ron Norman <rjn@inglenet.com>
+	* numeric.c,common.h: added cob_decimal_align function for 'arithemtic-osvs'
+
 2016-10-02 Ron Norman <rjn@inglenet.com>
 	* common.c: report time in COB_DEBUG_LOG for performance test
 	* reportio.c: fixed scan for changed fields to be faster
