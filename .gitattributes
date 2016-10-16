@@ -201,6 +201,7 @@ tests/testsuite.src/data_binary.at eol=lf
 tests/testsuite.src/data_display.at eol=lf
 tests/testsuite.src/data_packed.at eol=lf
 tests/testsuite.src/data_pointer.at eol=lf
+tests/testsuite.src/listings-sed.sh eol=lf
 tests/testsuite.src/listings.at eol=lf
 tests/testsuite.src/run_accept.at eol=lf
 tests/testsuite.src/run_extensions.at eol=lf
