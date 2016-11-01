@@ -99,7 +99,7 @@ config/Makefile.in eol=lf
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
 copy/Makefile.in eol=lf
-/create_win_dist.sh -text
+/create_win_dist.sh eol=lf
 doc/Makefile.am eol=lf
 doc/Makefile.in eol=lf
 doc/cbchelp.tex eol=lf
