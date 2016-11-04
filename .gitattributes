@@ -193,6 +193,7 @@ tests/cobol85/report.pl -text
 tests/cobol85/summary.pl -text
 tests/cobol85/summary.txt -text
 tests/cobol85/summarynoix.txt -text
+tests/listings-sed.sh eol=lf
 tests/package.m4 eol=lf
 tests/testsuite eol=lf
 tests/testsuite.at eol=lf
@@ -201,7 +202,6 @@ tests/testsuite.src/data_binary.at eol=lf
 tests/testsuite.src/data_display.at eol=lf
 tests/testsuite.src/data_packed.at eol=lf
 tests/testsuite.src/data_pointer.at eol=lf
-tests/testsuite.src/listings-sed.sh eol=lf
 tests/testsuite.src/listings.at eol=lf
 tests/testsuite.src/run_accept.at eol=lf
 tests/testsuite.src/run_extensions.at eol=lf
