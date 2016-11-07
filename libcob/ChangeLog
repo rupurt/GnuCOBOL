@@ -1,4 +1,7 @@
 
+2016-11-07 Ron Norman <rjn@inglenet.com>
+	* move.c,common.h: added cob_move_ibm function for 'move-ibm'
+
 2016-10-13 Ron Norman <rjn@inglenet.com>
 	* numeric.c,common.h: added cob_decimal_align function for 'arithemtic-osvs'
 

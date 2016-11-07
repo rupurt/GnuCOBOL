@@ -392,6 +392,7 @@ test.conf: Missing definitions
 	No definition of 'relaxed-syntax-check'
 	No definition of 'perform-osvs'
 	No definition of 'arithmetic-osvs'
+	No definition of 'move-ibm'
 	No definition of 'sticky-linkage'
 	No definition of 'relax-level-hierarchy'
 	No definition of 'cobol85-reserved'

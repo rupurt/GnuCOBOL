@@ -136,7 +136,9 @@ static const cob_field_attr	const_alpha_attr =
 				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
 static char			*cob_local_env = NULL;
+#if defined(COB_DEBUG_LOG)
 static int			cob_debug_log_time = 0;
+#endif
 static int			current_arg = 0;
 static unsigned char		*commlnptr = NULL;
 static size_t			commlncnt = 0;

@@ -1945,6 +1945,7 @@ process_command_line (const int argc, char **argv)
 
 	cb_mf_ibm_comp = -1;
 	cb_flag_arithmetic_osvs = -1;
+	cb_flag_move_ibm = -1;
 #ifdef _WIN32
 	/* Translate command line arguments from WIN to UNIX style */
 	argnum = 1;
@@ -2487,6 +2488,11 @@ process_command_line (const int argc, char **argv)
 		cb_arithmetic_osvs = 1;
 	} else if(cb_flag_arithmetic_osvs == 0) {
 		cb_arithmetic_osvs = 0;
+	}
+	if(cb_flag_move_ibm == 1) {		/* -f move-ibm overrides stdxxx.conf */
+		cb_move_ibm = 1;
+	} else if(cb_flag_move_ibm == 0) {
+		cb_move_ibm = 0;
 	}
 
 	return cob_optind;

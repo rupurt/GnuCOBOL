@@ -141,3 +141,6 @@ CB_FLAG (cb_mf_files, 1, "mf-files",
 CB_FLAG (cb_flag_arithmetic_osvs, 1, "arithmetic-osvs",
 	 _("Round down number of decimals in intermediate results\n\t\t\t = number of decimals in final result field\n\t\t\t- default: no rounding, More accurate "))
 
+CB_FLAG (cb_flag_move_ibm, 1, "move-ibm",
+	 _("MOVE operates as on IBM (left to right, byte by byte)\n\t\t\t default: no propagating move"))
+

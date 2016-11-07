@@ -1,4 +1,9 @@
 
+2016-11-07  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c cobc.c flag.def config.def: added code for
+	  'move-ibm' option which does MOVE same as IBM MVC instruction 
+
 2016-10-13  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c cobc.c flag.def config.def: added code for
