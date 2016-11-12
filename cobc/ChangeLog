@@ -1,4 +1,16 @@
 
+2016-11-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* parser.y: fixed extended_with_lock by differentiating between WITH
+	  LOCK / NO LOCK / KEPT LOCK
+	* typeck.c (cb_emit_read): set read_opts COB_READ_LOCK and 
+	  COB_READ_KEPT_LOCK for I/O statements with KEPT LOCK
+
+2016-11-07  Jim Rinn <jimrinn1@gmail.com>
+
+	* parser.y (lock_mode): OR-ing SELECT settings into file->lock_mode as they
+	  would override COB_LOCK_MULTIPLE (set in _lock_with) otherwise
+
 2016-11-07  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c cobc.c flag.def config.def: added code for
@@ -19,6 +31,15 @@
 	* codegen.c (call_list_reverse, static_call_list_reverse): added for
 	  keeping the generated variables in the same order it has in COBOL,
 	  called in (codegen)
+
+2016-09-21  Edward Hart <edward.dan.hart@gmail.com>
+
+	* parser.y: added RETRY and ADVANCING ON LOCK as pending features.
+	* parser.y, reserved.c: made FOREVER context-sensitive.
+	* reserved.c (default_reserved_words): corrected year of standard from
+	  2008 to 2014.
+	* reserved.c (lookup_reserved_word): changed to allow context-sensitive
+	  words to be activated by different words.
 
 2016-09-19  Ron Norman <rjn@inglenet.com>
 

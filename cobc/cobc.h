@@ -116,6 +116,9 @@
 #define	CB_CS_SET			(1U << 13)
 #define	CB_CS_STOP			(1U << 14)
 #define	CB_CS_WITH			(1U << 15)
+#define	CB_CS_PERFORM			(1U << 17)
+#define	CB_CS_RETRY			(1U << 18)
+#define	CB_CS_READ			(1U << 19)
 
 /* Operand operation type */
 enum cb_operation_type {

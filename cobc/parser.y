@@ -1,6 +1,7 @@
 /*
    Copyright (C) 2001-2016 Free Software Foundation, Inc.
-   Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
+   Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch,
+   Edward Hard
 
    This file is part of GnuCOBOL.
 
@@ -1101,6 +1102,7 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token RESERVE
 %token RESET
 %token RESET_TRACE		"RESET TRACE"
+%token RETRY
 %token RETURN
 %token RETURNING
 %token REVERSE_FUNC		"FUNCTION REVERSE"
@@ -1120,6 +1122,7 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token SCROLL
 %token SD
 %token SEARCH
+%token SECONDS
 %token SECTION
 %token SECURE
 %token SEGMENT_LIMIT		"SEGMENT-LIMIT"
@@ -2851,17 +2854,17 @@ lock_mode_clause:
 lock_mode:
   MANUAL lock_with
   {
-	current_file->lock_mode = COB_LOCK_MANUAL;
+	current_file->lock_mode |= COB_LOCK_MANUAL;
 	cobc_cs_check = 0;
   }
 | AUTOMATIC lock_with
   {
-	current_file->lock_mode = COB_LOCK_AUTOMATIC;
+	current_file->lock_mode |= COB_LOCK_AUTOMATIC;
 	cobc_cs_check = 0;
   }
 | EXCLUSIVE
   {
-	current_file->lock_mode = COB_LOCK_EXCLUSIVE;
+	current_file->lock_mode |= COB_LOCK_EXCLUSIVE;
 	cobc_cs_check = 0;
   }
 ;
@@ -6984,7 +6987,7 @@ delete_statement:
 ;
 
 delete_body:
-  file_name _record invalid_key
+  file_name _record _retry_phrase invalid_key
   {
 	cb_emit_delete ($1);
   }
@@ -8199,6 +8202,7 @@ perform_statement:
 	/* Turn off field debug - PERFORM is special */
 	save_debug = start_debug;
 	start_debug = 0;
+	cobc_cs_check = CB_CS_PERFORM;
   }
   perform_body
 ;
@@ -8208,12 +8212,14 @@ perform_body:
   {
 	cb_emit_perform ($2, $1);
 	start_debug = save_debug;
+	cobc_cs_check = 0;
   }
 | perform_option
   {
 	CB_ADD_TO_CHAIN ($1, perform_stack);
 	/* Restore field debug before inline statements */
 	start_debug = save_debug;
+	cobc_cs_check = 0;
   }
   statement_list end_perform
   {
@@ -8224,6 +8230,7 @@ perform_body:
   {
 	cb_emit_perform ($1, NULL);
 	start_debug = save_debug;
+	cobc_cs_check = 0;
   }
 ;
 
@@ -8372,8 +8379,10 @@ read_statement:
 ;
 
 read_body:
-  file_name flag_next _record read_into with_lock read_key read_handler
+  file_name flag_next _record read_into lock_phrases read_key read_handler
   {
+	cobc_cs_check = 0;
+	  
 	if (CB_VALID_TREE ($1)) {
 		struct cb_file	*cf;
 
@@ -8403,33 +8412,75 @@ read_into:
 | INTO identifier		{ $$ = $2; }
 ;
 
-with_lock:
-  /* empty */
+lock_phrases:
+  %prec SHIFT_PREFER /* empty */ 
   {
 	$$ = NULL;
   }
-| IGNORING LOCK
+| ignoring_lock
   {
 	$$ = cb_int3;
   }
-| _with LOCK
+| advancing_lock_or_retry _extended_with_lock
   {
-	$$ = cb_int1;
+	$$ = $2;
+  }
+| extended_with_lock
+  {
+	$$ = $1;
+  }
+;
+
+ignoring_lock:
+  IGNORING LOCK
+| _with IGNORE LOCK
+;
+  
+advancing_lock_or_retry:
+  ADVANCING _on LOCK
+  {
+	PENDING ("ADVANCING ON LOCK");
+  }
+| retry_phrase
+;
+
+_retry_phrase:
+  /* empty */
+| retry_phrase
+;
+
+retry_phrase:
+  retry_options
+  {
+	PENDING ("RETRY");
+	cobc_cs_check = 0;
+  }
+;
+
+retry_options:
+  /* HACK: added _for to fix shift/reduce conflict. */
+  RETRY _for exp TIMES
+| RETRY _for exp SECONDS
+| RETRY FOREVER
+;
+
+_extended_with_lock:
+  /* empty */
+| extended_with_lock
+;
+
+extended_with_lock:
+  with_lock
+  {
+	$$ = $1;
   }
 | _with KEPT LOCK
   {
-	$$ = cb_int1;
-  }
-| _with NO LOCK
-  {
-	$$ = cb_int2;
-  }
-| _with IGNORE LOCK
-  {
-	$$ = cb_int3;
+   $$ = cb_int5;
   }
 | _with WAIT
   {
+	/* TO-DO: Merge with RETRY phrase */
 	$$ = cb_int4;
   }
 ;
@@ -8539,19 +8590,23 @@ rewrite_statement:
 ;
 
 rewrite_body:
-  record_name from_option write_lock invalid_key
+  record_name from_option _retry_phrase _with_lock invalid_key
   {
-	cb_emit_rewrite ($1, $2, $3);
+	cb_emit_rewrite ($1, $2, $4);
 	start_debug = save_debug;
   }
 ;
 
-write_lock:
+_with_lock:
   /* empty */
   {
 	$$ = NULL;
   }
-| _with LOCK
+| with_lock
+;
+
+with_lock:
+  _with LOCK
   {
 	$$ = cb_int1;
   }
@@ -9669,10 +9724,10 @@ write_statement:
 ;
 
 write_body:
-  record_name from_option write_option write_lock write_handler
+  record_name from_option write_option _retry_phrase _with_lock write_handler
   {
 	if (CB_VALID_TREE ($1)) {
-		cb_emit_write ($1, $2, $3, $4);
+		cb_emit_write ($1, $2, $3, $5);
 	}
 	start_debug = save_debug;
   }
