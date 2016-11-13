@@ -5152,3 +5152,48 @@ Divide   RSLT    IS 009
 
 AT_CLEANUP
 
+
+AT_SETUP([CALL literal with spaces])
+AT_KEYWORDS([CALL])
+
+AT_DATA([prog.cob], [       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  MYRTN  PIC X(9) VALUE "SUB  ".
+       01  BINFLD PIC 9(9) BINARY VALUE 1280.
+       
+       PROCEDURE DIVISION.
+           CALL " SUB " USING 1280 BY VALUE 15.
+           MOVE x'00' TO MYRTN (5:1).
+           CALL MYRTN   USING 1280 BY VALUE 15.
+           CALL "SUB"   USING 2560 BY VALUE 16.
+           STOP RUN.
+        END PROGRAM prog.
+       
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. "SUB ".
+       
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  x  PIC 9(9) COMP.
+       01  y  PIC 9(9) COMP-5.
+       
+       PROCEDURE DIVISION USING x, VALUE y.
+            DISPLAY "COBOL: X is " x " and Y is " y.
+       END PROGRAM " SUB".
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [prog.cob: 10: Warning: ' SUB ' literal includes leading/trailing spaces which are omitted
+prog.cob: 18: Warning: 'SUB ' literal includes leading/trailing spaces which are omitted
+prog.cob: 27: Warning: ' SUB' literal includes leading/trailing spaces which are omitted
+])
+
+AT_CHECK([./prog], [0], [COBOL: X is 000001280 and Y is 000000015
+COBOL: X is 000001280 and Y is 000000015
+COBOL: X is 000002560 and Y is 000000016
+], [])
+
+AT_CLEANUP
+

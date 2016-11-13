@@ -1462,6 +1462,7 @@ end_mandatory:
 	if (depth) {
 		depth--;
 	}
+	cb_trim_program_id(s);
 	if (strcmp (stack_progid[depth], s)) {
 		cb_error (_("END PROGRAM '%s' is different to PROGRAM-ID '%s'"),
 			s, stack_progid[depth]);
@@ -1612,6 +1613,16 @@ function_identification:
 program_name:
   PROGRAM_NAME
 | LITERAL
+  {
+	char	*s;
+
+	if (CB_LITERAL_P ($1)) {
+		s = (char *)(CB_LITERAL ($1)->data);
+		if(strchr(s, ' ')) {
+			cb_warning_x ($1, _("'%s' literal includes leading/trailing spaces which are omitted"), s);
+		}
+	}
+  }
 ;
 
 as_literal:

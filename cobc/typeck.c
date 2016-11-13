@@ -1141,6 +1141,20 @@ cb_build_registers (void)
 }
 
 char *
+cb_trim_program_id (char *name)
+{
+	char		*p;
+	int		len;
+	len = strlen(name);
+	p = (char *) name;
+	while(*p == ' ') 
+		memmove(p,p+1,len--);
+	while(p[len-1] == ' ' && len > 0)
+		p[--len] = 0;
+	return name;
+}
+
+char *
 cb_encode_program_id (const char *name)
 {
 	unsigned char		*p;
@@ -1157,6 +1171,9 @@ cb_encode_program_id (const char *name)
 	if (!s) {
 		s = (const unsigned char *)name;
 	}
+
+	cb_trim_program_id ((char *)name);
+
 	p = buff;
 	/* Encode the initial digit */
 	if (*s <= (unsigned char)'9' && *s >= (unsigned char)'0') {
@@ -1209,6 +1226,7 @@ cb_build_program_id (cb_tree name, cb_tree alt_name, const cob_u32_t is_func)
 			cobc_check_string ((char *)CB_LITERAL (alt_name)->data);
 		s = cb_encode_program_id ((char *)CB_LITERAL (alt_name)->data);
 	} else if (CB_LITERAL_P (name)) {
+		cb_trim_program_id ((char *)CB_LITERAL (name)->data);
 		current_program->orig_program_id =
 			cobc_check_string ((char *)CB_LITERAL (name)->data);
 		s = cb_encode_program_id ((char *)CB_LITERAL (name)->data);
@@ -4910,6 +4928,13 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 		}
 		if (!entry) {
 			entry = (const char *)CB_LITERAL(prog)->data;
+		}
+		p = (const char *)CB_LITERAL(prog)->data;
+		for (; *p; ++p) {
+			if (*p == ' ') {
+				cb_warning_x (prog, _("'%s' literal includes leading/trailing spaces which are omitted"), entry);
+				break;
+			}
 		}
 		is_sys_idx = 1;
 		for (psyst = system_tab; psyst->syst_name; psyst++, is_sys_idx++) {
