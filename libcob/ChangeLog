@@ -1,5 +1,13 @@
 
+2016-11-13  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c, coblocal.h, fileio.c: moved common code parts of fileio.c as
+	  function (cob_runtime_warning) to common.c;
+	  reformatted message and include source location, if known
+	* call.c (cob_call_field): warn and remove leading spaces for CALL
+
 2016-11-07 Ron Norman <rjn@inglenet.com>
+
 	* move.c,common.h: added cob_move_ibm function for 'move-ibm'
 
 2016-10-13 Ron Norman <rjn@inglenet.com>

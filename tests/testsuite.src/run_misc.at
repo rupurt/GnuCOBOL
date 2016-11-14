@@ -5152,3 +5152,71 @@ Divide   RSLT    IS 009
 
 AT_CLEANUP
 
+
+AT_SETUP([PROGRAM-ID / CALL literal/variable with spaces])
+AT_KEYWORDS([CALL])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  MYRTN  PIC X(9) VALUE " SUB  ".
+       
+       PROCEDURE DIVISION.
+           CALL " SUB " USING 'X'.
+           MOVE x'00' TO MYRTN (6:1).
+           CALL MYRTN   USING 'Y'.
+           CALL "SUB"   USING 'Z'.
+           CALL "S U B" USING 'A'.
+           MOVE " S U B" TO MYRTN.
+           CALL MYRTN   USING 'B'.
+           STOP RUN.
+       END PROGRAM prog.
+       
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. "SUB ".
+       
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  x  PIC X.
+       
+       PROCEDURE DIVISION USING x.
+            DISPLAY "SUB GOT " X
+            END-DISPLAY.
+       END PROGRAM " SUB".
+       
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. "S U B".
+       
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  x  PIC X.
+       
+       PROCEDURE DIVISION USING x.
+            DISPLAY "S U B  GOT " X
+            END-DISPLAY.
+       END PROGRAM "S U B".
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 10: Warning: ' SUB ' literal includes leading spaces which are omitted
+prog.cob: 10: Warning: ' SUB ' literal includes trailing spaces which are omitted
+prog.cob: 21: Warning: 'SUB ' literal includes trailing spaces which are omitted
+prog.cob: 30: Warning: ' SUB' literal includes leading spaces which are omitted
+])
+
+AT_CHECK([./prog], [0],
+[SUB GOT X
+SUB GOT Y
+SUB GOT Z
+S U B  GOT A
+S U B  GOT B
+],
+[libcob: prog.cob: 12: warning: ' SUB' literal includes leading spaces which are omitted
+libcob: prog.cob: 16: warning: ' S U B' literal includes leading spaces which are omitted
+])
+
+AT_CLEANUP
+

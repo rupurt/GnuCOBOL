@@ -1612,6 +1612,9 @@ function_identification:
 program_name:
   PROGRAM_NAME
 | LITERAL
+  {
+	cb_trim_program_id ($1);
+  }
 ;
 
 as_literal:
@@ -6650,6 +6653,9 @@ call_body:
   call_on_exception
   call_not_on_exception
   {
+	if (CB_LITERAL_P ($2)) {
+		cb_trim_program_id ($2);
+	}
 	if (CB_LITERAL_P ($2) &&
 	    current_program->prog_type == CB_PROGRAM_TYPE &&
 	    !current_program->flag_recursive &&
