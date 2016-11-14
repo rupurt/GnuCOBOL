@@ -3724,7 +3724,7 @@ output_call_by_value_args (cb_tree x, cb_tree l)
 }
 
 static void
-output_bin_field (const cb_tree x, const cob_u32_t id, int opcd, int isref)
+output_bin_field (const cb_tree x, const cob_u32_t id, int opcd)
 {
 	int		i;
 	cob_u32_t	size;
@@ -3738,12 +3738,6 @@ output_bin_field (const cb_tree x, const cob_u32_t id, int opcd, int isref)
 	if (cb_fits_int (x)) {
 		size = 4;
 		aflags = COB_FLAG_HAVE_SIGN;
-#ifndef WORDS_BIGENDIAN
-		if (cb_binary_byteorder == CB_BYTEORDER_BIG_ENDIAN
-		&&  isref) {
-			aflags |= COB_FLAG_BINARY_SWAP;
-		}
-#endif
 	} else {
 		size = 8;
 		if (CB_LITERAL (x)->sign < 0) {
@@ -3784,7 +3778,6 @@ output_call (struct cb_call *p)
 	struct cb_text_list		*ctl;
 	char				*s;
 	cob_u32_t			n;
-	int				use_isref;
 	size_t				retptr;
 	size_t				gen_exit_program;
 	size_t				dynamic_link;
@@ -3812,11 +3805,8 @@ output_call (struct cb_call *p)
 	convention = "";
 #endif
 
-	use_isref = 1;
 	/* System routine entry points */
 	if (p->is_system) {
-		use_isref = 0;	/* Must verify all internal routines before removing this */
-				/* some of the one in fileio.c compensate for numeric literals */
 #if	0	/* RXWRXW - system */
 		lp = CB_LITERAL (p->name);
 		for (psyst = system_tab; psyst->syst_name; psyst++) {
@@ -3883,9 +3873,9 @@ output_call (struct cb_call *p)
 				}
 				output_line ("cob_content\tcontent_%u;", n);
 #if   defined(__SUNPRO_C)
-				output_bin_field (x, n, 1, use_isref);
+				output_bin_field (x, n, 1);
 #else
-				output_bin_field (x, n, 0, use_isref);
+				output_bin_field (x, n, 0);
 #endif
 			} else if (CB_CAST_P (x)) {
 				if (!need_brace) {
@@ -3927,9 +3917,9 @@ output_call (struct cb_call *p)
 				output_line ("\tint           dataint;");
 				output_line ("} content_%u;", n);
 #if   defined(__SUNPRO_C)
-				output_bin_field (x, n, 1, 0);
+				output_bin_field (x, n, 1);
 #else
-				output_bin_field (x, n, 0, 0);
+				output_bin_field (x, n, 0);
 #endif
 			}
 			break;
@@ -3949,11 +3939,12 @@ output_call (struct cb_call *p)
 			if (CB_NUMERIC_LITERAL_P (x)) {
 #if   defined(__SUNPRO_C)
 				/* Set this after all variable declarations */
-				output_bin_field (x, n, 2, use_isref);
+				output_bin_field (x, n, 2);
 #endif
 				output_prefix ();
 				if (cb_fits_int (x)) {
-					output ("cob_set_int(&content_fb_%d, %d);",n,cb_get_int (x));
+					output ("content_%u.dataint = ", n);
+					output ("%d", cb_get_int (x));
 				} else {
 					if (CB_LITERAL (x)->sign >= 0) {
 						output ("content_%u.dataull = ", n);
@@ -3988,7 +3979,7 @@ output_call (struct cb_call *p)
 				if (CB_NUMERIC_LITERAL_P (x)) {
 #if   defined(__SUNPRO_C)
 					/* Set this after all variable declarations */
-					output_bin_field (x, n, 2, 0);
+					output_bin_field (x, n, 2);
 #endif
 					output_prefix ();
 					if (cb_fits_int (x)) {
