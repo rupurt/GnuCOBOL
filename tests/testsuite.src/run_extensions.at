@@ -28,10 +28,13 @@ AT_DATA([dump.c], [
 #include <stdio.h>
 #define COB_LIB_EXPIMP
 #include <libcob.h>
-COB_EXPIMP int dump (unsigned char *, int *);
-int dump (unsigned char *data, int *p)
+COB_EXPIMP int dump (unsigned char *, char *);
+int dump (unsigned char *data, char *p)
 {
   int i;
+  if ( *p == 0 ) p++;
+  if ( *p == 0 ) p++;	/* Skip for BIG Endian system */
+  if ( *p == 0 ) p++;
   if ( *p == 1 ) {
      for (i = 0; i < 4; i++)
        printf ("%02x", data[[i]]);
@@ -66,6 +69,74 @@ AT_CHECK([./prog], [0],
 ])
 
 AT_CLEANUP
+
+AT_SETUP([CALL USING numeric literal])
+AT_KEYWORDS([CALL])
+
+AT_DATA([prog.cob], [       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  MYRTN  PIC X(9) VALUE "SUB  ".
+       01  BINFLD PIC S9(9) BINARY VALUE 1280.
+       
+       PROCEDURE DIVISION.
+           CALL "SUB"  USING LENGTH OF MYRTN BY VALUE 10.
+           CALL "SUB"  USING BINFLD BY VALUE 11.
+           CALL "SUB"  USING BY CONTENT BINFLD BY VALUE 12.
+           CALL "SUB"  USING BINFLD BY VALUE 13.
+           CALL "SUB"  USING 1280 BY VALUE 14.
+           CALL "SUB"  USING -1280 BY VALUE 15.
+           CALL "SUB"  USING BY CONTENT 1280 BY VALUE 16.
+           CALL "SUB"  USING BY CONTENT -1280 BY VALUE 17.
+           CALL "SUB"  USING BY REFERENCE 1280 BY VALUE 18.
+           CALL "SUB"  USING BY REFERENCE -1280 BY VALUE 19.
+           CALL "SUB"  USING BY CONTENT BINFLD BY VALUE 20.
+           CALL "SUB"  USING BY REFERENCE BINFLD BY VALUE 21.
+           CALL "SUB"  USING 1665431892 BY VALUE 22.
+           CALL "SUB"  USING 1665.892 BY VALUE 23.
+           CALL "SUB"  USING 1665.89200 BY VALUE 24. 
+	   CALL "SUB"  USING 16654318925468 BY VALUE 25.
+           STOP RUN.
+           END PROGRAM prog.
+       
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. "SUB".
+       
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01  x  PIC S9(9) BINARY.
+       01  y  PIC 9(9)  COMP-5.
+       
+       PROCEDURE DIVISION USING x, VALUE y.
+           DISPLAY "COBOL: X is " x " and Y is " y.
+           ADD 1 TO x.
+           END PROGRAM "SUB".
+])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [])
+
+AT_CHECK([./prog], [0], [COBOL: X is +0000000009 and Y is 0000000010
+COBOL: X is +0000001280 and Y is 0000000011
+COBOL: X is +0000001281 and Y is 0000000012
+COBOL: X is +0000001281 and Y is 0000000013
+COBOL: X is +0000001280 and Y is 0000000014
+COBOL: X is -0000001280 and Y is 0000000015
+COBOL: X is +0000001280 and Y is 0000000016
+COBOL: X is -0000001280 and Y is 0000000017
+COBOL: X is +0000001280 and Y is 0000000018
+COBOL: X is -0000001280 and Y is 0000000019
+COBOL: X is +0000001282 and Y is 0000000020
+COBOL: X is +0000001282 and Y is 0000000021
+COBOL: X is +1665431892 and Y is 0000000022
+COBOL: X is +0001665892 and Y is 0000000023
+COBOL: X is +0166589200 and Y is 0000000024
+COBOL: X is -1564248420 and Y is 0000000025
+], [])
+
+AT_CLEANUP
+
 
 ## H literal
 

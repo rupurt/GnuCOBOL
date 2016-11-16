@@ -871,9 +871,12 @@ AT_DATA([dump.c], [
 #include <stdio.h>
 #define COB_LIB_EXPIMP
 #include <libcob.h>
-COB_EXPIMP int dump (int *);
-int dump (int *p)
+COB_EXPIMP int dump (unsigned char *);
+int dump (unsigned char *p)
 {
+  if ( *p == 0 ) p++;
+  if ( *p == 0 ) p++;	/* Skip leading bytes for BIG Endian value */
+  if ( *p == 0 ) p++;
   printf ("%8.8d\n", *p);
   return 0;
 }

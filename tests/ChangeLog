@@ -1,4 +1,11 @@
 
+2016-11-15  Ron Norman <rjn@inglenet.com>
+
+	* run_misc.at: 
+	  changed dump.c as numeric literals are now passed
+	  as PIC 9(9) BINARY format.
+	* run_extensions.at: Added test case for CALL USING numeric literals
+
 2016-09-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* atlocal.in, atlocal_win : fix unset of environment variables

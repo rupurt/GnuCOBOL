@@ -1,4 +1,11 @@
 
+2016-11-15  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c ((output_call, output_bin_field)): 
+	  Numeric literals being passed BY REFERENCE or BY CONTENT  
+	  will have the value passed as PIC S9(9) BINARY 
+	  and now get the correct field attributes set.
+
 2016-11-14  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* typeck.c (cb_trim_program_id): change warning message for remove of
@@ -14,9 +21,6 @@
 
 	* codegen.c ((output_call, output_bin_field)): Numeric literals being
 	  passed BY REFERENCE will now get the correct field attributes set.
-	  Exception: the field is left incorrectly defined when calling an
-	  internal function as those functions have special code to handle the
-	  data. FIXME: fix the internal functions and remove the exception later
 
 2016-11-12  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 

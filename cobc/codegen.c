@@ -186,6 +186,7 @@ static int			local_working_mem = 0;
 static int			output_indent_level = 0;
 static int			last_segment = 0;
 static int			gen_if_level = 0;
+static int			gen_num_lit_big_end = 1;
 static unsigned int		nolitcast = 0;
 
 static unsigned int		inside_check = 0;
@@ -1365,6 +1366,42 @@ cb_lookup_literal (cb_tree x, int make_decimal)
 	literal_cache = l;
 
 	return cb_literal_id++;
+}
+
+/*
+ * Should numeric literal for truncated into a PIC S9(9) BINARY field, ignoring scale?
+ *  (This is the way that Micro Focus COBOL works; RJN Nov 2016)
+ */
+static int
+cb_fit_to_int (const cb_tree x)
+{
+	struct cb_literal	*l;
+	int			scale, sts;
+
+#ifndef WORDS_BIGENDIAN
+	if (cb_binary_byteorder == CB_BYTEORDER_BIG_ENDIAN) {
+		gen_num_lit_big_end = 1;
+	} else {
+		gen_num_lit_big_end = 0;
+	}
+#else
+	gen_num_lit_big_end = 1;
+#endif
+
+	if (CB_NUMERIC_LITERAL_P (x)) {
+		if (gen_num_lit_big_end) 
+			return 1;
+		l = CB_LITERAL (x);
+		if (l->scale > 0) {
+			scale = l->scale;
+			l->scale = 0;
+			sts = cb_fits_int ( x );
+			l->scale = scale;
+			return sts;
+		}
+	}
+
+	return cb_fits_int ( x );
 }
 
 /* Integer */
@@ -3724,7 +3761,7 @@ output_call_by_value_args (cb_tree x, cb_tree l)
 }
 
 static void
-output_bin_field (const cb_tree x, const cob_u32_t id, int opcd, int isref)
+output_bin_field (const cb_tree x, const cob_u32_t id, int opcd)
 {
 	int		i;
 	cob_u32_t	size;
@@ -3735,12 +3772,11 @@ output_bin_field (const cb_tree x, const cob_u32_t id, int opcd, int isref)
 		return;
 	}
 	aflags = 0;
-	if (cb_fits_int (x)) {
+	if (cb_fit_to_int (x)) {
 		size = 4;
 		aflags = COB_FLAG_HAVE_SIGN;
 #ifndef WORDS_BIGENDIAN
-		if (cb_binary_byteorder == CB_BYTEORDER_BIG_ENDIAN
-		&&  isref) {
+		if (cb_binary_byteorder == CB_BYTEORDER_BIG_ENDIAN) {
 			aflags |= COB_FLAG_BINARY_SWAP;
 		}
 #endif
@@ -3784,7 +3820,6 @@ output_call (struct cb_call *p)
 	struct cb_text_list		*ctl;
 	char				*s;
 	cob_u32_t			n;
-	int				use_isref;
 	size_t				retptr;
 	size_t				gen_exit_program;
 	size_t				dynamic_link;
@@ -3812,11 +3847,8 @@ output_call (struct cb_call *p)
 	convention = "";
 #endif
 
-	use_isref = 1;
 	/* System routine entry points */
 	if (p->is_system) {
-		use_isref = 0;	/* Must verify all internal routines before removing this */
-				/* some of the one in fileio.c compensate for numeric literals */
 #if	0	/* RXWRXW - system */
 		lp = CB_LITERAL (p->name);
 		for (psyst = system_tab; psyst->syst_name; psyst++) {
@@ -3883,9 +3915,9 @@ output_call (struct cb_call *p)
 				}
 				output_line ("cob_content\tcontent_%u;", n);
 #if   defined(__SUNPRO_C)
-				output_bin_field (x, n, 1, use_isref);
+				output_bin_field (x, n, 1);
 #else
-				output_bin_field (x, n, 0, use_isref);
+				output_bin_field (x, n, 0);
 #endif
 			} else if (CB_CAST_P (x)) {
 				if (!need_brace) {
@@ -3927,9 +3959,9 @@ output_call (struct cb_call *p)
 				output_line ("\tint           dataint;");
 				output_line ("} content_%u;", n);
 #if   defined(__SUNPRO_C)
-				output_bin_field (x, n, 1, 0);
+				output_bin_field (x, n, 1);
 #else
-				output_bin_field (x, n, 0, 0);
+				output_bin_field (x, n, 0);
 #endif
 			}
 			break;
@@ -3949,11 +3981,12 @@ output_call (struct cb_call *p)
 			if (CB_NUMERIC_LITERAL_P (x)) {
 #if   defined(__SUNPRO_C)
 				/* Set this after all variable declarations */
-				output_bin_field (x, n, 2, use_isref);
+				output_bin_field (x, n, 2);
 #endif
 				output_prefix ();
-				if (cb_fits_int (x)) {
-					output ("cob_set_int(&content_fb_%d, %d);",n,cb_get_int (x));
+				if (cb_fit_to_int (x)) {
+					unsigned int pval = (unsigned int)cb_get_int (x);
+					output ("cob_set_int(&content_fb_%d, %d)",n,pval);
 				} else {
 					if (CB_LITERAL (x)->sign >= 0) {
 						output ("content_%u.dataull = ", n);
@@ -3988,12 +4021,12 @@ output_call (struct cb_call *p)
 				if (CB_NUMERIC_LITERAL_P (x)) {
 #if   defined(__SUNPRO_C)
 					/* Set this after all variable declarations */
-					output_bin_field (x, n, 2, 0);
+					output_bin_field (x, n, 2);
 #endif
 					output_prefix ();
-					if (cb_fits_int (x)) {
-						output ("content_%u.dataint = ", n);
-						output ("%d", cb_get_int (x));
+					if (cb_fit_to_int (x)) {
+						unsigned int pval = (unsigned int)cb_get_int (x);
+						output ("cob_set_int(&content_fb_%d, %d)",n,pval);
 					} else {
 						if (CB_LITERAL (x)->sign >= 0) {
 							output ("content_%u.dataull = ", n);
