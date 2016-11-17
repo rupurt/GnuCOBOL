@@ -1170,36 +1170,37 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 558;run_extensions.at:2716;System routine CBL_NOT;extensions;
 559;run_extensions.at:2742;System routine CBL_EQ;extensions;
 560;run_extensions.at:2769;System routine CBL_OC_GETOPT;extensions;
-561;run_extensions.at:3204;System routine CBL_COPY_FILE;;
-562;run_extensions.at:3238;System routines for directories;;
-563;run_extensions.at:3279;System routines for files;;
-564;run_extensions.at:3394;Conditional/define directives (1);extensions;
-565;run_extensions.at:3419;Conditional/define directives (2);extensions;
-566;run_extensions.at:3444;Conditional/define directives (3);extensions;
-567;run_extensions.at:3472;Conditional/define directives (4);extensions;
-568;run_extensions.at:3498;Conditional/define directives (5);extensions;
-569;data_binary.at:23;BINARY: 2-4-8 big-endian;binary;
-570;data_binary.at:205;BINARY: 2-4-8 native;binary;
-571;data_binary.at:393;BINARY: 1-2-4-8 big-endian;binary;
-572;data_binary.at:575;BINARY: 1-2-4-8 native;binary;
-573;data_binary.at:763;BINARY: 1--8 big-endian;binary;
-574;data_binary.at:945;BINARY: 1--8 native;binary;
-575;data_binary.at:1133;BINARY: full-print;binary;
-576;data_display.at:21;DISPLAY: Sign ASCII;display;
-577;data_display.at:80;DISPLAY: Sign ASCII (2);display;
-578;data_display.at:126;DISPLAY: Sign EBCDIC;display;
-579;data_packed.at:25;PACKED-DECIMAL dump;packed;
-580;data_packed.at:162;PACKED-DECIMAL display;packed;
-581;data_packed.at:218;PACKED-DECIMAL move;packed;
-582;data_packed.at:276;PACKED-DECIMAL arithmetic (1);packed;
-583;data_packed.at:316;PACKED-DECIMAL arithmetic (2);packed;
-584;data_packed.at:353;PACKED-DECIMAL numeric test (1);packed;
-585;data_packed.at:494;PACKED-DECIMAL numeric test (2);packed;
-586;data_packed.at:635;COMP-6 display;packed;
-587;data_packed.at:671;COMP-6 move;packed;
-588;data_packed.at:717;COMP-6 arithmetic;packed;
-589;data_packed.at:748;COMP-6 numeric test ;packed;
-590;data_pointer.at:21;POINTER: display;pointer;
+561;run_extensions.at:3204;System routines CBL_GC_FORK and CBL_GC_WAITPID;extensions;
+562;run_extensions.at:3249;System routine CBL_COPY_FILE;;
+563;run_extensions.at:3283;System routines for directories;;
+564;run_extensions.at:3324;System routines for files;;
+565;run_extensions.at:3439;Conditional/define directives (1);extensions;
+566;run_extensions.at:3464;Conditional/define directives (2);extensions;
+567;run_extensions.at:3489;Conditional/define directives (3);extensions;
+568;run_extensions.at:3517;Conditional/define directives (4);extensions;
+569;run_extensions.at:3543;Conditional/define directives (5);extensions;
+570;data_binary.at:23;BINARY: 2-4-8 big-endian;binary;
+571;data_binary.at:205;BINARY: 2-4-8 native;binary;
+572;data_binary.at:393;BINARY: 1-2-4-8 big-endian;binary;
+573;data_binary.at:575;BINARY: 1-2-4-8 native;binary;
+574;data_binary.at:763;BINARY: 1--8 big-endian;binary;
+575;data_binary.at:945;BINARY: 1--8 native;binary;
+576;data_binary.at:1133;BINARY: full-print;binary;
+577;data_display.at:21;DISPLAY: Sign ASCII;display;
+578;data_display.at:80;DISPLAY: Sign ASCII (2);display;
+579;data_display.at:126;DISPLAY: Sign EBCDIC;display;
+580;data_packed.at:25;PACKED-DECIMAL dump;packed;
+581;data_packed.at:162;PACKED-DECIMAL display;packed;
+582;data_packed.at:218;PACKED-DECIMAL move;packed;
+583;data_packed.at:276;PACKED-DECIMAL arithmetic (1);packed;
+584;data_packed.at:316;PACKED-DECIMAL arithmetic (2);packed;
+585;data_packed.at:353;PACKED-DECIMAL numeric test (1);packed;
+586;data_packed.at:494;PACKED-DECIMAL numeric test (2);packed;
+587;data_packed.at:635;COMP-6 display;packed;
+588;data_packed.at:671;COMP-6 move;packed;
+589;data_packed.at:717;COMP-6 arithmetic;packed;
+590;data_packed.at:748;COMP-6 numeric test ;packed;
+591;data_pointer.at:21;POINTER: display;pointer;
 "
 # List of the all the test groups.
 at_groups_all=`$as_echo "$at_help_all" | sed 's/;.*//'`
@@ -1213,7 +1214,7 @@ at_fn_validate_ranges ()
   for at_grp
   do
     eval at_value=\$$at_grp
-    if test $at_value -lt 1 || test $at_value -gt 590; then
+    if test $at_value -lt 1 || test $at_value -gt 591; then
       $as_echo "invalid test group: $at_value" >&2
       exit 1
     fi
@@ -1600,7 +1601,7 @@ at_banner_text_2="Syntax tests"
 # Category starts at test group 158.
 at_banner_text_3="Run tests"
 # Banner 4. testsuite.at:67
-# Category starts at test group 569.
+# Category starts at test group 570.
 at_banner_text_4="Data Representation"
 
 # Take any -C into account.
@@ -56580,10 +56581,91 @@ read at_status <"$at_status_file"
 #AT_STOP_560
 #AT_START_561
 at_fn_group_banner 561 'run_extensions.at:3204' \
-  "System routine CBL_COPY_FILE" "                   " 3
+  "System routines CBL_GC_FORK and CBL_GC_WAITPID" " " 3
 at_xfail=no
 (
   $as_echo "561. $at_setup_line: testing $at_desc ..."
+  $at_traceon
+
+
+
+cat >prog.cob <<'_ATEOF'
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 CHILD-PID   PIC 9(9) BINARY.
+       01 MY-PID      PIC 9(9) BINARY VALUE 1.
+       01 WAIT-STS    PIC S9(9) BINARY VALUE -3.
+       01 NANO-TIME   PIC 9(18) BINARY VALUE 10000.
+       PROCEDURE DIVISION.
+
+           CALL "CBL_GC_FORK" RETURNING CHILD-PID.
+           IF CHILD-PID = ZERO
+               PERFORM CHILD-CODE
+           ELSE
+               PERFORM PARENT-CODE
+           END-IF.
+
+           STOP RUN.
+
+       CHILD-CODE.
+           CALL "C$GETPID" RETURNING MY-PID.
+           CALL "C$SLEEP"  USING 1 .
+           DISPLAY "Hello, I am the child".
+
+       PARENT-CODE.
+           CALL "C$GETPID" RETURNING MY-PID.
+           DISPLAY "Hello, I am the parent".
+           CALL "CBL_GC_WAITPID" USING CHILD-PID RETURNING WAIT-STS.
+           DISPLAY "Child ended status " WAIT-STS.
+
+_ATEOF
+
+
+{ set +x
+$as_echo "$at_srcdir/run_extensions.at:3239: cobc -x -std=mf -debug -Wall prog.cob"
+at_fn_check_prepare_trace "run_extensions.at:3239"
+( $at_check_trace; cobc -x -std=mf -debug -Wall prog.cob
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+at_fn_diff_devnull "$at_stderr" || at_failed=:
+at_fn_diff_devnull "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3239"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+
+{ set +x
+$as_echo "$at_srcdir/run_extensions.at:3241: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3241"
+( $at_check_trace; ./prog
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+at_fn_diff_devnull "$at_stderr" || at_failed=:
+echo >>"$at_stdout"; $as_echo "Hello, I am the parent
+Hello, I am the child
+Child ended status +0000000000
+" | \
+  $at_diff - "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3241"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+
+  set +x
+  $at_times_p && times >"$at_times_file"
+) 5>&1 2>&1 7>&- | eval $at_tee_pipe
+read at_status <"$at_status_file"
+#AT_STOP_561
+#AT_START_562
+at_fn_group_banner 562 'run_extensions.at:3249' \
+  "System routine CBL_COPY_FILE" "                   " 3
+at_xfail=no
+(
+  $as_echo "562. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56617,41 +56699,41 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3231: \$COMPILE prog2.cob"
-at_fn_check_prepare_dynamic "$COMPILE prog2.cob" "run_extensions.at:3231"
+$as_echo "$at_srcdir/run_extensions.at:3276: \$COMPILE prog2.cob"
+at_fn_check_prepare_dynamic "$COMPILE prog2.cob" "run_extensions.at:3276"
 ( $at_check_trace; $COMPILE prog2.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3231"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3276"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3232: ./prog2"
-at_fn_check_prepare_trace "run_extensions.at:3232"
+$as_echo "$at_srcdir/run_extensions.at:3277: ./prog2"
+at_fn_check_prepare_trace "run_extensions.at:3277"
 ( $at_check_trace; ./prog2
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3232"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3277"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3233: diff prog.cob prog3.cob"
-at_fn_check_prepare_trace "run_extensions.at:3233"
+$as_echo "$at_srcdir/run_extensions.at:3278: diff prog.cob prog3.cob"
+at_fn_check_prepare_trace "run_extensions.at:3278"
 ( $at_check_trace; diff prog.cob prog3.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3233"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3278"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -56660,13 +56742,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_561
-#AT_START_562
-at_fn_group_banner 562 'run_extensions.at:3238' \
+#AT_STOP_562
+#AT_START_563
+at_fn_group_banner 563 'run_extensions.at:3283' \
   "System routines for directories" "                " 3
 at_xfail=no
 (
-  $as_echo "562. $at_setup_line: testing $at_desc ..."
+  $as_echo "563. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56705,41 +56787,41 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3272: \$COMPILE prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3272"
+$as_echo "$at_srcdir/run_extensions.at:3317: \$COMPILE prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3317"
 ( $at_check_trace; $COMPILE prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3272"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3317"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3273: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3273"
+$as_echo "$at_srcdir/run_extensions.at:3318: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3318"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3273"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3318"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3274: test -e abcd"
-at_fn_check_prepare_trace "run_extensions.at:3274"
+$as_echo "$at_srcdir/run_extensions.at:3319: test -e abcd"
+at_fn_check_prepare_trace "run_extensions.at:3319"
 ( $at_check_trace; test -e abcd
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 1 $at_status "$at_srcdir/run_extensions.at:3274"
+at_fn_check_status 1 $at_status "$at_srcdir/run_extensions.at:3319"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -56748,13 +56830,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_562
-#AT_START_563
-at_fn_group_banner 563 'run_extensions.at:3279' \
+#AT_STOP_563
+#AT_START_564
+at_fn_group_banner 564 'run_extensions.at:3324' \
   "System routines for files" "                      " 3
 at_xfail=no
 (
-  $as_echo "563. $at_setup_line: testing $at_desc ..."
+  $as_echo "564. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56864,34 +56946,34 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3382: \$COMPILE prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3382"
+$as_echo "$at_srcdir/run_extensions.at:3427: \$COMPILE prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3427"
 ( $at_check_trace; $COMPILE prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3382"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3427"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3383: \$COMPILE prog2.cob"
-at_fn_check_prepare_dynamic "$COMPILE prog2.cob" "run_extensions.at:3383"
+$as_echo "$at_srcdir/run_extensions.at:3428: \$COMPILE prog2.cob"
+at_fn_check_prepare_dynamic "$COMPILE prog2.cob" "run_extensions.at:3428"
 ( $at_check_trace; $COMPILE prog2.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3383"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3428"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3384: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3384"
+$as_echo "$at_srcdir/run_extensions.at:3429: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3429"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -56902,20 +56984,20 @@ libcob: prog.cob: 15: warning: call to CBL_OPEN_FILE with wrong access mode: 55
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3384"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3429"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3389: ./prog2"
-at_fn_check_prepare_trace "run_extensions.at:3389"
+$as_echo "$at_srcdir/run_extensions.at:3434: ./prog2"
+at_fn_check_prepare_trace "run_extensions.at:3434"
 ( $at_check_trace; ./prog2
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3389"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3434"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -56924,13 +57006,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_563
-#AT_START_564
-at_fn_group_banner 564 'run_extensions.at:3394' \
+#AT_STOP_564
+#AT_START_565
+at_fn_group_banner 565 'run_extensions.at:3439' \
   "Conditional/define directives (1)" "              " 3
 at_xfail=no
 (
-  $as_echo "564. $at_setup_line: testing $at_desc ..."
+  $as_echo "565. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56954,21 +57036,21 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3413: \$COMPILE prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3413"
+$as_echo "$at_srcdir/run_extensions.at:3458: \$COMPILE prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE prog.cob" "run_extensions.at:3458"
 ( $at_check_trace; $COMPILE prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3413"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3458"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3414: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3414"
+$as_echo "$at_srcdir/run_extensions.at:3459: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3459"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -56976,68 +57058,7 @@ $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 echo >>"$at_stdout"; $as_echo "OK" | \
   $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3414"
-$at_failed && at_fn_log_failure
-$at_traceon; }
-
-
-  set +x
-  $at_times_p && times >"$at_times_file"
-) 5>&1 2>&1 7>&- | eval $at_tee_pipe
-read at_status <"$at_status_file"
-#AT_STOP_564
-#AT_START_565
-at_fn_group_banner 565 'run_extensions.at:3419' \
-  "Conditional/define directives (2)" "              " 3
-at_xfail=no
-(
-  $as_echo "565. $at_setup_line: testing $at_desc ..."
-  $at_traceon
-
-
-
-cat >prog.cob <<'_ATEOF'
-
-       IDENTIFICATION   DIVISION.
-       PROGRAM-ID.      prog.
-       DATA             DIVISION.
-       WORKING-STORAGE  SECTION.
-       PROCEDURE        DIVISION.
-       >>IF ACTIVATE DEFINED
-           DISPLAY "OK" NO ADVANCING
-           END-DISPLAY
-       >>ELSE
-           DISPLAY "NOTOK" NO ADVANCING
-           END-DISPLAY
-       >>END-IF
-           STOP RUN.
-_ATEOF
-
-
-{ set +x
-$as_echo "$at_srcdir/run_extensions.at:3438: \$COMPILE -DACTIVATE prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE prog.cob" "run_extensions.at:3438"
-( $at_check_trace; $COMPILE -DACTIVATE prog.cob
-) >>"$at_stdout" 2>>"$at_stderr" 5>&-
-at_status=$? at_failed=false
-$at_check_filter
-at_fn_diff_devnull "$at_stderr" || at_failed=:
-at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3438"
-$at_failed && at_fn_log_failure
-$at_traceon; }
-
-{ set +x
-$as_echo "$at_srcdir/run_extensions.at:3439: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3439"
-( $at_check_trace; ./prog
-) >>"$at_stdout" 2>>"$at_stderr" 5>&-
-at_status=$? at_failed=false
-$at_check_filter
-at_fn_diff_devnull "$at_stderr" || at_failed=:
-echo >>"$at_stdout"; $as_echo "OK" | \
-  $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3439"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3459"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -57048,8 +57069,8 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_565
 #AT_START_566
-at_fn_group_banner 566 'run_extensions.at:3444' \
-  "Conditional/define directives (3)" "              " 3
+at_fn_group_banner 566 'run_extensions.at:3464' \
+  "Conditional/define directives (2)" "              " 3
 at_xfail=no
 (
   $as_echo "566. $at_setup_line: testing $at_desc ..."
@@ -57065,9 +57086,6 @@ cat >prog.cob <<'_ATEOF'
        WORKING-STORAGE  SECTION.
        PROCEDURE        DIVISION.
        >>IF ACTIVATE DEFINED
-           DISPLAY "NOTOK" NO ADVANCING
-           END-DISPLAY
-       >>ELIF ACTIVATE2 DEFINED
            DISPLAY "OK" NO ADVANCING
            END-DISPLAY
        >>ELSE
@@ -57079,21 +57097,21 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3466: \$COMPILE -DACTIVATE2 prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3466"
-( $at_check_trace; $COMPILE -DACTIVATE2 prog.cob
+$as_echo "$at_srcdir/run_extensions.at:3483: \$COMPILE -DACTIVATE prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE prog.cob" "run_extensions.at:3483"
+( $at_check_trace; $COMPILE -DACTIVATE prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3466"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3483"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3467: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3467"
+$as_echo "$at_srcdir/run_extensions.at:3484: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3484"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -57101,7 +57119,7 @@ $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 echo >>"$at_stdout"; $as_echo "OK" | \
   $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3467"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3484"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -57112,8 +57130,8 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_566
 #AT_START_567
-at_fn_group_banner 567 'run_extensions.at:3472' \
-  "Conditional/define directives (4)" "              " 3
+at_fn_group_banner 567 'run_extensions.at:3489' \
+  "Conditional/define directives (3)" "              " 3
 at_xfail=no
 (
   $as_echo "567. $at_setup_line: testing $at_desc ..."
@@ -57132,6 +57150,8 @@ cat >prog.cob <<'_ATEOF'
            DISPLAY "NOTOK" NO ADVANCING
            END-DISPLAY
        >>ELIF ACTIVATE2 DEFINED
+           DISPLAY "OK" NO ADVANCING
+           END-DISPLAY
        >>ELSE
            DISPLAY "NOTOK" NO ADVANCING
            END-DISPLAY
@@ -57141,28 +57161,29 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3492: \$COMPILE -DACTIVATE2 prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3492"
+$as_echo "$at_srcdir/run_extensions.at:3511: \$COMPILE -DACTIVATE2 prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3511"
 ( $at_check_trace; $COMPILE -DACTIVATE2 prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3492"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3511"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3493: ./prog"
-at_fn_check_prepare_trace "run_extensions.at:3493"
+$as_echo "$at_srcdir/run_extensions.at:3512: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3512"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
-at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3493"
+echo >>"$at_stdout"; $as_echo "OK" | \
+  $at_diff - "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3512"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -57173,11 +57194,72 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_567
 #AT_START_568
-at_fn_group_banner 568 'run_extensions.at:3498' \
-  "Conditional/define directives (5)" "              " 3
+at_fn_group_banner 568 'run_extensions.at:3517' \
+  "Conditional/define directives (4)" "              " 3
 at_xfail=no
 (
   $as_echo "568. $at_setup_line: testing $at_desc ..."
+  $at_traceon
+
+
+
+cat >prog.cob <<'_ATEOF'
+
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       PROCEDURE        DIVISION.
+       >>IF ACTIVATE DEFINED
+           DISPLAY "NOTOK" NO ADVANCING
+           END-DISPLAY
+       >>ELIF ACTIVATE2 DEFINED
+       >>ELSE
+           DISPLAY "NOTOK" NO ADVANCING
+           END-DISPLAY
+       >>END-IF
+           STOP RUN.
+_ATEOF
+
+
+{ set +x
+$as_echo "$at_srcdir/run_extensions.at:3537: \$COMPILE -DACTIVATE2 prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3537"
+( $at_check_trace; $COMPILE -DACTIVATE2 prog.cob
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+at_fn_diff_devnull "$at_stderr" || at_failed=:
+at_fn_diff_devnull "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3537"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+{ set +x
+$as_echo "$at_srcdir/run_extensions.at:3538: ./prog"
+at_fn_check_prepare_trace "run_extensions.at:3538"
+( $at_check_trace; ./prog
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+at_fn_diff_devnull "$at_stderr" || at_failed=:
+at_fn_diff_devnull "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3538"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+
+  set +x
+  $at_times_p && times >"$at_times_file"
+) 5>&1 2>&1 7>&- | eval $at_tee_pipe
+read at_status <"$at_status_file"
+#AT_STOP_568
+#AT_START_569
+at_fn_group_banner 569 'run_extensions.at:3543' \
+  "Conditional/define directives (5)" "              " 3
+at_xfail=no
+(
+  $as_echo "569. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57201,8 +57283,8 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_extensions.at:3517: \$COMPILE -DACTIVATE2 prog.cob"
-at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3517"
+$as_echo "$at_srcdir/run_extensions.at:3562: \$COMPILE -DACTIVATE2 prog.cob"
+at_fn_check_prepare_dynamic "$COMPILE -DACTIVATE2 prog.cob" "run_extensions.at:3562"
 ( $at_check_trace; $COMPILE -DACTIVATE2 prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -57211,7 +57293,7 @@ at_fn_diff_devnull "$at_stderr" || at_failed=:
 echo >>"$at_stdout"; $as_echo "OK
 " | \
   $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3517"
+at_fn_check_status 0 $at_status "$at_srcdir/run_extensions.at:3562"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -57220,13 +57302,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_568
-#AT_START_569
-at_fn_group_banner 569 'data_binary.at:23' \
+#AT_STOP_569
+#AT_START_570
+at_fn_group_banner 570 'data_binary.at:23' \
   "BINARY: 2-4-8 big-endian" "                       " 4
 at_xfail=no
 (
-  $as_echo "569. $at_setup_line: testing $at_desc ..."
+  $as_echo "570. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57473,13 +57555,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_569
-#AT_START_570
-at_fn_group_banner 570 'data_binary.at:205' \
+#AT_STOP_570
+#AT_START_571
+at_fn_group_banner 571 'data_binary.at:205' \
   "BINARY: 2-4-8 native" "                           " 4
 at_xfail=no
 (
-  $as_echo "570. $at_setup_line: testing $at_desc ..."
+  $as_echo "571. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57744,13 +57826,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_570
-#AT_START_571
-at_fn_group_banner 571 'data_binary.at:393' \
+#AT_STOP_571
+#AT_START_572
+at_fn_group_banner 572 'data_binary.at:393' \
   "BINARY: 1-2-4-8 big-endian" "                     " 4
 at_xfail=no
 (
-  $as_echo "571. $at_setup_line: testing $at_desc ..."
+  $as_echo "572. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57997,13 +58079,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_571
-#AT_START_572
-at_fn_group_banner 572 'data_binary.at:575' \
+#AT_STOP_572
+#AT_START_573
+at_fn_group_banner 573 'data_binary.at:575' \
   "BINARY: 1-2-4-8 native" "                         " 4
 at_xfail=no
 (
-  $as_echo "572. $at_setup_line: testing $at_desc ..."
+  $as_echo "573. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58268,13 +58350,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_572
-#AT_START_573
-at_fn_group_banner 573 'data_binary.at:763' \
+#AT_STOP_573
+#AT_START_574
+at_fn_group_banner 574 'data_binary.at:763' \
   "BINARY: 1--8 big-endian" "                        " 4
 at_xfail=no
 (
-  $as_echo "573. $at_setup_line: testing $at_desc ..."
+  $as_echo "574. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58521,13 +58603,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_573
-#AT_START_574
-at_fn_group_banner 574 'data_binary.at:945' \
+#AT_STOP_574
+#AT_START_575
+at_fn_group_banner 575 'data_binary.at:945' \
   "BINARY: 1--8 native" "                            " 4
 at_xfail=no
 (
-  $as_echo "574. $at_setup_line: testing $at_desc ..."
+  $as_echo "575. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58792,13 +58874,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_574
-#AT_START_575
-at_fn_group_banner 575 'data_binary.at:1133' \
+#AT_STOP_575
+#AT_START_576
+at_fn_group_banner 576 'data_binary.at:1133' \
   "BINARY: full-print" "                             " 4
 at_xfail=no
 (
-  $as_echo "575. $at_setup_line: testing $at_desc ..."
+  $as_echo "576. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58876,13 +58958,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_575
-#AT_START_576
-at_fn_group_banner 576 'data_display.at:21' \
+#AT_STOP_576
+#AT_START_577
+at_fn_group_banner 577 'data_display.at:21' \
   "DISPLAY: Sign ASCII" "                            " 4
 at_xfail=no
 (
-  $as_echo "576. $at_setup_line: testing $at_desc ..."
+  $as_echo "577. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58971,13 +59053,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_576
-#AT_START_577
-at_fn_group_banner 577 'data_display.at:80' \
+#AT_STOP_577
+#AT_START_578
+at_fn_group_banner 578 'data_display.at:80' \
   "DISPLAY: Sign ASCII (2)" "                        " 4
 at_xfail=no
 (
-  $as_echo "577. $at_setup_line: testing $at_desc ..."
+  $as_echo "578. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59053,13 +59135,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_577
-#AT_START_578
-at_fn_group_banner 578 'data_display.at:126' \
+#AT_STOP_578
+#AT_START_579
+at_fn_group_banner 579 'data_display.at:126' \
   "DISPLAY: Sign EBCDIC" "                           " 4
 at_xfail=no
 (
-  $as_echo "578. $at_setup_line: testing $at_desc ..."
+  $as_echo "579. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59135,13 +59217,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_578
-#AT_START_579
-at_fn_group_banner 579 'data_packed.at:25' \
+#AT_STOP_579
+#AT_START_580
+at_fn_group_banner 580 'data_packed.at:25' \
   "PACKED-DECIMAL dump" "                            " 4
 at_xfail=no
 (
-  $as_echo "579. $at_setup_line: testing $at_desc ..."
+  $as_echo "580. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59318,13 +59400,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_579
-#AT_START_580
-at_fn_group_banner 580 'data_packed.at:162' \
+#AT_STOP_580
+#AT_START_581
+at_fn_group_banner 581 'data_packed.at:162' \
   "PACKED-DECIMAL display" "                         " 4
 at_xfail=no
 (
-  $as_echo "580. $at_setup_line: testing $at_desc ..."
+  $as_echo "581. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59408,13 +59490,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_580
-#AT_START_581
-at_fn_group_banner 581 'data_packed.at:218' \
+#AT_STOP_581
+#AT_START_582
+at_fn_group_banner 582 'data_packed.at:218' \
   "PACKED-DECIMAL move" "                            " 4
 at_xfail=no
 (
-  $as_echo "581. $at_setup_line: testing $at_desc ..."
+  $as_echo "582. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59500,13 +59582,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_581
-#AT_START_582
-at_fn_group_banner 582 'data_packed.at:276' \
+#AT_STOP_582
+#AT_START_583
+at_fn_group_banner 583 'data_packed.at:276' \
   "PACKED-DECIMAL arithmetic (1)" "                  " 4
 at_xfail=no
 (
-  $as_echo "582. $at_setup_line: testing $at_desc ..."
+  $as_echo "583. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59574,13 +59656,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_582
-#AT_START_583
-at_fn_group_banner 583 'data_packed.at:316' \
+#AT_STOP_583
+#AT_START_584
+at_fn_group_banner 584 'data_packed.at:316' \
   "PACKED-DECIMAL arithmetic (2)" "                  " 4
 at_xfail=no
 (
-  $as_echo "583. $at_setup_line: testing $at_desc ..."
+  $as_echo "584. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59645,13 +59727,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_583
-#AT_START_584
-at_fn_group_banner 584 'data_packed.at:353' \
+#AT_STOP_584
+#AT_START_585
+at_fn_group_banner 585 'data_packed.at:353' \
   "PACKED-DECIMAL numeric test (1)" "                " 4
 at_xfail=no
 (
-  $as_echo "584. $at_setup_line: testing $at_desc ..."
+  $as_echo "585. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59822,13 +59904,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_584
-#AT_START_585
-at_fn_group_banner 585 'data_packed.at:494' \
+#AT_STOP_585
+#AT_START_586
+at_fn_group_banner 586 'data_packed.at:494' \
   "PACKED-DECIMAL numeric test (2)" "                " 4
 at_xfail=no
 (
-  $as_echo "585. $at_setup_line: testing $at_desc ..."
+  $as_echo "586. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59999,13 +60081,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_585
-#AT_START_586
-at_fn_group_banner 586 'data_packed.at:635' \
+#AT_STOP_586
+#AT_START_587
+at_fn_group_banner 587 'data_packed.at:635' \
   "COMP-6 display" "                                 " 4
 at_xfail=no
 (
-  $as_echo "586. $at_setup_line: testing $at_desc ..."
+  $as_echo "587. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60071,13 +60153,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_586
-#AT_START_587
-at_fn_group_banner 587 'data_packed.at:671' \
+#AT_STOP_587
+#AT_START_588
+at_fn_group_banner 588 'data_packed.at:671' \
   "COMP-6 move" "                                    " 4
 at_xfail=no
 (
-  $as_echo "587. $at_setup_line: testing $at_desc ..."
+  $as_echo "588. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60153,13 +60235,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_587
-#AT_START_588
-at_fn_group_banner 588 'data_packed.at:717' \
+#AT_STOP_588
+#AT_START_589
+at_fn_group_banner 589 'data_packed.at:717' \
   "COMP-6 arithmetic" "                              " 4
 at_xfail=no
 (
-  $as_echo "588. $at_setup_line: testing $at_desc ..."
+  $as_echo "589. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60220,13 +60302,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_588
-#AT_START_589
-at_fn_group_banner 589 'data_packed.at:748' \
+#AT_STOP_589
+#AT_START_590
+at_fn_group_banner 590 'data_packed.at:748' \
   "COMP-6 numeric test " "                           " 4
 at_xfail=no
 (
-  $as_echo "589. $at_setup_line: testing $at_desc ..."
+  $as_echo "590. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60346,13 +60428,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_589
-#AT_START_590
-at_fn_group_banner 590 'data_pointer.at:21' \
+#AT_STOP_590
+#AT_START_591
+at_fn_group_banner 591 'data_pointer.at:21' \
   "POINTER: display" "                               " 4
 at_xfail=no
 (
-  $as_echo "590. $at_setup_line: testing $at_desc ..."
+  $as_echo "591. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60478,4 +60560,4 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_590
+#AT_STOP_591

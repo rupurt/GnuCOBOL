@@ -1,4 +1,8 @@
 
+2016-11-17  Ron Norman <rjn@inglenet.com>
+
+	* run_extensions.at: Add test case for CBL_GC_FORK & CBL_GC_WAITPID
+
 2016-11-15  Ron Norman <rjn@inglenet.com>
 
 	* run_misc.at: 
