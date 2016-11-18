@@ -73,7 +73,9 @@
 #define	fdopen		_fdopen
 #define lseek		_lseeki64
 #endif
+#ifndef off_t
 #define off_t		cob_s64_t
+#endif
 
 #ifndef	_O_TEMPORARY
 #define	_O_TEMPORARY	0
@@ -3658,7 +3660,7 @@ indexed_write_internal (cob_file *f, const int rewrite, const int opt)
 			len = bdb_savekey(f, p->temp_key, f->record->data, 0);
 			p->data.data = p->temp_key;
 			p->data.size = len;
-			memcpy (p->data.data + p->data.size, &dupno, sizeof(unsigned int));
+			memcpy (((char*)(p->data.data)) + p->data.size, &dupno, sizeof(unsigned int));
 			p->data.size += sizeof(unsigned int);
 		} else {
 			len = bdb_savekey(f, p->temp_key, f->record->data, 0);
