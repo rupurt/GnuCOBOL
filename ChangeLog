@@ -1,4 +1,8 @@
 
+2016-11-17  Ron Norman <rjn@inglenet.com>
+
+	* configure.ac: check for sys/wait.h (for CBL_GC_WAITPID)
+
 2016-05-04  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* general: removed project files and references to Visual C < 2005
@@ -27,7 +31,7 @@
 	  regenerated all Makefiles
 	* configure.ac: added AC_CONFIG_AUX_DIR([build_aux])
 
-2015-04-27  Ron Norman
+2015-04-27  Ron Norman <rjn@inglenet.com>
 
 	* Added support for Micro Focus format sequential and relative
 	  files. New compiler directive -fmf-files sets all sequential
