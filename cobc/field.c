@@ -529,9 +529,9 @@ validate_field_1 (struct cb_field *f)
 
 	/* Validate OCCURS */
 	if (f->flag_occurs) {
-		if ((!cb_verify (cb_top_level_occurs_clause, "01/77 OCCURS") &&
-		     (f->level == 01 || f->level == 77)) ||
-		    (f->level == 66 || f->level == 88)) {
+		if (((f->level == 01 || f->level == 77) 
+			&& !cb_verify (cb_top_level_occurs_clause, "01/77 OCCURS")) 
+		|| (f->level == 66 || f->level == 88)) {
 			level_redundant_error (x, "OCCURS");
 		}
 		for (l = f->index_list; l; l = CB_CHAIN (l)) {
