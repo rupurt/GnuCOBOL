@@ -224,9 +224,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY -frelax-syntax prog.cob], [1], ,
-[prog.cob: 9: Warning: 01/77 OCCURS used
-prog.cob: 9: Warning: 01/77 OCCURS used
-prog.cob: 10: Warning: Subscripts missing for 'X' - Defaulting to 1
+[prog.cob: 10: Warning: Subscripts missing for 'X' - Defaulting to 1
 prog.cob: 14: Error: 'X' requires 1 subscript
 prog.cob: 16: Warning: Subscripts missing for 'Y' - Defaulting to 1
 prog.cob: 20: Error: 'Y' requires 2 subscripts

@@ -877,6 +877,7 @@ struct cb_file {
 	int			organization;		/* ORGANIZATION */
 	int			access_mode;		/* ACCESS MODE */
 	int			lock_mode;		/* LOCK MODE */
+	int			fd_share_mode;		/* SHARING mode */
 	int			special;		/* Special file */
 	int			same_clause;		/* SAME clause */
 	unsigned int		flag_finalized	: 1;	/* Is finalized */
@@ -1177,12 +1178,18 @@ struct cb_statement {
 	cb_tree			null_check;		/* NULL check */
 	cb_tree			debug_check;		/* Field DEBUG */
 	cb_tree			debug_nodups;		/* Field DEBUG dups */
+	cb_tree			retry;			/* RETRY expression */
 	struct cb_attr_struct	*attr_ptr;		/* Attributes */
 	int			handler_id;		/* Handler id */
 	unsigned int		flag_no_based	: 1;	/* Check BASED */
 	unsigned int		flag_in_debug	: 1;	/* In DEBUGGING */
 	unsigned int		flag_merge	: 1;	/* Is MERGE */
 	unsigned int		flag_callback	: 1;	/* DEBUG Callback */
+	unsigned int		flag_retry_times: 1;	/* RETRY exp TIMES */
+	unsigned int		flag_retry_seconds: 1;	/* RETRY exp SECONDS */
+	unsigned int		flag_retry_forever: 1;	/* RETRY FOREVER */
+	unsigned int		flag_advancing_lock: 1;	/* ADVANCING ON LOCK */
+	unsigned int		flag_ignore_lock: 1;	/* IGNORE LOCK */
 };
 
 #define CB_STATEMENT(x)		(CB_TREE_CAST (CB_TAG_STATEMENT, struct cb_statement, x))
@@ -1395,6 +1402,7 @@ extern cb_tree			cb_int2;
 extern cb_tree			cb_int3;
 extern cb_tree			cb_int4;
 extern cb_tree			cb_int5;
+extern cb_tree			cb_int6;
 extern cb_tree			cb_i[COB_MAX_SUBSCRIPTS];
 extern cb_tree			cb_error_node;
 

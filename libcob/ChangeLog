@@ -1,4 +1,12 @@
 
+2016-11-30  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c,common.c,common.h,termio.c
+	  Compiler updated for handling the SHARING, RETRY, ADVANCING LOCK
+	  and IGNORE LOCK phrases, Mainly for RELATIVE files now.
+	  This is a 'work in progress' and more updates will follow to include
+	  support for INDEXED and SEQUENTIAL files
+
 2016-11-17 Ron Norman <rjn@inglenet.com>
 
 	* common.c,common.h,system.def: added cob_sys_fork for CBL_GC_FORK

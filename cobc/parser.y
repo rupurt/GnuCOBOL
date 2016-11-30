@@ -2880,7 +2880,7 @@ lock_with:
   }
 | WITH ROLLBACK
   {
-	current_file->lock_mode |= COB_LOCK_MULTIPLE;
+	current_file->lock_mode |= (COB_LOCK_ROLLBACK|COB_LOCK_MULTIPLE);
 	PENDING ("WITH ROLLBACK");
   }
 ;
@@ -3032,9 +3032,9 @@ sharing_clause:
 ;
 
 sharing_option:
-  ALL _other			{ $$ = NULL; }
-| NO _other			{ $$ = cb_int (COB_LOCK_OPEN_EXCLUSIVE); }
-| READ ONLY			{ $$ = NULL; }
+  ALL _other			{ $$ = cb_int (COB_SHARE_ALL_OTHER); }
+| NO _other			{ $$ = cb_int (COB_SHARE_NO_OTHER); }
+| READ ONLY			{ $$ = cb_int (COB_SHARE_READ_ONLY); }
 ;
 
 
@@ -8131,44 +8131,66 @@ open_statement:
 ;
 
 open_body:
-  open_mode open_sharing file_name_list open_option
+  open_mode open_sharing _retry_phrase file_name_list open_option
   {
 	cb_tree l;
 	cb_tree x;
+	cb_tree retry;
+	int	retry_times, retry_seconds, retry_forever;
 
-	if ($2 && $4) {
-		cb_error_x (CB_TREE (current_statement),
-			    _("%s and %s are mutually exclusive"), "SHARING", "LOCK clauses");
-	}
-	if ($4) {
-		x = $4;
-	} else {
-		x = $2;
-	}
-	for (l = $3; l; l = CB_CHAIN (l)) {
-		if (CB_VALID_TREE (CB_VALUE (l))) {
-			begin_implicit_statement ();
-			cb_emit_open (CB_VALUE (l), $1, x);
-		}
-	}
-  }
-| open_body open_mode open_sharing file_name_list open_option
-  {
-	cb_tree l;
-	cb_tree x;
-
-	if ($3 && $5) {
+	if ($2 && $5) {
 		cb_error_x (CB_TREE (current_statement),
 			    _("%s and %s are mutually exclusive"), "SHARING", "LOCK clauses");
 	}
 	if ($5) {
 		x = $5;
 	} else {
-		x = $3;
+		x = $2;
 	}
+	retry = current_statement->retry;
+	retry_times = current_statement->flag_retry_times;
+	retry_seconds = current_statement->flag_retry_seconds;
+	retry_forever = current_statement->flag_retry_forever;
+
 	for (l = $4; l; l = CB_CHAIN (l)) {
 		if (CB_VALID_TREE (CB_VALUE (l))) {
 			begin_implicit_statement ();
+			current_statement->retry = retry;
+			current_statement->flag_retry_times = retry_times;
+			current_statement->flag_retry_seconds = retry_seconds;
+			current_statement->flag_retry_forever = retry_forever;
+			cb_emit_open (CB_VALUE (l), $1, x);
+		}
+	}
+  }
+| open_body open_mode open_sharing _retry_phrase file_name_list open_option
+  {
+	cb_tree l;
+	cb_tree x;
+	cb_tree retry;
+	int	retry_times, retry_seconds, retry_forever;
+
+	if ($3 && $6) {
+		cb_error_x (CB_TREE (current_statement),
+			    _("%s and %s are mutually exclusive"), "SHARING", "LOCK clauses");
+	}
+	if ($6) {
+		x = $6;
+	} else {
+		x = $3;
+	}
+	retry = current_statement->retry;
+	retry_times = current_statement->flag_retry_times;
+	retry_seconds = current_statement->flag_retry_seconds;
+	retry_forever = current_statement->flag_retry_forever;
+
+	for (l = $5; l; l = CB_CHAIN (l)) {
+		if (CB_VALID_TREE (CB_VALUE (l))) {
+			begin_implicit_statement ();
+			current_statement->retry = retry;
+			current_statement->flag_retry_times = retry_times;
+			current_statement->flag_retry_seconds = retry_seconds;
+			current_statement->flag_retry_forever = retry_forever;
 			cb_emit_open (CB_VALUE (l), $2, x);
 		}
 	}
@@ -8439,13 +8461,19 @@ lock_phrases:
 
 ignoring_lock:
   IGNORING LOCK
+  {
+	current_statement->flag_ignore_lock = 1;
+  }
 | _with IGNORE LOCK
+  {
+	current_statement->flag_ignore_lock = 1;
+  }
 ;
   
 advancing_lock_or_retry:
   ADVANCING _on LOCK
   {
-	PENDING ("ADVANCING ON LOCK");
+	current_statement->flag_advancing_lock = 1;
   }
 | retry_phrase
 ;
@@ -8458,7 +8486,6 @@ _retry_phrase:
 retry_phrase:
   retry_options
   {
-	PENDING ("RETRY");
 	cobc_cs_check = 0;
   }
 ;
@@ -8466,8 +8493,20 @@ retry_phrase:
 retry_options:
   /* HACK: added _for to fix shift/reduce conflict. */
   RETRY _for exp TIMES
+  {
+	current_statement->retry = $3;
+	current_statement->flag_retry_times = 1;
+  }
 | RETRY _for exp SECONDS
+  {
+	current_statement->retry = $3;
+	current_statement->flag_retry_seconds = 1;
+  }
 | RETRY FOREVER
+  {
+	current_statement->retry = NULL;
+	current_statement->flag_retry_forever = 1;
+  }
 ;
 
 _extended_with_lock:
@@ -8482,11 +8521,10 @@ extended_with_lock:
   }
 | _with KEPT LOCK
   {
-   $$ = cb_int5;
+	$$ = cb_int5;
   }
 | _with WAIT
   {
-	/* TO-DO: Merge with RETRY phrase */
 	$$ = cb_int4;
   }
 ;
@@ -9283,7 +9321,6 @@ terminate_statement:
 terminate_body:
   report_name
   {
-	begin_implicit_statement ();
 	begin_implicit_statement ();
 	if ($1 != cb_error_node) {
 	    cb_emit_terminate($1);

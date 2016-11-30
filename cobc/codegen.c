@@ -5180,11 +5180,13 @@ output_stmt (cb_tree x)
 	struct cb_if		*ip;
 	struct cb_para_label	*pal;
 	struct cb_set_attr	*sap;
+	struct cb_file		*fl;
 #ifdef	COB_NON_ALIGNED
 	struct cb_cast		*cp;
 #endif
 	size_t			size;
 	int			code;
+	char			assgn[80];
 
 	stack_id = 0;
 	if (x == NULL) {
@@ -5234,6 +5236,31 @@ output_stmt (cb_tree x)
 		if (!p->file && (p->handler1 || p->handler2)) {
 #endif
 			output_line ("cob_glob_ptr->cob_exception_code = 0;");
+		}
+
+		if(p->file) {
+			fl = CB_FILE (p->file);
+			if(p->flag_retry_forever) {
+				strcpy(assgn,"COB_RETRY_FOREVER");
+			} else
+			if(p->flag_retry_times) {
+				strcpy(assgn,"COB_RETRY_TIMES");
+				output_prefix ();
+				output ("%s%s->retry_times = ", CB_PREFIX_FILE, fl->cname);
+				output_integer (p->retry);
+				output (";\n");
+			} else
+			if(p->flag_retry_seconds) {
+				strcpy(assgn,"COB_RETRY_SECONDS");
+				output_prefix ();
+				output ("%s%s->retry_seconds = ", CB_PREFIX_FILE, fl->cname);
+				output_integer (p->retry);
+				output (";\n");
+			} else {
+				strcpy(assgn,"0");
+			}
+
+			output_line ("%s%s->retry_mode = %s;", CB_PREFIX_FILE, fl->cname,assgn);
 		}
 
 		if (p->null_check) {

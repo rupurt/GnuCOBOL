@@ -1837,11 +1837,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -frelax-syntax prog.cob], [0], [],
-[prog.cob: 14: Warning: 01/77 OCCURS used
-prog.cob: 14: Warning: 01/77 OCCURS used
-prog.cob: 14: Warning: 01/77 OCCURS used
-])
+AT_CHECK([$COMPILE -frelax-syntax prog.cob], [0], [], [])
 AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP

@@ -1,10 +1,11 @@
 
-2016-11-15  Ron Norman <rjn@inglenet.com>
+2016-11-30  Ron Norman <rjn@inglenet.com>
 
-	* codegen.c ((output_call, output_bin_field)): 
-	  Numeric literals being passed BY REFERENCE or BY CONTENT  
-	  will have the value passed as PIC S9(9) BINARY 
-	  and now get the correct field attributes set.
+	* parser.y,codegen.c,typeck.c,tree.h,tree.c
+	  Compiler updated for handling the SHARING, RETRY, ADVANCING LOCK
+	  and IGNORE LOCK phrases, Mainly for RELATIVE files now.
+	  This is a 'work in progress' and more updates will follow to include
+	  support for INDEXED and SEQUENTIAL files
 
 2016-11-14  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
