@@ -6119,6 +6119,7 @@ cb_check_overlapping (cb_tree src, cb_tree dst,
 			goto overlapret;
 		}
 	}
+
 	if (src_off >= dst_off && src_off < (dst_off + dst_size)) {
 		goto overlapret;
 	}
@@ -7727,20 +7728,29 @@ cb_emit_rewrite (cb_tree record, cb_tree from, cb_tree lockopt)
 	if (cb_validate_one (from)) {
 		return;
 	}
-	if (!CB_REF_OR_FIELD_P (cb_ref (record))) {
-		cb_error_x (CB_TREE (current_statement),
-			_("%s requires a record name as subject"), "REWRITE");
-		return;
-	}
-	if (CB_FIELD_PTR (record)->storage != CB_STORAGE_FILE) {
-		cb_error_x (CB_TREE (current_statement),
-			_("%s subject does not refer to a record name"), "REWRITE");
-		return;
-	}
+	if (CB_FILE_P (cb_ref (record))) {
+		file = cb_ref(record);		/* FILE filename: was used */
+		f = CB_FILE (file);
+		if(f->record->sister)
+			record = CB_TREE(f->record->sister);
+		else
+			record = CB_TREE(f->record);
+	} else {
+		if (!CB_REF_OR_FIELD_P (cb_ref (record))) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s requires a record name as subject"), "REWRITE");
+			return;
+		}
+		if (CB_FIELD_PTR (record)->storage != CB_STORAGE_FILE) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s subject does not refer to a record name"), "REWRITE");
+			return;
+		}
 
-	file = CB_TREE (CB_FIELD (cb_ref (record))->file);
-	if (!file || file == cb_error_node) {
-		return;
+		file = CB_TREE (CB_FIELD (cb_ref (record))->file);
+		if (!file || file == cb_error_node) {
+			return;
+		}
 	}
 	current_statement->file = file;
 	f = CB_FILE (file);
@@ -7767,7 +7777,8 @@ cb_emit_rewrite (cb_tree record, cb_tree from, cb_tree lockopt)
 	}
 
 	if (from) {
-		cb_emit (cb_build_move (from, record));
+		if(CB_FIELD_PTR (from) != CB_FIELD_PTR (record))
+			cb_emit (cb_build_move (from, record));
 	}
 
 	/* Check debugging on record name */
@@ -8640,19 +8651,28 @@ cb_emit_write (cb_tree record, cb_tree from, cb_tree opt, cb_tree lockopt)
 	if (cb_validate_one (from)) {
 		return;
 	}
-	if (!CB_REF_OR_FIELD_P (cb_ref (record))) {
-		cb_error_x (CB_TREE (current_statement),
-			_("%s requires a record name as subject"), "WRITE");
-		return;
-	}
-	if (CB_FIELD_PTR (record)->storage != CB_STORAGE_FILE) {
-		cb_error_x (CB_TREE (current_statement),
-			_("%s subject does not refer to a record name"), "WRITE");
-		return;
-	}
-	file = CB_TREE (CB_FIELD (cb_ref (record))->file);
-	if (!file || file == cb_error_node) {
-		return;
+	if (CB_FILE_P (cb_ref (record))) {
+		file = cb_ref(record);		/* FILE filename: was used */
+		f = CB_FILE (file);
+		if(f->record->sister)
+			record = CB_TREE(f->record->sister);
+		else
+			record = CB_TREE(f->record);
+	} else {
+		if (!CB_REF_OR_FIELD_P (cb_ref (record))) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s requires a record name as subject"), "WRITE");
+			return;
+		}
+		if (CB_FIELD_PTR (record)->storage != CB_STORAGE_FILE) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s subject does not refer to a record name"), "WRITE");
+			return;
+		}
+		file = CB_TREE (CB_FIELD (cb_ref (record))->file);
+		if (!file || file == cb_error_node) {
+			return;
+		}
 	}
 	current_statement->file = file;
 	f = CB_FILE (file);
@@ -8680,7 +8700,8 @@ cb_emit_write (cb_tree record, cb_tree from, cb_tree opt, cb_tree lockopt)
 	}
 
 	if (from) {
-		cb_emit (cb_build_move (from, record));
+		if(CB_FIELD_PTR (from) != CB_FIELD_PTR (record))
+			cb_emit (cb_build_move (from, record));
 	}
 
 	/* Check debugging on record name */

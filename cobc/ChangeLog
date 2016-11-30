@@ -1,6 +1,11 @@
 
 2016-11-30  Ron Norman <rjn@inglenet.com>
 
+	* parser.y,typeck.c
+	  Compiler updated for WRITE|REWRITE FILE filename
+
+2016-11-30  Ron Norman <rjn@inglenet.com>
+
 	* parser.y,codegen.c,typeck.c,tree.h,tree.c
 	  Compiler updated for handling the SHARING, RETRY, ADVANCING LOCK
 	  and IGNORE LOCK phrases, Mainly for RELATIVE files now.
