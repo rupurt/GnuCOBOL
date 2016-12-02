@@ -1,7 +1,14 @@
 
+2016-12-02  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c,common.h
+	  Changes to use error status 51 for record locked and 
+	  52 for DeadLock instead of 61 for both. 62 is used for 
+	  file sharing errors on OPEN of the file
+
 2016-11-30  Ron Norman <rjn@inglenet.com>
 
-	* fileio.c,common.c,common.h,termio.c
+	* fileio.c,common.c,common.h
 	  Compiler updated for handling the SHARING, RETRY, ADVANCING LOCK
 	  and IGNORE LOCK phrases, Mainly for RELATIVE files now.
 	  This is a 'work in progress' and more updates will follow to include

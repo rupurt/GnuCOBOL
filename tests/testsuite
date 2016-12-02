@@ -956,8 +956,8 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 344;run_file.at:1207;RELATIVE one Record;runfile;
 345;run_file.at:1616;SEQUENTIAL Multi-Record;runfile;
 346;run_file.at:1875;SEQUENTIAL one Record;runfile;
-347;run_file.at:2083;RELATIVE File Locking;fileio;
-348;run_file.at:2608;WRITE+REWRITE FILE name ;runfile;
+347;run_file.at:2082;RELATIVE File Locking;fileio;
+348;run_file.at:2617;WRITE+REWRITE FILE name ;runfile;
 349;run_reportwriter.at:23;Report Line Order;report;
 350;run_reportwriter.at:120;Report COL PLUS;report;
 351;run_reportwriter.at:189;Report Overlapping Fields;report;
@@ -32102,7 +32102,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_346
 #AT_START_347
-at_fn_group_banner 347 'run_file.at:2083' \
+at_fn_group_banner 347 'run_file.at:2082' \
   "RELATIVE File Locking" "                          " 3
 at_xfail=no
 (
@@ -32236,8 +32236,8 @@ cat >prog.cob <<'_ATEOF'
                MOVE "Control" TO WMI
                PERFORM LOADFILE
                PERFORM LOCK-EXCLUSIVE
-               CALL "SYSTEM" USING "./prog PARENT &"
-               CALL "SYSTEM" USING "./prog CHILD &"
+               CALL "SYSTEM" USING "./prog  PARENT &"
+               CALL "SYSTEM" USING "./prog  CHILD &"
                CALL "C$SLEEP" USING 2
                MOVE "continue test " TO MSG
                PERFORM DISPLAY-IT
@@ -32253,14 +32253,14 @@ cat >prog.cob <<'_ATEOF'
                CALL "C$SLEEP" USING 1
                PERFORM LOCK-RELEASE
                CALL "C$SLEEP" USING 1
-               CALL "SYSTEM" USING "./prog LOCK &"
-               CALL "SYSTEM" USING "./prog READADV &"
+               CALL "SYSTEM" USING "./prog  LOCK &"
+               CALL "SYSTEM" USING "./prog  READADV &"
                CALL "C$SLEEP" USING 6
                MOVE "waiting step 2 completion " TO MSG
                PERFORM DISPLAY-IT
                PERFORM LOCK-EXCLUSIVE
-               CALL "SYSTEM" USING "./prog UPDT &"
-               CALL "SYSTEM" USING "./prog CHILDUP &"
+               CALL "SYSTEM" USING "./prog  UPDT &"
+               CALL "SYSTEM" USING "./prog  CHILDUP &"
                PERFORM LOCK-RELEASE
                CALL "C$SLEEP" USING 3
                PERFORM LOCK-EXCLUSIVE
@@ -32317,6 +32317,12 @@ cat >prog.cob <<'_ATEOF'
                MOVE "Par Lck" TO WMI
                PERFORM READ-FILE-ADV
                OPEN I-O SHARING ALL OTHER FLATFILE2
+               MOVE 1 TO REC-NUM
+               READ FLATFILE2 WITH LOCK
+	       DELETE FLATFILE2
+               STRING "Deleted " C2-CUST-NUM "        1  Sts:"
+	              CUST-STAT INTO MSG
+               PERFORM DISPLAY-IT
                MOVE 3 TO REC-NUM
                READ FLATFILE2 WITH LOCK
                STRING "Read    " C2-CUST-NUM " Locked 3  Sts:"
@@ -32367,7 +32373,7 @@ cat >prog.cob <<'_ATEOF'
 
        READ-FILE-RETRY-SHARE.
            OPEN INPUT SHARING NO OTHER RETRY 10 SECONDS FLATFILE.
-           STRING "RETRY SHARE Open Sts:" CUST-STAT INTO MSG
+           STRING "RETRY SHARE Open           Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
            IF  CUST-STAT  = "00"
                PERFORM 2 TIMES
@@ -32384,7 +32390,7 @@ cat >prog.cob <<'_ATEOF'
 
        READ-FILE-RETRY-SHORT.
            OPEN INPUT SHARING NO OTHER RETRY 2 SECONDS FLATFILE.
-           STRING "RETRY SHORT Open Sts:" CUST-STAT INTO MSG
+           STRING "RETRY SHORT Open           Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
            IF  CUST-STAT  = "00"
                PERFORM 2 TIMES
@@ -32408,7 +32414,8 @@ cat >prog.cob <<'_ATEOF'
                   INTO MSG
            PERFORM DISPLAY-IT.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE TSP2-RECORD WITH NO LOCK
+           REWRITE FILE FLATFILE2 WITH NO LOCK
+      *    REWRITE TSP2-RECORD WITH NO LOCK
            STRING "REWRITE " C2-CUST-NUM " Trms:" C2-NO-TERMINALS
                   " Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
@@ -32417,7 +32424,7 @@ cat >prog.cob <<'_ATEOF'
            STRING "Read    " C2-CUST-NUM " with LOCK Sts:" CUST-STAT
                   INTO MSG
            PERFORM DISPLAY-IT.
-           CALL "C$SLEEP" USING 1
+           CALL "C$SLEEP" USING 2
            READ FLATFILE2 WITH LOCK
            STRING "Re-Read " C2-CUST-NUM " with LOCK Sts:" CUST-STAT
                   INTO MSG
@@ -32521,7 +32528,8 @@ cat >prog.cob <<'_ATEOF'
            MOVE SPACES TO LCK-RECORD.
            MOVE ZERO TO LCK-NUM.
            MOVE "Lock control" TO LCK-MESSAGE.
-           WRITE LCK-RECORD.
+           WRITE FILE LOCKFILE FROM LCK-RECORD
+      *    WRITE LCK-RECORD.
            CLOSE LOCKFILE.
 
            OPEN OUTPUT FLATFILE.
@@ -32545,29 +32553,29 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2517: cobc -x -std=mf -w -fmf-files prog.cob"
-at_fn_check_prepare_trace "run_file.at:2517"
+$as_echo "$at_srcdir/run_file.at:2524: cobc -x -std=mf -w -fmf-files prog.cob"
+at_fn_check_prepare_trace "run_file.at:2524"
 ( $at_check_trace; cobc -x -std=mf -w -fmf-files prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2517"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2524"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2519: ./prog"
-at_fn_check_prepare_trace "run_file.at:2519"
+$as_echo "$at_srcdir/run_file.at:2526: ./prog"
+at_fn_check_prepare_trace "run_file.at:2526"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2519"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2526"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -32586,15 +32594,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2532: diff reference control.txt"
-at_fn_check_prepare_trace "run_file.at:2532"
+$as_echo "$at_srcdir/run_file.at:2539: diff reference control.txt"
+at_fn_check_prepare_trace "run_file.at:2539"
 ( $at_check_trace; diff reference control.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2532"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2539"
 $at_failed && at_fn_log_failure  \
 "./control.txt"
 $at_traceon; }
@@ -32610,10 +32618,10 @@ cat >reference <<'_ATEOF'
  PARENT :04: NO SHARE Open              Sts:00
  PARENT :05: Next    ALP00000 Trms:0010 #0001
  PARENT :06: Next    BET00000 Trms:0010 #0002
- PARENT :07: RETRY SHARE Open Sts:00
+ PARENT :07: RETRY SHARE Open           Sts:00
  PARENT :08: Next    ALP00000 Trms:0010 #0001
  PARENT :09: Next    BET00000 Trms:0010 #0002
- PARENT :10: RETRY SHORT Open Sts:61
+ PARENT :10: RETRY SHORT Open           Sts:61
  PARENT :11: Read Next                  Sts:47
  PARENT :12: ending
 Par Lck :01: READ Open                  Sts:00
@@ -32621,8 +32629,9 @@ Par Lck :02: Nextadv ALP00000 Trms:0010 #0001
 Par Lck :03: Nextadv BET00000 Trms:0010 #0002
 Par Lck :04: Nextadv DEL00000 Trms:0010 #0003
 Par Lck :05: Nextadv EPS00000 Trms:0010 #0004
-Par Lck :06: Read    DEL00000 Locked 3  Sts:00
-Par Lck :07: ending
+Par Lck :06: Deleted ALP00000        1  Sts:00
+Par Lck :07: Read    DEL00000 Locked 3  Sts:00
+Par Lck :08: ending
 Par Upd :01: Read    DEL00000 no lock   Sts:00
 Par Upd :02: REWRITE DEL00000 Trms:0011 Sts:00
 Par Upd :03: Read    DEL00000 with LOCK Sts:00
@@ -32635,15 +32644,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2566: diff reference parent.txt"
-at_fn_check_prepare_trace "run_file.at:2566"
+$as_echo "$at_srcdir/run_file.at:2574: diff reference parent.txt"
+at_fn_check_prepare_trace "run_file.at:2574"
 ( $at_check_trace; diff reference parent.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2566"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2574"
 $at_failed && at_fn_log_failure  \
 "./control.txt" \
 "./parent.txt"
@@ -32659,27 +32668,27 @@ cat >reference <<'_ATEOF'
   CHILD :03: Next    BET00000 Trms:0010 #0002
   CHILD :04: NO SHARE Open              Sts:61
   CHILD :05: Read Next                  Sts:47
-  CHILD :06: RETRY SHARE Open Sts:00
+  CHILD :06: RETRY SHARE Open           Sts:00
   CHILD :07: Next    ALP00000 Trms:0010 #0001
   CHILD :08: Next    BET00000 Trms:0010 #0002
-  CHILD :09: RETRY SHARE Open Sts:00
+  CHILD :09: RETRY SHARE Open           Sts:00
   CHILD :10: Next    ALP00000 Trms:0010 #0001
   CHILD :11: Next    BET00000 Trms:0010 #0002
   CHILD :12: ending
 Cld Adv :01: READ Open                  Sts:00
-Cld Adv :02: Nextadv ALP00000 Trms:0010 #0001
-Cld Adv :03: Nextadv BET00000 Trms:0010 #0002
-Cld Adv :04: Nextadv EPS00000 Trms:0010 #0004
-Cld Adv :05: Nextadv FOR00000 Trms:0010 #0005
+Cld Adv :02: Nextadv BET00000 Trms:0010 #0002
+Cld Adv :03: Nextadv EPS00000 Trms:0010 #0004
+Cld Adv :04: Nextadv FOR00000 Trms:0010 #0005
+Cld Adv :05: Nextadv GAM00000 Trms:0010 #0006
 Cld Ign :06: READ Open                  Sts:00
-Cld Ign :07: Nextign ALP00000 Trms:0010 #0001
-Cld Ign :08: Nextign BET00000 Trms:0010 #0002
-Cld Ign :09: Nextign DEL00000 Trms:0010 #0003
-Cld Ign :10: Nextign EPS00000 Trms:0010 #0004
+Cld Ign :07: Nextign BET00000 Trms:0010 #0002
+Cld Ign :08: Nextign DEL00000 Trms:0010 #0003
+Cld Ign :09: Nextign EPS00000 Trms:0010 #0004
+Cld Ign :10: Nextign FOR00000 Trms:0010 #0005
 Cld Ign :11: ending
 Cld Upd :01: Read    DEL00000 no lock   Sts:00
-Cld Upd :02: REWRITE DEL00000 Trms:0012 Sts:61
-Cld Upd :03: Read    DEL00000 with LOCK Sts:61
+Cld Upd :02: REWRITE DEL00000 Trms:0012 Sts:51
+Cld Upd :03: Read    DEL00000 with LOCK Sts:51
 Cld Upd :04: Re-Read DEL00000 with LOCK Sts:00
 Cld Upd :05: REWRITE DEL00000 Trms:0011 Sts:00
 Cld Upd :06: Read    DEL00000  and LOCK Sts:00
@@ -32689,15 +32698,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2604: diff reference child.txt"
-at_fn_check_prepare_trace "run_file.at:2604"
+$as_echo "$at_srcdir/run_file.at:2612: diff reference child.txt"
+at_fn_check_prepare_trace "run_file.at:2612"
 ( $at_check_trace; diff reference child.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2604"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2612"
 $at_failed && at_fn_log_failure  \
 "./control.txt" \
 "./parent.txt" \
@@ -32711,7 +32720,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_347
 #AT_START_348
-at_fn_group_banner 348 'run_file.at:2608' \
+at_fn_group_banner 348 'run_file.at:2617' \
   "WRITE+REWRITE FILE name " "                       " 3
 at_xfail=no
 (
@@ -32861,22 +32870,22 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2749: cobc -x -std=mf -w prog.cob"
-at_fn_check_prepare_trace "run_file.at:2749"
+$as_echo "$at_srcdir/run_file.at:2758: cobc -x -std=mf -w prog.cob"
+at_fn_check_prepare_trace "run_file.at:2758"
 ( $at_check_trace; cobc -x -std=mf -w prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2749"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2758"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2751: ./prog"
-at_fn_check_prepare_trace "run_file.at:2751"
+$as_echo "$at_srcdir/run_file.at:2760: ./prog"
+at_fn_check_prepare_trace "run_file.at:2760"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -32888,7 +32897,7 @@ Read    BET00000 Sts:00 Trms:0013
 REWROTE BET00000 Sts:00 Trms:0014
 " | \
   $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2751"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2760"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 

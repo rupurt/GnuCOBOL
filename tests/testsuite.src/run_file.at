@@ -2079,7 +2079,6 @@ Read Status: 10
 
 AT_CLEANUP
 
-
 AT_SETUP([RELATIVE File Locking])
 AT_KEYWORDS([FileIo])
 
@@ -2207,8 +2206,8 @@ AT_DATA([prog.cob], [
                MOVE "Control" TO WMI
                PERFORM LOADFILE
                PERFORM LOCK-EXCLUSIVE
-               CALL "SYSTEM" USING "./prog PARENT &"
-               CALL "SYSTEM" USING "./prog CHILD &"
+               CALL "SYSTEM" USING "./prog  PARENT &"
+               CALL "SYSTEM" USING "./prog  CHILD &"
                CALL "C$SLEEP" USING 2
                MOVE "continue test " TO MSG
                PERFORM DISPLAY-IT
@@ -2224,14 +2223,14 @@ AT_DATA([prog.cob], [
                CALL "C$SLEEP" USING 1
                PERFORM LOCK-RELEASE
                CALL "C$SLEEP" USING 1
-               CALL "SYSTEM" USING "./prog LOCK &"
-               CALL "SYSTEM" USING "./prog READADV &"
+               CALL "SYSTEM" USING "./prog  LOCK &"
+               CALL "SYSTEM" USING "./prog  READADV &"
                CALL "C$SLEEP" USING 6
                MOVE "waiting step 2 completion " TO MSG
                PERFORM DISPLAY-IT
                PERFORM LOCK-EXCLUSIVE
-               CALL "SYSTEM" USING "./prog UPDT &"
-               CALL "SYSTEM" USING "./prog CHILDUP &"
+               CALL "SYSTEM" USING "./prog  UPDT &"
+               CALL "SYSTEM" USING "./prog  CHILDUP &"
                PERFORM LOCK-RELEASE
                CALL "C$SLEEP" USING 3
                PERFORM LOCK-EXCLUSIVE
@@ -2288,6 +2287,12 @@ AT_DATA([prog.cob], [
                MOVE "Par Lck" TO WMI
                PERFORM READ-FILE-ADV
                OPEN I-O SHARING ALL OTHER FLATFILE2
+               MOVE 1 TO REC-NUM
+               READ FLATFILE2 WITH LOCK
+	       DELETE FLATFILE2
+               STRING "Deleted " C2-CUST-NUM "        1  Sts:" 
+	              CUST-STAT INTO MSG
+               PERFORM DISPLAY-IT
                MOVE 3 TO REC-NUM
                READ FLATFILE2 WITH LOCK
                STRING "Read    " C2-CUST-NUM " Locked 3  Sts:" 
@@ -2338,7 +2343,7 @@ AT_DATA([prog.cob], [
 
        READ-FILE-RETRY-SHARE.
            OPEN INPUT SHARING NO OTHER RETRY 10 SECONDS FLATFILE.
-           STRING "RETRY SHARE Open Sts:" CUST-STAT INTO MSG
+           STRING "RETRY SHARE Open           Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
            IF  CUST-STAT  = "00"
                PERFORM 2 TIMES
@@ -2355,7 +2360,7 @@ AT_DATA([prog.cob], [
 
        READ-FILE-RETRY-SHORT.
            OPEN INPUT SHARING NO OTHER RETRY 2 SECONDS FLATFILE.
-           STRING "RETRY SHORT Open Sts:" CUST-STAT INTO MSG
+           STRING "RETRY SHORT Open           Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
            IF  CUST-STAT  = "00"
                PERFORM 2 TIMES
@@ -2379,7 +2384,8 @@ AT_DATA([prog.cob], [
                   INTO MSG
            PERFORM DISPLAY-IT.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE TSP2-RECORD WITH NO LOCK
+           REWRITE FILE FLATFILE2 WITH NO LOCK
+      *    REWRITE TSP2-RECORD WITH NO LOCK
            STRING "REWRITE " C2-CUST-NUM " Trms:" C2-NO-TERMINALS 
                   " Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
@@ -2388,7 +2394,7 @@ AT_DATA([prog.cob], [
            STRING "Read    " C2-CUST-NUM " with LOCK Sts:" CUST-STAT 
                   INTO MSG
            PERFORM DISPLAY-IT.
-           CALL "C$SLEEP" USING 1
+           CALL "C$SLEEP" USING 2
            READ FLATFILE2 WITH LOCK
            STRING "Re-Read " C2-CUST-NUM " with LOCK Sts:" CUST-STAT 
                   INTO MSG
@@ -2492,7 +2498,8 @@ AT_DATA([prog.cob], [
            MOVE SPACES TO LCK-RECORD.
            MOVE ZERO TO LCK-NUM.
            MOVE "Lock control" TO LCK-MESSAGE.
-           WRITE LCK-RECORD.
+           WRITE FILE LOCKFILE FROM LCK-RECORD
+      *    WRITE LCK-RECORD.
            CLOSE LOCKFILE.
 
            OPEN OUTPUT FLATFILE.
@@ -2529,7 +2536,7 @@ Control :04: waiting step 3 completion
 Control :05: ending
 ])
 
-AT_CHECK([diff reference control.txt], [0])
+AT_CHECK([diff reference control.txt], [0], [], [])
 
 
 AT_CAPTURE_FILE(./parent.txt)
@@ -2540,10 +2547,10 @@ AT_DATA([reference], [ PARENT :01: READ Open                  Sts:00
  PARENT :04: NO SHARE Open              Sts:00
  PARENT :05: Next    ALP00000 Trms:0010 #0001
  PARENT :06: Next    BET00000 Trms:0010 #0002
- PARENT :07: RETRY SHARE Open Sts:00
+ PARENT :07: RETRY SHARE Open           Sts:00
  PARENT :08: Next    ALP00000 Trms:0010 #0001
  PARENT :09: Next    BET00000 Trms:0010 #0002
- PARENT :10: RETRY SHORT Open Sts:61
+ PARENT :10: RETRY SHORT Open           Sts:61
  PARENT :11: Read Next                  Sts:47
  PARENT :12: ending
 Par Lck :01: READ Open                  Sts:00
@@ -2551,8 +2558,9 @@ Par Lck :02: Nextadv ALP00000 Trms:0010 #0001
 Par Lck :03: Nextadv BET00000 Trms:0010 #0002
 Par Lck :04: Nextadv DEL00000 Trms:0010 #0003
 Par Lck :05: Nextadv EPS00000 Trms:0010 #0004
-Par Lck :06: Read    DEL00000 Locked 3  Sts:00
-Par Lck :07: ending
+Par Lck :06: Deleted ALP00000        1  Sts:00
+Par Lck :07: Read    DEL00000 Locked 3  Sts:00
+Par Lck :08: ending
 Par Upd :01: Read    DEL00000 no lock   Sts:00
 Par Upd :02: REWRITE DEL00000 Trms:0011 Sts:00
 Par Upd :03: Read    DEL00000 with LOCK Sts:00
@@ -2563,7 +2571,7 @@ Par Upd :07: REWRITE BEPar Up No read!  Sts:00
 Par Upd :08: ending
 ])
 
-AT_CHECK([diff reference parent.txt], [0])
+AT_CHECK([diff reference parent.txt], [0], [], [])
 
 
 AT_CAPTURE_FILE(./child.txt)
@@ -2573,27 +2581,27 @@ AT_DATA([reference], [  CHILD :01: READ Open                  Sts:00
   CHILD :03: Next    BET00000 Trms:0010 #0002
   CHILD :04: NO SHARE Open              Sts:61
   CHILD :05: Read Next                  Sts:47
-  CHILD :06: RETRY SHARE Open Sts:00
+  CHILD :06: RETRY SHARE Open           Sts:00
   CHILD :07: Next    ALP00000 Trms:0010 #0001
   CHILD :08: Next    BET00000 Trms:0010 #0002
-  CHILD :09: RETRY SHARE Open Sts:00
+  CHILD :09: RETRY SHARE Open           Sts:00
   CHILD :10: Next    ALP00000 Trms:0010 #0001
   CHILD :11: Next    BET00000 Trms:0010 #0002
   CHILD :12: ending
 Cld Adv :01: READ Open                  Sts:00
-Cld Adv :02: Nextadv ALP00000 Trms:0010 #0001
-Cld Adv :03: Nextadv BET00000 Trms:0010 #0002
-Cld Adv :04: Nextadv EPS00000 Trms:0010 #0004
-Cld Adv :05: Nextadv FOR00000 Trms:0010 #0005
+Cld Adv :02: Nextadv BET00000 Trms:0010 #0002
+Cld Adv :03: Nextadv EPS00000 Trms:0010 #0004
+Cld Adv :04: Nextadv FOR00000 Trms:0010 #0005
+Cld Adv :05: Nextadv GAM00000 Trms:0010 #0006
 Cld Ign :06: READ Open                  Sts:00
-Cld Ign :07: Nextign ALP00000 Trms:0010 #0001
-Cld Ign :08: Nextign BET00000 Trms:0010 #0002
-Cld Ign :09: Nextign DEL00000 Trms:0010 #0003
-Cld Ign :10: Nextign EPS00000 Trms:0010 #0004
+Cld Ign :07: Nextign BET00000 Trms:0010 #0002
+Cld Ign :08: Nextign DEL00000 Trms:0010 #0003
+Cld Ign :09: Nextign EPS00000 Trms:0010 #0004
+Cld Ign :10: Nextign FOR00000 Trms:0010 #0005
 Cld Ign :11: ending
 Cld Upd :01: Read    DEL00000 no lock   Sts:00
-Cld Upd :02: REWRITE DEL00000 Trms:0012 Sts:61
-Cld Upd :03: Read    DEL00000 with LOCK Sts:61
+Cld Upd :02: REWRITE DEL00000 Trms:0012 Sts:51
+Cld Upd :03: Read    DEL00000 with LOCK Sts:51
 Cld Upd :04: Re-Read DEL00000 with LOCK Sts:00
 Cld Upd :05: REWRITE DEL00000 Trms:0011 Sts:00
 Cld Upd :06: Read    DEL00000  and LOCK Sts:00
@@ -2601,9 +2609,10 @@ Cld Upd :07: REWRITE BECld Up No read!  Sts:00
 Cld Upd :08: ending
 ])
 
-AT_CHECK([diff reference child.txt], [0])
+AT_CHECK([diff reference child.txt], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([WRITE+REWRITE FILE name ])
 AT_KEYWORDS([runfile])

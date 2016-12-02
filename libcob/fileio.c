@@ -3309,8 +3309,9 @@ relative_read (cob_file *f, cob_field *k, const int read_opts)
 			switch (errsts) {
 			case EACCES:
 			case EAGAIN:
+				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
-				return COB_STATUS_61_FILE_SHARING;
+				return COB_STATUS_52_DEAD_LOCK;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
@@ -3388,11 +3389,15 @@ relative_read_next (cob_file *f, const int read_opts)
 				switch (errsts) {
 				case EACCES:
 				case EAGAIN:
+					if ((f->retry_mode & COB_ADVANCING_LOCK)
+					 || (read_opts & COB_READ_ADVANCING_LOCK))
+						goto next_record;
+					return COB_STATUS_51_RECORD_LOCKED;
 				case EDEADLK:
 					if ((f->retry_mode & COB_ADVANCING_LOCK)
 					 || (read_opts & COB_READ_ADVANCING_LOCK))
 						goto next_record;
-					return COB_STATUS_61_FILE_SHARING;
+					return COB_STATUS_52_DEAD_LOCK;
 				default:
 					return COB_STATUS_30_PERMANENT_ERROR;
 				}
@@ -3621,8 +3626,9 @@ relative_rewrite (cob_file *f, const int opt)
 			switch (errsts) {
 			case EACCES:
 			case EAGAIN:
+				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
-				return COB_STATUS_61_FILE_SHARING;
+				return COB_STATUS_52_DEAD_LOCK;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
@@ -3697,8 +3703,9 @@ relative_delete (cob_file *f)
 			switch (errsts) {
 			case EACCES:
 			case EAGAIN:
+				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
-				return COB_STATUS_61_FILE_SHARING;
+				return COB_STATUS_52_DEAD_LOCK;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
