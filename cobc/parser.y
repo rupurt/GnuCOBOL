@@ -8634,7 +8634,7 @@ rewrite_statement:
 ;
 
 rewrite_body:
-  file_record_name from_option _retry_phrase _with_lock invalid_key
+  file_or_record_name from_option _retry_phrase _with_lock invalid_key
   {
 	cb_emit_rewrite ($1, $2, $4);
 	start_debug = save_debug;
@@ -9767,7 +9767,7 @@ write_statement:
 ;
 
 write_body:
-  file_record_name from_option write_option _retry_phrase _with_lock write_handler
+  file_or_record_name from_option write_option _retry_phrase _with_lock write_handler
   {
 	if (CB_VALID_TREE ($1)) {
 		cb_emit_write ($1, $2, $3, $5);
@@ -10271,9 +10271,9 @@ record_name:
   qualified_word		{ cb_build_identifier ($1, 0); }
 ;
 
-/* FILE name -or- Record name */
+/* FILE name -or- Record-name */
 
-file_record_name:
+file_or_record_name:
   record_name
 | TOK_FILE WORD
   {

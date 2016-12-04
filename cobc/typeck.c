@@ -7729,6 +7729,11 @@ cb_emit_rewrite (cb_tree record, cb_tree from, cb_tree lockopt)
 		return;
 	}
 	if (CB_FILE_P (cb_ref (record))) {
+		if(from == NULL) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s FILE requires a FROM clause"), "REWRITE");
+			return;
+		}
 		file = cb_ref(record);		/* FILE filename: was used */
 		f = CB_FILE (file);
 		if(f->record->sister)
@@ -8652,6 +8657,11 @@ cb_emit_write (cb_tree record, cb_tree from, cb_tree opt, cb_tree lockopt)
 		return;
 	}
 	if (CB_FILE_P (cb_ref (record))) {
+		if(from == NULL) {
+			cb_error_x (CB_TREE (current_statement),
+				_("%s FILE requires a FROM clause"), "WRITE");
+			return;
+		}
 		file = cb_ref(record);		/* FILE filename: was used */
 		f = CB_FILE (file);
 		if(f->record->sister)

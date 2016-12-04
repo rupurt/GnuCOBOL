@@ -2894,7 +2894,7 @@ static const char *const yytname[] =
   "partial_expr", "$@87", "expr_tokens", "expr_token", "eq", "gt", "lt",
   "ge", "le", "exp_list", "e_sep", "exp", "exp_term", "exp_factor",
   "exp_unary", "exp_atom", "line_linage_page_counter", "arithmetic_x_list",
-  "arithmetic_x", "record_name", "file_record_name", "table_name",
+  "arithmetic_x", "record_name", "file_or_record_name", "table_name",
   "file_name_list", "file_name", "report_name", "mnemonic_name_list",
   "mnemonic_name", "procedure_name_list", "procedure_name", "label",
   "integer_label", "reference_list", "reference", "single_reference",

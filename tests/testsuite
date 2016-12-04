@@ -957,7 +957,7 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 345;run_file.at:1616;SEQUENTIAL Multi-Record;runfile;
 346;run_file.at:1875;SEQUENTIAL one Record;runfile;
 347;run_file.at:2082;RELATIVE File Locking;fileio;
-348;run_file.at:2617;WRITE+REWRITE FILE name ;runfile;
+348;run_file.at:2615;WRITE+REWRITE FILE name ;runfile;
 349;run_reportwriter.at:23;Report Line Order;report;
 350;run_reportwriter.at:120;Report COL PLUS;report;
 351;run_reportwriter.at:189;Report Overlapping Fields;report;
@@ -32414,8 +32414,7 @@ cat >prog.cob <<'_ATEOF'
                   INTO MSG
            PERFORM DISPLAY-IT.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE FILE FLATFILE2 WITH NO LOCK
-      *    REWRITE TSP2-RECORD WITH NO LOCK
+           REWRITE FILE FLATFILE2 FROM TSP2-RECORD WITH NO LOCK
            STRING "REWRITE " C2-CUST-NUM " Trms:" C2-NO-TERMINALS
                   " Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
@@ -32529,7 +32528,6 @@ cat >prog.cob <<'_ATEOF'
            MOVE ZERO TO LCK-NUM.
            MOVE "Lock control" TO LCK-MESSAGE.
            WRITE FILE LOCKFILE FROM LCK-RECORD
-      *    WRITE LCK-RECORD.
            CLOSE LOCKFILE.
 
            OPEN OUTPUT FLATFILE.
@@ -32553,29 +32551,29 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2524: cobc -x -std=mf -w -fmf-files prog.cob"
-at_fn_check_prepare_trace "run_file.at:2524"
+$as_echo "$at_srcdir/run_file.at:2522: cobc -x -std=mf -w -fmf-files prog.cob"
+at_fn_check_prepare_trace "run_file.at:2522"
 ( $at_check_trace; cobc -x -std=mf -w -fmf-files prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2524"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2522"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2526: ./prog"
-at_fn_check_prepare_trace "run_file.at:2526"
+$as_echo "$at_srcdir/run_file.at:2524: ./prog"
+at_fn_check_prepare_trace "run_file.at:2524"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2526"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2524"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
@@ -32594,15 +32592,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2539: diff reference control.txt"
-at_fn_check_prepare_trace "run_file.at:2539"
+$as_echo "$at_srcdir/run_file.at:2537: diff reference control.txt"
+at_fn_check_prepare_trace "run_file.at:2537"
 ( $at_check_trace; diff reference control.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2539"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2537"
 $at_failed && at_fn_log_failure  \
 "./control.txt"
 $at_traceon; }
@@ -32644,15 +32642,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2574: diff reference parent.txt"
-at_fn_check_prepare_trace "run_file.at:2574"
+$as_echo "$at_srcdir/run_file.at:2572: diff reference parent.txt"
+at_fn_check_prepare_trace "run_file.at:2572"
 ( $at_check_trace; diff reference parent.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2574"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2572"
 $at_failed && at_fn_log_failure  \
 "./control.txt" \
 "./parent.txt"
@@ -32698,15 +32696,15 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2612: diff reference child.txt"
-at_fn_check_prepare_trace "run_file.at:2612"
+$as_echo "$at_srcdir/run_file.at:2610: diff reference child.txt"
+at_fn_check_prepare_trace "run_file.at:2610"
 ( $at_check_trace; diff reference child.txt
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2612"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2610"
 $at_failed && at_fn_log_failure  \
 "./control.txt" \
 "./parent.txt" \
@@ -32720,7 +32718,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_347
 #AT_START_348
-at_fn_group_banner 348 'run_file.at:2617' \
+at_fn_group_banner 348 'run_file.at:2615' \
   "WRITE+REWRITE FILE name " "                       " 3
 at_xfail=no
 (
@@ -32834,7 +32832,7 @@ cat >prog.cob <<'_ATEOF'
            DISPLAY "Read    " C2-CUST-NUM " Sts:" CUST-STAT
                    " Trms:" C2-NO-TERMINALS.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE FILE FLATFILE2
+           REWRITE FILE FLATFILE2 FROM TSP2-RECORD
            READ FLATFILE2
            DISPLAY "REWROTE " C2-CUST-NUM " Sts:" CUST-STAT
                    " Trms:" C2-NO-TERMINALS.
@@ -32870,22 +32868,22 @@ _ATEOF
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2758: cobc -x -std=mf -w prog.cob"
-at_fn_check_prepare_trace "run_file.at:2758"
+$as_echo "$at_srcdir/run_file.at:2756: cobc -x -std=mf -w prog.cob"
+at_fn_check_prepare_trace "run_file.at:2756"
 ( $at_check_trace; cobc -x -std=mf -w prog.cob
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
 at_fn_diff_devnull "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2758"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2756"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 
 
 { set +x
-$as_echo "$at_srcdir/run_file.at:2760: ./prog"
-at_fn_check_prepare_trace "run_file.at:2760"
+$as_echo "$at_srcdir/run_file.at:2758: ./prog"
+at_fn_check_prepare_trace "run_file.at:2758"
 ( $at_check_trace; ./prog
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
@@ -32897,7 +32895,7 @@ Read    BET00000 Sts:00 Trms:0013
 REWROTE BET00000 Sts:00 Trms:0014
 " | \
   $at_diff - "$at_stdout" || at_failed=:
-at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2760"
+at_fn_check_status 0 $at_status "$at_srcdir/run_file.at:2758"
 $at_failed && at_fn_log_failure
 $at_traceon; }
 

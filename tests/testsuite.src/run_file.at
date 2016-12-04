@@ -2384,8 +2384,7 @@ AT_DATA([prog.cob], [
                   INTO MSG
            PERFORM DISPLAY-IT.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE FILE FLATFILE2 WITH NO LOCK
-      *    REWRITE TSP2-RECORD WITH NO LOCK
+           REWRITE FILE FLATFILE2 FROM TSP2-RECORD WITH NO LOCK
            STRING "REWRITE " C2-CUST-NUM " Trms:" C2-NO-TERMINALS 
                   " Sts:" CUST-STAT INTO MSG
            PERFORM DISPLAY-IT
@@ -2499,7 +2498,6 @@ AT_DATA([prog.cob], [
            MOVE ZERO TO LCK-NUM.
            MOVE "Lock control" TO LCK-MESSAGE.
            WRITE FILE LOCKFILE FROM LCK-RECORD
-      *    WRITE LCK-RECORD.
            CLOSE LOCKFILE.
 
            OPEN OUTPUT FLATFILE.
@@ -2721,7 +2719,7 @@ AT_DATA([prog.cob], [
            DISPLAY "Read    " C2-CUST-NUM " Sts:" CUST-STAT
                    " Trms:" C2-NO-TERMINALS.
            ADD 1 TO C2-NO-TERMINALS
-           REWRITE FILE FLATFILE2
+           REWRITE FILE FLATFILE2 FROM TSP2-RECORD
            READ FLATFILE2
            DISPLAY "REWROTE " C2-CUST-NUM " Sts:" CUST-STAT 
                    " Trms:" C2-NO-TERMINALS.
