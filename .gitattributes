@@ -193,6 +193,7 @@ po/stamp-po -text
 tests/Makefile.am eol=lf
 tests/Makefile.in eol=lf
 tests/atlocal.in eol=lf
+tests/atlocal_valgrind eol=lf
 tests/atlocal_win eol=lf
 tests/cobol85/DB.txt -text
 tests/cobol85/DBNOIX.txt -text
