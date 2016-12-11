@@ -189,6 +189,7 @@ po/nl.po -text
 po/quot.sed -text
 po/remove-potcdate.sin -text
 po/stamp-po -text
+po/update_linguas.sh eol=lf
 /tarstamp.h eol=lf
 tests/Makefile.am eol=lf
 tests/Makefile.in eol=lf
