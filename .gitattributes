@@ -121,7 +121,7 @@ doc/texinfo.tex eol=lf
 doc/version.texi eol=lf
 extras/Makefile.am eol=lf
 extras/Makefile.in eol=lf
-/gnu-cobol.spec eol=lf
+/gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 lib/Makefile.in eol=lf
 /libcob.h eol=lf
@@ -170,7 +170,6 @@ po/Makevars -text
 po/POTFILES.in -text
 po/Rules-quot -text
 po/boldquot.sed -text
-po/en.translate -text
 po/en@boldquot.gmo -text
 po/en@boldquot.header -text
 po/en@boldquot.insert-header -text
@@ -181,7 +180,7 @@ po/en@quot.insert-header -text
 po/en@quot.po -text
 po/es.gmo -text
 po/es.po -text
-po/gnu-cobol.pot -text
+po/gnucobol.pot -text
 po/insert-header.sin -text
 po/ja.gmo -text
 po/ja.po -text
