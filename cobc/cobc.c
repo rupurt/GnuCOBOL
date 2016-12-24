@@ -1741,23 +1741,23 @@ cobc_print_info (void)
 	}
 
 #ifdef	WITH_SEQRA_EXTFH
-	cobc_var_print (_("Sequential handler"),	_("External"), 0);
+	cobc_var_print (_("Sequential file handler"),	_("External"), 0);
 #else
-	cobc_var_print (_("Sequential handler"),	_("Internal"), 0);
+	cobc_var_print (_("Sequential file handler"),	_("Internal"), 0);
 #endif
 
 #if defined	(WITH_INDEX_EXTFH)
-	cobc_var_print (_("ISAM handler"),		_("External"), 0);
+	cobc_var_print (_("INDEXED file handler"),	_("External"), 0);
 #elif defined	(WITH_DB)
-	cobc_var_print (_("ISAM handler"),		"BDB", 0);
+	cobc_var_print (_("INDEXED file handler"),	"BDB", 0);
 #elif defined	(WITH_CISAM)
-	cobc_var_print (_("ISAM handler"),		"C-ISAM", 0);
+	cobc_var_print (_("INDEXED file handler"),	"C-ISAM", 0);
 #elif defined	(WITH_DISAM)
-	cobc_var_print (_("ISAM handler"),		"D-ISAM", 0);
+	cobc_var_print (_("INDEXED file handler"),	"D-ISAM", 0);
 #elif defined	(WITH_VBISAM)
-	cobc_var_print (_("ISAM handler"),		"VBISAM", 0);
+	cobc_var_print (_("INDEXED file handler"),	"VBISAM", 0);
 #else
-	cobc_var_print (_("ISAM handler"),		_("Not available"), 0);
+	cobc_var_print (_("INDEXED file handler"),	_("Not available"), 0);
 #endif
 }
 

@@ -1,4 +1,8 @@
 
+2016-12-24  Ron Norman <rjn@inglenet.com>
+
+	* cobc.c - Changed --info to say 'INDEXED file handler'
+
 2016-11-30  Ron Norman <rjn@inglenet.com>
 
 	* parser.y,typeck.c

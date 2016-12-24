@@ -351,6 +351,8 @@ COB_HIDDEN void		cob_init_strings	(void);
 COB_HIDDEN void		cob_init_move		(cob_global *, cob_settings *);
 COB_HIDDEN void		cob_init_screenio	(cob_global *, cob_settings *);
 
+COB_HIDDEN void		cob_fork_fileio		(cob_global *, cob_settings *);
+
 COB_HIDDEN void		cob_exit_screen		(void);
 
 COB_HIDDEN void		cob_exit_numeric	(void);

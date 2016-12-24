@@ -453,20 +453,6 @@ cob_terminate_routines (void)
 		return;
 	}
 
-	if (cob_debug_file 
-	&& !cobsetptr->external_trace_file
-	&& cob_debug_file != cobsetptr->cob_trace_file) {
-		if(cob_debug_file_name != NULL
-		&& ftell(cob_debug_file) == 0) {
-			fclose (cob_debug_file);
-			unlink(cob_debug_file_name);
-			cob_debug_file_name = NULL;
-		} else {
-			fclose (cob_debug_file);
-		}
-	}
-	cob_debug_file = NULL;
-
 	if (cobsetptr->cob_trace_file 
 	&& !cobsetptr->external_trace_file
 	&& cobsetptr->cob_trace_file != stderr) {
@@ -481,7 +467,23 @@ cob_terminate_routines (void)
 	cob_exit_numeric ();
 	cob_exit_call ();
 	cob_exit_reportio ();
+
+	if (cob_debug_file 
+	&& !cobsetptr->external_trace_file
+	&& cob_debug_file != cobsetptr->cob_trace_file) {
+		if(cob_debug_file_name != NULL
+		&& ftell(cob_debug_file) == 0) {
+			fclose (cob_debug_file);
+			unlink(cob_debug_file_name);
+			cob_debug_file_name = NULL;
+		} else {
+			fclose (cob_debug_file);
+		}
+	}
+	cob_debug_file = NULL;
+
 	cob_exit_common ();
+
 }
 
 #ifdef	HAVE_SIGNAL_H
@@ -3964,6 +3966,7 @@ cob_sys_fork (void)
 #else
 	int	pid;
 	if ( (pid = fork()) == 0 ) {
+		cob_fork_fileio(cobglobptr, cobsetptr);
 		return 0;		/* child process just returns */
 	}
 	if (pid < 0) {			/* Some error happened */
@@ -5511,23 +5514,23 @@ print_info (void)
 	}
 
 #ifdef	WITH_SEQRA_EXTFH
-	var_print (_("Sequential handler"),	_("External"), "", 0);
+	var_print (_("Sequential file handler"),	_("External"), "", 0);
 #else
-	var_print (_("Sequential handler"), _("Internal"), "", 0);
+	var_print (_("Sequential file handler"), _("Internal"), "", 0);
 #endif
 
 #if defined	(WITH_INDEX_EXTFH)
-	var_print (_("ISAM handler"),		_("External"), "", 0);
+	var_print (_("INDEXED file handler"),		_("External"), "", 0);
 #elif defined	(WITH_DB)
-	var_print (_("ISAM handler"),		"BDB", "", 0);
+	var_print (_("INDEXED file handler"),		"BDB", "", 0);
 #elif defined	(WITH_CISAM)
-	var_print (_("ISAM handler"),		"C-ISAM" "", 0);
+	var_print (_("INDEXED file handler"),		"C-ISAM" "", 0);
 #elif defined	(WITH_DISAM)
-	var_print (_("ISAM handler"),		"D-ISAM", "", 0);
+	var_print (_("INDEXED file handler"),		"D-ISAM", "", 0);
 #elif defined	(WITH_VBISAM)
-	var_print (_("ISAM handler"),		"VBISAM", "", 0);
+	var_print (_("INDEXED file handler"),		"VBISAM", "", 0);
 #else
-	var_print (_("ISAM handler"),		_("Not available"), "", 0);
+	var_print (_("INDEXED file handler"),		_("Not available"), "", 0);
 #endif
 }
 
