@@ -1,4 +1,9 @@
 
+2016-12-27  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c - Added checks for RELATIVE KEY field being
+	  integer in WORKING-STORAGE and having no OCCURS
+
 2016-12-24  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c - Changed --info to say 'INDEXED file handler'
