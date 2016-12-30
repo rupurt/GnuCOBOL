@@ -1,4 +1,9 @@
 
+2016-12-30  Ron Norman <rjn@inglenet.com>
+
+	* cobc.c --info, Give BDB version when being used
+	  Also give VB-ISAM version info when used
+
 2016-12-27  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c - Added checks for RELATIVE KEY field being

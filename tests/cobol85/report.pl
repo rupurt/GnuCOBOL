@@ -134,6 +134,9 @@ $nooutput{IF402M} = 1;
 
 
 open (LOG, "> report.txt") or die;
+if ($ENV{'DB_HOME'}) {
+	system ("db_recover ");
+}
 print LOG "Filename    total pass fail deleted inspect\n";
 print LOG "--------    ----- ---- ---- ------- -------\n";
 
@@ -286,3 +289,6 @@ printf LOG ("Number of programs:    %2s\n", $num_progs);
 printf LOG ("Successfully executed: %2s\n", $total_ok);
 printf LOG ("Compile error:         %2s\n", $compile_error);
 printf LOG ("Execute error:         %2s\n", $execute_error);
+if ($ENV{'DB_HOME'}) {
+	system ("db_recover ");
+}

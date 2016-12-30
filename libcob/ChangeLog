@@ -1,4 +1,15 @@
 
+2016-12-30  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c,common.h
+	  Complete work on BDB use of SHARING & RETRY
+	  Problems solved by closing BDB cursor as soon/often as possible
+	  as the BDB cursor seems to create some internal locks
+	  Retry interval reduced to 100ms
+
+	* INDEXED file test case added and uses a file to synchronize tests
+	* RELATIVE file test case added and uses a file to synchronize tests
+
 2016-12-24  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c,common.c,common.h,coblocal.h

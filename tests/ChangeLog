@@ -1,4 +1,13 @@
 
+2016-12-30  Ron Norman <rjn@inglenet.com>
+
+	* run_file.at: Add test cases for fiel SHARING/RETRY 
+	  These test programs use SYSTEM with & to start two
+	  concurrent running copies of the test program to
+	  run concurrent test cases. There is also several C$SLEEP
+	  calls to setup the test scenarios.
+	  So these tests appear to run for a long time 
+
 2016-11-17  Ron Norman <rjn@inglenet.com>
 
 	* run_extensions.at: Add test case for CBL_GC_FORK & CBL_GC_WAITPID
