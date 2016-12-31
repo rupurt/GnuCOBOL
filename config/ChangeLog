@@ -1,8 +1,13 @@
 
-2016-10-13  Ron Norman
+2016-12-26  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* runtime.conf: FR #191 added COB_EXIT_WAIT and COB_EXIT_MSG
+
+2016-10-13  Ron Norman <rjn@inglenet.com>
+
 	* Add arithmetic-osvs
 
-2015-07-07  Ron Norman
+2015-07-07  Ron Norman <rjn@inglenet.com>
 
 	* DISPLAY ... UPON PRINTER can be redirected via
 	  the env var COBPRINTER similar to what Micro Focus supports

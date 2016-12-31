@@ -258,7 +258,9 @@ typedef struct __cob_settings {
 	unsigned int	cob_beep_value;		/* Bell disposition */
 	unsigned int	cob_extended_status;	/* Extended status */
 	unsigned int	cob_use_esc;		/* Check ESC key */
-	int		cob_timeout_scale;	/* timeout scale */
+	unsigned int	cob_timeout_scale;	/* timeout scale */
+	unsigned int	cob_exit_wait;		/* wait on program exit if no ACCEPT came after last DISPLAY */
+	char			*cob_exit_msg;		/* message for cob_exit_wait */
 
 	/* reportio.c */
 	unsigned int 	cob_col_just_lrc;	/* Justify data in column LEFT/RIGHT/CENTER */

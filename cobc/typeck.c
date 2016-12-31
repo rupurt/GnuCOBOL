@@ -1,7 +1,6 @@
 /*
-   Copyright (C) 2001-2012, 2014-2015 Free Software Foundation, Inc.
-   Written by Keisuke Nishida, Roger While, Simon Sobisch
-   Copyright (C) 2013-2016 Ron Norman 
+   Copyright (C) 2001-2016 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
 
@@ -845,52 +844,16 @@ void
 cb_list_system (void)
 {
 	const struct system_table	*psyst;
-	const char			*s;
-	size_t				n;
 
 	putchar ('\n');
 	printf (_("System routine\t\t\tParameters"));
 	puts ("\n");
 	for (psyst = system_tab; psyst->syst_name; psyst++) {
-		switch (*(unsigned char *)(psyst->syst_name)) {
-		case 'C':
-		case 'S':
-			printf ("%s", psyst->syst_name);
-			break;
-		case 0xF4:
-			printf ("X\"F4\"");
-			break;
-		case 0xF5:
-			printf ("X\"F5\"");
-			break;
-		case 0x91:
-			printf ("X\"91\"");
-			break;
-		case 0xE4:
-			printf ("X\"E4\"");
-			break;
-		case 0xE5:
-			printf ("X\"E5\"");
-			break;
-		default:
-			break;
+		if (strlen (psyst->syst_name) != 1) {
+			printf ("%-32s%d\n", psyst->syst_name, psyst->syst_params);
+		} else {
+			printf ("X\"%2X\"%-27s%d\n", (unsigned char)psyst->syst_name[0], "", psyst->syst_params);
 		}
-		n = strlen (psyst->syst_name);
-		switch (n / 8) {
-		case 0:
-			s = "\t\t\t\t";
-			break;
-		case 1:
-			s = "\t\t\t";
-			break;
-		case 2:
-			s = "\t\t";
-			break;
-		default:
-			s = "\t";
-			break;
-		}
-		printf ("%s%d\n", s, psyst->syst_params);
 	}
 }
 

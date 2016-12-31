@@ -8,9 +8,14 @@
 	  calls to setup the test scenarios.
 	  So these tests appear to run for a long time 
 
+2016-11-19  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* testsuite.src/run_extensions.at: splitted tests for CBL_GC_FORK /
+	  CBL_GC_WAITPID, skip these tests if the functions return "not available"
+
 2016-11-17  Ron Norman <rjn@inglenet.com>
 
-	* run_extensions.at: Add test case for CBL_GC_FORK & CBL_GC_WAITPID
+	* testsuite.src/run_extensions.at: Add CBL_GC_FORK & CBL_GC_WAITPID
 
 2016-11-15  Ron Norman <rjn@inglenet.com>
 
