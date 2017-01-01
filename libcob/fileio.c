@@ -5142,6 +5142,10 @@ dobuild:
 	int			ret = 0;
 	int			nonexistent;
 
+	if (cobsetptr->bdb_home != NULL
+	 && bdb_env == NULL) {		/* Join BDB, on first OPEN of INDEXED file */
+		bdb_join_environment ();
+	}
 	f->share_mode = sharing;
 
 	cob_chk_file_mapping ();
@@ -6887,7 +6891,7 @@ cob_read_next (cob_file *f, cob_field *fnstatus, const int read_opts)
 
 	if (unlikely(f->flag_nonexistent)) {
 		if (f->flag_first_read == 0) {
-			save_status (f, fnstatus, COB_STATUS_23_KEY_NOT_EXISTS);
+			save_status (f, fnstatus, COB_STATUS_46_READ_ERROR);
 			return;
 		}
 		f->flag_first_read = 0;
@@ -8594,7 +8598,6 @@ cob_init_fileio (cob_global *lptr, cob_settings *sptr)
 #ifdef	WITH_DB
 	bdb_env = NULL;
 	bdb_data_dir = NULL;
-	bdb_join_environment ();
 	record_lock_object = cob_malloc ((size_t)1032);
 	rlo_size = 1024;
 	bdb_buff = cob_malloc ((size_t)COB_SMALL_BUFF+1);
@@ -8614,8 +8617,10 @@ cob_fork_fileio (cob_global *lptr, cob_settings *sptr)
 	COB_UNUSED (sptr);
 #ifdef	WITH_DB
 	bdb_lock_id = 0;
-	bdb_env->lock_id (bdb_env, &bdb_lock_id);
-	bdb_env->set_lk_detect (bdb_env, DB_LOCK_DEFAULT);
+	if (bdb_env) {
+		bdb_env->lock_id (bdb_env, &bdb_lock_id);
+		bdb_env->set_lk_detect (bdb_env, DB_LOCK_DEFAULT);
+	}
 #endif
 }
 

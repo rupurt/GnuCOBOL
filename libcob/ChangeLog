@@ -1,4 +1,10 @@
 
+2017-01-01  Ron Norman <rjn@inglenet.com>
+	* fileio.c:
+	  Fix coding error in cob_fork_fileio. 
+	  Moved call to bdb_join_environment to indexed_open.
+	  Change to return 46 on 2nd read on an optional missing file.
+
 2016-12-30  Ron Norman <rjn@inglenet.com>
 
 	* fileio.c, common.h:

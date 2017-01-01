@@ -2230,6 +2230,7 @@ REWROTE BET00000 Sts:00 Trms:0014
 
 AT_CLEANUP
 
+
 AT_SETUP([INDEXED File Locking])
 AT_KEYWORDS([FileIo])
 
@@ -2605,6 +2606,7 @@ AT_DATA([prog.cob], [
            STRING "Re-Read " CM-CUST-NUM " with LOCK Sts:" CUST-STAT 
                   INTO MSG
            PERFORM DISPLAY-IT.
+           CALL "C$SLEEP" USING SLP-TIME
            REWRITE TSPFL-RECORD WITH NO LOCK
            STRING "REWRITE " CM-CUST-NUM " Trms:" CM-NO-TERMINALS 
                   " Sts:" CUST-STAT INTO MSG
@@ -2781,9 +2783,9 @@ AT_DATA([prog.cob], [
            MOVE SPACES TO REPORT-RECORD.
 ])
 
-AT_CHECK([cobc -x -std=mf -w -fmf-files prog.cob], [0], [], [])
+AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [], [])
+AT_CHECK([DB_HOME=. ./prog], [0], [], [])
 
 
 AT_CAPTURE_FILE(./control.txt)
@@ -2885,6 +2887,7 @@ Cld Upd  :09: ending
 AT_CHECK([diff reference child.txt], [0], [], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([RELATIVE File Locking])
 AT_KEYWORDS([FileIo])
@@ -3428,6 +3431,65 @@ Cld Upd :08: ending
 ])
 
 AT_CHECK([diff reference child.txt], [0], [], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([Read on optional missing file])
+AT_KEYWORDS([FILEIO])
+
+AT_DATA([prog.cob], [       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT OPTIONAL INFILE  ASSIGN TO
+                "missing.txt"
+                ORGANIZATION IS RELATIVE
+                ACCESS IS SEQUENTIAL
+                FILE STATUS IS WSFS.
+       DATA DIVISION.
+       FILE SECTION.
+       FD  INFILE.
+       01  INREC             PIC X(80).
+       WORKING-STORAGE SECTION.
+       01  WSFS           PIC X(2).
+           88  RECORDFOUND VALUE "00".
+       01  WSINREC         PIC X(80).
+       PROCEDURE DIVISION.
+       MAIN-PROCEDURE.
+      *    Open missing file
+           OPEN INPUT INFILE
+      *    First read, raise a FS 10 (AT END) which is expected
+           READ INFILE INTO WSINREC
+           END-READ
+	   IF WSFS = '10'
+             DISPLAY "1st Read on missing optional file = " WSFS " OK"
+	   ELSE
+             DISPLAY "1st Read on missing optional file = " WSFS " Bad"
+	   END-IF.
+
+      *    Second read, should raise a FS 46 (READ AFTER AT END)
+      *    but a FS 23 is raised instead.
+           READ INFILE INTO WSINREC
+           END-READ
+
+	   IF WSFS = '46'
+             DISPLAY "2nd Read on missing optional file = " WSFS " OK"
+	   ELSE
+             DISPLAY "2nd Read on missing optional file = " WSFS " Bad"
+	   END-IF.
+
+           CLOSE INFILE
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [])
+
+AT_CHECK([./prog], [0], [1st Read on missing optional file = 10 OK
+2nd Read on missing optional file = 46 OK
+], [])
 
 AT_CLEANUP
 
