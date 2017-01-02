@@ -5685,14 +5685,6 @@ indexed_read_next (cob_file *f, const int read_opts)
 	ret = COB_STATUS_00_SUCCESS;
 	lmode = 0;
 
-	if (f->flag_nonexistent) {
-		if (f->flag_first_read == 0) {
-			return COB_STATUS_23_KEY_NOT_EXISTS;
-		}
-		f->flag_first_read = 0;
-		return COB_STATUS_10_END_OF_FILE;
-	}
-
 	if (fh->curkey == -1) {
 		/* Switch to primary index */
 		isstart (fh->isfd, &fh->key[0], 0, NULL, ISFIRST);
