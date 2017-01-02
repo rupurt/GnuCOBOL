@@ -1848,8 +1848,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [1], [], [prog.cob: 12: Error: Entries under REDEFINES cannot have a VALUE clause
-prog.cob: 14: Error: Entries under REDEFINES cannot have a VALUE clause
+AT_CHECK([$COMPILE prog.cob], [1], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
+prog.cob: 14: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 17: Error: Invalid MOVE statement
 prog.cob: 19: Error: Invalid MOVE statement
 prog.cob: 29: Error: Invalid MOVE statement

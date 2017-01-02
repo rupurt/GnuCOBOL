@@ -1,4 +1,11 @@
 
+2017-01-02  Ron Norman <rjn@inglenet.com>
+
+	* cobc.c,warning.def,codegen.c:  
+	  Allow VALUES on REDEFINES with just a warning
+	  Set VALUEs for field in REDEFINES for
+	  INITIALIZE ... WITH FILLER ALL VALUES
+
 2016-12-30  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c --info, Give BDB version when being used

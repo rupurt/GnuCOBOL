@@ -2481,6 +2481,9 @@ process_command_line (const int argc, char **argv)
 		cb_relax_level_hierarchy = 1;
 		cb_top_level_occurs_clause = 1;
 	}
+	if (cb_relaxed_syntax_check && !warningopt) {
+		cb_warn_ignored_initial_val = 0;
+	}
 
 	/* If C debug, do not strip output */
 	if (gflag_set) {

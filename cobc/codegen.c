@@ -3268,8 +3268,8 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 
 				for (; f->sister; f = f->sister) {
 					if (!f->sister->redefines) {
-						if (initialize_type (p, f->sister, 0) != INITIALIZE_DEFAULT ||
-						    initialize_uniform_char (f->sister, p) != last_char) {
+						if (initialize_type (p, f->sister, 0) != INITIALIZE_DEFAULT 
+						 || initialize_uniform_char (f->sister, p) != last_char) {
 							break;
 						}
 					}
@@ -3282,6 +3282,21 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				}
 
 				output_initialize_uniform (c, last_char, (int) size);
+
+				if (p->flag_init_statement
+				 && p->val) {
+					/* INITIALIZE statement; so do fields with VALUE */
+					for (f = ff->children; f->sister; f = f->sister) {
+						if (f->flag_filler
+						 && p->flag_no_filler_init)
+							continue;
+						if (f->level != 88
+						 && f->values != NULL) {
+							c = cb_build_field_reference (f, x);
+							output_initialize_one (p, c);
+						}
+					}
+				}
 				break;
 			}
 			/* Fall through */

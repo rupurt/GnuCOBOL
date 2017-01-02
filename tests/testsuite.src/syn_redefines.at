@@ -331,31 +331,7 @@ AT_CLEANUP
 
 # 10) DONE
 
-AT_SETUP([REDEFINES: with VALUE])
-AT_KEYWORDS([redefines])
-
-AT_DATA([prog.cob], [
-       IDENTIFICATION   DIVISION.
-       PROGRAM-ID.      prog.
-       DATA             DIVISION.
-       WORKING-STORAGE  SECTION.
-       01 X             PIC X.
-       01 A             REDEFINES X PIC X VALUE "A".
-       01 G             REDEFINES X.
-         02 B           PIC X VALUE "A".
-       01 Y             REDEFINES X PIC X.
-         88 C           VALUE "A".
-       PROCEDURE        DIVISION.
-           STOP RUN.
-])
-
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
-[prog.cob: 7: Error: Entries under REDEFINES cannot have a VALUE clause
-prog.cob: 9: Error: Entries under REDEFINES cannot have a VALUE clause
-])
-
-AT_CLEANUP
-
+# Removed 'Error: Entries under REDEFINES cannot have a VALUE clause'
 
 # 11) DONE
 
