@@ -1062,7 +1062,7 @@ output_attr (const cb_tree x)
 	case CB_TAG_LITERAL:
 		l = CB_LITERAL (x);
 		if (CB_TREE_CLASS (x) == CB_CLASS_NUMERIC) {
-			flags = 0;
+			flags = COB_FLAG_CONSTANT;
 			if (l->sign != 0) {
 				flags = COB_FLAG_HAVE_SIGN | COB_FLAG_SIGN_SEPARATE;
 			}
@@ -1070,9 +1070,9 @@ output_attr (const cb_tree x)
 					  l->size, l->scale, flags, NULL, 0);
 		} else {
 			if (l->all) {
-				id = lookup_attr (COB_TYPE_ALPHANUMERIC_ALL, 0, 0, 0, NULL, 0);
+				id = lookup_attr (COB_TYPE_ALPHANUMERIC_ALL, 0, 0, COB_FLAG_CONSTANT, NULL, 0);
 			} else {
-				id = lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL, 0);
+				id = lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, COB_FLAG_CONSTANT, NULL, 0);
 			}
 		}
 		break;
@@ -3806,7 +3806,7 @@ output_bin_field (const cb_tree x, const cob_u32_t id, int opcd)
 	} else {
 		digits = 9;
 	}
-	aflags |= COB_FLAG_REAL_BINARY;
+	aflags |= COB_FLAG_REAL_BINARY | COB_FLAG_CONSTANT;
 	i = lookup_attr (COB_TYPE_NUMERIC_BINARY, digits, 0, aflags, NULL, 0);
 	if(opcd == 0) {
 		/* Some C compilers (SUN for one) will not accept 'content_%u.data' because
@@ -3949,8 +3949,9 @@ output_call (struct cb_call *p)
 					output_indent ("{");
 				}
 				output_line ("void *ptr_%u;", n);
-			} else if (CB_TREE_TAG (x) != CB_TAG_INTRINSIC &&
-			    x != cb_null && !(CB_CAST_P (x))) {
+			} else if (CB_TREE_TAG (x) != CB_TAG_INTRINSIC 
+				&& x != cb_null 
+				&& !(CB_CAST_P (x))) {
 				if (!need_brace) {
 					need_brace = 1;
 					output_indent ("{");
@@ -3958,8 +3959,9 @@ output_call (struct cb_call *p)
 				output_line ("union {");
 				output_prefix ();
 				output ("\tunsigned char data[");
-				if (CB_NUMERIC_LITERAL_P (x) ||
-				    CB_BINARY_OP_P (x) || CB_CAST_P(x)) {
+				if (CB_NUMERIC_LITERAL_P (x) 
+				 || CB_BINARY_OP_P (x) 
+				 || CB_CAST_P(x)) {
 					output ("8");
 				} else {
 					if (CB_REF_OR_FIELD_P (x)) {
@@ -3973,6 +3975,8 @@ output_call (struct cb_call *p)
 				output_line ("\tcob_u64_t     dataull;");
 				output_line ("\tint           dataint;");
 				output_line ("} content_%u;", n);
+				output_line ("cob_field      content_%s%u;", CB_PREFIX_FIELD, n);
+				output_line ("cob_field_attr content_%s%u;", CB_PREFIX_ATTR, n);
 #if   defined(__SUNPRO_C)
 				output_bin_field (x, n, 1);
 #else
@@ -4005,12 +4009,10 @@ output_call (struct cb_call *p)
 				} else {
 					if (CB_LITERAL (x)->sign >= 0) {
 						output ("content_%u.dataull = ", n);
-						output (CB_FMT_LLU_F,
-							cb_get_u_long_long (x));
+						output (CB_FMT_LLU_F, cb_get_u_long_long (x));
 					} else {
 						output ("content_%u.datall = ", n);
-						output (CB_FMT_LLD_F,
-							cb_get_long_long (x));
+						output (CB_FMT_LLD_F, cb_get_long_long (x));
 					}
 				}
 				output (";\n");
@@ -4045,29 +4047,31 @@ output_call (struct cb_call *p)
 					} else {
 						if (CB_LITERAL (x)->sign >= 0) {
 							output ("content_%u.dataull = ", n);
-							output (CB_FMT_LLU_F,
-								cb_get_u_long_long (x));
+							output (CB_FMT_LLU_F, cb_get_u_long_long (x));
 						} else {
 							output ("content_%u.datall = ", n);
-							output (CB_FMT_LLD_F,
-								cb_get_long_long (x));
+							output (CB_FMT_LLD_F, cb_get_long_long (x));
 						}
 					}
 					output (";\n");
-				} else if (CB_REF_OR_FIELD_P (x) &&
-					   CB_TREE_CATEGORY (x) == CB_CATEGORY_NUMERIC &&
-					   cb_code_field (x)->usage == CB_USAGE_LENGTH) {
+				} else if (CB_REF_OR_FIELD_P (x) 
+					&& CB_TREE_CATEGORY (x) == CB_CATEGORY_NUMERIC 
+					&& cb_code_field (x)->usage == CB_USAGE_LENGTH) {
 					output_prefix ();
 					output ("content_%u.dataint = ", n);
 					output_integer (x);
 					output (";\n");
 				} else if (x != cb_null && !(CB_CAST_P (x))) {
+					/*
+					 * Create copy of cob_field&attr pointing to local copy of data
+					 * and setting flag COB_FLAG_CONSTANT
+					 */
 					output_prefix ();
-					output ("memcpy (content_%u.data, ", n);
-					output_data (x);
-					output (", ");
-					output_size (x);
-					output (");\n");
+					output ("cob_field_constant (");
+					output_param (x, -1);
+					output (", &content_%s%u ", CB_PREFIX_FIELD, n);
+					output (", &content_%s%u ", CB_PREFIX_ATTR, n);
+					output (", &content_%u);\n", n);
 				}
 			}
 			break;
@@ -4085,14 +4089,18 @@ output_call (struct cb_call *p)
 		output ("cob_procedure_params[%u] = ", n);
 		switch (CB_TREE_TAG (x)) {
 		case CB_TAG_LITERAL:
-			if (CB_NUMERIC_LITERAL_P (x) &&
-			    CB_PURPOSE_INT (l) != CB_CALL_BY_VALUE) {
+			if (CB_NUMERIC_LITERAL_P (x) 
+			 && CB_PURPOSE_INT (l) != CB_CALL_BY_VALUE) {
 				output ("&content_fb_%u", n + 1);
 				break;
 			}
 			/* Fall through */
 		case CB_TAG_FIELD:
 		case CB_TAG_INTRINSIC:
+			if (CB_PURPOSE_INT (l) == CB_CALL_BY_CONTENT) {
+				output ("&content_%s%u", CB_PREFIX_FIELD, n + 1);
+				break;
+			}
 			output_param (x, -1);
 			break;
 		case CB_TAG_REFERENCE:
@@ -4100,6 +4108,10 @@ output_call (struct cb_call *p)
 			case CB_TAG_LITERAL:
 			case CB_TAG_FIELD:
 			case CB_TAG_INTRINSIC:
+				if (CB_PURPOSE_INT (l) == CB_CALL_BY_CONTENT) {
+					output ("&content_%s%u", CB_PREFIX_FIELD, n + 1);
+					break;
+				}
 				output_param (x, -1);
 				break;
 			default:
@@ -4114,18 +4126,6 @@ output_call (struct cb_call *p)
 		output (";\n");
 	}
 
-#if	0	/* RXWRXW - Clear params */
-	/* Clear extra parameters */
-	if (n > COB_MAX_FIELD_PARAMS - 4) {
-		parmnum = COB_MAX_FIELD_PARAMS - n;
-	} else {
-		parmnum = 4;
-	}
-	parmnum *= sizeof(cob_field *);
-	output_line ("memset (&(cob_procedure_params[%u]), 0, %u);",
-		     n, parmnum);
-#endif
-
 	/* Set number of parameters */
 	output_prefix ();
 	output ("cob_glob_ptr->cob_call_params = %u;\n", n);
@@ -4133,10 +4133,9 @@ output_call (struct cb_call *p)
 	/* Function name */
 	output_prefix ();
 	/* Special for program pointers */
-	if (CB_REFERENCE_P (p->name) &&
-	    CB_FIELD_P (CB_REFERENCE (p->name)->value) &&
-	    CB_FIELD (CB_REFERENCE (p->name)->value)->usage ==
-	    CB_USAGE_PROGRAM_POINTER) {
+	if (CB_REFERENCE_P (p->name) 
+	 && CB_FIELD_P (CB_REFERENCE (p->name)->value) 
+	 && CB_FIELD (CB_REFERENCE (p->name)->value)->usage == CB_USAGE_PROGRAM_POINTER) {
 		needs_unifunc = 1;
 		output ("cob_unifunc.funcvoid = ");
 		output_integer (p->name);

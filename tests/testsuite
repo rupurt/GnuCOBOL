@@ -943,270 +943,271 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 331;run_misc.at:5082;Default Arithmetic Test;runtime;
 332;run_misc.at:5157;OSVS Arithmetic Test;runtime;
 333;run_misc.at:5245;PROGRAM-ID / CALL literal/variable with spaces;call;
-334;run_file.at:22;READ INTO AT-END sequence;runfile;
-335;run_file.at:59;First READ on empty SEQUENTIAL INDEXED file;runfile;
-336;run_file.at:99;REWRITE a RELATIVE file with RANDOM access;runfile;
-337;run_file.at:166;INDEXED File Sparse/Split keys;runfile;
-338;run_file.at:684;SORT with SD, I/O SEQUENTIAL;runfile using giving;
-339;run_file.at:732;SORT with SD, I/O LINE SEQUENTIAL;runfile using giving;
-340;run_file.at:789;SORT with SD, I/O LINE SEQUENTIAL same file;runfile using giving;
-341;run_file.at:846;SORT nonexistent file;runfile;
-342;run_file.at:881;ASSIGN with LOCAL-STORAGE item;runfile;
-343;run_file.at:917;ASSIGN with LOCAL-STORAGE item and INITIAL prog;runfile;
-344;run_file.at:957;RELATIVE Multi-Record;runfile;
-345;run_file.at:1207;RELATIVE one Record;runfile;
-346;run_file.at:1616;SEQUENTIAL Multi-Record;runfile;
-347;run_file.at:1875;SEQUENTIAL one Record;runfile;
-348;run_file.at:2082;WRITE+REWRITE FILE name ;runfile;
-349;run_file.at:2234;INDEXED File Locking;fileio;
-350;run_file.at:2892;RELATIVE File Locking;fileio;
-351;run_file.at:3438;Read on optional missing file;fileio;
-352;run_reportwriter.at:23;Report Line Order;report;
-353;run_reportwriter.at:120;Report COL PLUS;report;
-354;run_reportwriter.at:189;Report Overlapping Fields;report;
-355;run_reportwriter.at:258;EMPTY REPORT;report;
-356;run_reportwriter.at:327;PAGE LIMIT REPORT;report;
-357;run_reportwriter.at:389;PAGE LIMIT REPORT 2;report;
-358;run_reportwriter.at:461;Sample Customer Report;report;
-359;run_reportwriter.at:776;Sample Charge Report;report;
-360;run_reportwriter.at:1129;Sample Charge Report 2;report;
-361;run_reportwriter.at:1499;Sample Charge Report 3;report;
-362;run_reportwriter.at:1799;Sample Charge Report 4;report;
-363;run_reportwriter.at:2215;Sample Payroll Report;report;
-364;run_reportwriter.at:2900;Sample REPORT with RIGHT/CENTER;report;
-365;run_reportwriter.at:3061;STUDENT REPORT with INITIAL;report;
-366;run_reportwriter.at:3212;ORDER REPORT; Test substring;report;
-367;run_reportwriter.at:3564;Sample Control Break;report;
-368;run_reportwriter.at:3793;Sample Inventory Report;report;
-369;run_reportwriter.at:3983;Duplicate Detail Line;report;
-370;run_reportwriter.at:4111;Report with OCCURS;report;
-371;run_reportwriter.at:4224;Duplicate INITIATE;report;
-372;run_reportwriter.at:4290;Missing INITIATE;report;
-373;run_reportwriter.at:4352;Next Group Next Page;report;
-374;run_reportwriter.at:8675;Report PRESENT AFTER;report;
-375;run_returncode.at:23;RETURN-CODE moving;returncode;
-376;run_returncode.at:49;RETURN-CODE passing;returncode;
-377;run_returncode.at:101;RETURN-CODE nested;returncode;
-378;run_functions.at:25;FUNCTION ABS;functions;
-379;run_functions.at:47;FUNCTION ACOS;functions;
-380;run_functions.at:71;FUNCTION ANNUITY;functions;
-381;run_functions.at:95;FUNCTION ASIN;functions;
-382;run_functions.at:119;FUNCTION ATAN;functions;
-383;run_functions.at:143;FUNCTION BYTE-LENGTH;functions;
-384;run_functions.at:176;FUNCTION CHAR;functions;
-385;run_functions.at:214;FUNCTION COMBINED-DATETIME;functions;
-386;run_functions.at:239;FUNCTION CONCATENATE;functions;
-387;run_functions.at:278;FUNCTION CONCATENATE with reference modding;functions;
-388;run_functions.at:306;FUNCTION COS;functions;
-389;run_functions.at:330;FUNCTION CURRENCY-SYMBOL;functions;
-390;run_functions.at:353;FUNCTION CURRENT-DATE;functions;
-391;run_functions.at:424;FUNCTION DATE-OF-INTEGER;functions;
-392;run_functions.at:449;FUNCTION DATE-TO-YYYYMMDD;functions;
-393;run_functions.at:474;FUNCTION DAY-OF-INTEGER;functions;
-394;run_functions.at:499;FUNCTION DAY-TO-YYYYDDD;functions;
-395;run_functions.at:524;FUNCTION E;functions;
-396;run_functions.at:548;FUNCTION EXCEPTION-FILE;functions;
-397;run_functions.at:580;FUNCTION EXCEPTION-LOCATION;functions;
-398;run_functions.at:616;FUNCTION EXCEPTION-STATEMENT;functions;
-399;run_functions.at:648;FUNCTION EXCEPTION-STATUS;functions;
-400;run_functions.at:680;FUNCTION EXP;functions;
-401;run_functions.at:704;FUNCTION EXP10;functions;
-402;run_functions.at:729;FUNCTION FACTORIAL;functions;
-403;run_functions.at:754;FUNCTION FORMATTED-CURRENT-DATE;functions;
-404;run_functions.at:782;FUNCTION FORMATTED-DATE;functions;
-405;run_functions.at:845;FUNCTION FORMATTED-DATE with ref modding;functions;
-406;run_functions.at:870;FUNCTION FORMATTED-DATETIME;functions;
-407;run_functions.at:927;FUNCTION FORMATTED-DATETIME with ref modding;functions;
-408;run_functions.at:953;FUNCTION FORMATTED-TIME;functions;
-409;run_functions.at:1040;FUNCTION FORMATTED-TIME DP.COMMA;functions;
-410;run_functions.at:1071;FUNCTION FORMATTED-TIME with ref modding;functions;
-411;run_functions.at:1096;FUNCTION FRACTION-PART;functions;
-412;run_functions.at:1127;FUNCTION HIGHEST-ALGEBRAIC;functions;
-413;run_functions.at:1195;FUNCTION INTEGER;functions;
-414;run_functions.at:1228;FUNCTION INTEGER-OF-DATE;functions;
-415;run_functions.at:1253;FUNCTION INTEGER-OF-DAY;functions;
-416;run_functions.at:1278;FUNCTION INTEGER-OF-FORMATTED-DATE;functions;
-417;run_functions.at:1328;FUNCTION INTEGER-PART;functions;
-418;run_functions.at:1354;FUNCTION LENGTH;functions;
-419;run_functions.at:1380;FUNCTION LOCALE-COMPARE;functions;
-420;run_functions.at:1410;FUNCTION LOCALE-DATE;functions;
-421;run_functions.at:1436;FUNCTION LOCALE-TIME;functions;
-422;run_functions.at:1462;FUNCTION LOCALE-TIME-FROM-SECONDS;functions;
-423;run_functions.at:1488;FUNCTION LOG;functions;
-424;run_functions.at:1512;FUNCTION LOG10;functions;
-425;run_functions.at:1536;FUNCTION LOWER-CASE;functions;
-426;run_functions.at:1564;FUNCTION LOWER-CASE with reference modding;functions;
-427;run_functions.at:1590;FUNCTION LOWEST-ALGEBRAIC;functions;
-428;run_functions.at:1643;FUNCTION MAX;functions;
-429;run_functions.at:1665;FUNCTION MEAN;functions;
-430;run_functions.at:1687;FUNCTION MEDIAN;functions;
-431;run_functions.at:1709;FUNCTION MIDRANGE;functions;
-432;run_functions.at:1731;FUNCTION MIN;functions;
-433;run_functions.at:1753;FUNCTION MOD;functions;
-434;run_functions.at:1779;FUNCTION MODULE-CALLER-ID;functions;
-435;run_functions.at:1813;FUNCTION MODULE-DATE;functions;
-436;run_functions.at:1838;FUNCTION MODULE-FORMATTED-DATE;functions;
-437;run_functions.at:1863;FUNCTION MODULE-ID;functions;
-438;run_functions.at:1884;FUNCTION MODULE-PATH;functions;
-439;run_functions.at:1909;FUNCTION MODULE-SOURCE;functions;
-440;run_functions.at:1930;FUNCTION MODULE-TIME;functions;
-441;run_functions.at:1955;FUNCTION MONETARY-DECIMAL-POINT;functions;
-442;run_functions.at:1978;FUNCTION MONETARY-THOUSANDS-SEPARATOR;functions;
-443;run_functions.at:2001;FUNCTION NUMERIC-DECIMAL-POINT;functions;
-444;run_functions.at:2024;FUNCTION NUMERIC-THOUSANDS-SEPARATOR;functions;
-445;run_functions.at:2047;FUNCTION NUMVAL;functions;
-446;run_functions.at:2078;FUNCTION NUMVAL-C;functions;
-447;run_functions.at:2109;FUNCTION NUMVAL-C DP.COMMA;functions;
-448;run_functions.at:2139;FUNCTION NUMVAL-F;functions;
-449;run_functions.at:2162;FUNCTION ORD;functions;
-450;run_functions.at:2184;FUNCTION ORD-MAX;functions;
-451;run_functions.at:2206;FUNCTION ORD-MIN;functions;
-452;run_functions.at:2228;FUNCTION PI;functions;
-453;run_functions.at:2252;FUNCTION PRESENT-VALUE;functions;
-454;run_functions.at:2274;FUNCTION RANDOM;functions;
-455;run_functions.at:2298;FUNCTION RANGE;functions;
-456;run_functions.at:2322;FUNCTION REM;functions;
-457;run_functions.at:2346;FUNCTION REVERSE;functions;
-458;run_functions.at:2371;FUNCTION REVERSE with reference modding;functions;
-459;run_functions.at:2396;FUNCTION SECONDS-FROM-FORMATTED-TIME;functions;
-460;run_functions.at:2463;FUNCTION SECONDS-PAST-MIDNIGHT;functions;
-461;run_functions.at:2487;FUNCTION SIGN;functions;
-462;run_functions.at:2526;FUNCTION SIN;functions;
-463;run_functions.at:2550;FUNCTION SQRT;functions;
-464;run_functions.at:2574;FUNCTION STANDARD-DEVIATION;functions;
-465;run_functions.at:2598;FUNCTION STORED-CHAR-LENGTH;functions;
-466;run_functions.at:2624;FUNCTION SUBSTITUTE;functions;
-467;run_functions.at:2653;FUNCTION SUBSTITUTE with reference modding;functions;
-468;run_functions.at:2681;FUNCTION SUBSTITUTE-CASE;functions;
-469;run_functions.at:2708;FUNCTION SUBSTITUTE-CASE with reference mod;functions;
-470;run_functions.at:2736;FUNCTION SUM;functions;
-471;run_functions.at:2760;FUNCTION TAN;functions;
-472;run_functions.at:2784;FUNCTION TEST-DATE-YYYYMMDD;functions;
-473;run_functions.at:2806;FUNCTION TEST-DAY-YYYYDDD;functions;
-474;run_functions.at:2828;FUNCTION TEST-FORMATTED-DATETIME with dates;functions;
-475;run_functions.at:2955;FUNCTION TEST-FORMATTED-DATETIME with times;functions;
-476;run_functions.at:3036;FUNCTION TEST-FORMATTED-DATETIME with datetimes;functions;
-477;run_functions.at:3083;FUNCTION TEST-FORMATTED-DATETIME DP.COMMA;functions;
-478;run_functions.at:3124;FUNCTION TEST-NUMVAL;functions;
-479;run_functions.at:3222;FUNCTION TEST-NUMVAL-C;functions;
-480;run_functions.at:3320;FUNCTION TEST-NUMVAL-F;functions;
-481;run_functions.at:3418;FUNCTION TRIM;functions;
-482;run_functions.at:3444;FUNCTION TRIM with reference modding;functions;
-483;run_functions.at:3470;FUNCTION TRIM zero length;functions;
-484;run_functions.at:3497;FUNCTION UPPER-CASE;functions;
-485;run_functions.at:3522;FUNCTION UPPER-CASE with reference modding;functions;
-486;run_functions.at:3547;FUNCTION VARIANCE;functions;
-487;run_functions.at:3571;FUNCTION WHEN-COMPILED;functions;
-488;run_functions.at:3597;FUNCTION YEAR-TO-YYYY;functions;
-489;run_functions.at:3621;Formatted funcs w/ invalid variable format;functions;
-490;run_functions.at:3698;FORMATTED-(DATE)TIME with SYSTEM-OFFSET;functions formatted-time formatted-datetime extensions;
-491;run_functions.at:3738;Intrinsics without FUNCTION keyword (1);functions;
-492;run_functions.at:3759;Intrinsics without FUNCTION keyword (2);functions;
-493;run_functions.at:3782;User-Defined FUNCTION with/without parameter;functions;
-494;run_extensions.at:24;CALL BY CONTENT binary and literal;extensions;
-495;run_extensions.at:73;CALL USING numeric literal;call;
-496;run_extensions.at:143;Hexadecimal numeric literal;extensions;
-497;run_extensions.at:171;Semi-parenthesized condition;extensions;
-498;run_extensions.at:195;ADDRESS OF;extensions;
-499;run_extensions.at:245;LENGTH OF;extensions;
-500;run_extensions.at:283;WHEN-COMPILED;extensions;
-501;run_extensions.at:309;Complex OCCURS DEPENDING ON (1);extensions;
-502;run_extensions.at:338;Complex OCCURS DEPENDING ON (2);extensions;
-503;run_extensions.at:401;Complex OCCURS DEPENDING ON (3);extensions;
-504;run_extensions.at:464;Complex OCCURS DEPENDING ON (4);extensions;
-505;run_extensions.at:530;Complex OCCURS DEPENDING ON (5);extensions;
-506;run_extensions.at:595;INITIALIZE level 01;initialize;
-507;run_extensions.at:646;MOVE NON-INTEGER TO ALPHA-NUMERIC;extensions;
-508;run_extensions.at:736;CALL USING file-name;extensions;
-509;run_extensions.at:780;CALL unusual PROGRAM-ID.;extensions;
-510;run_extensions.at:844;CALL / GOBACK with LOCAL-STORAGE;extensions;
-511;run_extensions.at:894;CALL BY VALUE alphanumeric item;extensions;
-512;run_extensions.at:929;Case independent PROGRAM-ID;extensions;
-513;run_extensions.at:951;PROGRAM-ID AS clause;extensions;
-514;run_extensions.at:973;Quoted PROGRAM-ID;extensions;
-515;run_extensions.at:997;ASSIGN clause;extensions;
-516;run_extensions.at:1025;ASSIGN clause IBM;extensions;
-517;run_extensions.at:1053;ASSIGN mapping;extensions;
-518;run_extensions.at:1108;ASSIGN expansion;extensions;
-519;run_extensions.at:1134;ASSIGN with COB_FILE_PATH;extensions;
-520;run_extensions.at:1162;NUMBER-OF-CALL-PARAMETERS;extensions;
-521;run_extensions.at:1218;TALLY;extensions;
-522;run_extensions.at:1246;PROCEDURE DIVISION USING BY ...;extensions;
-523;run_extensions.at:1296;PROCEDURE DIVISION CHAINING ...;extensions;
-524;run_extensions.at:1322;STOP RUN RETURNING/GIVING;extensions;
-525;run_extensions.at:1348;GOBACK/EXIT PROGRAM RETURNING/GIVING;extensions;
-526;run_extensions.at:1398;ENTRY;extensions;
-527;run_extensions.at:1445;LINE SEQUENTIAL write;extensions;
-528;run_extensions.at:1491;LINE SEQUENTIAL read;extensions;
-529;run_extensions.at:1558;ASSIGN to KEYBOARD/DISPLAY;extensions;
-530;run_extensions.at:1616;SORT ASSIGN KEYBOARD to ASSIGN DISPLAY;extensions;
-531;run_extensions.at:1678;Environment/Argument variable;extensions;
-532;run_extensions.at:1725;DECIMAL-POINT is COMMA (1);extensions;
-533;run_extensions.at:1753;DECIMAL-POINT is COMMA (2);extensions;
-534;run_extensions.at:1781;DECIMAL-POINT is COMMA (3);extensions;
-535;run_extensions.at:1809;DECIMAL-POINT is COMMA (4);extensions;
-536;run_extensions.at:1837;DECIMAL-POINT is COMMA (5);extensions;
-537;run_extensions.at:1871;78 Level (1);extensions;
-538;run_extensions.at:1894;78 Level (2);extensions;
-539;run_extensions.at:1920;78 Level (3);extensions;
-540;run_extensions.at:1944;DEBUG (not active);extensions;
-541;run_extensions.at:1967;DEBUG (fdebugging-line);extensions;
-542;run_extensions.at:1990;DEBUG (obsolete WITH DEBUGGING MODE);extensions;
-543;run_extensions.at:2016;DEBUG free format (not active);extensions;
-544;run_extensions.at:2039;DEBUG free format (fdebugging-line);extensions;
-545;run_extensions.at:2062;SWITCHES with non-standard names;runmisc extensions;
-546;run_extensions.at:2163;Larger REDEFINES lengths;extensions;
-547;run_extensions.at:2250;Obsolete 85 keywords;extensions;
-548;run_extensions.at:2276;System routine C\$CALLEDBY;extensions;
-549;run_extensions.at:2322;System routine C\$NARG;extensions;
-550;run_extensions.at:2362;System routine C\$PARAMSIZE;extensions;
-551;run_extensions.at:2404;System routine C\$JUSTIFY;extensions;
-552;run_extensions.at:2429;System routine C\$PRINTABLE;extensions;
-553;run_extensions.at:2458;System routine C\$MAKEDIR;extensions;
-554;run_extensions.at:2479;System routine C\$GETPID;extensions;
-555;run_extensions.at:2504;System routine C\$TOUPPER;extensions;
-556;run_extensions.at:2529;System routine C\$TOLOWER;extensions;
-557;run_extensions.at:2554;System routine CBL_OR;extensions;
-558;run_extensions.at:2581;System routine CBL_NOR;extensions;
-559;run_extensions.at:2608;System routine CBL_AND;extensions;
-560;run_extensions.at:2635;System routine CBL_XOR;extensions;
-561;run_extensions.at:2662;System routine CBL_IMP;extensions;
-562;run_extensions.at:2689;System routine CBL_NIMP;extensions;
-563;run_extensions.at:2716;System routine CBL_NOT;extensions;
-564;run_extensions.at:2742;System routine CBL_EQ;extensions;
-565;run_extensions.at:2769;System routine CBL_OC_GETOPT;extensions;
-566;run_extensions.at:3204;System routine CBL_GC_FORK;extensions;
-567;run_extensions.at:3247;System routine CBL_GC_WAITPID;extensions;
-568;run_extensions.at:3299;System routine CBL_COPY_FILE;;
-569;run_extensions.at:3333;System routines for directories;extensions cbl_create_dir cbl_change_dir cbl_delete_dir;
-570;run_extensions.at:3375;System routines for files;extensions cbl_create_file cbl_write_file cbl_flush_file cbl_open_file cbl_read_file cbl_close_file cbl_rename_file cbl_delete_file;
-571;run_extensions.at:3492;Conditional/define directives (1);extensions directive;
-572;run_extensions.at:3517;Conditional/define directives (2);extensions directive;
-573;run_extensions.at:3542;Conditional/define directives (3);extensions directive;
-574;run_extensions.at:3570;Conditional/define directives (4);extensions directive;
-575;run_extensions.at:3596;Conditional/define directives (5);extensions directive;
-576;data_binary.at:23;BINARY: 2-4-8 big-endian;binary;
-577;data_binary.at:205;BINARY: 2-4-8 native;binary;
-578;data_binary.at:393;BINARY: 1-2-4-8 big-endian;binary;
-579;data_binary.at:575;BINARY: 1-2-4-8 native;binary;
-580;data_binary.at:763;BINARY: 1--8 big-endian;binary;
-581;data_binary.at:945;BINARY: 1--8 native;binary;
-582;data_binary.at:1133;BINARY: full-print;binary;
-583;data_display.at:21;DISPLAY: Sign ASCII;display;
-584;data_display.at:80;DISPLAY: Sign ASCII (2);display;
-585;data_display.at:126;DISPLAY: Sign EBCDIC;display;
-586;data_packed.at:25;PACKED-DECIMAL dump;packed;
-587;data_packed.at:162;PACKED-DECIMAL display;packed;
-588;data_packed.at:218;PACKED-DECIMAL move;packed;
-589;data_packed.at:276;PACKED-DECIMAL arithmetic (1);packed;
-590;data_packed.at:316;PACKED-DECIMAL arithmetic (2);packed;
-591;data_packed.at:353;PACKED-DECIMAL numeric test (1);packed;
-592;data_packed.at:494;PACKED-DECIMAL numeric test (2);packed;
-593;data_packed.at:635;COMP-6 display;packed;
-594;data_packed.at:671;COMP-6 move;packed;
-595;data_packed.at:717;COMP-6 arithmetic;packed;
-596;data_packed.at:748;COMP-6 numeric test ;packed;
-597;data_pointer.at:21;POINTER: display;pointer;
+334;run_misc.at:5312;C API Test;call;
+335;run_file.at:22;READ INTO AT-END sequence;runfile;
+336;run_file.at:59;First READ on empty SEQUENTIAL INDEXED file;runfile;
+337;run_file.at:99;REWRITE a RELATIVE file with RANDOM access;runfile;
+338;run_file.at:166;INDEXED File Sparse/Split keys;runfile;
+339;run_file.at:684;SORT with SD, I/O SEQUENTIAL;runfile using giving;
+340;run_file.at:732;SORT with SD, I/O LINE SEQUENTIAL;runfile using giving;
+341;run_file.at:789;SORT with SD, I/O LINE SEQUENTIAL same file;runfile using giving;
+342;run_file.at:846;SORT nonexistent file;runfile;
+343;run_file.at:881;ASSIGN with LOCAL-STORAGE item;runfile;
+344;run_file.at:917;ASSIGN with LOCAL-STORAGE item and INITIAL prog;runfile;
+345;run_file.at:957;RELATIVE Multi-Record;runfile;
+346;run_file.at:1207;RELATIVE one Record;runfile;
+347;run_file.at:1616;SEQUENTIAL Multi-Record;runfile;
+348;run_file.at:1875;SEQUENTIAL one Record;runfile;
+349;run_file.at:2082;WRITE+REWRITE FILE name ;runfile;
+350;run_file.at:2234;INDEXED File Locking;fileio;
+351;run_file.at:2892;RELATIVE File Locking;fileio;
+352;run_file.at:3438;Read on optional missing file;fileio;
+353;run_reportwriter.at:23;Report Line Order;report;
+354;run_reportwriter.at:120;Report COL PLUS;report;
+355;run_reportwriter.at:189;Report Overlapping Fields;report;
+356;run_reportwriter.at:258;EMPTY REPORT;report;
+357;run_reportwriter.at:327;PAGE LIMIT REPORT;report;
+358;run_reportwriter.at:389;PAGE LIMIT REPORT 2;report;
+359;run_reportwriter.at:461;Sample Customer Report;report;
+360;run_reportwriter.at:776;Sample Charge Report;report;
+361;run_reportwriter.at:1129;Sample Charge Report 2;report;
+362;run_reportwriter.at:1499;Sample Charge Report 3;report;
+363;run_reportwriter.at:1799;Sample Charge Report 4;report;
+364;run_reportwriter.at:2215;Sample Payroll Report;report;
+365;run_reportwriter.at:2900;Sample REPORT with RIGHT/CENTER;report;
+366;run_reportwriter.at:3061;STUDENT REPORT with INITIAL;report;
+367;run_reportwriter.at:3212;ORDER REPORT; Test substring;report;
+368;run_reportwriter.at:3564;Sample Control Break;report;
+369;run_reportwriter.at:3793;Sample Inventory Report;report;
+370;run_reportwriter.at:3983;Duplicate Detail Line;report;
+371;run_reportwriter.at:4111;Report with OCCURS;report;
+372;run_reportwriter.at:4224;Duplicate INITIATE;report;
+373;run_reportwriter.at:4290;Missing INITIATE;report;
+374;run_reportwriter.at:4352;Next Group Next Page;report;
+375;run_reportwriter.at:8675;Report PRESENT AFTER;report;
+376;run_returncode.at:23;RETURN-CODE moving;returncode;
+377;run_returncode.at:49;RETURN-CODE passing;returncode;
+378;run_returncode.at:101;RETURN-CODE nested;returncode;
+379;run_functions.at:25;FUNCTION ABS;functions;
+380;run_functions.at:47;FUNCTION ACOS;functions;
+381;run_functions.at:71;FUNCTION ANNUITY;functions;
+382;run_functions.at:95;FUNCTION ASIN;functions;
+383;run_functions.at:119;FUNCTION ATAN;functions;
+384;run_functions.at:143;FUNCTION BYTE-LENGTH;functions;
+385;run_functions.at:176;FUNCTION CHAR;functions;
+386;run_functions.at:214;FUNCTION COMBINED-DATETIME;functions;
+387;run_functions.at:239;FUNCTION CONCATENATE;functions;
+388;run_functions.at:278;FUNCTION CONCATENATE with reference modding;functions;
+389;run_functions.at:306;FUNCTION COS;functions;
+390;run_functions.at:330;FUNCTION CURRENCY-SYMBOL;functions;
+391;run_functions.at:353;FUNCTION CURRENT-DATE;functions;
+392;run_functions.at:424;FUNCTION DATE-OF-INTEGER;functions;
+393;run_functions.at:449;FUNCTION DATE-TO-YYYYMMDD;functions;
+394;run_functions.at:474;FUNCTION DAY-OF-INTEGER;functions;
+395;run_functions.at:499;FUNCTION DAY-TO-YYYYDDD;functions;
+396;run_functions.at:524;FUNCTION E;functions;
+397;run_functions.at:548;FUNCTION EXCEPTION-FILE;functions;
+398;run_functions.at:580;FUNCTION EXCEPTION-LOCATION;functions;
+399;run_functions.at:616;FUNCTION EXCEPTION-STATEMENT;functions;
+400;run_functions.at:648;FUNCTION EXCEPTION-STATUS;functions;
+401;run_functions.at:680;FUNCTION EXP;functions;
+402;run_functions.at:704;FUNCTION EXP10;functions;
+403;run_functions.at:729;FUNCTION FACTORIAL;functions;
+404;run_functions.at:754;FUNCTION FORMATTED-CURRENT-DATE;functions;
+405;run_functions.at:782;FUNCTION FORMATTED-DATE;functions;
+406;run_functions.at:845;FUNCTION FORMATTED-DATE with ref modding;functions;
+407;run_functions.at:870;FUNCTION FORMATTED-DATETIME;functions;
+408;run_functions.at:927;FUNCTION FORMATTED-DATETIME with ref modding;functions;
+409;run_functions.at:953;FUNCTION FORMATTED-TIME;functions;
+410;run_functions.at:1040;FUNCTION FORMATTED-TIME DP.COMMA;functions;
+411;run_functions.at:1071;FUNCTION FORMATTED-TIME with ref modding;functions;
+412;run_functions.at:1096;FUNCTION FRACTION-PART;functions;
+413;run_functions.at:1127;FUNCTION HIGHEST-ALGEBRAIC;functions;
+414;run_functions.at:1195;FUNCTION INTEGER;functions;
+415;run_functions.at:1228;FUNCTION INTEGER-OF-DATE;functions;
+416;run_functions.at:1253;FUNCTION INTEGER-OF-DAY;functions;
+417;run_functions.at:1278;FUNCTION INTEGER-OF-FORMATTED-DATE;functions;
+418;run_functions.at:1328;FUNCTION INTEGER-PART;functions;
+419;run_functions.at:1354;FUNCTION LENGTH;functions;
+420;run_functions.at:1380;FUNCTION LOCALE-COMPARE;functions;
+421;run_functions.at:1410;FUNCTION LOCALE-DATE;functions;
+422;run_functions.at:1436;FUNCTION LOCALE-TIME;functions;
+423;run_functions.at:1462;FUNCTION LOCALE-TIME-FROM-SECONDS;functions;
+424;run_functions.at:1488;FUNCTION LOG;functions;
+425;run_functions.at:1512;FUNCTION LOG10;functions;
+426;run_functions.at:1536;FUNCTION LOWER-CASE;functions;
+427;run_functions.at:1564;FUNCTION LOWER-CASE with reference modding;functions;
+428;run_functions.at:1590;FUNCTION LOWEST-ALGEBRAIC;functions;
+429;run_functions.at:1643;FUNCTION MAX;functions;
+430;run_functions.at:1665;FUNCTION MEAN;functions;
+431;run_functions.at:1687;FUNCTION MEDIAN;functions;
+432;run_functions.at:1709;FUNCTION MIDRANGE;functions;
+433;run_functions.at:1731;FUNCTION MIN;functions;
+434;run_functions.at:1753;FUNCTION MOD;functions;
+435;run_functions.at:1779;FUNCTION MODULE-CALLER-ID;functions;
+436;run_functions.at:1813;FUNCTION MODULE-DATE;functions;
+437;run_functions.at:1838;FUNCTION MODULE-FORMATTED-DATE;functions;
+438;run_functions.at:1863;FUNCTION MODULE-ID;functions;
+439;run_functions.at:1884;FUNCTION MODULE-PATH;functions;
+440;run_functions.at:1909;FUNCTION MODULE-SOURCE;functions;
+441;run_functions.at:1930;FUNCTION MODULE-TIME;functions;
+442;run_functions.at:1955;FUNCTION MONETARY-DECIMAL-POINT;functions;
+443;run_functions.at:1978;FUNCTION MONETARY-THOUSANDS-SEPARATOR;functions;
+444;run_functions.at:2001;FUNCTION NUMERIC-DECIMAL-POINT;functions;
+445;run_functions.at:2024;FUNCTION NUMERIC-THOUSANDS-SEPARATOR;functions;
+446;run_functions.at:2047;FUNCTION NUMVAL;functions;
+447;run_functions.at:2078;FUNCTION NUMVAL-C;functions;
+448;run_functions.at:2109;FUNCTION NUMVAL-C DP.COMMA;functions;
+449;run_functions.at:2139;FUNCTION NUMVAL-F;functions;
+450;run_functions.at:2162;FUNCTION ORD;functions;
+451;run_functions.at:2184;FUNCTION ORD-MAX;functions;
+452;run_functions.at:2206;FUNCTION ORD-MIN;functions;
+453;run_functions.at:2228;FUNCTION PI;functions;
+454;run_functions.at:2252;FUNCTION PRESENT-VALUE;functions;
+455;run_functions.at:2274;FUNCTION RANDOM;functions;
+456;run_functions.at:2298;FUNCTION RANGE;functions;
+457;run_functions.at:2322;FUNCTION REM;functions;
+458;run_functions.at:2346;FUNCTION REVERSE;functions;
+459;run_functions.at:2371;FUNCTION REVERSE with reference modding;functions;
+460;run_functions.at:2396;FUNCTION SECONDS-FROM-FORMATTED-TIME;functions;
+461;run_functions.at:2463;FUNCTION SECONDS-PAST-MIDNIGHT;functions;
+462;run_functions.at:2487;FUNCTION SIGN;functions;
+463;run_functions.at:2526;FUNCTION SIN;functions;
+464;run_functions.at:2550;FUNCTION SQRT;functions;
+465;run_functions.at:2574;FUNCTION STANDARD-DEVIATION;functions;
+466;run_functions.at:2598;FUNCTION STORED-CHAR-LENGTH;functions;
+467;run_functions.at:2624;FUNCTION SUBSTITUTE;functions;
+468;run_functions.at:2653;FUNCTION SUBSTITUTE with reference modding;functions;
+469;run_functions.at:2681;FUNCTION SUBSTITUTE-CASE;functions;
+470;run_functions.at:2708;FUNCTION SUBSTITUTE-CASE with reference mod;functions;
+471;run_functions.at:2736;FUNCTION SUM;functions;
+472;run_functions.at:2760;FUNCTION TAN;functions;
+473;run_functions.at:2784;FUNCTION TEST-DATE-YYYYMMDD;functions;
+474;run_functions.at:2806;FUNCTION TEST-DAY-YYYYDDD;functions;
+475;run_functions.at:2828;FUNCTION TEST-FORMATTED-DATETIME with dates;functions;
+476;run_functions.at:2955;FUNCTION TEST-FORMATTED-DATETIME with times;functions;
+477;run_functions.at:3036;FUNCTION TEST-FORMATTED-DATETIME with datetimes;functions;
+478;run_functions.at:3083;FUNCTION TEST-FORMATTED-DATETIME DP.COMMA;functions;
+479;run_functions.at:3124;FUNCTION TEST-NUMVAL;functions;
+480;run_functions.at:3222;FUNCTION TEST-NUMVAL-C;functions;
+481;run_functions.at:3320;FUNCTION TEST-NUMVAL-F;functions;
+482;run_functions.at:3418;FUNCTION TRIM;functions;
+483;run_functions.at:3444;FUNCTION TRIM with reference modding;functions;
+484;run_functions.at:3470;FUNCTION TRIM zero length;functions;
+485;run_functions.at:3497;FUNCTION UPPER-CASE;functions;
+486;run_functions.at:3522;FUNCTION UPPER-CASE with reference modding;functions;
+487;run_functions.at:3547;FUNCTION VARIANCE;functions;
+488;run_functions.at:3571;FUNCTION WHEN-COMPILED;functions;
+489;run_functions.at:3597;FUNCTION YEAR-TO-YYYY;functions;
+490;run_functions.at:3621;Formatted funcs w/ invalid variable format;functions;
+491;run_functions.at:3698;FORMATTED-(DATE)TIME with SYSTEM-OFFSET;functions formatted-time formatted-datetime extensions;
+492;run_functions.at:3738;Intrinsics without FUNCTION keyword (1);functions;
+493;run_functions.at:3759;Intrinsics without FUNCTION keyword (2);functions;
+494;run_functions.at:3782;User-Defined FUNCTION with/without parameter;functions;
+495;run_extensions.at:24;CALL BY CONTENT binary and literal;extensions;
+496;run_extensions.at:73;CALL USING numeric literal;call;
+497;run_extensions.at:143;Hexadecimal numeric literal;extensions;
+498;run_extensions.at:171;Semi-parenthesized condition;extensions;
+499;run_extensions.at:195;ADDRESS OF;extensions;
+500;run_extensions.at:245;LENGTH OF;extensions;
+501;run_extensions.at:283;WHEN-COMPILED;extensions;
+502;run_extensions.at:309;Complex OCCURS DEPENDING ON (1);extensions;
+503;run_extensions.at:338;Complex OCCURS DEPENDING ON (2);extensions;
+504;run_extensions.at:401;Complex OCCURS DEPENDING ON (3);extensions;
+505;run_extensions.at:464;Complex OCCURS DEPENDING ON (4);extensions;
+506;run_extensions.at:530;Complex OCCURS DEPENDING ON (5);extensions;
+507;run_extensions.at:595;INITIALIZE level 01;initialize;
+508;run_extensions.at:646;MOVE NON-INTEGER TO ALPHA-NUMERIC;extensions;
+509;run_extensions.at:736;CALL USING file-name;extensions;
+510;run_extensions.at:780;CALL unusual PROGRAM-ID.;extensions;
+511;run_extensions.at:844;CALL / GOBACK with LOCAL-STORAGE;extensions;
+512;run_extensions.at:894;CALL BY VALUE alphanumeric item;extensions;
+513;run_extensions.at:929;Case independent PROGRAM-ID;extensions;
+514;run_extensions.at:951;PROGRAM-ID AS clause;extensions;
+515;run_extensions.at:973;Quoted PROGRAM-ID;extensions;
+516;run_extensions.at:997;ASSIGN clause;extensions;
+517;run_extensions.at:1025;ASSIGN clause IBM;extensions;
+518;run_extensions.at:1053;ASSIGN mapping;extensions;
+519;run_extensions.at:1108;ASSIGN expansion;extensions;
+520;run_extensions.at:1134;ASSIGN with COB_FILE_PATH;extensions;
+521;run_extensions.at:1162;NUMBER-OF-CALL-PARAMETERS;extensions;
+522;run_extensions.at:1218;TALLY;extensions;
+523;run_extensions.at:1246;PROCEDURE DIVISION USING BY ...;extensions;
+524;run_extensions.at:1296;PROCEDURE DIVISION CHAINING ...;extensions;
+525;run_extensions.at:1322;STOP RUN RETURNING/GIVING;extensions;
+526;run_extensions.at:1348;GOBACK/EXIT PROGRAM RETURNING/GIVING;extensions;
+527;run_extensions.at:1398;ENTRY;extensions;
+528;run_extensions.at:1445;LINE SEQUENTIAL write;extensions;
+529;run_extensions.at:1491;LINE SEQUENTIAL read;extensions;
+530;run_extensions.at:1558;ASSIGN to KEYBOARD/DISPLAY;extensions;
+531;run_extensions.at:1616;SORT ASSIGN KEYBOARD to ASSIGN DISPLAY;extensions;
+532;run_extensions.at:1678;Environment/Argument variable;extensions;
+533;run_extensions.at:1725;DECIMAL-POINT is COMMA (1);extensions;
+534;run_extensions.at:1753;DECIMAL-POINT is COMMA (2);extensions;
+535;run_extensions.at:1781;DECIMAL-POINT is COMMA (3);extensions;
+536;run_extensions.at:1809;DECIMAL-POINT is COMMA (4);extensions;
+537;run_extensions.at:1837;DECIMAL-POINT is COMMA (5);extensions;
+538;run_extensions.at:1871;78 Level (1);extensions;
+539;run_extensions.at:1894;78 Level (2);extensions;
+540;run_extensions.at:1920;78 Level (3);extensions;
+541;run_extensions.at:1944;DEBUG (not active);extensions;
+542;run_extensions.at:1967;DEBUG (fdebugging-line);extensions;
+543;run_extensions.at:1990;DEBUG (obsolete WITH DEBUGGING MODE);extensions;
+544;run_extensions.at:2016;DEBUG free format (not active);extensions;
+545;run_extensions.at:2039;DEBUG free format (fdebugging-line);extensions;
+546;run_extensions.at:2062;SWITCHES with non-standard names;runmisc extensions;
+547;run_extensions.at:2163;Larger REDEFINES lengths;extensions;
+548;run_extensions.at:2250;Obsolete 85 keywords;extensions;
+549;run_extensions.at:2276;System routine C\$CALLEDBY;extensions;
+550;run_extensions.at:2322;System routine C\$NARG;extensions;
+551;run_extensions.at:2362;System routine C\$PARAMSIZE;extensions;
+552;run_extensions.at:2404;System routine C\$JUSTIFY;extensions;
+553;run_extensions.at:2429;System routine C\$PRINTABLE;extensions;
+554;run_extensions.at:2458;System routine C\$MAKEDIR;extensions;
+555;run_extensions.at:2479;System routine C\$GETPID;extensions;
+556;run_extensions.at:2504;System routine C\$TOUPPER;extensions;
+557;run_extensions.at:2529;System routine C\$TOLOWER;extensions;
+558;run_extensions.at:2554;System routine CBL_OR;extensions;
+559;run_extensions.at:2581;System routine CBL_NOR;extensions;
+560;run_extensions.at:2608;System routine CBL_AND;extensions;
+561;run_extensions.at:2635;System routine CBL_XOR;extensions;
+562;run_extensions.at:2662;System routine CBL_IMP;extensions;
+563;run_extensions.at:2689;System routine CBL_NIMP;extensions;
+564;run_extensions.at:2716;System routine CBL_NOT;extensions;
+565;run_extensions.at:2742;System routine CBL_EQ;extensions;
+566;run_extensions.at:2769;System routine CBL_OC_GETOPT;extensions;
+567;run_extensions.at:3204;System routine CBL_GC_FORK;extensions;
+568;run_extensions.at:3247;System routine CBL_GC_WAITPID;extensions;
+569;run_extensions.at:3299;System routine CBL_COPY_FILE;;
+570;run_extensions.at:3333;System routines for directories;extensions cbl_create_dir cbl_change_dir cbl_delete_dir;
+571;run_extensions.at:3375;System routines for files;extensions cbl_create_file cbl_write_file cbl_flush_file cbl_open_file cbl_read_file cbl_close_file cbl_rename_file cbl_delete_file;
+572;run_extensions.at:3492;Conditional/define directives (1);extensions directive;
+573;run_extensions.at:3517;Conditional/define directives (2);extensions directive;
+574;run_extensions.at:3542;Conditional/define directives (3);extensions directive;
+575;run_extensions.at:3570;Conditional/define directives (4);extensions directive;
+576;run_extensions.at:3596;Conditional/define directives (5);extensions directive;
+577;data_binary.at:23;BINARY: 2-4-8 big-endian;binary;
+578;data_binary.at:205;BINARY: 2-4-8 native;binary;
+579;data_binary.at:393;BINARY: 1-2-4-8 big-endian;binary;
+580;data_binary.at:575;BINARY: 1-2-4-8 native;binary;
+581;data_binary.at:763;BINARY: 1--8 big-endian;binary;
+582;data_binary.at:945;BINARY: 1--8 native;binary;
+583;data_binary.at:1133;BINARY: full-print;binary;
+584;data_display.at:21;DISPLAY: Sign ASCII;display;
+585;data_display.at:80;DISPLAY: Sign ASCII (2);display;
+586;data_display.at:126;DISPLAY: Sign EBCDIC;display;
+587;data_packed.at:25;PACKED-DECIMAL dump;packed;
+588;data_packed.at:162;PACKED-DECIMAL display;packed;
+589;data_packed.at:218;PACKED-DECIMAL move;packed;
+590;data_packed.at:276;PACKED-DECIMAL arithmetic (1);packed;
+591;data_packed.at:316;PACKED-DECIMAL arithmetic (2);packed;
+592;data_packed.at:353;PACKED-DECIMAL numeric test (1);packed;
+593;data_packed.at:494;PACKED-DECIMAL numeric test (2);packed;
+594;data_packed.at:635;COMP-6 display;packed;
+595;data_packed.at:671;COMP-6 move;packed;
+596;data_packed.at:717;COMP-6 arithmetic;packed;
+597;data_packed.at:748;COMP-6 numeric test ;packed;
+598;data_pointer.at:21;POINTER: display;pointer;
 "
 # List of the all the test groups.
 at_groups_all=`$as_echo "$at_help_all" | sed 's/;.*//'`
@@ -1220,7 +1221,7 @@ at_fn_validate_ranges ()
   for at_grp
   do
     eval at_value=\$$at_grp
-    if test $at_value -lt 1 || test $at_value -gt 597; then
+    if test $at_value -lt 1 || test $at_value -gt 598; then
       $as_echo "invalid test group: $at_value" >&2
       exit 1
     fi
@@ -1607,7 +1608,7 @@ at_banner_text_2="Syntax tests"
 # Category starts at test group 158.
 at_banner_text_3="Run tests"
 # Banner 4. testsuite.at:67
-# Category starts at test group 576.
+# Category starts at test group 577.
 at_banner_text_4="Data Representation"
 
 # Take any -C into account.
@@ -29603,11 +29604,256 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_333
 #AT_START_334
-at_fn_group_banner 334 'run_file.at:22' \
-  "READ INTO AT-END sequence" "                      " 3
+at_fn_group_banner 334 'run_misc.at:5312' \
+  "C API Test" "                                     " 3
 at_xfail=no
 (
   $as_echo "334. $at_setup_line: testing $at_desc ..."
+  $at_traceon
+
+
+
+cat >prog.cob <<'_ATEOF'
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  BINFLD5     PIC  9(5) BINARY  VALUE  1280.
+       01  BINFLD5S    PIC S9(5) BINARY  VALUE  1024.
+       01  BINFLD9     PIC  9(9) BINARY  VALUE  2560.
+       01  COMP3       PIC  9(8) COMP-3  VALUE  4096.
+       01  COMP3V99    PIC S9(7)V99 COMP-3  VALUE  12.50.
+       01  PIC9        PIC S9(8) DISPLAY VALUE  8192.
+       01  NE          PIC Z(4)9.99-.
+       01  COMP5       PIC S9(5) COMP-5  VALUE 10240.
+       01  CHRX        PIC  X(9)         VALUE 'Hello'.
+       01  GRPX.
+           05  FILLER  PIC  X(9)         VALUE 'Hello'.
+           05  FILLER  PIC  X(9)         VALUE 'World'.
+
+       PROCEDURE DIVISION.
+           MOVE -512.77 TO NE.
+           CALL "CAPI" USING 2560 BY VALUE 16.
+           CALL "CAPI" USING BINFLD5, NE.
+           CALL "CAPI" USING BINFLD5S.
+           CALL "CAPI" USING BINFLD9.
+           MOVE  512.77 TO NE.
+           CALL "CAPI" USING COMP3, NE.
+           CALL "CAPI" USING PIC9 COMP5 CHRX GRPX.
+           CALL "CAPI" USING COMP3, NE, CHRX.
+           CALL "CAPI" USING BINFLD5, NE.
+           MOVE "Hello!" TO CHRX.
+           CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
+           CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
+           CALL "CAPI" USING LENGTH OF GRPX.
+           CALL "CAPI" USING BY VALUE GRPX LENGTH OF GRPX.
+           CALL "CAPI" USING "Fred Fish", COMP3.
+           CALL "CAPI" USING COMP3V99.
+           CALL "CAPI" .
+           DISPLAY "COMP3 field is now " COMP3 ";".
+           DISPLAY "COMP4 field is now " BINFLD5 ";".
+           DISPLAY "COMP5 field is now " COMP5 ";".
+           DISPLAY " CHRX field is now " CHRX ";".
+           DISPLAY "NE    field is now " NE ";".
+           STOP RUN.
+_ATEOF
+
+
+cat >cmod.c <<'_ATEOF'
+
+#include <stdio.h>
+#include <string.h>
+#include <libcob.h>
+
+static char *
+getType(int type)
+{
+   static char wrk[24];
+   sprintf(wrk,"Type %04X",type);
+   switch (type) {
+   case COB_TYPE_GROUP:    return "Group";
+   case COB_TYPE_NUMERIC_COMP5:  return "COMP-5";
+   case COB_TYPE_NUMERIC_BINARY: return "COMP-4";
+   case COB_TYPE_NUMERIC_PACKED: return "COMP-3";
+   case COB_TYPE_NUMERIC_FLOAT:  return "COMP-1";
+   case COB_TYPE_NUMERIC_DOUBLE: return "COMP-2";
+   case COB_TYPE_NUMERIC_DISPLAY:   return "DISPLAY";
+   case COB_TYPE_ALPHANUMERIC:   return "X";
+   case COB_TYPE_NUMERIC_EDITED: return "EDITED";
+   }
+   return wrk;
+}
+
+int
+CAPI(void *p1, ...)
+{
+   int      k,nargs,type,digits,scale,size,sign;
+   cob_s64_t   val;
+   char     *str, wrk[80],pic[24];
+
+   nargs = cob_get_num_params();
+   printf("CAPI called with %d parameters\n",nargs);
+   for(k=1; k <= nargs; k++) {
+      type   = cob_get_param_type (k);
+      digits = cob_get_param_digits (k);
+      scale  = cob_get_param_scale (k);
+      size   = cob_get_param_size (k);
+      sign   = cob_get_param_sign (k);
+      printf("%d: %-8s ",k,getType(type));
+      if (cob_get_param_constant(k))
+         printf("BY VALUE     ");
+      else
+         printf("BY REFERENCE ");
+      if (type == COB_TYPE_ALPHANUMERIC) {
+         sprintf(pic,"X(%d)",size);
+         str = cob_get_picx_param (k, NULL, 0);
+         printf("%-11s '%s'",pic,str);
+         cob_free ((void*)str);
+         cob_put_picx_param (k, "Bye!");
+      } else if (type == COB_TYPE_GROUP) {
+         str = cob_get_grp_param (k, NULL, 0);
+         printf("%-11s '%.*s'","",size,str);
+         cob_free ((void*)str);
+         memset(wrk,' ',sizeof(wrk));
+         memcpy(wrk,"Bye-Bye Birdie!",15);
+         cob_put_grp_param (k, wrk, sizeof(wrk));
+      } else if (type == COB_TYPE_NUMERIC_EDITED) {
+         if(scale > 0) {
+            sprintf(pic,"%s9(%d)V9(%d)",sign?"S":"",digits-scale,scale);
+         } else {
+            sprintf(pic,"%s9(%d)",sign?"S":"",digits-scale);
+         }
+         val = cob_get_s64_param (k);
+         printf("%-11s %lld ",pic,val);
+         val = val + 130;
+         val = -val;
+         cob_put_s64_param (k, val);
+         cob_get_grp_param (k, wrk, sizeof(wrk));
+         printf(" to %.*s",size,wrk);
+      } else {
+         if(scale > 0) {
+            sprintf(pic,"%s9(%d)V9(%d)",sign?"S":"",digits-scale,scale);
+         } else {
+            sprintf(pic,"%s9(%d)",sign?"S":"",digits-scale);
+         }
+         val = cob_get_s64_param (k);
+         printf("%-11s %lld",pic,val);
+         cob_put_s64_param (k, val + 3);
+      }
+      printf(".\n");
+      fflush(stdout);
+   }
+   if (nargs > 2)
+      cob_put_s64_param (7, val + 3);
+   return 0;
+}
+_ATEOF
+
+
+{ set +x
+$as_echo "$at_srcdir/run_misc.at:5450: cobc -x -std=mf -w prog.cob cmod.c"
+at_fn_check_prepare_trace "run_misc.at:5450"
+( $at_check_trace; cobc -x -std=mf -w prog.cob cmod.c
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+echo >>"$at_stderr"; $as_echo "prog.cob: 32: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 33: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 35: Warning: BY CONTENT assumed for alphanumeric item
+" | \
+  $at_diff - "$at_stderr" || at_failed=:
+at_fn_diff_devnull "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_misc.at:5450"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+
+{ set +x
+$as_echo "$at_srcdir/run_misc.at:5455: ./prog"
+at_fn_check_prepare_trace "run_misc.at:5455"
+( $at_check_trace; ./prog
+) >>"$at_stdout" 2>>"$at_stderr" 5>&-
+at_status=$? at_failed=false
+$at_check_filter
+echo >>"$at_stderr"; $as_echo "libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 2563
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 2 with 19
+libcob: warning: cob_put_s64_param: param 7 is not within range of 4
+libcob: warning: cob_put_s64_param: param 7 is not within range of 3
+libcob: warning: cob_put_picx_param: attempt to over-write constant param 2 with 'Bye!'
+libcob: warning: cob_put_picx_param: attempt to over-write constant param 2 with 'Bye!'
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 21
+libcob: warning: cob_put_grp_param: attempt to over-write constant param 1
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 2 with 21
+libcob: warning: cob_put_picx_param: attempt to over-write constant param 1 with 'Bye!'
+" | \
+  $at_diff - "$at_stderr" || at_failed=:
+echo >>"$at_stdout"; $as_echo "CAPI called with 2 parameters
+1: COMP-4   BY VALUE     S9(9)       2560.
+2: DISPLAY  BY VALUE     9(2)        16.
+CAPI called with 2 parameters
+1: COMP-4   BY REFERENCE 9(5)        1280.
+2: EDITED   BY REFERENCE S9(5)V9(2)  -51277  to   511.47 .
+CAPI called with 1 parameters
+1: COMP-4   BY REFERENCE S9(5)       1024.
+CAPI called with 1 parameters
+1: COMP-4   BY REFERENCE 9(9)        2560.
+CAPI called with 2 parameters
+1: COMP-3   BY REFERENCE 9(8)        4096.
+2: EDITED   BY REFERENCE S9(5)V9(2)  51277  to   514.07-.
+CAPI called with 4 parameters
+1: DISPLAY  BY REFERENCE S9(8)       8192.
+2: COMP-5   BY REFERENCE S9(5)       10240.
+3: X        BY REFERENCE X(9)        'Hello'.
+4: Group    BY REFERENCE             'Hello    World    '.
+CAPI called with 3 parameters
+1: COMP-3   BY REFERENCE 9(8)        4099.
+2: EDITED   BY REFERENCE S9(5)V9(2)  -51407  to   512.77 .
+3: X        BY REFERENCE X(9)        'Bye!'.
+CAPI called with 2 parameters
+1: COMP-4   BY REFERENCE 9(5)        1283.
+2: EDITED   BY REFERENCE S9(5)V9(2)  51277  to   514.07-.
+CAPI called with 2 parameters
+1: COMP-4   BY REFERENCE 9(5)        1286.
+2: X        BY VALUE     X(9)        'Hello!'.
+CAPI called with 2 parameters
+1: COMP-4   BY REFERENCE 9(5)        1289.
+2: X        BY VALUE     X(9)        'Hello!'.
+CAPI called with 1 parameters
+1: COMP-4   BY VALUE     S9(9)       18.
+CAPI called with 2 parameters
+1: Group    BY VALUE                 'Bye-Bye Birdie!   '.
+2: COMP-4   BY VALUE     S9(9)       18.
+CAPI called with 2 parameters
+1: X        BY VALUE     X(9)        'Fred Fish'.
+2: COMP-3   BY REFERENCE 9(8)        4102.
+CAPI called with 1 parameters
+1: COMP-3   BY REFERENCE S9(7)V9(2)  1250.
+CAPI called with 0 parameters
+COMP3 field is now 00004105;
+COMP4 field is now 00001292;
+COMP5 field is now +00010243;
+ CHRX field is now Hello!   ;
+NE    field is now   514.07-;
+" | \
+  $at_diff - "$at_stdout" || at_failed=:
+at_fn_check_status 0 $at_status "$at_srcdir/run_misc.at:5455"
+$at_failed && at_fn_log_failure
+$at_traceon; }
+
+
+  set +x
+  $at_times_p && times >"$at_times_file"
+) 5>&1 2>&1 7>&- | eval $at_tee_pipe
+read at_status <"$at_status_file"
+#AT_STOP_334
+#AT_START_335
+at_fn_group_banner 335 'run_file.at:22' \
+  "READ INTO AT-END sequence" "                      " 3
+at_xfail=no
+(
+  $as_echo "335. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -29673,13 +29919,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_334
-#AT_START_335
-at_fn_group_banner 335 'run_file.at:59' \
+#AT_STOP_335
+#AT_START_336
+at_fn_group_banner 336 'run_file.at:59' \
   "First READ on empty SEQUENTIAL INDEXED file" "    " 3
 at_xfail=no
 (
-  $as_echo "335. $at_setup_line: testing $at_desc ..."
+  $as_echo "336. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -29760,13 +30006,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_335
-#AT_START_336
-at_fn_group_banner 336 'run_file.at:99' \
+#AT_STOP_336
+#AT_START_337
+at_fn_group_banner 337 'run_file.at:99' \
   "REWRITE a RELATIVE file with RANDOM access" "     " 3
 at_xfail=no
 (
-  $as_echo "336. $at_setup_line: testing $at_desc ..."
+  $as_echo "337. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -29862,13 +30108,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_336
-#AT_START_337
-at_fn_group_banner 337 'run_file.at:166' \
+#AT_STOP_337
+#AT_START_338
+at_fn_group_banner 338 'run_file.at:166' \
   "INDEXED File Sparse/Split keys" "                 " 3
 at_xfail=no
 (
-  $as_echo "337. $at_setup_line: testing $at_desc ..."
+  $as_echo "338. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30418,13 +30664,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_337
-#AT_START_338
-at_fn_group_banner 338 'run_file.at:684' \
+#AT_STOP_338
+#AT_START_339
+at_fn_group_banner 339 'run_file.at:684' \
   "SORT with SD, I/O SEQUENTIAL" "                   " 3
 at_xfail=no
 (
-  $as_echo "338. $at_setup_line: testing $at_desc ..."
+  $as_echo "339. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30514,13 +30760,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_338
-#AT_START_339
-at_fn_group_banner 339 'run_file.at:732' \
+#AT_STOP_339
+#AT_START_340
+at_fn_group_banner 340 'run_file.at:732' \
   "SORT with SD, I/O LINE SEQUENTIAL" "              " 3
 at_xfail=no
 (
-  $as_echo "339. $at_setup_line: testing $at_desc ..."
+  $as_echo "340. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30619,13 +30865,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_339
-#AT_START_340
-at_fn_group_banner 340 'run_file.at:789' \
+#AT_STOP_340
+#AT_START_341
+at_fn_group_banner 341 'run_file.at:789' \
   "SORT with SD, I/O LINE SEQUENTIAL same file" "    " 3
 at_xfail=no
 (
-  $as_echo "340. $at_setup_line: testing $at_desc ..."
+  $as_echo "341. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30726,13 +30972,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_340
-#AT_START_341
-at_fn_group_banner 341 'run_file.at:846' \
+#AT_STOP_341
+#AT_START_342
+at_fn_group_banner 342 'run_file.at:846' \
   "SORT nonexistent file" "                          " 3
 at_xfail=no
 (
-  $as_echo "341. $at_setup_line: testing $at_desc ..."
+  $as_echo "342. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30808,13 +31054,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_341
-#AT_START_342
-at_fn_group_banner 342 'run_file.at:881' \
+#AT_STOP_342
+#AT_START_343
+at_fn_group_banner 343 'run_file.at:881' \
   "ASSIGN with LOCAL-STORAGE item" "                 " 3
 at_xfail=no
 (
-  $as_echo "342. $at_setup_line: testing $at_desc ..."
+  $as_echo "343. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30881,13 +31127,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_342
-#AT_START_343
-at_fn_group_banner 343 'run_file.at:917' \
+#AT_STOP_343
+#AT_START_344
+at_fn_group_banner 344 'run_file.at:917' \
   "ASSIGN with LOCAL-STORAGE item and INITIAL prog" "" 3
 at_xfail=no
 (
-  $as_echo "343. $at_setup_line: testing $at_desc ..."
+  $as_echo "344. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -30957,13 +31203,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_343
-#AT_START_344
-at_fn_group_banner 344 'run_file.at:957' \
+#AT_STOP_344
+#AT_START_345
+at_fn_group_banner 345 'run_file.at:957' \
   "RELATIVE Multi-Record" "                          " 3
 at_xfail=no
 (
-  $as_echo "344. $at_setup_line: testing $at_desc ..."
+  $as_echo "345. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -31243,13 +31489,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_344
-#AT_START_345
-at_fn_group_banner 345 'run_file.at:1207' \
+#AT_STOP_345
+#AT_START_346
+at_fn_group_banner 346 'run_file.at:1207' \
   "RELATIVE one Record" "                            " 3
 at_xfail=no
 (
-  $as_echo "345. $at_setup_line: testing $at_desc ..."
+  $as_echo "346. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -31688,13 +31934,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_345
-#AT_START_346
-at_fn_group_banner 346 'run_file.at:1616' \
+#AT_STOP_346
+#AT_START_347
+at_fn_group_banner 347 'run_file.at:1616' \
   "SEQUENTIAL Multi-Record" "                        " 3
 at_xfail=no
 (
-  $as_echo "346. $at_setup_line: testing $at_desc ..."
+  $as_echo "347. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -31983,13 +32229,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_346
-#AT_START_347
-at_fn_group_banner 347 'run_file.at:1875' \
+#AT_STOP_347
+#AT_START_348
+at_fn_group_banner 348 'run_file.at:1875' \
   "SEQUENTIAL one Record" "                          " 3
 at_xfail=no
 (
-  $as_echo "347. $at_setup_line: testing $at_desc ..."
+  $as_echo "348. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -32227,13 +32473,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_347
-#AT_START_348
-at_fn_group_banner 348 'run_file.at:2082' \
+#AT_STOP_348
+#AT_START_349
+at_fn_group_banner 349 'run_file.at:2082' \
   "WRITE+REWRITE FILE name " "                       " 3
 at_xfail=no
 (
-  $as_echo "348. $at_setup_line: testing $at_desc ..."
+  $as_echo "349. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -32415,13 +32661,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_348
-#AT_START_349
-at_fn_group_banner 349 'run_file.at:2234' \
+#AT_STOP_349
+#AT_START_350
+at_fn_group_banner 350 'run_file.at:2234' \
   "INDEXED File Locking" "                           " 3
 at_xfail=no
 (
-  $as_echo "349. $at_setup_line: testing $at_desc ..."
+  $as_echo "350. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -33156,13 +33402,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_349
-#AT_START_350
-at_fn_group_banner 350 'run_file.at:2892' \
+#AT_STOP_350
+#AT_START_351
+at_fn_group_banner 351 'run_file.at:2892' \
   "RELATIVE File Locking" "                          " 3
 at_xfail=no
 (
-  $as_echo "350. $at_setup_line: testing $at_desc ..."
+  $as_echo "351. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -33785,13 +34031,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_350
-#AT_START_351
-at_fn_group_banner 351 'run_file.at:3438' \
+#AT_STOP_351
+#AT_START_352
+at_fn_group_banner 352 'run_file.at:3438' \
   "Read on optional missing file" "                  " 3
 at_xfail=no
 (
-  $as_echo "351. $at_setup_line: testing $at_desc ..."
+  $as_echo "352. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -33880,13 +34126,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_351
-#AT_START_352
-at_fn_group_banner 352 'run_reportwriter.at:23' \
+#AT_STOP_352
+#AT_START_353
+at_fn_group_banner 353 'run_reportwriter.at:23' \
   "Report Line Order" "                              " 3
 at_xfail=no
 (
-  $as_echo "352. $at_setup_line: testing $at_desc ..."
+  $as_echo "353. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34027,13 +34273,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_352
-#AT_START_353
-at_fn_group_banner 353 'run_reportwriter.at:120' \
+#AT_STOP_353
+#AT_START_354
+at_fn_group_banner 354 'run_reportwriter.at:120' \
   "Report COL PLUS" "                                " 3
 at_xfail=no
 (
-  $as_echo "353. $at_setup_line: testing $at_desc ..."
+  $as_echo "354. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34146,13 +34392,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_353
-#AT_START_354
-at_fn_group_banner 354 'run_reportwriter.at:189' \
+#AT_STOP_354
+#AT_START_355
+at_fn_group_banner 355 'run_reportwriter.at:189' \
   "Report Overlapping Fields" "                      " 3
 at_xfail=no
 (
-  $as_echo "354. $at_setup_line: testing $at_desc ..."
+  $as_echo "355. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34265,13 +34511,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_354
-#AT_START_355
-at_fn_group_banner 355 'run_reportwriter.at:258' \
+#AT_STOP_355
+#AT_START_356
+at_fn_group_banner 356 'run_reportwriter.at:258' \
   "EMPTY REPORT" "                                   " 3
 at_xfail=no
 (
-  $as_echo "355. $at_setup_line: testing $at_desc ..."
+  $as_echo "356. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34382,13 +34628,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_355
-#AT_START_356
-at_fn_group_banner 356 'run_reportwriter.at:327' \
+#AT_STOP_356
+#AT_START_357
+at_fn_group_banner 357 'run_reportwriter.at:327' \
   "PAGE LIMIT REPORT" "                              " 3
 at_xfail=no
 (
-  $as_echo "356. $at_setup_line: testing $at_desc ..."
+  $as_echo "357. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34494,13 +34740,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_356
-#AT_START_357
-at_fn_group_banner 357 'run_reportwriter.at:389' \
+#AT_STOP_357
+#AT_START_358
+at_fn_group_banner 358 'run_reportwriter.at:389' \
   "PAGE LIMIT REPORT 2" "                            " 3
 at_xfail=no
 (
-  $as_echo "357. $at_setup_line: testing $at_desc ..."
+  $as_echo "358. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34616,13 +34862,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_357
-#AT_START_358
-at_fn_group_banner 358 'run_reportwriter.at:461' \
+#AT_STOP_358
+#AT_START_359
+at_fn_group_banner 359 'run_reportwriter.at:461' \
   "Sample Customer Report" "                         " 3
 at_xfail=no
 (
-  $as_echo "358. $at_setup_line: testing $at_desc ..."
+  $as_echo "359. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -34983,13 +35229,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_358
-#AT_START_359
-at_fn_group_banner 359 'run_reportwriter.at:776' \
+#AT_STOP_359
+#AT_START_360
+at_fn_group_banner 360 'run_reportwriter.at:776' \
   "Sample Charge Report" "                           " 3
 at_xfail=no
 (
-  $as_echo "359. $at_setup_line: testing $at_desc ..."
+  $as_echo "360. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -35388,13 +35634,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_359
-#AT_START_360
-at_fn_group_banner 360 'run_reportwriter.at:1129' \
+#AT_STOP_360
+#AT_START_361
+at_fn_group_banner 361 'run_reportwriter.at:1129' \
   "Sample Charge Report 2" "                         " 3
 at_xfail=no
 (
-  $as_echo "360. $at_setup_line: testing $at_desc ..."
+  $as_echo "361. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -35810,13 +36056,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_360
-#AT_START_361
-at_fn_group_banner 361 'run_reportwriter.at:1499' \
+#AT_STOP_361
+#AT_START_362
+at_fn_group_banner 362 'run_reportwriter.at:1499' \
   "Sample Charge Report 3" "                         " 3
 at_xfail=no
 (
-  $as_echo "361. $at_setup_line: testing $at_desc ..."
+  $as_echo "362. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -36162,13 +36408,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_361
-#AT_START_362
-at_fn_group_banner 362 'run_reportwriter.at:1799' \
+#AT_STOP_362
+#AT_START_363
+at_fn_group_banner 363 'run_reportwriter.at:1799' \
   "Sample Charge Report 4" "                         " 3
 at_xfail=no
 (
-  $as_echo "362. $at_setup_line: testing $at_desc ..."
+  $as_echo "363. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -36630,13 +36876,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_362
-#AT_START_363
-at_fn_group_banner 363 'run_reportwriter.at:2215' \
+#AT_STOP_363
+#AT_START_364
+at_fn_group_banner 364 'run_reportwriter.at:2215' \
   "Sample Payroll Report" "                          " 3
 at_xfail=no
 (
-  $as_echo "363. $at_setup_line: testing $at_desc ..."
+  $as_echo "364. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -37367,13 +37613,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_363
-#AT_START_364
-at_fn_group_banner 364 'run_reportwriter.at:2900' \
+#AT_STOP_364
+#AT_START_365
+at_fn_group_banner 365 'run_reportwriter.at:2900' \
   "Sample REPORT with RIGHT/CENTER" "                " 3
 at_xfail=no
 (
-  $as_echo "364. $at_setup_line: testing $at_desc ..."
+  $as_echo "365. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -37580,13 +37826,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_364
-#AT_START_365
-at_fn_group_banner 365 'run_reportwriter.at:3061' \
+#AT_STOP_365
+#AT_START_366
+at_fn_group_banner 366 'run_reportwriter.at:3061' \
   "STUDENT REPORT with INITIAL" "                    " 3
 at_xfail=no
 (
-  $as_echo "365. $at_setup_line: testing $at_desc ..."
+  $as_echo "366. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -37783,13 +38029,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_365
-#AT_START_366
-at_fn_group_banner 366 'run_reportwriter.at:3212' \
+#AT_STOP_366
+#AT_START_367
+at_fn_group_banner 367 'run_reportwriter.at:3212' \
   "ORDER REPORT; Test substring" "                   " 3
 at_xfail=no
 (
-  $as_echo "366. $at_setup_line: testing $at_desc ..."
+  $as_echo "367. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -38187,13 +38433,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_366
-#AT_START_367
-at_fn_group_banner 367 'run_reportwriter.at:3564' \
+#AT_STOP_367
+#AT_START_368
+at_fn_group_banner 368 'run_reportwriter.at:3564' \
   "Sample Control Break" "                           " 3
 at_xfail=no
 (
-  $as_echo "367. $at_setup_line: testing $at_desc ..."
+  $as_echo "368. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -38468,13 +38714,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_367
-#AT_START_368
-at_fn_group_banner 368 'run_reportwriter.at:3793' \
+#AT_STOP_368
+#AT_START_369
+at_fn_group_banner 369 'run_reportwriter.at:3793' \
   "Sample Inventory Report" "                        " 3
 at_xfail=no
 (
-  $as_echo "368. $at_setup_line: testing $at_desc ..."
+  $as_echo "369. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -38710,13 +38956,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_368
-#AT_START_369
-at_fn_group_banner 369 'run_reportwriter.at:3983' \
+#AT_STOP_369
+#AT_START_370
+at_fn_group_banner 370 'run_reportwriter.at:3983' \
   "Duplicate Detail Line" "                          " 3
 at_xfail=no
 (
-  $as_echo "369. $at_setup_line: testing $at_desc ..."
+  $as_echo "370. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -38888,13 +39134,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_369
-#AT_START_370
-at_fn_group_banner 370 'run_reportwriter.at:4111' \
+#AT_STOP_370
+#AT_START_371
+at_fn_group_banner 371 'run_reportwriter.at:4111' \
   "Report with OCCURS" "                             " 3
 at_xfail=no
 (
-  $as_echo "370. $at_setup_line: testing $at_desc ..."
+  $as_echo "371. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -39051,13 +39297,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_370
-#AT_START_371
-at_fn_group_banner 371 'run_reportwriter.at:4224' \
+#AT_STOP_371
+#AT_START_372
+at_fn_group_banner 372 'run_reportwriter.at:4224' \
   "Duplicate INITIATE" "                             " 3
 at_xfail=no
 (
-  $as_echo "371. $at_setup_line: testing $at_desc ..."
+  $as_echo "372. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -39167,13 +39413,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_371
-#AT_START_372
-at_fn_group_banner 372 'run_reportwriter.at:4290' \
+#AT_STOP_372
+#AT_START_373
+at_fn_group_banner 373 'run_reportwriter.at:4290' \
   "Missing INITIATE" "                               " 3
 at_xfail=no
 (
-  $as_echo "372. $at_setup_line: testing $at_desc ..."
+  $as_echo "373. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -39277,13 +39523,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_372
-#AT_START_373
-at_fn_group_banner 373 'run_reportwriter.at:4352' \
+#AT_STOP_373
+#AT_START_374
+at_fn_group_banner 374 'run_reportwriter.at:4352' \
   "Next Group Next Page" "                           " 3
 at_xfail=no
 (
-  $as_echo "373. $at_setup_line: testing $at_desc ..."
+  $as_echo "374. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -43652,13 +43898,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_373
-#AT_START_374
-at_fn_group_banner 374 'run_reportwriter.at:8675' \
+#AT_STOP_374
+#AT_START_375
+at_fn_group_banner 375 'run_reportwriter.at:8675' \
   "Report PRESENT AFTER" "                           " 3
 at_xfail=no
 (
-  $as_echo "374. $at_setup_line: testing $at_desc ..."
+  $as_echo "375. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -43964,13 +44210,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_374
-#AT_START_375
-at_fn_group_banner 375 'run_returncode.at:23' \
+#AT_STOP_375
+#AT_START_376
+at_fn_group_banner 376 'run_returncode.at:23' \
   "RETURN-CODE moving" "                             " 3
 at_xfail=no
 (
-  $as_echo "375. $at_setup_line: testing $at_desc ..."
+  $as_echo "376. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44026,13 +44272,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_375
-#AT_START_376
-at_fn_group_banner 376 'run_returncode.at:49' \
+#AT_STOP_376
+#AT_START_377
+at_fn_group_banner 377 'run_returncode.at:49' \
   "RETURN-CODE passing" "                            " 3
 at_xfail=no
 (
-  $as_echo "376. $at_setup_line: testing $at_desc ..."
+  $as_echo "377. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44142,13 +44388,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_376
-#AT_START_377
-at_fn_group_banner 377 'run_returncode.at:101' \
+#AT_STOP_377
+#AT_START_378
+at_fn_group_banner 378 'run_returncode.at:101' \
   "RETURN-CODE nested" "                             " 3
 at_xfail=no
 (
-  $as_echo "377. $at_setup_line: testing $at_desc ..."
+  $as_echo "378. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44215,13 +44461,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_377
-#AT_START_378
-at_fn_group_banner 378 'run_functions.at:25' \
+#AT_STOP_378
+#AT_START_379
+at_fn_group_banner 379 'run_functions.at:25' \
   "FUNCTION ABS" "                                   " 3
 at_xfail=no
 (
-  $as_echo "378. $at_setup_line: testing $at_desc ..."
+  $as_echo "379. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44272,13 +44518,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_378
-#AT_START_379
-at_fn_group_banner 379 'run_functions.at:47' \
+#AT_STOP_379
+#AT_START_380
+at_fn_group_banner 380 'run_functions.at:47' \
   "FUNCTION ACOS" "                                  " 3
 at_xfail=no
 (
-  $as_echo "379. $at_setup_line: testing $at_desc ..."
+  $as_echo "380. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44331,13 +44577,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_379
-#AT_START_380
-at_fn_group_banner 380 'run_functions.at:71' \
+#AT_STOP_380
+#AT_START_381
+at_fn_group_banner 381 'run_functions.at:71' \
   "FUNCTION ANNUITY" "                               " 3
 at_xfail=no
 (
-  $as_echo "380. $at_setup_line: testing $at_desc ..."
+  $as_echo "381. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44390,13 +44636,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_380
-#AT_START_381
-at_fn_group_banner 381 'run_functions.at:95' \
+#AT_STOP_381
+#AT_START_382
+at_fn_group_banner 382 'run_functions.at:95' \
   "FUNCTION ASIN" "                                  " 3
 at_xfail=no
 (
-  $as_echo "381. $at_setup_line: testing $at_desc ..."
+  $as_echo "382. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44449,13 +44695,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_381
-#AT_START_382
-at_fn_group_banner 382 'run_functions.at:119' \
+#AT_STOP_382
+#AT_START_383
+at_fn_group_banner 383 'run_functions.at:119' \
   "FUNCTION ATAN" "                                  " 3
 at_xfail=no
 (
-  $as_echo "382. $at_setup_line: testing $at_desc ..."
+  $as_echo "383. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44508,13 +44754,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_382
-#AT_START_383
-at_fn_group_banner 383 'run_functions.at:143' \
+#AT_STOP_383
+#AT_START_384
+at_fn_group_banner 384 'run_functions.at:143' \
   "FUNCTION BYTE-LENGTH" "                           " 3
 at_xfail=no
 (
-  $as_echo "383. $at_setup_line: testing $at_desc ..."
+  $as_echo "384. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44576,13 +44822,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_383
-#AT_START_384
-at_fn_group_banner 384 'run_functions.at:176' \
+#AT_STOP_384
+#AT_START_385
+at_fn_group_banner 385 'run_functions.at:176' \
   "FUNCTION CHAR" "                                  " 3
 at_xfail=no
 (
-  $as_echo "384. $at_setup_line: testing $at_desc ..."
+  $as_echo "385. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44649,13 +44895,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_384
-#AT_START_385
-at_fn_group_banner 385 'run_functions.at:214' \
+#AT_STOP_385
+#AT_START_386
+at_fn_group_banner 386 'run_functions.at:214' \
   "FUNCTION COMBINED-DATETIME" "                     " 3
 at_xfail=no
 (
-  $as_echo "385. $at_setup_line: testing $at_desc ..."
+  $as_echo "386. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44709,13 +44955,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_385
-#AT_START_386
-at_fn_group_banner 386 'run_functions.at:239' \
+#AT_STOP_386
+#AT_START_387
+at_fn_group_banner 387 'run_functions.at:239' \
   "FUNCTION CONCATENATE" "                           " 3
 at_xfail=no
 (
-  $as_echo "386. $at_setup_line: testing $at_desc ..."
+  $as_echo "387. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44783,13 +45029,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_386
-#AT_START_387
-at_fn_group_banner 387 'run_functions.at:278' \
+#AT_STOP_387
+#AT_START_388
+at_fn_group_banner 388 'run_functions.at:278' \
   "FUNCTION CONCATENATE with reference modding" "    " 3
 at_xfail=no
 (
-  $as_echo "387. $at_setup_line: testing $at_desc ..."
+  $as_echo "388. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44846,13 +45092,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_387
-#AT_START_388
-at_fn_group_banner 388 'run_functions.at:306' \
+#AT_STOP_388
+#AT_START_389
+at_fn_group_banner 389 'run_functions.at:306' \
   "FUNCTION COS" "                                   " 3
 at_xfail=no
 (
-  $as_echo "388. $at_setup_line: testing $at_desc ..."
+  $as_echo "389. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44905,13 +45151,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_388
-#AT_START_389
-at_fn_group_banner 389 'run_functions.at:330' \
+#AT_STOP_389
+#AT_START_390
+at_fn_group_banner 390 'run_functions.at:330' \
   "FUNCTION CURRENCY-SYMBOL" "                       " 3
 at_xfail=no
 (
-  $as_echo "389. $at_setup_line: testing $at_desc ..."
+  $as_echo "390. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -44964,13 +45210,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_389
-#AT_START_390
-at_fn_group_banner 390 'run_functions.at:353' \
+#AT_STOP_390
+#AT_START_391
+at_fn_group_banner 391 'run_functions.at:353' \
   "FUNCTION CURRENT-DATE" "                          " 3
 at_xfail=no
 (
-  $as_echo "390. $at_setup_line: testing $at_desc ..."
+  $as_echo "391. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45070,13 +45316,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_390
-#AT_START_391
-at_fn_group_banner 391 'run_functions.at:424' \
+#AT_STOP_391
+#AT_START_392
+at_fn_group_banner 392 'run_functions.at:424' \
   "FUNCTION DATE-OF-INTEGER" "                       " 3
 at_xfail=no
 (
-  $as_echo "391. $at_setup_line: testing $at_desc ..."
+  $as_echo "392. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45130,13 +45376,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_391
-#AT_START_392
-at_fn_group_banner 392 'run_functions.at:449' \
+#AT_STOP_392
+#AT_START_393
+at_fn_group_banner 393 'run_functions.at:449' \
   "FUNCTION DATE-TO-YYYYMMDD" "                      " 3
 at_xfail=no
 (
-  $as_echo "392. $at_setup_line: testing $at_desc ..."
+  $as_echo "393. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45190,13 +45436,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_392
-#AT_START_393
-at_fn_group_banner 393 'run_functions.at:474' \
+#AT_STOP_393
+#AT_START_394
+at_fn_group_banner 394 'run_functions.at:474' \
   "FUNCTION DAY-OF-INTEGER" "                        " 3
 at_xfail=no
 (
-  $as_echo "393. $at_setup_line: testing $at_desc ..."
+  $as_echo "394. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45250,13 +45496,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_393
-#AT_START_394
-at_fn_group_banner 394 'run_functions.at:499' \
+#AT_STOP_394
+#AT_START_395
+at_fn_group_banner 395 'run_functions.at:499' \
   "FUNCTION DAY-TO-YYYYDDD" "                        " 3
 at_xfail=no
 (
-  $as_echo "394. $at_setup_line: testing $at_desc ..."
+  $as_echo "395. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45310,13 +45556,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_394
-#AT_START_395
-at_fn_group_banner 395 'run_functions.at:524' \
+#AT_STOP_395
+#AT_START_396
+at_fn_group_banner 396 'run_functions.at:524' \
   "FUNCTION E" "                                     " 3
 at_xfail=no
 (
-  $as_echo "395. $at_setup_line: testing $at_desc ..."
+  $as_echo "396. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45369,13 +45615,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_395
-#AT_START_396
-at_fn_group_banner 396 'run_functions.at:548' \
+#AT_STOP_396
+#AT_START_397
+at_fn_group_banner 397 'run_functions.at:548' \
   "FUNCTION EXCEPTION-FILE" "                        " 3
 at_xfail=no
 (
-  $as_echo "396. $at_setup_line: testing $at_desc ..."
+  $as_echo "397. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45436,13 +45682,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_396
-#AT_START_397
-at_fn_group_banner 397 'run_functions.at:580' \
+#AT_STOP_397
+#AT_START_398
+at_fn_group_banner 398 'run_functions.at:580' \
   "FUNCTION EXCEPTION-LOCATION" "                    " 3
 at_xfail=no
 (
-  $as_echo "397. $at_setup_line: testing $at_desc ..."
+  $as_echo "398. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45507,13 +45753,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_397
-#AT_START_398
-at_fn_group_banner 398 'run_functions.at:616' \
+#AT_STOP_398
+#AT_START_399
+at_fn_group_banner 399 'run_functions.at:616' \
   "FUNCTION EXCEPTION-STATEMENT" "                   " 3
 at_xfail=no
 (
-  $as_echo "398. $at_setup_line: testing $at_desc ..."
+  $as_echo "399. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45574,13 +45820,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_398
-#AT_START_399
-at_fn_group_banner 399 'run_functions.at:648' \
+#AT_STOP_399
+#AT_START_400
+at_fn_group_banner 400 'run_functions.at:648' \
   "FUNCTION EXCEPTION-STATUS" "                      " 3
 at_xfail=no
 (
-  $as_echo "399. $at_setup_line: testing $at_desc ..."
+  $as_echo "400. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45641,13 +45887,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_399
-#AT_START_400
-at_fn_group_banner 400 'run_functions.at:680' \
+#AT_STOP_400
+#AT_START_401
+at_fn_group_banner 401 'run_functions.at:680' \
   "FUNCTION EXP" "                                   " 3
 at_xfail=no
 (
-  $as_echo "400. $at_setup_line: testing $at_desc ..."
+  $as_echo "401. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45700,13 +45946,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_400
-#AT_START_401
-at_fn_group_banner 401 'run_functions.at:704' \
+#AT_STOP_401
+#AT_START_402
+at_fn_group_banner 402 'run_functions.at:704' \
   "FUNCTION EXP10" "                                 " 3
 at_xfail=no
 (
-  $as_echo "401. $at_setup_line: testing $at_desc ..."
+  $as_echo "402. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45760,13 +46006,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_401
-#AT_START_402
-at_fn_group_banner 402 'run_functions.at:729' \
+#AT_STOP_402
+#AT_START_403
+at_fn_group_banner 403 'run_functions.at:729' \
   "FUNCTION FACTORIAL" "                             " 3
 at_xfail=no
 (
-  $as_echo "402. $at_setup_line: testing $at_desc ..."
+  $as_echo "403. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45820,13 +46066,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_402
-#AT_START_403
-at_fn_group_banner 403 'run_functions.at:754' \
+#AT_STOP_403
+#AT_START_404
+at_fn_group_banner 404 'run_functions.at:754' \
   "FUNCTION FORMATTED-CURRENT-DATE" "                " 3
 at_xfail=no
 (
-  $as_echo "403. $at_setup_line: testing $at_desc ..."
+  $as_echo "404. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45883,13 +46129,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_403
-#AT_START_404
-at_fn_group_banner 404 'run_functions.at:782' \
+#AT_STOP_404
+#AT_START_405
+at_fn_group_banner 405 'run_functions.at:782' \
   "FUNCTION FORMATTED-DATE" "                        " 3
 at_xfail=no
 (
-  $as_echo "404. $at_setup_line: testing $at_desc ..."
+  $as_echo "405. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -45981,13 +46227,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_404
-#AT_START_405
-at_fn_group_banner 405 'run_functions.at:845' \
+#AT_STOP_405
+#AT_START_406
+at_fn_group_banner 406 'run_functions.at:845' \
   "FUNCTION FORMATTED-DATE with ref modding" "       " 3
 at_xfail=no
 (
-  $as_echo "405. $at_setup_line: testing $at_desc ..."
+  $as_echo "406. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46041,13 +46287,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_405
-#AT_START_406
-at_fn_group_banner 406 'run_functions.at:870' \
+#AT_STOP_406
+#AT_START_407
+at_fn_group_banner 407 'run_functions.at:870' \
   "FUNCTION FORMATTED-DATETIME" "                    " 3
 at_xfail=no
 (
-  $as_echo "406. $at_setup_line: testing $at_desc ..."
+  $as_echo "407. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46133,13 +46379,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_406
-#AT_START_407
-at_fn_group_banner 407 'run_functions.at:927' \
+#AT_STOP_407
+#AT_START_408
+at_fn_group_banner 408 'run_functions.at:927' \
   "FUNCTION FORMATTED-DATETIME with ref modding" "   " 3
 at_xfail=no
 (
-  $as_echo "407. $at_setup_line: testing $at_desc ..."
+  $as_echo "408. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46194,13 +46440,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_407
-#AT_START_408
-at_fn_group_banner 408 'run_functions.at:953' \
+#AT_STOP_408
+#AT_START_409
+at_fn_group_banner 409 'run_functions.at:953' \
   "FUNCTION FORMATTED-TIME" "                        " 3
 at_xfail=no
 (
-  $as_echo "408. $at_setup_line: testing $at_desc ..."
+  $as_echo "409. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46316,13 +46562,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_408
-#AT_START_409
-at_fn_group_banner 409 'run_functions.at:1040' \
+#AT_STOP_409
+#AT_START_410
+at_fn_group_banner 410 'run_functions.at:1040' \
   "FUNCTION FORMATTED-TIME DP.COMMA" "               " 3
 at_xfail=no
 (
-  $as_echo "409. $at_setup_line: testing $at_desc ..."
+  $as_echo "410. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46382,13 +46628,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_409
-#AT_START_410
-at_fn_group_banner 410 'run_functions.at:1071' \
+#AT_STOP_410
+#AT_START_411
+at_fn_group_banner 411 'run_functions.at:1071' \
   "FUNCTION FORMATTED-TIME with ref modding" "       " 3
 at_xfail=no
 (
-  $as_echo "410. $at_setup_line: testing $at_desc ..."
+  $as_echo "411. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46442,13 +46688,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_410
-#AT_START_411
-at_fn_group_banner 411 'run_functions.at:1096' \
+#AT_STOP_411
+#AT_START_412
+at_fn_group_banner 412 'run_functions.at:1096' \
   "FUNCTION FRACTION-PART" "                         " 3
 at_xfail=no
 (
-  $as_echo "411. $at_setup_line: testing $at_desc ..."
+  $as_echo "412. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46508,13 +46754,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_411
-#AT_START_412
-at_fn_group_banner 412 'run_functions.at:1127' \
+#AT_STOP_412
+#AT_START_413
+at_fn_group_banner 413 'run_functions.at:1127' \
   "FUNCTION HIGHEST-ALGEBRAIC" "                     " 3
 at_xfail=no
 (
-  $as_echo "412. $at_setup_line: testing $at_desc ..."
+  $as_echo "413. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46611,13 +46857,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_412
-#AT_START_413
-at_fn_group_banner 413 'run_functions.at:1195' \
+#AT_STOP_413
+#AT_START_414
+at_fn_group_banner 414 'run_functions.at:1195' \
   "FUNCTION INTEGER" "                               " 3
 at_xfail=no
 (
-  $as_echo "413. $at_setup_line: testing $at_desc ..."
+  $as_echo "414. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46679,13 +46925,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_413
-#AT_START_414
-at_fn_group_banner 414 'run_functions.at:1228' \
+#AT_STOP_414
+#AT_START_415
+at_fn_group_banner 415 'run_functions.at:1228' \
   "FUNCTION INTEGER-OF-DATE" "                       " 3
 at_xfail=no
 (
-  $as_echo "414. $at_setup_line: testing $at_desc ..."
+  $as_echo "415. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46739,13 +46985,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_414
-#AT_START_415
-at_fn_group_banner 415 'run_functions.at:1253' \
+#AT_STOP_415
+#AT_START_416
+at_fn_group_banner 416 'run_functions.at:1253' \
   "FUNCTION INTEGER-OF-DAY" "                        " 3
 at_xfail=no
 (
-  $as_echo "415. $at_setup_line: testing $at_desc ..."
+  $as_echo "416. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46799,13 +47045,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_415
-#AT_START_416
-at_fn_group_banner 416 'run_functions.at:1278' \
+#AT_STOP_416
+#AT_START_417
+at_fn_group_banner 417 'run_functions.at:1278' \
   "FUNCTION INTEGER-OF-FORMATTED-DATE" "             " 3
 at_xfail=no
 (
-  $as_echo "416. $at_setup_line: testing $at_desc ..."
+  $as_echo "417. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46884,13 +47130,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_416
-#AT_START_417
-at_fn_group_banner 417 'run_functions.at:1328' \
+#AT_STOP_417
+#AT_START_418
+at_fn_group_banner 418 'run_functions.at:1328' \
   "FUNCTION INTEGER-PART" "                          " 3
 at_xfail=no
 (
-  $as_echo "417. $at_setup_line: testing $at_desc ..."
+  $as_echo "418. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -46945,13 +47191,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_417
-#AT_START_418
-at_fn_group_banner 418 'run_functions.at:1354' \
+#AT_STOP_418
+#AT_START_419
+at_fn_group_banner 419 'run_functions.at:1354' \
   "FUNCTION LENGTH" "                                " 3
 at_xfail=no
 (
-  $as_echo "418. $at_setup_line: testing $at_desc ..."
+  $as_echo "419. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47006,13 +47252,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_418
-#AT_START_419
-at_fn_group_banner 419 'run_functions.at:1380' \
+#AT_STOP_419
+#AT_START_420
+at_fn_group_banner 420 'run_functions.at:1380' \
   "FUNCTION LOCALE-COMPARE" "                        " 3
 at_xfail=no
 (
-  $as_echo "419. $at_setup_line: testing $at_desc ..."
+  $as_echo "420. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47071,13 +47317,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_419
-#AT_START_420
-at_fn_group_banner 420 'run_functions.at:1410' \
+#AT_STOP_420
+#AT_START_421
+at_fn_group_banner 421 'run_functions.at:1410' \
   "FUNCTION LOCALE-DATE" "                           " 3
 at_xfail=no
 (
-  $as_echo "420. $at_setup_line: testing $at_desc ..."
+  $as_echo "421. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47132,13 +47378,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_420
-#AT_START_421
-at_fn_group_banner 421 'run_functions.at:1436' \
+#AT_STOP_421
+#AT_START_422
+at_fn_group_banner 422 'run_functions.at:1436' \
   "FUNCTION LOCALE-TIME" "                           " 3
 at_xfail=no
 (
-  $as_echo "421. $at_setup_line: testing $at_desc ..."
+  $as_echo "422. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47193,13 +47439,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_421
-#AT_START_422
-at_fn_group_banner 422 'run_functions.at:1462' \
+#AT_STOP_422
+#AT_START_423
+at_fn_group_banner 423 'run_functions.at:1462' \
   "FUNCTION LOCALE-TIME-FROM-SECONDS" "              " 3
 at_xfail=no
 (
-  $as_echo "422. $at_setup_line: testing $at_desc ..."
+  $as_echo "423. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47254,13 +47500,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_422
-#AT_START_423
-at_fn_group_banner 423 'run_functions.at:1488' \
+#AT_STOP_423
+#AT_START_424
+at_fn_group_banner 424 'run_functions.at:1488' \
   "FUNCTION LOG" "                                   " 3
 at_xfail=no
 (
-  $as_echo "423. $at_setup_line: testing $at_desc ..."
+  $as_echo "424. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47313,13 +47559,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_423
-#AT_START_424
-at_fn_group_banner 424 'run_functions.at:1512' \
+#AT_STOP_424
+#AT_START_425
+at_fn_group_banner 425 'run_functions.at:1512' \
   "FUNCTION LOG10" "                                 " 3
 at_xfail=no
 (
-  $as_echo "424. $at_setup_line: testing $at_desc ..."
+  $as_echo "425. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47372,13 +47618,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_424
-#AT_START_425
-at_fn_group_banner 425 'run_functions.at:1536' \
+#AT_STOP_425
+#AT_START_426
+at_fn_group_banner 426 'run_functions.at:1536' \
   "FUNCTION LOWER-CASE" "                            " 3
 at_xfail=no
 (
-  $as_echo "425. $at_setup_line: testing $at_desc ..."
+  $as_echo "426. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47435,13 +47681,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_425
-#AT_START_426
-at_fn_group_banner 426 'run_functions.at:1564' \
+#AT_STOP_426
+#AT_START_427
+at_fn_group_banner 427 'run_functions.at:1564' \
   "FUNCTION LOWER-CASE with reference modding" "     " 3
 at_xfail=no
 (
-  $as_echo "426. $at_setup_line: testing $at_desc ..."
+  $as_echo "427. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47496,13 +47742,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_426
-#AT_START_427
-at_fn_group_banner 427 'run_functions.at:1590' \
+#AT_STOP_427
+#AT_START_428
+at_fn_group_banner 428 'run_functions.at:1590' \
   "FUNCTION LOWEST-ALGEBRAIC" "                      " 3
 at_xfail=no
 (
-  $as_echo "427. $at_setup_line: testing $at_desc ..."
+  $as_echo "428. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47584,13 +47830,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_427
-#AT_START_428
-at_fn_group_banner 428 'run_functions.at:1643' \
+#AT_STOP_428
+#AT_START_429
+at_fn_group_banner 429 'run_functions.at:1643' \
   "FUNCTION MAX" "                                   " 3
 at_xfail=no
 (
-  $as_echo "428. $at_setup_line: testing $at_desc ..."
+  $as_echo "429. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47641,13 +47887,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_428
-#AT_START_429
-at_fn_group_banner 429 'run_functions.at:1665' \
+#AT_STOP_429
+#AT_START_430
+at_fn_group_banner 430 'run_functions.at:1665' \
   "FUNCTION MEAN" "                                  " 3
 at_xfail=no
 (
-  $as_echo "429. $at_setup_line: testing $at_desc ..."
+  $as_echo "430. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47698,13 +47944,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_429
-#AT_START_430
-at_fn_group_banner 430 'run_functions.at:1687' \
+#AT_STOP_430
+#AT_START_431
+at_fn_group_banner 431 'run_functions.at:1687' \
   "FUNCTION MEDIAN" "                                " 3
 at_xfail=no
 (
-  $as_echo "430. $at_setup_line: testing $at_desc ..."
+  $as_echo "431. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47755,13 +48001,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_430
-#AT_START_431
-at_fn_group_banner 431 'run_functions.at:1709' \
+#AT_STOP_431
+#AT_START_432
+at_fn_group_banner 432 'run_functions.at:1709' \
   "FUNCTION MIDRANGE" "                              " 3
 at_xfail=no
 (
-  $as_echo "431. $at_setup_line: testing $at_desc ..."
+  $as_echo "432. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47812,13 +48058,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_431
-#AT_START_432
-at_fn_group_banner 432 'run_functions.at:1731' \
+#AT_STOP_432
+#AT_START_433
+at_fn_group_banner 433 'run_functions.at:1731' \
   "FUNCTION MIN" "                                   " 3
 at_xfail=no
 (
-  $as_echo "432. $at_setup_line: testing $at_desc ..."
+  $as_echo "433. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47869,13 +48115,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_432
-#AT_START_433
-at_fn_group_banner 433 'run_functions.at:1753' \
+#AT_STOP_433
+#AT_START_434
+at_fn_group_banner 434 'run_functions.at:1753' \
   "FUNCTION MOD" "                                   " 3
 at_xfail=no
 (
-  $as_echo "433. $at_setup_line: testing $at_desc ..."
+  $as_echo "434. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -47930,13 +48176,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_433
-#AT_START_434
-at_fn_group_banner 434 'run_functions.at:1779' \
+#AT_STOP_434
+#AT_START_435
+at_fn_group_banner 435 'run_functions.at:1779' \
   "FUNCTION MODULE-CALLER-ID" "                      " 3
 at_xfail=no
 (
-  $as_echo "434. $at_setup_line: testing $at_desc ..."
+  $as_echo "435. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48014,13 +48260,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_434
-#AT_START_435
-at_fn_group_banner 435 'run_functions.at:1813' \
+#AT_STOP_435
+#AT_START_436
+at_fn_group_banner 436 'run_functions.at:1813' \
   "FUNCTION MODULE-DATE" "                           " 3
 at_xfail=no
 (
-  $as_echo "435. $at_setup_line: testing $at_desc ..."
+  $as_echo "436. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48075,13 +48321,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_435
-#AT_START_436
-at_fn_group_banner 436 'run_functions.at:1838' \
+#AT_STOP_436
+#AT_START_437
+at_fn_group_banner 437 'run_functions.at:1838' \
   "FUNCTION MODULE-FORMATTED-DATE" "                 " 3
 at_xfail=no
 (
-  $as_echo "436. $at_setup_line: testing $at_desc ..."
+  $as_echo "437. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48136,13 +48382,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_436
-#AT_START_437
-at_fn_group_banner 437 'run_functions.at:1863' \
+#AT_STOP_437
+#AT_START_438
+at_fn_group_banner 438 'run_functions.at:1863' \
   "FUNCTION MODULE-ID" "                             " 3
 at_xfail=no
 (
-  $as_echo "437. $at_setup_line: testing $at_desc ..."
+  $as_echo "438. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48193,13 +48439,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_437
-#AT_START_438
-at_fn_group_banner 438 'run_functions.at:1884' \
+#AT_STOP_438
+#AT_START_439
+at_fn_group_banner 439 'run_functions.at:1884' \
   "FUNCTION MODULE-PATH" "                           " 3
 at_xfail=no
 (
-  $as_echo "438. $at_setup_line: testing $at_desc ..."
+  $as_echo "439. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48254,13 +48500,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_438
-#AT_START_439
-at_fn_group_banner 439 'run_functions.at:1909' \
+#AT_STOP_439
+#AT_START_440
+at_fn_group_banner 440 'run_functions.at:1909' \
   "FUNCTION MODULE-SOURCE" "                         " 3
 at_xfail=no
 (
-  $as_echo "439. $at_setup_line: testing $at_desc ..."
+  $as_echo "440. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48311,13 +48557,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_439
-#AT_START_440
-at_fn_group_banner 440 'run_functions.at:1930' \
+#AT_STOP_440
+#AT_START_441
+at_fn_group_banner 441 'run_functions.at:1930' \
   "FUNCTION MODULE-TIME" "                           " 3
 at_xfail=no
 (
-  $as_echo "440. $at_setup_line: testing $at_desc ..."
+  $as_echo "441. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48372,13 +48618,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_440
-#AT_START_441
-at_fn_group_banner 441 'run_functions.at:1955' \
+#AT_STOP_441
+#AT_START_442
+at_fn_group_banner 442 'run_functions.at:1955' \
   "FUNCTION MONETARY-DECIMAL-POINT" "                " 3
 at_xfail=no
 (
-  $as_echo "441. $at_setup_line: testing $at_desc ..."
+  $as_echo "442. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48431,13 +48677,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_441
-#AT_START_442
-at_fn_group_banner 442 'run_functions.at:1978' \
+#AT_STOP_442
+#AT_START_443
+at_fn_group_banner 443 'run_functions.at:1978' \
   "FUNCTION MONETARY-THOUSANDS-SEPARATOR" "          " 3
 at_xfail=no
 (
-  $as_echo "442. $at_setup_line: testing $at_desc ..."
+  $as_echo "443. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48490,13 +48736,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_442
-#AT_START_443
-at_fn_group_banner 443 'run_functions.at:2001' \
+#AT_STOP_443
+#AT_START_444
+at_fn_group_banner 444 'run_functions.at:2001' \
   "FUNCTION NUMERIC-DECIMAL-POINT" "                 " 3
 at_xfail=no
 (
-  $as_echo "443. $at_setup_line: testing $at_desc ..."
+  $as_echo "444. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48549,13 +48795,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_443
-#AT_START_444
-at_fn_group_banner 444 'run_functions.at:2024' \
+#AT_STOP_444
+#AT_START_445
+at_fn_group_banner 445 'run_functions.at:2024' \
   "FUNCTION NUMERIC-THOUSANDS-SEPARATOR" "           " 3
 at_xfail=no
 (
-  $as_echo "444. $at_setup_line: testing $at_desc ..."
+  $as_echo "445. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48608,13 +48854,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_444
-#AT_START_445
-at_fn_group_banner 445 'run_functions.at:2047' \
+#AT_STOP_445
+#AT_START_446
+at_fn_group_banner 446 'run_functions.at:2047' \
   "FUNCTION NUMVAL" "                                " 3
 at_xfail=no
 (
-  $as_echo "445. $at_setup_line: testing $at_desc ..."
+  $as_echo "446. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48674,13 +48920,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_445
-#AT_START_446
-at_fn_group_banner 446 'run_functions.at:2078' \
+#AT_STOP_446
+#AT_START_447
+at_fn_group_banner 447 'run_functions.at:2078' \
   "FUNCTION NUMVAL-C" "                              " 3
 at_xfail=no
 (
-  $as_echo "446. $at_setup_line: testing $at_desc ..."
+  $as_echo "447. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48740,13 +48986,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_446
-#AT_START_447
-at_fn_group_banner 447 'run_functions.at:2109' \
+#AT_STOP_447
+#AT_START_448
+at_fn_group_banner 448 'run_functions.at:2109' \
   "FUNCTION NUMVAL-C DP.COMMA" "                     " 3
 at_xfail=no
 (
-  $as_echo "447. $at_setup_line: testing $at_desc ..."
+  $as_echo "448. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48805,13 +49051,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_447
-#AT_START_448
-at_fn_group_banner 448 'run_functions.at:2139' \
+#AT_STOP_448
+#AT_START_449
+at_fn_group_banner 449 'run_functions.at:2139' \
   "FUNCTION NUMVAL-F" "                              " 3
 at_xfail=no
 (
-  $as_echo "448. $at_setup_line: testing $at_desc ..."
+  $as_echo "449. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48863,13 +49109,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_448
-#AT_START_449
-at_fn_group_banner 449 'run_functions.at:2162' \
+#AT_STOP_449
+#AT_START_450
+at_fn_group_banner 450 'run_functions.at:2162' \
   "FUNCTION ORD" "                                   " 3
 at_xfail=no
 (
-  $as_echo "449. $at_setup_line: testing $at_desc ..."
+  $as_echo "450. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48920,13 +49166,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_449
-#AT_START_450
-at_fn_group_banner 450 'run_functions.at:2184' \
+#AT_STOP_450
+#AT_START_451
+at_fn_group_banner 451 'run_functions.at:2184' \
   "FUNCTION ORD-MAX" "                               " 3
 at_xfail=no
 (
-  $as_echo "450. $at_setup_line: testing $at_desc ..."
+  $as_echo "451. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -48977,13 +49223,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_450
-#AT_START_451
-at_fn_group_banner 451 'run_functions.at:2206' \
+#AT_STOP_451
+#AT_START_452
+at_fn_group_banner 452 'run_functions.at:2206' \
   "FUNCTION ORD-MIN" "                               " 3
 at_xfail=no
 (
-  $as_echo "451. $at_setup_line: testing $at_desc ..."
+  $as_echo "452. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49034,13 +49280,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_451
-#AT_START_452
-at_fn_group_banner 452 'run_functions.at:2228' \
+#AT_STOP_452
+#AT_START_453
+at_fn_group_banner 453 'run_functions.at:2228' \
   "FUNCTION PI" "                                    " 3
 at_xfail=no
 (
-  $as_echo "452. $at_setup_line: testing $at_desc ..."
+  $as_echo "453. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49093,13 +49339,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_452
-#AT_START_453
-at_fn_group_banner 453 'run_functions.at:2252' \
+#AT_STOP_453
+#AT_START_454
+at_fn_group_banner 454 'run_functions.at:2252' \
   "FUNCTION PRESENT-VALUE" "                         " 3
 at_xfail=no
 (
-  $as_echo "453. $at_setup_line: testing $at_desc ..."
+  $as_echo "454. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49150,13 +49396,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_453
-#AT_START_454
-at_fn_group_banner 454 'run_functions.at:2274' \
+#AT_STOP_454
+#AT_START_455
+at_fn_group_banner 455 'run_functions.at:2274' \
   "FUNCTION RANDOM" "                                " 3
 at_xfail=no
 (
-  $as_echo "454. $at_setup_line: testing $at_desc ..."
+  $as_echo "455. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49209,13 +49455,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_454
-#AT_START_455
-at_fn_group_banner 455 'run_functions.at:2298' \
+#AT_STOP_455
+#AT_START_456
+at_fn_group_banner 456 'run_functions.at:2298' \
   "FUNCTION RANGE" "                                 " 3
 at_xfail=no
 (
-  $as_echo "455. $at_setup_line: testing $at_desc ..."
+  $as_echo "456. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49268,13 +49514,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_455
-#AT_START_456
-at_fn_group_banner 456 'run_functions.at:2322' \
+#AT_STOP_456
+#AT_START_457
+at_fn_group_banner 457 'run_functions.at:2322' \
   "FUNCTION REM" "                                   " 3
 at_xfail=no
 (
-  $as_echo "456. $at_setup_line: testing $at_desc ..."
+  $as_echo "457. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49327,13 +49573,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_456
-#AT_START_457
-at_fn_group_banner 457 'run_functions.at:2346' \
+#AT_STOP_457
+#AT_START_458
+at_fn_group_banner 458 'run_functions.at:2346' \
   "FUNCTION REVERSE" "                               " 3
 at_xfail=no
 (
-  $as_echo "457. $at_setup_line: testing $at_desc ..."
+  $as_echo "458. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49387,13 +49633,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_457
-#AT_START_458
-at_fn_group_banner 458 'run_functions.at:2371' \
+#AT_STOP_458
+#AT_START_459
+at_fn_group_banner 459 'run_functions.at:2371' \
   "FUNCTION REVERSE with reference modding" "        " 3
 at_xfail=no
 (
-  $as_echo "458. $at_setup_line: testing $at_desc ..."
+  $as_echo "459. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49447,13 +49693,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_458
-#AT_START_459
-at_fn_group_banner 459 'run_functions.at:2396' \
+#AT_STOP_459
+#AT_START_460
+at_fn_group_banner 460 'run_functions.at:2396' \
   "FUNCTION SECONDS-FROM-FORMATTED-TIME" "           " 3
 at_xfail=no
 (
-  $as_echo "459. $at_setup_line: testing $at_desc ..."
+  $as_echo "460. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49549,13 +49795,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_459
-#AT_START_460
-at_fn_group_banner 460 'run_functions.at:2463' \
+#AT_STOP_460
+#AT_START_461
+at_fn_group_banner 461 'run_functions.at:2463' \
   "FUNCTION SECONDS-PAST-MIDNIGHT" "                 " 3
 at_xfail=no
 (
-  $as_echo "460. $at_setup_line: testing $at_desc ..."
+  $as_echo "461. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49608,13 +49854,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_460
-#AT_START_461
-at_fn_group_banner 461 'run_functions.at:2487' \
+#AT_STOP_461
+#AT_START_462
+at_fn_group_banner 462 'run_functions.at:2487' \
   "FUNCTION SIGN" "                                  " 3
 at_xfail=no
 (
-  $as_echo "461. $at_setup_line: testing $at_desc ..."
+  $as_echo "462. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49682,13 +49928,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_461
-#AT_START_462
-at_fn_group_banner 462 'run_functions.at:2526' \
+#AT_STOP_462
+#AT_START_463
+at_fn_group_banner 463 'run_functions.at:2526' \
   "FUNCTION SIN" "                                   " 3
 at_xfail=no
 (
-  $as_echo "462. $at_setup_line: testing $at_desc ..."
+  $as_echo "463. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49741,13 +49987,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_462
-#AT_START_463
-at_fn_group_banner 463 'run_functions.at:2550' \
+#AT_STOP_463
+#AT_START_464
+at_fn_group_banner 464 'run_functions.at:2550' \
   "FUNCTION SQRT" "                                  " 3
 at_xfail=no
 (
-  $as_echo "463. $at_setup_line: testing $at_desc ..."
+  $as_echo "464. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49800,13 +50046,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_463
-#AT_START_464
-at_fn_group_banner 464 'run_functions.at:2574' \
+#AT_STOP_464
+#AT_START_465
+at_fn_group_banner 465 'run_functions.at:2574' \
   "FUNCTION STANDARD-DEVIATION" "                    " 3
 at_xfail=no
 (
-  $as_echo "464. $at_setup_line: testing $at_desc ..."
+  $as_echo "465. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49859,13 +50105,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_464
-#AT_START_465
-at_fn_group_banner 465 'run_functions.at:2598' \
+#AT_STOP_465
+#AT_START_466
+at_fn_group_banner 466 'run_functions.at:2598' \
   "FUNCTION STORED-CHAR-LENGTH" "                    " 3
 at_xfail=no
 (
-  $as_echo "465. $at_setup_line: testing $at_desc ..."
+  $as_echo "466. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49920,13 +50166,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_465
-#AT_START_466
-at_fn_group_banner 466 'run_functions.at:2624' \
+#AT_STOP_466
+#AT_START_467
+at_fn_group_banner 467 'run_functions.at:2624' \
   "FUNCTION SUBSTITUTE" "                            " 3
 at_xfail=no
 (
-  $as_echo "466. $at_setup_line: testing $at_desc ..."
+  $as_echo "467. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -49984,13 +50230,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_466
-#AT_START_467
-at_fn_group_banner 467 'run_functions.at:2653' \
+#AT_STOP_467
+#AT_START_468
+at_fn_group_banner 468 'run_functions.at:2653' \
   "FUNCTION SUBSTITUTE with reference modding" "     " 3
 at_xfail=no
 (
-  $as_echo "467. $at_setup_line: testing $at_desc ..."
+  $as_echo "468. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50047,13 +50293,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_467
-#AT_START_468
-at_fn_group_banner 468 'run_functions.at:2681' \
+#AT_STOP_468
+#AT_START_469
+at_fn_group_banner 469 'run_functions.at:2681' \
   "FUNCTION SUBSTITUTE-CASE" "                       " 3
 at_xfail=no
 (
-  $as_echo "468. $at_setup_line: testing $at_desc ..."
+  $as_echo "469. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50109,13 +50355,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_468
-#AT_START_469
-at_fn_group_banner 469 'run_functions.at:2708' \
+#AT_STOP_469
+#AT_START_470
+at_fn_group_banner 470 'run_functions.at:2708' \
   "FUNCTION SUBSTITUTE-CASE with reference mod" "    " 3
 at_xfail=no
 (
-  $as_echo "469. $at_setup_line: testing $at_desc ..."
+  $as_echo "470. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50172,13 +50418,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_469
-#AT_START_470
-at_fn_group_banner 470 'run_functions.at:2736' \
+#AT_STOP_470
+#AT_START_471
+at_fn_group_banner 471 'run_functions.at:2736' \
   "FUNCTION SUM" "                                   " 3
 at_xfail=no
 (
-  $as_echo "470. $at_setup_line: testing $at_desc ..."
+  $as_echo "471. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50231,13 +50477,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_470
-#AT_START_471
-at_fn_group_banner 471 'run_functions.at:2760' \
+#AT_STOP_471
+#AT_START_472
+at_fn_group_banner 472 'run_functions.at:2760' \
   "FUNCTION TAN" "                                   " 3
 at_xfail=no
 (
-  $as_echo "471. $at_setup_line: testing $at_desc ..."
+  $as_echo "472. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50290,13 +50536,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_471
-#AT_START_472
-at_fn_group_banner 472 'run_functions.at:2784' \
+#AT_STOP_472
+#AT_START_473
+at_fn_group_banner 473 'run_functions.at:2784' \
   "FUNCTION TEST-DATE-YYYYMMDD" "                    " 3
 at_xfail=no
 (
-  $as_echo "472. $at_setup_line: testing $at_desc ..."
+  $as_echo "473. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50347,13 +50593,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_472
-#AT_START_473
-at_fn_group_banner 473 'run_functions.at:2806' \
+#AT_STOP_473
+#AT_START_474
+at_fn_group_banner 474 'run_functions.at:2806' \
   "FUNCTION TEST-DAY-YYYYDDD" "                      " 3
 at_xfail=no
 (
-  $as_echo "473. $at_setup_line: testing $at_desc ..."
+  $as_echo "474. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50404,13 +50650,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_473
-#AT_START_474
-at_fn_group_banner 474 'run_functions.at:2828' \
+#AT_STOP_474
+#AT_START_475
+at_fn_group_banner 475 'run_functions.at:2828' \
   "FUNCTION TEST-FORMATTED-DATETIME with dates" "    " 3
 at_xfail=no
 (
-  $as_echo "474. $at_setup_line: testing $at_desc ..."
+  $as_echo "475. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50566,13 +50812,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_474
-#AT_START_475
-at_fn_group_banner 475 'run_functions.at:2955' \
+#AT_STOP_475
+#AT_START_476
+at_fn_group_banner 476 'run_functions.at:2955' \
   "FUNCTION TEST-FORMATTED-DATETIME with times" "    " 3
 at_xfail=no
 (
-  $as_echo "475. $at_setup_line: testing $at_desc ..."
+  $as_echo "476. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50682,13 +50928,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_475
-#AT_START_476
-at_fn_group_banner 476 'run_functions.at:3036' \
+#AT_STOP_476
+#AT_START_477
+at_fn_group_banner 477 'run_functions.at:3036' \
   "FUNCTION TEST-FORMATTED-DATETIME with datetimes" "" 3
 at_xfail=no
 (
-  $as_echo "476. $at_setup_line: testing $at_desc ..."
+  $as_echo "477. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50764,13 +51010,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_476
-#AT_START_477
-at_fn_group_banner 477 'run_functions.at:3083' \
+#AT_STOP_477
+#AT_START_478
+at_fn_group_banner 478 'run_functions.at:3083' \
   "FUNCTION TEST-FORMATTED-DATETIME DP.COMMA" "      " 3
 at_xfail=no
 (
-  $as_echo "477. $at_setup_line: testing $at_desc ..."
+  $as_echo "478. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50840,13 +51086,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_477
-#AT_START_478
-at_fn_group_banner 478 'run_functions.at:3124' \
+#AT_STOP_478
+#AT_START_479
+at_fn_group_banner 479 'run_functions.at:3124' \
   "FUNCTION TEST-NUMVAL" "                           " 3
 at_xfail=no
 (
-  $as_echo "478. $at_setup_line: testing $at_desc ..."
+  $as_echo "479. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -50973,13 +51219,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_478
-#AT_START_479
-at_fn_group_banner 479 'run_functions.at:3222' \
+#AT_STOP_479
+#AT_START_480
+at_fn_group_banner 480 'run_functions.at:3222' \
   "FUNCTION TEST-NUMVAL-C" "                         " 3
 at_xfail=no
 (
-  $as_echo "479. $at_setup_line: testing $at_desc ..."
+  $as_echo "480. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51106,13 +51352,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_479
-#AT_START_480
-at_fn_group_banner 480 'run_functions.at:3320' \
+#AT_STOP_480
+#AT_START_481
+at_fn_group_banner 481 'run_functions.at:3320' \
   "FUNCTION TEST-NUMVAL-F" "                         " 3
 at_xfail=no
 (
-  $as_echo "480. $at_setup_line: testing $at_desc ..."
+  $as_echo "481. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51239,13 +51485,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_480
-#AT_START_481
-at_fn_group_banner 481 'run_functions.at:3418' \
+#AT_STOP_481
+#AT_START_482
+at_fn_group_banner 482 'run_functions.at:3418' \
   "FUNCTION TRIM" "                                  " 3
 at_xfail=no
 (
-  $as_echo "481. $at_setup_line: testing $at_desc ..."
+  $as_echo "482. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51300,13 +51546,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_481
-#AT_START_482
-at_fn_group_banner 482 'run_functions.at:3444' \
+#AT_STOP_482
+#AT_START_483
+at_fn_group_banner 483 'run_functions.at:3444' \
   "FUNCTION TRIM with reference modding" "           " 3
 at_xfail=no
 (
-  $as_echo "482. $at_setup_line: testing $at_desc ..."
+  $as_echo "483. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51361,13 +51607,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_482
-#AT_START_483
-at_fn_group_banner 483 'run_functions.at:3470' \
+#AT_STOP_483
+#AT_START_484
+at_fn_group_banner 484 'run_functions.at:3470' \
   "FUNCTION TRIM zero length" "                      " 3
 at_xfail=no
 (
-  $as_echo "483. $at_setup_line: testing $at_desc ..."
+  $as_echo "484. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51423,13 +51669,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_483
-#AT_START_484
-at_fn_group_banner 484 'run_functions.at:3497' \
+#AT_STOP_484
+#AT_START_485
+at_fn_group_banner 485 'run_functions.at:3497' \
   "FUNCTION UPPER-CASE" "                            " 3
 at_xfail=no
 (
-  $as_echo "484. $at_setup_line: testing $at_desc ..."
+  $as_echo "485. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51483,13 +51729,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_484
-#AT_START_485
-at_fn_group_banner 485 'run_functions.at:3522' \
+#AT_STOP_485
+#AT_START_486
+at_fn_group_banner 486 'run_functions.at:3522' \
   "FUNCTION UPPER-CASE with reference modding" "     " 3
 at_xfail=no
 (
-  $as_echo "485. $at_setup_line: testing $at_desc ..."
+  $as_echo "486. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51543,13 +51789,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_485
-#AT_START_486
-at_fn_group_banner 486 'run_functions.at:3547' \
+#AT_STOP_486
+#AT_START_487
+at_fn_group_banner 487 'run_functions.at:3547' \
   "FUNCTION VARIANCE" "                              " 3
 at_xfail=no
 (
-  $as_echo "486. $at_setup_line: testing $at_desc ..."
+  $as_echo "487. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51602,13 +51848,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_486
-#AT_START_487
-at_fn_group_banner 487 'run_functions.at:3571' \
+#AT_STOP_487
+#AT_START_488
+at_fn_group_banner 488 'run_functions.at:3571' \
   "FUNCTION WHEN-COMPILED" "                         " 3
 at_xfail=no
 (
-  $as_echo "487. $at_setup_line: testing $at_desc ..."
+  $as_echo "488. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51663,13 +51909,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_487
-#AT_START_488
-at_fn_group_banner 488 'run_functions.at:3597' \
+#AT_STOP_488
+#AT_START_489
+at_fn_group_banner 489 'run_functions.at:3597' \
   "FUNCTION YEAR-TO-YYYY" "                          " 3
 at_xfail=no
 (
-  $as_echo "488. $at_setup_line: testing $at_desc ..."
+  $as_echo "489. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51722,13 +51968,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_488
-#AT_START_489
-at_fn_group_banner 489 'run_functions.at:3621' \
+#AT_STOP_489
+#AT_START_490
+at_fn_group_banner 490 'run_functions.at:3621' \
   "Formatted funcs w/ invalid variable format" "     " 3
 at_xfail=no
 (
-  $as_echo "489. $at_setup_line: testing $at_desc ..."
+  $as_echo "490. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51834,13 +52080,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_489
-#AT_START_490
-at_fn_group_banner 490 'run_functions.at:3698' \
+#AT_STOP_490
+#AT_START_491
+at_fn_group_banner 491 'run_functions.at:3698' \
   "FORMATTED-(DATE)TIME with SYSTEM-OFFSET" "        " 3
 at_xfail=no
 (
-  $as_echo "490. $at_setup_line: testing $at_desc ..."
+  $as_echo "491. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51911,13 +52157,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_490
-#AT_START_491
-at_fn_group_banner 491 'run_functions.at:3738' \
+#AT_STOP_491
+#AT_START_492
+at_fn_group_banner 492 'run_functions.at:3738' \
   "Intrinsics without FUNCTION keyword (1)" "        " 3
 at_xfail=no
 (
-  $as_echo "491. $at_setup_line: testing $at_desc ..."
+  $as_echo "492. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -51967,13 +52213,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_491
-#AT_START_492
-at_fn_group_banner 492 'run_functions.at:3759' \
+#AT_STOP_492
+#AT_START_493
+at_fn_group_banner 493 'run_functions.at:3759' \
   "Intrinsics without FUNCTION keyword (2)" "        " 3
 at_xfail=no
 (
-  $as_echo "492. $at_setup_line: testing $at_desc ..."
+  $as_echo "493. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52023,13 +52269,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_492
-#AT_START_493
-at_fn_group_banner 493 'run_functions.at:3782' \
+#AT_STOP_493
+#AT_START_494
+at_fn_group_banner 494 'run_functions.at:3782' \
   "User-Defined FUNCTION with/without parameter" "   " 3
 at_xfail=no
 (
-  $as_echo "493. $at_setup_line: testing $at_desc ..."
+  $as_echo "494. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52109,13 +52355,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_493
-#AT_START_494
-at_fn_group_banner 494 'run_extensions.at:24' \
+#AT_STOP_494
+#AT_START_495
+at_fn_group_banner 495 'run_extensions.at:24' \
   "CALL BY CONTENT binary and literal" "             " 3
 at_xfail=no
 (
-  $as_echo "494. $at_setup_line: testing $at_desc ..."
+  $as_echo "495. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52208,13 +52454,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_494
-#AT_START_495
-at_fn_group_banner 495 'run_extensions.at:73' \
+#AT_STOP_495
+#AT_START_496
+at_fn_group_banner 496 'run_extensions.at:73' \
   "CALL USING numeric literal" "                     " 3
 at_xfail=no
 (
-  $as_echo "495. $at_setup_line: testing $at_desc ..."
+  $as_echo "496. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52312,13 +52558,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_495
-#AT_START_496
-at_fn_group_banner 496 'run_extensions.at:143' \
+#AT_STOP_496
+#AT_START_497
+at_fn_group_banner 497 'run_extensions.at:143' \
   "Hexadecimal numeric literal" "                    " 3
 at_xfail=no
 (
-  $as_echo "496. $at_setup_line: testing $at_desc ..."
+  $as_echo "497. $at_setup_line: testing $at_desc ..."
   $at_traceon
  # Shouldn't this be in run_fundamentals?
 
@@ -52374,13 +52620,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_496
-#AT_START_497
-at_fn_group_banner 497 'run_extensions.at:171' \
+#AT_STOP_497
+#AT_START_498
+at_fn_group_banner 498 'run_extensions.at:171' \
   "Semi-parenthesized condition" "                   " 3
 at_xfail=no
 (
-  $as_echo "497. $at_setup_line: testing $at_desc ..."
+  $as_echo "498. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
  # Shouldn't this be in run_fundamentals?
@@ -52434,13 +52680,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_497
-#AT_START_498
-at_fn_group_banner 498 'run_extensions.at:195' \
+#AT_STOP_498
+#AT_START_499
+at_fn_group_banner 499 'run_extensions.at:195' \
   "ADDRESS OF" "                                     " 3
 at_xfail=no
 (
-  $as_echo "498. $at_setup_line: testing $at_desc ..."
+  $as_echo "499. $at_setup_line: testing $at_desc ..."
   $at_traceon
  # Shouldn't this be in run_fundamentals?
 
@@ -52519,13 +52765,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_498
-#AT_START_499
-at_fn_group_banner 499 'run_extensions.at:245' \
+#AT_STOP_499
+#AT_START_500
+at_fn_group_banner 500 'run_extensions.at:245' \
   "LENGTH OF" "                                      " 3
 at_xfail=no
 (
-  $as_echo "499. $at_setup_line: testing $at_desc ..."
+  $as_echo "500. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52592,13 +52838,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_499
-#AT_START_500
-at_fn_group_banner 500 'run_extensions.at:283' \
+#AT_STOP_500
+#AT_START_501
+at_fn_group_banner 501 'run_extensions.at:283' \
   "WHEN-COMPILED" "                                  " 3
 at_xfail=no
 (
-  $as_echo "500. $at_setup_line: testing $at_desc ..."
+  $as_echo "501. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52652,13 +52898,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_500
-#AT_START_501
-at_fn_group_banner 501 'run_extensions.at:309' \
+#AT_STOP_501
+#AT_START_502
+at_fn_group_banner 502 'run_extensions.at:309' \
   "Complex OCCURS DEPENDING ON (1)" "                " 3
 at_xfail=no
 (
-  $as_echo "501. $at_setup_line: testing $at_desc ..."
+  $as_echo "502. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52717,13 +52963,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_501
-#AT_START_502
-at_fn_group_banner 502 'run_extensions.at:338' \
+#AT_STOP_502
+#AT_START_503
+at_fn_group_banner 503 'run_extensions.at:338' \
   "Complex OCCURS DEPENDING ON (2)" "                " 3
 at_xfail=no
 (
-  $as_echo "502. $at_setup_line: testing $at_desc ..."
+  $as_echo "503. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52815,13 +53061,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_502
-#AT_START_503
-at_fn_group_banner 503 'run_extensions.at:401' \
+#AT_STOP_503
+#AT_START_504
+at_fn_group_banner 504 'run_extensions.at:401' \
   "Complex OCCURS DEPENDING ON (3)" "                " 3
 at_xfail=no
 (
-  $as_echo "503. $at_setup_line: testing $at_desc ..."
+  $as_echo "504. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -52913,13 +53159,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_503
-#AT_START_504
-at_fn_group_banner 504 'run_extensions.at:464' \
+#AT_STOP_504
+#AT_START_505
+at_fn_group_banner 505 'run_extensions.at:464' \
   "Complex OCCURS DEPENDING ON (4)" "                " 3
 at_xfail=no
 (
-  $as_echo "504. $at_setup_line: testing $at_desc ..."
+  $as_echo "505. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53014,13 +53260,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_504
-#AT_START_505
-at_fn_group_banner 505 'run_extensions.at:530' \
+#AT_STOP_505
+#AT_START_506
+at_fn_group_banner 506 'run_extensions.at:530' \
   "Complex OCCURS DEPENDING ON (5)" "                " 3
 at_xfail=no
 (
-  $as_echo "505. $at_setup_line: testing $at_desc ..."
+  $as_echo "506. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53115,13 +53361,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_505
-#AT_START_506
-at_fn_group_banner 506 'run_extensions.at:595' \
+#AT_STOP_506
+#AT_START_507
+at_fn_group_banner 507 'run_extensions.at:595' \
   "INITIALIZE level 01" "                            " 3
 at_xfail=no
 (
-  $as_echo "506. $at_setup_line: testing $at_desc ..."
+  $as_echo "507. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53202,13 +53448,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_506
-#AT_START_507
-at_fn_group_banner 507 'run_extensions.at:646' \
+#AT_STOP_507
+#AT_START_508
+at_fn_group_banner 508 'run_extensions.at:646' \
   "MOVE NON-INTEGER TO ALPHA-NUMERIC" "              " 3
 at_xfail=no
 (
-  $as_echo "507. $at_setup_line: testing $at_desc ..."
+  $as_echo "508. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53327,13 +53573,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_507
-#AT_START_508
-at_fn_group_banner 508 'run_extensions.at:736' \
+#AT_STOP_508
+#AT_START_509
+at_fn_group_banner 509 'run_extensions.at:736' \
   "CALL USING file-name" "                           " 3
 at_xfail=no
 (
-  $as_echo "508. $at_setup_line: testing $at_desc ..."
+  $as_echo "509. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53433,13 +53679,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_508
-#AT_START_509
-at_fn_group_banner 509 'run_extensions.at:780' \
+#AT_STOP_509
+#AT_START_510
+at_fn_group_banner 510 'run_extensions.at:780' \
   "CALL unusual PROGRAM-ID." "                       " 3
 at_xfail=no
 (
-  $as_echo "509. $at_setup_line: testing $at_desc ..."
+  $as_echo "510. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53590,13 +53836,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_509
-#AT_START_510
-at_fn_group_banner 510 'run_extensions.at:844' \
+#AT_STOP_510
+#AT_START_511
+at_fn_group_banner 511 'run_extensions.at:844' \
   "CALL / GOBACK with LOCAL-STORAGE" "               " 3
 at_xfail=no
 (
-  $as_echo "510. $at_setup_line: testing $at_desc ..."
+  $as_echo "511. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53690,13 +53936,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_510
-#AT_START_511
-at_fn_group_banner 511 'run_extensions.at:894' \
+#AT_STOP_511
+#AT_START_512
+at_fn_group_banner 512 'run_extensions.at:894' \
   "CALL BY VALUE alphanumeric item" "                " 3
 at_xfail=no
 (
-  $as_echo "511. $at_setup_line: testing $at_desc ..."
+  $as_echo "512. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53761,13 +54007,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_511
-#AT_START_512
-at_fn_group_banner 512 'run_extensions.at:929' \
+#AT_STOP_512
+#AT_START_513
+at_fn_group_banner 513 'run_extensions.at:929' \
   "Case independent PROGRAM-ID" "                    " 3
 at_xfail=no
 (
-  $as_echo "512. $at_setup_line: testing $at_desc ..."
+  $as_echo "513. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53819,13 +54065,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_512
-#AT_START_513
-at_fn_group_banner 513 'run_extensions.at:951' \
+#AT_STOP_513
+#AT_START_514
+at_fn_group_banner 514 'run_extensions.at:951' \
   "PROGRAM-ID AS clause" "                           " 3
 at_xfail=no
 (
-  $as_echo "513. $at_setup_line: testing $at_desc ..."
+  $as_echo "514. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53877,13 +54123,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_513
-#AT_START_514
-at_fn_group_banner 514 'run_extensions.at:973' \
+#AT_STOP_514
+#AT_START_515
+at_fn_group_banner 515 'run_extensions.at:973' \
   "Quoted PROGRAM-ID" "                              " 3
 at_xfail=no
 (
-  $as_echo "514. $at_setup_line: testing $at_desc ..."
+  $as_echo "515. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53935,13 +54181,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_514
-#AT_START_515
-at_fn_group_banner 515 'run_extensions.at:997' \
+#AT_STOP_515
+#AT_START_516
+at_fn_group_banner 516 'run_extensions.at:997' \
   "ASSIGN clause" "                                  " 3
 at_xfail=no
 (
-  $as_echo "515. $at_setup_line: testing $at_desc ..."
+  $as_echo "516. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -53999,13 +54245,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_515
-#AT_START_516
-at_fn_group_banner 516 'run_extensions.at:1025' \
+#AT_STOP_516
+#AT_START_517
+at_fn_group_banner 517 'run_extensions.at:1025' \
   "ASSIGN clause IBM" "                              " 3
 at_xfail=no
 (
-  $as_echo "516. $at_setup_line: testing $at_desc ..."
+  $as_echo "517. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54075,13 +54321,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_516
-#AT_START_517
-at_fn_group_banner 517 'run_extensions.at:1053' \
+#AT_STOP_517
+#AT_START_518
+at_fn_group_banner 518 'run_extensions.at:1053' \
   "ASSIGN mapping" "                                 " 3
 at_xfail=no
 (
-  $as_echo "517. $at_setup_line: testing $at_desc ..."
+  $as_echo "518. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54312,13 +54558,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_517
-#AT_START_518
-at_fn_group_banner 518 'run_extensions.at:1108' \
+#AT_STOP_518
+#AT_START_519
+at_fn_group_banner 519 'run_extensions.at:1108' \
   "ASSIGN expansion" "                               " 3
 at_xfail=no
 (
-  $as_echo "518. $at_setup_line: testing $at_desc ..."
+  $as_echo "519. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54386,13 +54632,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_518
-#AT_START_519
-at_fn_group_banner 519 'run_extensions.at:1134' \
+#AT_STOP_519
+#AT_START_520
+at_fn_group_banner 520 'run_extensions.at:1134' \
   "ASSIGN with COB_FILE_PATH" "                      " 3
 at_xfail=no
 (
-  $as_echo "519. $at_setup_line: testing $at_desc ..."
+  $as_echo "520. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54460,13 +54706,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_519
-#AT_START_520
-at_fn_group_banner 520 'run_extensions.at:1162' \
+#AT_STOP_520
+#AT_START_521
+at_fn_group_banner 521 'run_extensions.at:1162' \
   "NUMBER-OF-CALL-PARAMETERS" "                      " 3
 at_xfail=no
 (
-  $as_echo "520. $at_setup_line: testing $at_desc ..."
+  $as_echo "521. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54564,13 +54810,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_520
-#AT_START_521
-at_fn_group_banner 521 'run_extensions.at:1218' \
+#AT_STOP_521
+#AT_START_522
+at_fn_group_banner 522 'run_extensions.at:1218' \
   "TALLY" "                                          " 3
 at_xfail=no
 (
-  $as_echo "521. $at_setup_line: testing $at_desc ..."
+  $as_echo "522. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54626,13 +54872,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_521
-#AT_START_522
-at_fn_group_banner 522 'run_extensions.at:1246' \
+#AT_STOP_522
+#AT_START_523
+at_fn_group_banner 523 'run_extensions.at:1246' \
   "PROCEDURE DIVISION USING BY ..." "                " 3
 at_xfail=no
 (
-  $as_echo "522. $at_setup_line: testing $at_desc ..."
+  $as_echo "523. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54726,13 +54972,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_522
-#AT_START_523
-at_fn_group_banner 523 'run_extensions.at:1296' \
+#AT_STOP_523
+#AT_START_524
+at_fn_group_banner 524 'run_extensions.at:1296' \
   "PROCEDURE DIVISION CHAINING ..." "                " 3
 at_xfail=no
 (
-  $as_echo "523. $at_setup_line: testing $at_desc ..."
+  $as_echo "524. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54788,13 +55034,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_523
-#AT_START_524
-at_fn_group_banner 524 'run_extensions.at:1322' \
+#AT_STOP_524
+#AT_START_525
+at_fn_group_banner 525 'run_extensions.at:1322' \
   "STOP RUN RETURNING/GIVING" "                      " 3
 at_xfail=no
 (
-  $as_echo "524. $at_setup_line: testing $at_desc ..."
+  $as_echo "525. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54875,13 +55121,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_524
-#AT_START_525
-at_fn_group_banner 525 'run_extensions.at:1348' \
+#AT_STOP_525
+#AT_START_526
+at_fn_group_banner 526 'run_extensions.at:1348' \
   "GOBACK/EXIT PROGRAM RETURNING/GIVING" "           " 3
 at_xfail=no
 (
-  $as_echo "525. $at_setup_line: testing $at_desc ..."
+  $as_echo "526. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -54962,13 +55208,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_525
-#AT_START_526
-at_fn_group_banner 526 'run_extensions.at:1398' \
+#AT_STOP_526
+#AT_START_527
+at_fn_group_banner 527 'run_extensions.at:1398' \
   "ENTRY" "                                          " 3
 at_xfail=no
 (
-  $as_echo "526. $at_setup_line: testing $at_desc ..."
+  $as_echo "527. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55056,13 +55302,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_526
-#AT_START_527
-at_fn_group_banner 527 'run_extensions.at:1445' \
+#AT_STOP_527
+#AT_START_528
+at_fn_group_banner 528 'run_extensions.at:1445' \
   "LINE SEQUENTIAL write" "                          " 3
 at_xfail=no
 (
-  $as_echo "527. $at_setup_line: testing $at_desc ..."
+  $as_echo "528. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55149,13 +55395,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_527
-#AT_START_528
-at_fn_group_banner 528 'run_extensions.at:1491' \
+#AT_STOP_528
+#AT_START_529
+at_fn_group_banner 529 'run_extensions.at:1491' \
   "LINE SEQUENTIAL read" "                           " 3
 at_xfail=no
 (
-  $as_echo "528. $at_setup_line: testing $at_desc ..."
+  $as_echo "529. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55252,13 +55498,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_528
-#AT_START_529
-at_fn_group_banner 529 'run_extensions.at:1558' \
+#AT_STOP_529
+#AT_START_530
+at_fn_group_banner 530 'run_extensions.at:1558' \
   "ASSIGN to KEYBOARD/DISPLAY" "                     " 3
 at_xfail=no
 (
-  $as_echo "529. $at_setup_line: testing $at_desc ..."
+  $as_echo "530. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55346,13 +55592,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_529
-#AT_START_530
-at_fn_group_banner 530 'run_extensions.at:1616' \
+#AT_STOP_530
+#AT_START_531
+at_fn_group_banner 531 'run_extensions.at:1616' \
   "SORT ASSIGN KEYBOARD to ASSIGN DISPLAY" "         " 3
 at_xfail=yes
 (
-  $as_echo "530. $at_setup_line: testing $at_desc ..."
+  $as_echo "531. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55444,13 +55690,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_530
-#AT_START_531
-at_fn_group_banner 531 'run_extensions.at:1678' \
+#AT_STOP_531
+#AT_START_532
+at_fn_group_banner 532 'run_extensions.at:1678' \
   "Environment/Argument variable" "                  " 3
 at_xfail=no
 (
-  $as_echo "531. $at_setup_line: testing $at_desc ..."
+  $as_echo "532. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55526,13 +55772,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_531
-#AT_START_532
-at_fn_group_banner 532 'run_extensions.at:1725' \
+#AT_STOP_532
+#AT_START_533
+at_fn_group_banner 533 'run_extensions.at:1725' \
   "DECIMAL-POINT is COMMA (1)" "                     " 3
 at_xfail=no
 (
-  $as_echo "532. $at_setup_line: testing $at_desc ..."
+  $as_echo "533. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55589,13 +55835,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_532
-#AT_START_533
-at_fn_group_banner 533 'run_extensions.at:1753' \
+#AT_STOP_533
+#AT_START_534
+at_fn_group_banner 534 'run_extensions.at:1753' \
   "DECIMAL-POINT is COMMA (2)" "                     " 3
 at_xfail=no
 (
-  $as_echo "533. $at_setup_line: testing $at_desc ..."
+  $as_echo "534. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55652,13 +55898,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_533
-#AT_START_534
-at_fn_group_banner 534 'run_extensions.at:1781' \
+#AT_STOP_534
+#AT_START_535
+at_fn_group_banner 535 'run_extensions.at:1781' \
   "DECIMAL-POINT is COMMA (3)" "                     " 3
 at_xfail=no
 (
-  $as_echo "534. $at_setup_line: testing $at_desc ..."
+  $as_echo "535. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55715,13 +55961,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_534
-#AT_START_535
-at_fn_group_banner 535 'run_extensions.at:1809' \
+#AT_STOP_535
+#AT_START_536
+at_fn_group_banner 536 'run_extensions.at:1809' \
   "DECIMAL-POINT is COMMA (4)" "                     " 3
 at_xfail=no
 (
-  $as_echo "535. $at_setup_line: testing $at_desc ..."
+  $as_echo "536. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55778,13 +56024,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_535
-#AT_START_536
-at_fn_group_banner 536 'run_extensions.at:1837' \
+#AT_STOP_536
+#AT_START_537
+at_fn_group_banner 537 'run_extensions.at:1837' \
   "DECIMAL-POINT is COMMA (5)" "                     " 3
 at_xfail=no
 (
-  $as_echo "536. $at_setup_line: testing $at_desc ..."
+  $as_echo "537. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55847,13 +56093,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_536
-#AT_START_537
-at_fn_group_banner 537 'run_extensions.at:1871' \
+#AT_STOP_537
+#AT_START_538
+at_fn_group_banner 538 'run_extensions.at:1871' \
   "78 Level (1)" "                                   " 3
 at_xfail=no
 (
-  $as_echo "537. $at_setup_line: testing $at_desc ..."
+  $as_echo "538. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55905,13 +56151,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_537
-#AT_START_538
-at_fn_group_banner 538 'run_extensions.at:1894' \
+#AT_STOP_538
+#AT_START_539
+at_fn_group_banner 539 'run_extensions.at:1894' \
   "78 Level (2)" "                                   " 3
 at_xfail=no
 (
-  $as_echo "538. $at_setup_line: testing $at_desc ..."
+  $as_echo "539. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -55966,13 +56212,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_538
-#AT_START_539
-at_fn_group_banner 539 'run_extensions.at:1920' \
+#AT_STOP_539
+#AT_START_540
+at_fn_group_banner 540 'run_extensions.at:1920' \
   "78 Level (3)" "                                   " 3
 at_xfail=no
 (
-  $as_echo "539. $at_setup_line: testing $at_desc ..."
+  $as_echo "540. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56025,13 +56271,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_539
-#AT_START_540
-at_fn_group_banner 540 'run_extensions.at:1944' \
+#AT_STOP_540
+#AT_START_541
+at_fn_group_banner 541 'run_extensions.at:1944' \
   "DEBUG (not active)" "                             " 3
 at_xfail=no
 (
-  $as_echo "540. $at_setup_line: testing $at_desc ..."
+  $as_echo "541. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56083,13 +56329,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_540
-#AT_START_541
-at_fn_group_banner 541 'run_extensions.at:1967' \
+#AT_STOP_541
+#AT_START_542
+at_fn_group_banner 542 'run_extensions.at:1967' \
   "DEBUG (fdebugging-line)" "                        " 3
 at_xfail=no
 (
-  $as_echo "541. $at_setup_line: testing $at_desc ..."
+  $as_echo "542. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56141,13 +56387,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_541
-#AT_START_542
-at_fn_group_banner 542 'run_extensions.at:1990' \
+#AT_STOP_542
+#AT_START_543
+at_fn_group_banner 543 'run_extensions.at:1990' \
   "DEBUG (obsolete WITH DEBUGGING MODE)" "           " 3
 at_xfail=no
 (
-  $as_echo "542. $at_setup_line: testing $at_desc ..."
+  $as_echo "543. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56202,13 +56448,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_542
-#AT_START_543
-at_fn_group_banner 543 'run_extensions.at:2016' \
+#AT_STOP_543
+#AT_START_544
+at_fn_group_banner 544 'run_extensions.at:2016' \
   "DEBUG free format (not active)" "                 " 3
 at_xfail=no
 (
-  $as_echo "543. $at_setup_line: testing $at_desc ..."
+  $as_echo "544. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56260,13 +56506,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_543
-#AT_START_544
-at_fn_group_banner 544 'run_extensions.at:2039' \
+#AT_STOP_544
+#AT_START_545
+at_fn_group_banner 545 'run_extensions.at:2039' \
   "DEBUG free format (fdebugging-line)" "            " 3
 at_xfail=no
 (
-  $as_echo "544. $at_setup_line: testing $at_desc ..."
+  $as_echo "545. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56318,13 +56564,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_544
-#AT_START_545
-at_fn_group_banner 545 'run_extensions.at:2062' \
+#AT_STOP_545
+#AT_START_546
+at_fn_group_banner 546 'run_extensions.at:2062' \
   "SWITCHES with non-standard names" "               " 3
 at_xfail=no
 (
-  $as_echo "545. $at_setup_line: testing $at_desc ..."
+  $as_echo "546. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56454,13 +56700,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_545
-#AT_START_546
-at_fn_group_banner 546 'run_extensions.at:2163' \
+#AT_STOP_546
+#AT_START_547
+at_fn_group_banner 547 'run_extensions.at:2163' \
   "Larger REDEFINES lengths" "                       " 3
 at_xfail=no
 (
-  $as_echo "546. $at_setup_line: testing $at_desc ..."
+  $as_echo "547. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56576,13 +56822,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_546
-#AT_START_547
-at_fn_group_banner 547 'run_extensions.at:2250' \
+#AT_STOP_547
+#AT_START_548
+at_fn_group_banner 548 'run_extensions.at:2250' \
   "Obsolete 85 keywords" "                           " 3
 at_xfail=no
 (
-  $as_echo "547. $at_setup_line: testing $at_desc ..."
+  $as_echo "548. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56635,13 +56881,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_547
-#AT_START_548
-at_fn_group_banner 548 'run_extensions.at:2276' \
+#AT_STOP_548
+#AT_START_549
+at_fn_group_banner 549 'run_extensions.at:2276' \
   "System routine C\$CALLEDBY" "                      " 3
 at_xfail=no
 (
-  $as_echo "548. $at_setup_line: testing $at_desc ..."
+  $as_echo "549. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56731,13 +56977,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_548
-#AT_START_549
-at_fn_group_banner 549 'run_extensions.at:2322' \
+#AT_STOP_549
+#AT_START_550
+at_fn_group_banner 550 'run_extensions.at:2322' \
   "System routine C\$NARG" "                          " 3
 at_xfail=no
 (
-  $as_echo "549. $at_setup_line: testing $at_desc ..."
+  $as_echo "550. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56820,13 +57066,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_549
-#AT_START_550
-at_fn_group_banner 550 'run_extensions.at:2362' \
+#AT_STOP_550
+#AT_START_551
+at_fn_group_banner 551 'run_extensions.at:2362' \
   "System routine C\$PARAMSIZE" "                     " 3
 at_xfail=no
 (
-  $as_echo "550. $at_setup_line: testing $at_desc ..."
+  $as_echo "551. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56911,13 +57157,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_550
-#AT_START_551
-at_fn_group_banner 551 'run_extensions.at:2404' \
+#AT_STOP_551
+#AT_START_552
+at_fn_group_banner 552 'run_extensions.at:2404' \
   "System routine C\$JUSTIFY" "                       " 3
 at_xfail=no
 (
-  $as_echo "551. $at_setup_line: testing $at_desc ..."
+  $as_echo "552. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -56971,13 +57217,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_551
-#AT_START_552
-at_fn_group_banner 552 'run_extensions.at:2429' \
+#AT_STOP_552
+#AT_START_553
+at_fn_group_banner 553 'run_extensions.at:2429' \
   "System routine C\$PRINTABLE" "                     " 3
 at_xfail=no
 (
-  $as_echo "552. $at_setup_line: testing $at_desc ..."
+  $as_echo "553. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57035,13 +57281,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_552
-#AT_START_553
-at_fn_group_banner 553 'run_extensions.at:2458' \
+#AT_STOP_553
+#AT_START_554
+at_fn_group_banner 554 'run_extensions.at:2458' \
   "System routine C\$MAKEDIR" "                       " 3
 at_xfail=no
 (
-  $as_echo "553. $at_setup_line: testing $at_desc ..."
+  $as_echo "554. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57103,13 +57349,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_553
-#AT_START_554
-at_fn_group_banner 554 'run_extensions.at:2479' \
+#AT_STOP_554
+#AT_START_555
+at_fn_group_banner 555 'run_extensions.at:2479' \
   "System routine C\$GETPID" "                        " 3
 at_xfail=no
 (
-  $as_echo "554. $at_setup_line: testing $at_desc ..."
+  $as_echo "555. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57163,13 +57409,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_554
-#AT_START_555
-at_fn_group_banner 555 'run_extensions.at:2504' \
+#AT_STOP_555
+#AT_START_556
+at_fn_group_banner 556 'run_extensions.at:2504' \
   "System routine C\$TOUPPER" "                       " 3
 at_xfail=no
 (
-  $as_echo "555. $at_setup_line: testing $at_desc ..."
+  $as_echo "556. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57223,13 +57469,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_555
-#AT_START_556
-at_fn_group_banner 556 'run_extensions.at:2529' \
+#AT_STOP_556
+#AT_START_557
+at_fn_group_banner 557 'run_extensions.at:2529' \
   "System routine C\$TOLOWER" "                       " 3
 at_xfail=no
 (
-  $as_echo "556. $at_setup_line: testing $at_desc ..."
+  $as_echo "557. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57283,13 +57529,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_556
-#AT_START_557
-at_fn_group_banner 557 'run_extensions.at:2554' \
+#AT_STOP_557
+#AT_START_558
+at_fn_group_banner 558 'run_extensions.at:2554' \
   "System routine CBL_OR" "                          " 3
 at_xfail=no
 (
-  $as_echo "557. $at_setup_line: testing $at_desc ..."
+  $as_echo "558. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57345,13 +57591,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_557
-#AT_START_558
-at_fn_group_banner 558 'run_extensions.at:2581' \
+#AT_STOP_558
+#AT_START_559
+at_fn_group_banner 559 'run_extensions.at:2581' \
   "System routine CBL_NOR" "                         " 3
 at_xfail=no
 (
-  $as_echo "558. $at_setup_line: testing $at_desc ..."
+  $as_echo "559. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57407,13 +57653,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_558
-#AT_START_559
-at_fn_group_banner 559 'run_extensions.at:2608' \
+#AT_STOP_559
+#AT_START_560
+at_fn_group_banner 560 'run_extensions.at:2608' \
   "System routine CBL_AND" "                         " 3
 at_xfail=no
 (
-  $as_echo "559. $at_setup_line: testing $at_desc ..."
+  $as_echo "560. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57469,13 +57715,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_559
-#AT_START_560
-at_fn_group_banner 560 'run_extensions.at:2635' \
+#AT_STOP_560
+#AT_START_561
+at_fn_group_banner 561 'run_extensions.at:2635' \
   "System routine CBL_XOR" "                         " 3
 at_xfail=no
 (
-  $as_echo "560. $at_setup_line: testing $at_desc ..."
+  $as_echo "561. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57531,13 +57777,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_560
-#AT_START_561
-at_fn_group_banner 561 'run_extensions.at:2662' \
+#AT_STOP_561
+#AT_START_562
+at_fn_group_banner 562 'run_extensions.at:2662' \
   "System routine CBL_IMP" "                         " 3
 at_xfail=no
 (
-  $as_echo "561. $at_setup_line: testing $at_desc ..."
+  $as_echo "562. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57593,13 +57839,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_561
-#AT_START_562
-at_fn_group_banner 562 'run_extensions.at:2689' \
+#AT_STOP_562
+#AT_START_563
+at_fn_group_banner 563 'run_extensions.at:2689' \
   "System routine CBL_NIMP" "                        " 3
 at_xfail=no
 (
-  $as_echo "562. $at_setup_line: testing $at_desc ..."
+  $as_echo "563. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57655,13 +57901,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_562
-#AT_START_563
-at_fn_group_banner 563 'run_extensions.at:2716' \
+#AT_STOP_563
+#AT_START_564
+at_fn_group_banner 564 'run_extensions.at:2716' \
   "System routine CBL_NOT" "                         " 3
 at_xfail=no
 (
-  $as_echo "563. $at_setup_line: testing $at_desc ..."
+  $as_echo "564. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57716,13 +57962,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_563
-#AT_START_564
-at_fn_group_banner 564 'run_extensions.at:2742' \
+#AT_STOP_564
+#AT_START_565
+at_fn_group_banner 565 'run_extensions.at:2742' \
   "System routine CBL_EQ" "                          " 3
 at_xfail=no
 (
-  $as_echo "564. $at_setup_line: testing $at_desc ..."
+  $as_echo "565. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -57778,13 +58024,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_564
-#AT_START_565
-at_fn_group_banner 565 'run_extensions.at:2769' \
+#AT_STOP_565
+#AT_START_566
+at_fn_group_banner 566 'run_extensions.at:2769' \
   "System routine CBL_OC_GETOPT" "                   " 3
 at_xfail=no
 (
-  $as_echo "565. $at_setup_line: testing $at_desc ..."
+  $as_echo "566. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58354,13 +58600,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_565
-#AT_START_566
-at_fn_group_banner 566 'run_extensions.at:3204' \
+#AT_STOP_566
+#AT_START_567
+at_fn_group_banner 567 'run_extensions.at:3204' \
   "System routine CBL_GC_FORK" "                     " 3
 at_xfail=no
 (
-  $as_echo "566. $at_setup_line: testing $at_desc ..."
+  $as_echo "567. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58430,13 +58676,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_566
-#AT_START_567
-at_fn_group_banner 567 'run_extensions.at:3247' \
+#AT_STOP_567
+#AT_START_568
+at_fn_group_banner 568 'run_extensions.at:3247' \
   "System routine CBL_GC_WAITPID" "                  " 3
 at_xfail=no
 (
-  $as_echo "567. $at_setup_line: testing $at_desc ..."
+  $as_echo "568. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58518,13 +58764,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_567
-#AT_START_568
-at_fn_group_banner 568 'run_extensions.at:3299' \
+#AT_STOP_568
+#AT_START_569
+at_fn_group_banner 569 'run_extensions.at:3299' \
   "System routine CBL_COPY_FILE" "                   " 3
 at_xfail=no
 (
-  $as_echo "568. $at_setup_line: testing $at_desc ..."
+  $as_echo "569. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58601,13 +58847,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_568
-#AT_START_569
-at_fn_group_banner 569 'run_extensions.at:3333' \
+#AT_STOP_569
+#AT_START_570
+at_fn_group_banner 570 'run_extensions.at:3333' \
   "System routines for directories" "                " 3
 at_xfail=no
 (
-  $as_echo "569. $at_setup_line: testing $at_desc ..."
+  $as_echo "570. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58690,13 +58936,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_569
-#AT_START_570
-at_fn_group_banner 570 'run_extensions.at:3375' \
+#AT_STOP_570
+#AT_START_571
+at_fn_group_banner 571 'run_extensions.at:3375' \
   "System routines for files" "                      " 3
 at_xfail=no
 (
-  $as_echo "570. $at_setup_line: testing $at_desc ..."
+  $as_echo "571. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58867,13 +59113,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_570
-#AT_START_571
-at_fn_group_banner 571 'run_extensions.at:3492' \
+#AT_STOP_571
+#AT_START_572
+at_fn_group_banner 572 'run_extensions.at:3492' \
   "Conditional/define directives (1)" "              " 3
 at_xfail=no
 (
-  $as_echo "571. $at_setup_line: testing $at_desc ..."
+  $as_echo "572. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58928,13 +59174,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_571
-#AT_START_572
-at_fn_group_banner 572 'run_extensions.at:3517' \
+#AT_STOP_572
+#AT_START_573
+at_fn_group_banner 573 'run_extensions.at:3517' \
   "Conditional/define directives (2)" "              " 3
 at_xfail=no
 (
-  $as_echo "572. $at_setup_line: testing $at_desc ..."
+  $as_echo "573. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -58989,13 +59235,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_572
-#AT_START_573
-at_fn_group_banner 573 'run_extensions.at:3542' \
+#AT_STOP_573
+#AT_START_574
+at_fn_group_banner 574 'run_extensions.at:3542' \
   "Conditional/define directives (3)" "              " 3
 at_xfail=no
 (
-  $as_echo "573. $at_setup_line: testing $at_desc ..."
+  $as_echo "574. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59053,13 +59299,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_573
-#AT_START_574
-at_fn_group_banner 574 'run_extensions.at:3570' \
+#AT_STOP_574
+#AT_START_575
+at_fn_group_banner 575 'run_extensions.at:3570' \
   "Conditional/define directives (4)" "              " 3
 at_xfail=no
 (
-  $as_echo "574. $at_setup_line: testing $at_desc ..."
+  $as_echo "575. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59114,13 +59360,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_574
-#AT_START_575
-at_fn_group_banner 575 'run_extensions.at:3596' \
+#AT_STOP_575
+#AT_START_576
+at_fn_group_banner 576 'run_extensions.at:3596' \
   "Conditional/define directives (5)" "              " 3
 at_xfail=no
 (
-  $as_echo "575. $at_setup_line: testing $at_desc ..."
+  $as_echo "576. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59163,13 +59409,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_575
-#AT_START_576
-at_fn_group_banner 576 'data_binary.at:23' \
+#AT_STOP_576
+#AT_START_577
+at_fn_group_banner 577 'data_binary.at:23' \
   "BINARY: 2-4-8 big-endian" "                       " 4
 at_xfail=no
 (
-  $as_echo "576. $at_setup_line: testing $at_desc ..."
+  $as_echo "577. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59416,13 +59662,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_576
-#AT_START_577
-at_fn_group_banner 577 'data_binary.at:205' \
+#AT_STOP_577
+#AT_START_578
+at_fn_group_banner 578 'data_binary.at:205' \
   "BINARY: 2-4-8 native" "                           " 4
 at_xfail=no
 (
-  $as_echo "577. $at_setup_line: testing $at_desc ..."
+  $as_echo "578. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59687,13 +59933,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_577
-#AT_START_578
-at_fn_group_banner 578 'data_binary.at:393' \
+#AT_STOP_578
+#AT_START_579
+at_fn_group_banner 579 'data_binary.at:393' \
   "BINARY: 1-2-4-8 big-endian" "                     " 4
 at_xfail=no
 (
-  $as_echo "578. $at_setup_line: testing $at_desc ..."
+  $as_echo "579. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -59940,13 +60186,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_578
-#AT_START_579
-at_fn_group_banner 579 'data_binary.at:575' \
+#AT_STOP_579
+#AT_START_580
+at_fn_group_banner 580 'data_binary.at:575' \
   "BINARY: 1-2-4-8 native" "                         " 4
 at_xfail=no
 (
-  $as_echo "579. $at_setup_line: testing $at_desc ..."
+  $as_echo "580. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60211,13 +60457,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_579
-#AT_START_580
-at_fn_group_banner 580 'data_binary.at:763' \
+#AT_STOP_580
+#AT_START_581
+at_fn_group_banner 581 'data_binary.at:763' \
   "BINARY: 1--8 big-endian" "                        " 4
 at_xfail=no
 (
-  $as_echo "580. $at_setup_line: testing $at_desc ..."
+  $as_echo "581. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60464,13 +60710,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_580
-#AT_START_581
-at_fn_group_banner 581 'data_binary.at:945' \
+#AT_STOP_581
+#AT_START_582
+at_fn_group_banner 582 'data_binary.at:945' \
   "BINARY: 1--8 native" "                            " 4
 at_xfail=no
 (
-  $as_echo "581. $at_setup_line: testing $at_desc ..."
+  $as_echo "582. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60735,13 +60981,13 @@ fi
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_581
-#AT_START_582
-at_fn_group_banner 582 'data_binary.at:1133' \
+#AT_STOP_582
+#AT_START_583
+at_fn_group_banner 583 'data_binary.at:1133' \
   "BINARY: full-print" "                             " 4
 at_xfail=no
 (
-  $as_echo "582. $at_setup_line: testing $at_desc ..."
+  $as_echo "583. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60819,13 +61065,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_582
-#AT_START_583
-at_fn_group_banner 583 'data_display.at:21' \
+#AT_STOP_583
+#AT_START_584
+at_fn_group_banner 584 'data_display.at:21' \
   "DISPLAY: Sign ASCII" "                            " 4
 at_xfail=no
 (
-  $as_echo "583. $at_setup_line: testing $at_desc ..."
+  $as_echo "584. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60914,13 +61160,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_583
-#AT_START_584
-at_fn_group_banner 584 'data_display.at:80' \
+#AT_STOP_584
+#AT_START_585
+at_fn_group_banner 585 'data_display.at:80' \
   "DISPLAY: Sign ASCII (2)" "                        " 4
 at_xfail=no
 (
-  $as_echo "584. $at_setup_line: testing $at_desc ..."
+  $as_echo "585. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -60996,13 +61242,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_584
-#AT_START_585
-at_fn_group_banner 585 'data_display.at:126' \
+#AT_STOP_585
+#AT_START_586
+at_fn_group_banner 586 'data_display.at:126' \
   "DISPLAY: Sign EBCDIC" "                           " 4
 at_xfail=no
 (
-  $as_echo "585. $at_setup_line: testing $at_desc ..."
+  $as_echo "586. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61078,13 +61324,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_585
-#AT_START_586
-at_fn_group_banner 586 'data_packed.at:25' \
+#AT_STOP_586
+#AT_START_587
+at_fn_group_banner 587 'data_packed.at:25' \
   "PACKED-DECIMAL dump" "                            " 4
 at_xfail=no
 (
-  $as_echo "586. $at_setup_line: testing $at_desc ..."
+  $as_echo "587. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61261,13 +61507,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_586
-#AT_START_587
-at_fn_group_banner 587 'data_packed.at:162' \
+#AT_STOP_587
+#AT_START_588
+at_fn_group_banner 588 'data_packed.at:162' \
   "PACKED-DECIMAL display" "                         " 4
 at_xfail=no
 (
-  $as_echo "587. $at_setup_line: testing $at_desc ..."
+  $as_echo "588. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61351,13 +61597,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_587
-#AT_START_588
-at_fn_group_banner 588 'data_packed.at:218' \
+#AT_STOP_588
+#AT_START_589
+at_fn_group_banner 589 'data_packed.at:218' \
   "PACKED-DECIMAL move" "                            " 4
 at_xfail=no
 (
-  $as_echo "588. $at_setup_line: testing $at_desc ..."
+  $as_echo "589. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61443,13 +61689,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_588
-#AT_START_589
-at_fn_group_banner 589 'data_packed.at:276' \
+#AT_STOP_589
+#AT_START_590
+at_fn_group_banner 590 'data_packed.at:276' \
   "PACKED-DECIMAL arithmetic (1)" "                  " 4
 at_xfail=no
 (
-  $as_echo "589. $at_setup_line: testing $at_desc ..."
+  $as_echo "590. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61517,13 +61763,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_589
-#AT_START_590
-at_fn_group_banner 590 'data_packed.at:316' \
+#AT_STOP_590
+#AT_START_591
+at_fn_group_banner 591 'data_packed.at:316' \
   "PACKED-DECIMAL arithmetic (2)" "                  " 4
 at_xfail=no
 (
-  $as_echo "590. $at_setup_line: testing $at_desc ..."
+  $as_echo "591. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61588,13 +61834,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_590
-#AT_START_591
-at_fn_group_banner 591 'data_packed.at:353' \
+#AT_STOP_591
+#AT_START_592
+at_fn_group_banner 592 'data_packed.at:353' \
   "PACKED-DECIMAL numeric test (1)" "                " 4
 at_xfail=no
 (
-  $as_echo "591. $at_setup_line: testing $at_desc ..."
+  $as_echo "592. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61765,13 +62011,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_591
-#AT_START_592
-at_fn_group_banner 592 'data_packed.at:494' \
+#AT_STOP_592
+#AT_START_593
+at_fn_group_banner 593 'data_packed.at:494' \
   "PACKED-DECIMAL numeric test (2)" "                " 4
 at_xfail=no
 (
-  $as_echo "592. $at_setup_line: testing $at_desc ..."
+  $as_echo "593. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -61942,13 +62188,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_592
-#AT_START_593
-at_fn_group_banner 593 'data_packed.at:635' \
+#AT_STOP_593
+#AT_START_594
+at_fn_group_banner 594 'data_packed.at:635' \
   "COMP-6 display" "                                 " 4
 at_xfail=no
 (
-  $as_echo "593. $at_setup_line: testing $at_desc ..."
+  $as_echo "594. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -62014,13 +62260,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_593
-#AT_START_594
-at_fn_group_banner 594 'data_packed.at:671' \
+#AT_STOP_594
+#AT_START_595
+at_fn_group_banner 595 'data_packed.at:671' \
   "COMP-6 move" "                                    " 4
 at_xfail=no
 (
-  $as_echo "594. $at_setup_line: testing $at_desc ..."
+  $as_echo "595. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -62096,13 +62342,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_594
-#AT_START_595
-at_fn_group_banner 595 'data_packed.at:717' \
+#AT_STOP_595
+#AT_START_596
+at_fn_group_banner 596 'data_packed.at:717' \
   "COMP-6 arithmetic" "                              " 4
 at_xfail=no
 (
-  $as_echo "595. $at_setup_line: testing $at_desc ..."
+  $as_echo "596. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -62163,13 +62409,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_595
-#AT_START_596
-at_fn_group_banner 596 'data_packed.at:748' \
+#AT_STOP_596
+#AT_START_597
+at_fn_group_banner 597 'data_packed.at:748' \
   "COMP-6 numeric test " "                           " 4
 at_xfail=no
 (
-  $as_echo "596. $at_setup_line: testing $at_desc ..."
+  $as_echo "597. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -62289,13 +62535,13 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_596
-#AT_START_597
-at_fn_group_banner 597 'data_pointer.at:21' \
+#AT_STOP_597
+#AT_START_598
+at_fn_group_banner 598 'data_pointer.at:21' \
   "POINTER: display" "                               " 4
 at_xfail=no
 (
-  $as_echo "597. $at_setup_line: testing $at_desc ..."
+  $as_echo "598. $at_setup_line: testing $at_desc ..."
   $at_traceon
 
 
@@ -62421,4 +62667,4 @@ $at_traceon; }
   $at_times_p && times >"$at_times_file"
 ) 5>&1 2>&1 7>&- | eval $at_tee_pipe
 read at_status <"$at_status_file"
-#AT_STOP_597
+#AT_STOP_598

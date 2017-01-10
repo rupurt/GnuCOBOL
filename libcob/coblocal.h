@@ -183,6 +183,7 @@
 #define COB_I2D(x)		((x) + '0')
 
 #define	COB_MODULE_PTR		cobglobptr->cob_current_module
+#define COB_MODULE_EBCDIC	(cobglobptr && COB_MODULE_PTR && COB_MODULE_PTR->ebcdic_sign)
 #define	COB_TERM_BUFF		cobglobptr->cob_term_buff
 #define	COB_ACCEPT_STATUS	cobglobptr->cob_accept_status
 #define	COB_MAX_Y_COORD		cobglobptr->cob_max_y

@@ -1,4 +1,11 @@
 
+2017-01-10  Ron Norman <rjn@inglenet.com>
+	* codegen.c:  
+	  For CALL statements parameters passed BY VALUE or CONTENT
+	  are copied to a temporary varible with the attribute of 
+	  COB_FLAG_CONSTANT. This is done so that the subroutine
+	  will not accidentially overwrite these parameter fields
+
 2017-01-02  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c,warning.def,codegen.c:  
