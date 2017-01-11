@@ -943,7 +943,7 @@ at_help_all="1;used_binaries.at:21;Compiler outputs;runmisc cobc;
 331;run_misc.at:5082;Default Arithmetic Test;runtime;
 332;run_misc.at:5157;OSVS Arithmetic Test;runtime;
 333;run_misc.at:5245;PROGRAM-ID / CALL literal/variable with spaces;call;
-334;run_misc.at:5312;C API Test;call;
+334;run_misc.at:5313;C API Test;call;
 335;run_file.at:22;READ INTO AT-END sequence;runfile;
 336;run_file.at:59;First READ on empty SEQUENTIAL INDEXED file;runfile;
 337;run_file.at:99;REWRITE a RELATIVE file with RANDOM access;runfile;
@@ -29604,7 +29604,7 @@ $at_traceon; }
 read at_status <"$at_status_file"
 #AT_STOP_333
 #AT_START_334
-at_fn_group_banner 334 'run_misc.at:5312' \
+at_fn_group_banner 334 'run_misc.at:5313' \
   "C API Test" "                                     " 3
 at_xfail=no
 (
@@ -29627,7 +29627,6 @@ cat >prog.cob <<'_ATEOF'
        01  COMP3V99    PIC S9(7)V99 COMP-3  VALUE  12.50.
        01  PIC9        PIC S9(8) DISPLAY VALUE  8192.
        01  NE          PIC Z(4)9.99-.
-       01  COMP5       PIC S9(5) COMP-5  VALUE 10240.
        01  CHRX        PIC  X(9)         VALUE 'Hello'.
        01  GRPX.
            05  FILLER  PIC  X(9)         VALUE 'Hello'.
@@ -29641,7 +29640,7 @@ cat >prog.cob <<'_ATEOF'
            CALL "CAPI" USING BINFLD9.
            MOVE  512.77 TO NE.
            CALL "CAPI" USING COMP3, NE.
-           CALL "CAPI" USING PIC9 COMP5 CHRX GRPX.
+           CALL "CAPI" USING PIC9 BINFLD5S CHRX GRPX.
            CALL "CAPI" USING COMP3, NE, CHRX.
            CALL "CAPI" USING BINFLD5, NE.
            MOVE "Hello!" TO CHRX.
@@ -29652,11 +29651,11 @@ cat >prog.cob <<'_ATEOF'
            CALL "CAPI" USING "Fred Fish", COMP3.
            CALL "CAPI" USING COMP3V99.
            CALL "CAPI" .
-           DISPLAY "COMP3 field is now " COMP3 ";".
-           DISPLAY "COMP4 field is now " BINFLD5 ";".
-           DISPLAY "COMP5 field is now " COMP5 ";".
-           DISPLAY " CHRX field is now " CHRX ";".
-           DISPLAY "NE    field is now " NE ";".
+           DISPLAY "COMP3    is now " COMP3 ";".
+           DISPLAY "COMP4    is now " BINFLD5 ";".
+           DISPLAY "BINFLD5S is now " BINFLD5S ";".
+           DISPLAY "CHRX     is now " CHRX ";".
+           DISPLAY "NE       is now " NE ";".
            STOP RUN.
 _ATEOF
 
@@ -29759,9 +29758,9 @@ at_fn_check_prepare_trace "run_misc.at:5450"
 ) >>"$at_stdout" 2>>"$at_stderr" 5>&-
 at_status=$? at_failed=false
 $at_check_filter
-echo >>"$at_stderr"; $as_echo "prog.cob: 32: Warning: BY CONTENT assumed for alphanumeric item
-prog.cob: 33: Warning: BY CONTENT assumed for alphanumeric item
-prog.cob: 35: Warning: BY CONTENT assumed for alphanumeric item
+echo >>"$at_stderr"; $as_echo "prog.cob: 31: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 32: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 34: Warning: BY CONTENT assumed for alphanumeric item
 " | \
   $at_diff - "$at_stderr" || at_failed=:
 at_fn_diff_devnull "$at_stdout" || at_failed=:
@@ -29804,7 +29803,7 @@ CAPI called with 2 parameters
 2: EDITED   BY REFERENCE S9(5)V9(2)  51277  to   514.07-.
 CAPI called with 4 parameters
 1: DISPLAY  BY REFERENCE S9(8)       8192.
-2: COMP-5   BY REFERENCE S9(5)       10240.
+2: COMP-4   BY REFERENCE S9(5)       1027.
 3: X        BY REFERENCE X(9)        'Hello'.
 4: Group    BY REFERENCE             'Hello    World    '.
 CAPI called with 3 parameters
@@ -29831,11 +29830,11 @@ CAPI called with 2 parameters
 CAPI called with 1 parameters
 1: COMP-3   BY REFERENCE S9(7)V9(2)  1250.
 CAPI called with 0 parameters
-COMP3 field is now 00004105;
-COMP4 field is now 00001292;
-COMP5 field is now +00010243;
- CHRX field is now Hello!   ;
-NE    field is now   514.07-;
+COMP3    is now 00004105;
+COMP4    is now 00001292;
+BINFLD5S is now +00001030;
+CHRX     is now Hello!   ;
+NE       is now   514.07-;
 " | \
   $at_diff - "$at_stdout" || at_failed=:
 at_fn_check_status 0 $at_status "$at_srcdir/run_misc.at:5455"
