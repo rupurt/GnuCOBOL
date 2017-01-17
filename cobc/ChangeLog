@@ -1,4 +1,10 @@
 
+2017-01-17  Ron Norman <rjn@inglenet.com>
+	* codegen.c:  
+	  Pointer arithmetic on systems with COB_NON_ALIGNED insert
+	  (cob_u8_ptr) before cob_get_pointer (..) as some systems
+	  do not allow pointer arithmetic on (void*)
+
 2017-01-10  Ron Norman <rjn@inglenet.com>
 	* codegen.c:  
 	  For CALL statements parameters passed BY VALUE or CONTENT
