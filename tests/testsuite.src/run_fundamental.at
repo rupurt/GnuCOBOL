@@ -601,7 +601,6 @@ AT_DATA([prog.cob], [
          05  TSTMOV2 PIC X(10).
        PROCEDURE DIVISION.
            SET TSTPTR TO ADDRESS OF TSTMOV2.
-           DISPLAY "Address is " TSTPTR.
            MOVE "0123456789" TO TSTMOV2.
            MOVE TSTMOV2 (2:9) TO TSTMOV2 (1:9)
            IF TSTMOV2 NOT = "1234567899"
@@ -619,12 +618,11 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 14: Warning: Overlapping MOVE may produce unpredictable results
-prog.cob: 20: Warning: Overlapping MOVE may produce unpredictable results
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 13: Warning: Overlapping MOVE may produce unpredictable results
+prog.cob: 19: Warning: Overlapping MOVE may produce unpredictable results
 ])
 
-AT_CHECK([./prog], [0], [Address is 0x00000000006022ff
-  OK with MOVE: 1234567899
+AT_CHECK([./prog], [0], [  OK with MOVE: 1234567899
   OK with MOVE: 0012345679
 ], [])
 
@@ -644,7 +642,6 @@ AT_DATA([prog.cob], [
          05  TSTMOV2 PIC X(10).
        PROCEDURE DIVISION.
            SET TSTPTR TO ADDRESS OF TSTMOV2.
-           DISPLAY "Address is " TSTPTR.
            MOVE "0123456789" TO TSTMOV2.
            MOVE TSTMOV2 (2:9) TO TSTMOV2 (1:9)
            IF TSTMOV2 NOT = "1234567899"
@@ -664,8 +661,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([cobc -x -std=ibm -debug -Wall prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [Address is 0x00000000006022ff
-  OK with MOVE: 1234567899
+AT_CHECK([./prog], [0], [  OK with MOVE: 1234567899
 IBM style MOVE: 0000000009
 ], [])
 
