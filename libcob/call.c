@@ -1649,7 +1649,7 @@ cob_put_s64_param ( int n, cob_s64_t val )
 	case COB_TYPE_NUMERIC_BINARY:
 #ifndef WORDS_BIGENDIAN 
 		if (COB_FIELD_BINARY_SWAP(f))
-			cob_put_u64_compx (val, cbldata, size);
+			cob_put_s64_compx (val, cbldata, size);
 		else
 			cob_put_s64_comp5 (val, cbldata, size);
 #else

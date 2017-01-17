@@ -2,6 +2,8 @@
 2017-01-17  Ron Norman <rjn@inglenet.com>
 	* call.c:
 	  Added code to handle default data field types by using cob_move
+	* move.c:
+	  Added missing cob_put_s64_compx routine
 
 2017-01-10  Ron Norman <rjn@inglenet.com>
 	* move.c, call.c, common.h:
