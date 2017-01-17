@@ -1,5 +1,10 @@
 
 2017-01-17  Ron Norman <rjn@inglenet.com>
+	* parser.y,parser.c:  
+	  Fixed coding errors in referencing CB_LITERAL before verifying
+	  that the token is a literal in REPORT DIVISION 
+
+2017-01-17  Ron Norman <rjn@inglenet.com>
 	* codegen.c:  
 	  Pointer arithmetic on systems with COB_NON_ALIGNED insert
 	  (cob_u8_ptr) before cob_get_pointer (..) as some systems

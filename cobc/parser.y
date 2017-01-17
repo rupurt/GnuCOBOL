@@ -4993,7 +4993,7 @@ next_group_clause:
 next_group_plus:
   integer
   {
-	if (CB_LITERAL ($1)->sign > 0) {
+	if (CB_LITERAL_P($1) && CB_LITERAL ($1)->sign > 0) {
 		current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
 	} else {
 		current_field->report_flag |= COB_REPORT_NEXT_GROUP_LINE;
@@ -5149,7 +5149,7 @@ line_clause_option:
 	current_field->report_line = cb_get_int($2);
 	if($2 != cb_int0
 	&& $2 != cb_int1) {
-		if (CB_LITERAL ($2)->sign < 0
+		if ((CB_LITERAL_P($2) && CB_LITERAL ($2)->sign < 0)
 		|| current_field->report_line < 0) {
 			cb_error (_("Positive Integer value expected"));
 		}
@@ -5164,7 +5164,7 @@ line_clause_option:
 	current_field->report_line = cb_get_int($2);
 	if($2 != cb_int0
 	&& $2 != cb_int1) {
-		if (CB_LITERAL ($2)->sign < 0
+		if ((CB_LITERAL_P($2) && CB_LITERAL ($2)->sign < 0)
 		|| current_field->report_line < 0) {
 			cb_error (_("Positive Integer value expected"));
 		}
@@ -5185,10 +5185,10 @@ line_clause_integer:
   {
 	current_field->report_line = cb_get_int($1);
 	if($1 != cb_int0) {
-		if (CB_LITERAL ($1)->sign > 0) {
+		if (CB_LITERAL_P($1) && CB_LITERAL ($1)->sign > 0) {
 			current_field->report_flag |= COB_REPORT_LINE_PLUS;
-		} else if (CB_LITERAL ($1)->sign < 0
-		|| current_field->report_line < 0) {
+		} else if ((CB_LITERAL_P($1) && CB_LITERAL ($1)->sign < 0)
+			|| current_field->report_line < 0) {
 			cb_error (_("Positive Integer value expected"));
 			current_field->report_line = 1;
 			current_field->report_flag |= COB_REPORT_LINE_PLUS;
@@ -5279,7 +5279,7 @@ column_integer:
   {
 	int colnum;
 	colnum = cb_get_int ($1);
-	if (CB_LITERAL ($1)->sign > 0) {
+	if (CB_LITERAL_P($1) && CB_LITERAL ($1)->sign > 0) {
 		if(current_field->parent
 		&& current_field->parent->children == current_field) {
 			cb_warning (_("PLUS is ignored on first field of line"));
@@ -5290,7 +5290,7 @@ column_integer:
 	if($1 != cb_int1
 	&& $1 != cb_int0) {
 		if (colnum <= 0
-		|| CB_LITERAL ($1)->sign < 0) {
+		|| (CB_LITERAL_P($1) && CB_LITERAL ($1)->sign < 0)) {
 			cb_error (_("Invalid COLUMN integer; Must be > 0"));
 			colnum = 0;
 			$$ = cb_int0;
@@ -10836,7 +10836,8 @@ integer:
 	if (cb_tree_category ($1) != CB_CATEGORY_NUMERIC) {
 		cb_error (_("Integer value expected"));
 		$$ = cb_int1;
-	} else if (CB_LITERAL ($1)->sign < 0 || CB_LITERAL ($1)->scale) {
+	} else if (CB_LITERAL_P($1) 
+		&& (CB_LITERAL ($1)->sign < 0 || CB_LITERAL ($1)->scale)) {
 		cb_error (_("Integer value expected"));
 		$$ = cb_int1;
 	} else {
@@ -10853,7 +10854,8 @@ symbolic_integer:
 	if (cb_tree_category ($1) != CB_CATEGORY_NUMERIC) {
 		cb_error (_("Integer value expected"));
 		$$ = cb_int1;
-	} else if (CB_LITERAL ($1)->sign || CB_LITERAL ($1)->scale) {
+	} else if (CB_LITERAL_P ($1)
+		&& (CB_LITERAL ($1)->sign || CB_LITERAL ($1)->scale)) {
 		cb_error (_("Integer value expected"));
 		$$ = cb_int1;
 	} else {
@@ -10876,7 +10878,8 @@ report_integer:
 	if (cb_tree_category ($1) != CB_CATEGORY_NUMERIC) {
 		cb_error (_("Integer value expected"));
 		$$ = cb_int1;
-	} else if (CB_LITERAL ($1)->sign < 0 || CB_LITERAL ($1)->scale) {
+	} else if (CB_LITERAL_P ($1)
+		&& (CB_LITERAL ($1)->sign < 0 || CB_LITERAL ($1)->scale)) {
 		cb_error (_("Positive Integer value expected"));
 		$$ = cb_int1;
 	} else {
