@@ -176,7 +176,9 @@ static size_t			call_lastsize;
 static size_t			resolve_size;
 static unsigned int		cob_jmp_primed;
 static cob_field_attr	const_binll_attr =
-				{COB_TYPE_NUMERIC_BINARY, 18, 0, COB_FLAG_HAVE_SIGN, NULL};
+			{COB_TYPE_NUMERIC_BINARY, 18, 0, COB_FLAG_HAVE_SIGN, NULL};
+static cob_field_attr	const_binull_attr =
+			{COB_TYPE_NUMERIC_BINARY, 18, 0, 0, NULL};
 
 #undef	COB_SYSTEM_GEN
 #if 0
@@ -1521,6 +1523,7 @@ cob_get_s64_param ( int n )
 	int		size;
 	cob_s64_t	val;
 	double		dbl;
+	cob_field	temp;
 	cob_field	*f = cob_get_param_field (n, "cob_get_s64_param");
 	if (f == NULL)
 		return -1;
@@ -1549,6 +1552,13 @@ cob_get_s64_param ( int n )
 		return val;
 	case COB_TYPE_NUMERIC_EDITED:
 		return cob_get_s64_pic9 (cbldata, size);
+	default:
+		temp.size = 8;
+		temp.data = (unsigned char *)&val;
+		temp.attr = &const_binll_attr;
+		const_binll_attr.scale = f->attr->scale;
+		cob_move (f, &temp);
+		return val;
 	}
 	return -1;
 }
@@ -1560,6 +1570,7 @@ cob_get_u64_param ( int n )
 	int		size;
 	cob_u64_t	val;
 	double		dbl;
+	cob_field	temp;
 	cob_field	*f = cob_get_param_field (n, "cob_get_u64_param");
 	if (f == NULL)
 		return 0;
@@ -1585,6 +1596,15 @@ cob_get_u64_param ( int n )
 	case COB_TYPE_NUMERIC_DOUBLE:
 		dbl = cob_get_comp2 (cbldata);
 		val = dbl;
+		return val;
+	case COB_TYPE_NUMERIC_EDITED:
+		return cob_get_u64_pic9 (cbldata, size);
+	default:
+		temp.size = 8;
+		temp.data = (unsigned char *)&val;
+		temp.attr = &const_binull_attr;
+		const_binull_attr.scale = f->attr->scale;
+		cob_move (f, &temp);
 		return val;
 	}
 	return 0;
@@ -1648,7 +1668,7 @@ cob_put_s64_param ( int n, cob_s64_t val )
 		dbl = val;
 		cob_put_comp2 (dbl, cbldata);
 		return;
-	case COB_TYPE_NUMERIC_EDITED:
+	default:	/* COB_TYPE_NUMERIC_EDITED, ... */
 		temp.size = 8;
 		temp.data = (unsigned char *)&val;
 		temp.attr = &const_binll_attr;
@@ -1703,7 +1723,7 @@ cob_put_u64_param ( int n, cob_u64_t val )
 		dbl = val;
 		cob_put_comp2 (dbl, cbldata);
 		return;
-	case COB_TYPE_NUMERIC_EDITED:
+	default:	/* COB_TYPE_NUMERIC_EDITED, ... */
 		temp.size = 8;
 		temp.data = (unsigned char *)&val;
 		temp.attr = &const_binll_attr;
