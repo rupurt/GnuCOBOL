@@ -2774,7 +2774,7 @@ AT_DATA([caller.c], [[
 #include <libcob.h>
 
 
-int callee (char *);
+int callee (char *, char *);
 
 int
 main (int argc, char **argv)
@@ -2785,7 +2785,7 @@ main (int argc, char **argv)
 	cob_init(argc, argv);
 	cobol_global = cob_get_global_ptr ();
 	cobol_global->cob_call_params = 1;
-	return callee (p1);
+	return callee (p1, NULL);
 }
 ]])
 
