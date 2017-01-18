@@ -3812,10 +3812,11 @@ output_bin_field (const cb_tree x, const cob_u32_t id, int opcd)
 	if (!CB_NUMERIC_LITERAL_P (x)) {
 		return;
 	}
-	aflags = 0;
+	aflags = COB_FLAG_REAL_BINARY;
 	if (cb_fit_to_int (x)) {
 		size = 4;
-		aflags = COB_FLAG_HAVE_SIGN;
+		digits = 9;
+		aflags = COB_FLAG_HAVE_SIGN;	/* Drop: COB_FLAG_REAL_BINARY */
 #ifndef WORDS_BIGENDIAN
 		if (cb_binary_byteorder == CB_BYTEORDER_BIG_ENDIAN) {
 			aflags |= COB_FLAG_BINARY_SWAP;
@@ -3823,16 +3824,12 @@ output_bin_field (const cb_tree x, const cob_u32_t id, int opcd)
 #endif
 	} else {
 		size = 8;
+		digits = 18;
 		if (CB_LITERAL (x)->sign < 0) {
-			aflags = COB_FLAG_HAVE_SIGN;
+			aflags |= COB_FLAG_HAVE_SIGN;
 		}
 	}
-	if (size == 8) {
-		digits = 18;
-	} else {
-		digits = 9;
-	}
-	aflags |= COB_FLAG_REAL_BINARY | COB_FLAG_CONSTANT;
+	aflags |= COB_FLAG_CONSTANT;
 	i = lookup_attr (COB_TYPE_NUMERIC_BINARY, digits, 0, aflags, NULL, 0);
 	if(opcd == 0) {
 		/* Some C compilers (SUN for one) will not accept 'content_%u.data' because

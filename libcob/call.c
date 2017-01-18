@@ -1447,12 +1447,11 @@ cob_get_param_type ( int n )
 	if (f == NULL)
 		return -1;
 	if (f->attr->type == COB_TYPE_NUMERIC_BINARY) {
+		if (COB_FIELD_REAL_BINARY (f))
+			return COB_TYPE_NUMERIC_COMP5;
 #ifndef WORDS_BIGENDIAN 
-		if (COB_FIELD_BINARY_SWAP(f))
-			return COB_TYPE_NUMERIC_BINARY;
-		return COB_TYPE_NUMERIC_COMP5;
-#else
-		return COB_TYPE_NUMERIC_BINARY;
+		if (!COB_FIELD_BINARY_SWAP(f))
+			return COB_TYPE_NUMERIC_COMP5;
 #endif
 	}
 	return (int)f->attr->type;
