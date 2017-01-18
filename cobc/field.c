@@ -731,6 +731,7 @@ validate_field_1 (struct cb_field *f)
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_COMP_5:
+			f->flag_real_binary = 1;
 		case CB_USAGE_COMP_X:
 			if (f->pic) {
 				if (f->pic->category != CB_CATEGORY_NUMERIC &&
@@ -909,6 +910,7 @@ setup_parameters (struct cb_field *f)
 			break;
 
 		case CB_USAGE_COMP_5:
+			f->flag_real_binary = 1;
 		case CB_USAGE_COMP_X:
 			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC
 			&& f->usage == CB_USAGE_COMP_X) {
