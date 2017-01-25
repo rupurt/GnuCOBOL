@@ -1166,6 +1166,12 @@ typedef struct __cob_module {
 	unsigned char		flag_main;		/* Main module */
 	unsigned char		flag_fold_call;		/* Fold case */
 	unsigned char		flag_exit_program;	/* Exit after CALL */
+
+	unsigned char		flag_dump_ready;	/* Module was compiled with -fdump */
+	unsigned char		unused[3];		/* Use these flags up later */
+
+	unsigned int		module_stmt;		/* Last statement executed */
+	const char		**module_sources;	/* Source module names compiled */
 } cob_module;
 
 
@@ -1579,16 +1585,21 @@ COB_EXPIMP int	cob_sys_printable(void *, ...);
 
 /* Utilities */
 
-COB_EXPIMP void	cob_set_location(const char *, const unsigned int,
-	const char *, const char *,
-	const char *);
-COB_EXPIMP void	cob_trace_section(const char *, const char *, const int);
+COB_EXPIMP void	cob_set_location  (const char *, const unsigned int,
+				   const char *, const char *, const char *);
+COB_EXPIMP void	cob_trace_section (const char *, const char *, const int);
+COB_EXPIMP void	cob_trace_sect    (const char *name);
+COB_EXPIMP void	cob_trace_para    (const char *name);
+COB_EXPIMP void	cob_trace_entry   (const char *name);
+COB_EXPIMP void	cob_trace_exit    (const char *name);
+COB_EXPIMP void	cob_trace_stmt    (const char *stmt);
 
 COB_EXPIMP void			*cob_external_addr(const char *, const int);
 COB_EXPIMP unsigned char	*cob_get_pointer(const void *);
 COB_EXPIMP void			*cob_get_prog_pointer(const void *);
 COB_EXPIMP void			cob_ready_trace(void);
 COB_EXPIMP void			cob_reset_trace(void);
+COB_EXPIMP void			cob_dump_module(char *reason);
 
 /* Call from outside to set libcob options */
 #define COB_SET_RUNTIME_TRACE_FILE 		0	/* 'p' is  FILE *  */
@@ -1596,6 +1607,13 @@ COB_EXPIMP void			cob_reset_trace(void);
 #define COB_SET_RUNTIME_RESCAN_ENV		2	/* rescan environment variables */
 COB_EXPIMP void			cob_set_runtime_option(int opt, void *p);
 COB_EXPIMP void			*cob_get_runtime_option(int opt);
+#define COB_DUMP_TO_FILE 3
+#define COB_DUMP_TO_PRINT 2
+COB_EXPIMP FILE			*cob_get_dump_file(int where);
+
+#define COB_GET_LINE_NUM(n) ( n & 0xFFFFF )
+#define COB_GET_FILE_NUM(n) ( (n >> 20) & 0xFFF)
+#define COB_SET_LINE_FILE(l,f) ( (unsigned int)((unsigned int)f<<20) | l)
 
 /* COB_DEBUG_LOG Macros and routines found in common.c */
 COB_EXPIMP int cob_debug_open( const char *cob_debug_env );
@@ -2149,6 +2167,7 @@ typedef struct {
 /* Functions in termio.c */
 
 COB_EXPIMP void cob_display(const int, const int, const int, ...);
+COB_EXPIMP void cob_dump_field (const int, const char *, cob_field *, const int, const int, ...);
 COB_EXPIMP void cob_accept(cob_field *);
 
 /*******************************/

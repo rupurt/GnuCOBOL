@@ -1,4 +1,13 @@
 
+2017-01-25  Ron Norman <rjn@inglenet.com>
+	* common.c,common.h,coblocal.h,termio.c:
+	  New routines for handling -ftrace, -ftraceall & -fdump=ALL
+	  -fdump= causes code to be generated that will dump out data
+	  variables in the event of a program abort or abnormal end
+	  New runtime.cfg/env-vars: 
+	      COB_DUMP_FILE, COB_DUMP_FORMAT, COB_DUMP_WIDTH
+	  The old trace routines have been kept for backward compatible
+
 2017-01-18  Ron Norman <rjn@inglenet.com>
 	* call.c:
 	  In cob_get_param_type added check for COB_FIELD_REAL_BINARY
