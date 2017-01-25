@@ -54,6 +54,9 @@ CB_FLAG_RQ (cb_default_byte, 1, "defaultbyte", -1, 6,
 CB_FLAG_RQ (cb_def_callfh, 1, "callfh", -1, 7,
 	 _("Call user written EXTFH interface module for I/O"))
 
+CB_FLAG_RQ (cb_def_dump, 1, "dump", -1, 8,
+	 _("Dump data fields on abort, ALL, WS, LS, RD, FD, SC"))
+
 /* Flags with required parameter and no associated variable */
 
 CB_FLAG_NQ (1, "intrinsics", 10,

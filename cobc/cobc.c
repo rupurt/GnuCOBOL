@@ -178,6 +178,7 @@ int			cobc_flag_main = 0;
 int			cb_flag_main = 0;
 int			cobc_wants_debug = 0;
 int			cb_flag_functions_all = 0;
+int			cb_flag_dump = 0;
 
 int			errorcount = 0;
 int			warningcount = 0;
@@ -209,6 +210,9 @@ struct cb_exception cb_exception_table[] = {
 #undef	CB_FLAG
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+
+/* Flag to emit Old style: cob_set_location, cob_trace_section */
+int	cb_old_trace = 0;
 
 #undef	CB_WARNDEF
 #undef	CB_NOWARNDEF
@@ -1917,6 +1921,44 @@ cobc_options_error_build (void)
 }
 
 static void
+cobc_def_dump_opts (const char *opt)
+{
+	char	*p, *q;
+	cb_old_trace = 0;			/* Use new methods */
+	if (!strcasecmp (opt, "ALL")) {
+		cb_flag_dump = COB_DUMP_ALL;
+		return;
+	}
+
+	p = cobc_strdup (opt);
+	q = strtok (p, ",");
+	while (q) {
+		if (!strcasecmp (q, "FD")) {
+			cb_flag_dump |= COB_DUMP_FD;
+		} else
+		if (!strcasecmp (q, "WS")) {
+			cb_flag_dump |= COB_DUMP_WS;
+		} else
+		if (!strcasecmp (q, "LS")) {
+			cb_flag_dump |= COB_DUMP_LS;
+		} else
+		if (!strcasecmp (q, "RD")) {
+			cb_flag_dump |= COB_DUMP_RD;
+		} else
+		if (!strcasecmp (q, "SD")) {
+			cb_flag_dump |= COB_DUMP_SD;
+		} else
+		if (!strcasecmp (q, "SC")) {
+			cb_flag_dump |= COB_DUMP_SC;
+		} else {
+			cobc_err_exit (_("-fdump= requires one of ALL,FD,WS,LS,RD,FD,SC not '%s'"),opt);
+		}
+		q = strtok (NULL, ",");
+	}
+	cobc_free (p);
+}
+
+static void
 cobc_deciph_funcs (const char *opt)
 {
 	char	*p;
@@ -2358,6 +2400,10 @@ process_command_line (const int argc, char **argv)
 
 		case 7:
 			cb_call_extfh = cobc_main_strdup (cob_optarg);
+			break;
+
+		case 8:
+			cobc_def_dump_opts (cob_optarg);
 			break;
 
 		case 10:
@@ -4155,6 +4201,12 @@ main (int argc, char **argv)
 		(void)_setmode (_fileno (stderr), _O_BINARY);
 	}
 #endif
+
+	/* Flag to emit Old style: cob_set_location, cob_trace_section */  
+	p = getenv ("COB_OLD_TRACE");
+	if (p && (*p == 'Y' || *p == 'y' || *p == '1')) {
+		cb_old_trace = 1;
+	}
 
 #ifdef	HAVE_SETLOCALE
 	setlocale (LC_ALL, "");

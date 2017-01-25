@@ -1,4 +1,14 @@
 
+2017-01-25  Ron Norman <rjn@inglenet.com>
+	* flag.def:  
+	  Compiler option -fdump= added
+	* cobc.h:  
+	  Added cb_flag_dump and defines for values
+	* cobc.c:  
+	  Added code to set cb_flag_dump
+	* codegen.c:  
+	  Added code to emit calls to new trace & dump routines
+
 2017-01-18  Ron Norman <rjn@inglenet.com>
 	* field.c:  
 	  Correction so that COB_FLAG_REAL_BINARY will be set on for COMP-5
