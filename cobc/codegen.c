@@ -7221,6 +7221,12 @@ output_field_display (struct cb_field *f, int offset, int idx)
 	x = cb_build_field_reference (f, NULL);
 	output_prefix ();
 	output ("cob_dump_field (%2d, \"%s\", ", f->level, fname);
+	if (f->flag_local) {
+		output ("COB_SET_DATA (%s%d, ",
+			CB_PREFIX_FIELD, f->id);
+		output_data (x);
+		output (")");
+	} else
 	if (f->count > 0) {
 		output_param (x, 0);
 	} else {
@@ -8493,6 +8499,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			sprintf(fdname,"FD %s",fl->name);
 			output_line ("/* Dump %s */",fdname);
 			output_line ("cob_dump_field (-1, \"%s\", NULL, 0, 0);", fdname);
+			output_line ("cob_dump_field (-2, (const char*)%s%s, NULL, 0, 0);", 
+							CB_PREFIX_FILE, fl->cname);
 			if (fl->record->sister
 			 && fl->record->sister->sister == NULL) {	/* Only one record layout */
 				f = fl->record->sister->redefines;

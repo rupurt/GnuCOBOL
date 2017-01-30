@@ -1,4 +1,9 @@
 
+2017-01-30  Ron Norman <rjn@inglenet.com>
+	* codegen.c:  
+	  For dump, emit call to pass address of file for dump of specific
+	  fields such as FILE STATUS
+
 2017-01-25  Ron Norman <rjn@inglenet.com>
 	* flag.def:  
 	  Compiler option -fdump= added

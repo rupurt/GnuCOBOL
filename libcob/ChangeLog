@@ -1,4 +1,8 @@
 
+2017-01-30  Ron Norman <rjn@inglenet.com>
+	* termio.c:
+	  For -fdump=ALL,IO; Dump FILE STATUS value
+
 2017-01-25  Ron Norman <rjn@inglenet.com>
 	* common.c,common.h,coblocal.h,termio.c:
 	  New routines for handling -ftrace, -ftraceall & -fdump=ALL
