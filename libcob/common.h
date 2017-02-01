@@ -20,6 +20,7 @@
 
 #ifndef COB_COMMON_H
 #define COB_COMMON_H
+#include <stdio.h>
 
 /* General type defines */
 #define	cob_c8_t		char
