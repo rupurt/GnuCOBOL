@@ -1611,14 +1611,20 @@ void
 cob_trace_sect (const char *name)
 {
 	char	val[60];
+	cob_current_section = name;
 	if (cobsetptr->cob_line_trace) {
-		cob_current_section = name;
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
 		sprintf(val,"  Section: %-31.31s",name);
 		cob_trace_print (val);
 		return;
+	} else
+	if (COB_MODULE_PTR->module_stmt != 0) {
+		cob_current_program_id = COB_MODULE_PTR->module_name;
+		cob_source_file = 
+			COB_MODULE_PTR->module_sources[COB_GET_FILE_NUM(COB_MODULE_PTR->module_stmt)];
+		cob_source_line = COB_GET_LINE_NUM(COB_MODULE_PTR->module_stmt);
 	}
 }
 
@@ -1626,14 +1632,20 @@ void
 cob_trace_para (const char *name)
 {
 	char	val[60];
+	cob_current_paragraph = name;
 	if (cobsetptr->cob_line_trace) {
-		cob_current_paragraph = name;
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
 		sprintf(val,"Paragraph: %-31.31s",name);
 		cob_trace_print (val);
 		return;
+	} else
+	if (COB_MODULE_PTR->module_stmt != 0) {
+		cob_current_program_id = COB_MODULE_PTR->module_name;
+		cob_source_file = 
+			COB_MODULE_PTR->module_sources[COB_GET_FILE_NUM(COB_MODULE_PTR->module_stmt)];
+		cob_source_line = COB_GET_LINE_NUM(COB_MODULE_PTR->module_stmt);
 	}
 }
 
@@ -1648,6 +1660,12 @@ cob_trace_entry (const char *name)
 		sprintf(val,"    Entry: %-31.31s",name);
 		cob_trace_print (val);
 		return;
+	} else
+	if (COB_MODULE_PTR->module_stmt != 0) {
+		cob_current_program_id = COB_MODULE_PTR->module_name;
+		cob_source_file = 
+			COB_MODULE_PTR->module_sources[COB_GET_FILE_NUM(COB_MODULE_PTR->module_stmt)];
+		cob_source_line = COB_GET_LINE_NUM(COB_MODULE_PTR->module_stmt);
 	}
 }
 
@@ -1662,6 +1680,12 @@ cob_trace_exit (const char *name)
 		sprintf(val,"     Exit: %-31.31s",name);
 		cob_trace_print (val);
 		return;
+	} else
+	if (COB_MODULE_PTR->module_stmt != 0) {
+		cob_current_program_id = COB_MODULE_PTR->module_name;
+		cob_source_file = 
+			COB_MODULE_PTR->module_sources[COB_GET_FILE_NUM(COB_MODULE_PTR->module_stmt)];
+		cob_source_line = COB_GET_LINE_NUM(COB_MODULE_PTR->module_stmt);
 	}
 }
 
@@ -1669,13 +1693,20 @@ void
 cob_trace_stmt (const char *stmt)
 {
 	char	val[60];
-	if (cobsetptr->cob_line_trace) {
+	if (stmt)
 		cob_source_statement = stmt;
+	if (cobsetptr->cob_line_trace) {
 		if (cob_trace_prep())
 			return;
 		sprintf(val,"            %-30.30s", stmt ? (char *)stmt : "Unknown");
 		cob_trace_print (val);
 		return;
+	} else
+	if (COB_MODULE_PTR->module_stmt != 0) {
+		cob_current_program_id = COB_MODULE_PTR->module_name;
+		cob_source_file = 
+			COB_MODULE_PTR->module_sources[COB_GET_FILE_NUM(COB_MODULE_PTR->module_stmt)];
+		cob_source_line = COB_GET_LINE_NUM(COB_MODULE_PTR->module_stmt);
 	}
 }
 
@@ -2055,6 +2086,7 @@ cob_module_enter (cob_module **module, cob_global **mglobal,
 	/* Push module pointer */
 	(*module)->next = COB_MODULE_PTR;
 	COB_MODULE_PTR = *module;
+	COB_MODULE_PTR->module_stmt = 0;
 }
 
 void
