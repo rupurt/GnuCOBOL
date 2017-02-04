@@ -1,4 +1,8 @@
 
+2017-02-04  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* added vs projects for gcdiff an added them to GnuCOBOL.sln
+
 2016-05-04  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* vc7: removed (GC 2+ will not build with Visual C compiler < 2005)

@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cobcrun", "cobcrun.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsupport", "libsupport.vcxproj", "{6D310774-FCE5-447B-93E3-BB8FAD3DA946}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gcdiff", "gcdiff.vcxproj", "{04AE4200-7622-4269-B3FA-51872E05DDE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -55,6 +57,14 @@ Global
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|Win32.Build.0 = Release|Win32
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|x64.ActiveCfg = Release|x64
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|x64.Build.0 = Release|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|Win32.Build.0 = Debug|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|x64.ActiveCfg = Debug|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|x64.Build.0 = Debug|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|Win32.ActiveCfg = Release|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|Win32.Build.0 = Release|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|x64.ActiveCfg = Release|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

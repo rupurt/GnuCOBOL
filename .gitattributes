@@ -48,6 +48,8 @@ build_windows/vc10/cobc.vcxproj.user -text
 build_windows/vc10/cobcrun.vcxproj -text
 build_windows/vc10/cobcrun.vcxproj.filters -text
 build_windows/vc10/cobcrun.vcxproj.user -text
+build_windows/vc10/gcdiff.vcxproj -text
+build_windows/vc10/gcdiff.vcxproj.filters -text
 build_windows/vc10/libcob.vcxproj -text
 build_windows/vc10/libcob.vcxproj.filters -text
 build_windows/vc10/libcob.vcxproj.user -text
@@ -61,6 +63,8 @@ build_windows/vc11/cobc.vcxproj.user -text
 build_windows/vc11/cobcrun.vcxproj -text
 build_windows/vc11/cobcrun.vcxproj.filters -text
 build_windows/vc11/cobcrun.vcxproj.user -text
+build_windows/vc11/gcdiff.vcxproj -text
+build_windows/vc11/gcdiff.vcxproj.filters -text
 build_windows/vc11/libcob.vcxproj -text
 build_windows/vc11/libcob.vcxproj.filters -text
 build_windows/vc11/libcob.vcxproj.user -text
@@ -72,6 +76,8 @@ build_windows/vc12/cobc.vcxproj -text
 build_windows/vc12/cobc.vcxproj.filters -text
 build_windows/vc12/cobcrun.vcxproj -text
 build_windows/vc12/cobcrun.vcxproj.filters -text
+build_windows/vc12/gcdiff.vcxproj -text
+build_windows/vc12/gcdiff.vcxproj.filters -text
 build_windows/vc12/libcob.vcxproj -text
 build_windows/vc12/libcob.vcxproj.filters -text
 build_windows/vc12/libsupport.vcxproj -text
@@ -81,6 +87,8 @@ build_windows/vc14/cobc.vcxproj -text
 build_windows/vc14/cobc.vcxproj.filters -text
 build_windows/vc14/cobcrun.vcxproj -text
 build_windows/vc14/cobcrun.vcxproj.filters -text
+build_windows/vc14/gcdiff.vcxproj -text
+build_windows/vc14/gcdiff.vcxproj.filters -text
 build_windows/vc14/libcob.vcxproj -text
 build_windows/vc14/libcob.vcxproj.filters -text
 build_windows/vc14/libsupport.vcxproj -text
@@ -90,6 +98,8 @@ build_windows/vc8/cobc.vcproj -text
 build_windows/vc8/cobc.vcproj.user -text
 build_windows/vc8/cobcrun.vcproj -text
 build_windows/vc8/cobcrun.vcproj.user -text
+build_windows/vc8/gcdiff.vcproj -text
+build_windows/vc8/gcdiff.vcproj.user -text
 build_windows/vc8/libcob.vcproj -text
 build_windows/vc8/libcob.vcproj.user -text
 build_windows/vc9/GnuCOBOL.sln -text
@@ -97,10 +107,13 @@ build_windows/vc9/cobc.vcproj -text
 build_windows/vc9/cobc.vcproj.user -text
 build_windows/vc9/cobcrun.vcproj -text
 build_windows/vc9/cobcrun.vcproj.user -text
+build_windows/vc9/gcdiff.vcproj -text
+build_windows/vc9/gcdiff.vcproj.user -text
 build_windows/vc9/libcob.vcproj -text
 build_windows/vc9/libcob.vcproj.user -text
 build_windows/version_cobc.rc -text
 build_windows/version_cobcrun.rc -text
+build_windows/version_gcdiff.rc -text
 build_windows/version_libcob.rc -text
 cobc/ChangeLog -text
 cobc/Makefile.am -text
