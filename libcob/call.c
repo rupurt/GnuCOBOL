@@ -1661,7 +1661,6 @@ cob_put_s64_param ( int n, cob_s64_t val )
 	case COB_TYPE_NUMERIC_FLOAT:
 		flt = val;
 		cob_put_comp1 (flt, cbldata);
-		val = dbl;
 		return;
 	case COB_TYPE_NUMERIC_DOUBLE:
 		dbl = val;
@@ -1716,7 +1715,6 @@ cob_put_u64_param ( int n, cob_u64_t val )
 	case COB_TYPE_NUMERIC_FLOAT:
 		flt = val;
 		cob_put_comp1 (flt, cbldata);
-		val = dbl;
 		return;
 	case COB_TYPE_NUMERIC_DOUBLE:
 		dbl = val;
