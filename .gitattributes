@@ -19,6 +19,7 @@ bin/Makefile.in -text
 bin/cob-config.in -text
 bin/cobcrun.1 -text
 bin/cobcrun.c -text
+bin/gcdiff.c -text
 build_aux/ChangeLog -text
 build_aux/compile -text
 build_aux/config.guess -text
