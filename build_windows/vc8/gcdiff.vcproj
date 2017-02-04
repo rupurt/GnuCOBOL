@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="libcob"
-	ProjectGUID="{8BCB185E-CF30-40F2-95EC-9E09A4733C85}"
-	RootNamespace="libcob"
+	Name="gcdiff"
+	ProjectGUID="{04AE4200-7622-4269-B3FA-51872E05DDE2}"
+	RootNamespace="gcdiff"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -22,7 +22,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(TargetName)\"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			>
 			<Tool
@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\.."
-				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;_DEBUG;_WINDOWS;_USRDLL"
+				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -65,12 +65,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mpir.lib pdcurses.lib libvbisam.lib advapi32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)..\$(PlatformName)"
-				ModuleDefinitionFile=""
+				AdditionalLibraryDirectories="$(SolutionDir)..\($PlatformName)"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="1"
 				EnableCOMDATFolding="1"
 				TargetMachine="1"
@@ -104,7 +102,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(TargetName)\"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -131,7 +129,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\.."
-				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;NDEBUG;_WINDOWS;_USRDLL"
+				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -149,13 +147,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mpir.lib pdcurses.lib libvbisam.lib advapi32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)..\$(PlatformName)"
-				ModuleDefinitionFile=""
-				DelayLoadDLLs=""
+				AdditionalLibraryDirectories="$(SolutionDir)..\($PlatformName)"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -189,7 +184,7 @@
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(TargetName)\"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			>
 			<Tool
@@ -212,7 +207,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\.."
-				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;_DEBUG;_WINDOWS;_USRDLL"
+				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -232,12 +227,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mpir.lib pdcurses.lib libvbisam.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)"
-				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -269,7 +261,7 @@
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(TargetName)\"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -292,7 +284,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)..;$(SolutionDir)..\.."
-				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;NDEBUG;_WINDOWS;_USRDLL"
+				PreprocessorDefinitions="HAVE_CONFIG_H;WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -310,12 +302,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mpir.lib pdcurses.lib libvbisam.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)"
-				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="17"
@@ -347,6 +336,10 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<ProjectReference
+			ReferencedProjectIdentifier="{8BCB185E-CF30-40F2-95EC-9E09A4733C85}"
+			RelativePathToProject=".\libcob.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -355,47 +348,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libcob\call.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\cobgetopt.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\fileio.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\intrinsic.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\move.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\numeric.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\reportio.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\screenio.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\strings.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\termio.c"
+				RelativePath="..\..\bin\gcdiff.c"
 				>
 			</File>
 		</Filter>
@@ -405,18 +358,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libcob\cobgetopt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\coblocal.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libcob\common.h"
-				>
-			</File>
-			<File
 				RelativePath="..\config.h"
 				>
 			</File>
@@ -425,15 +366,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcob\exception.def"
+				RelativePath="..\..\libcob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libcob\system.def"
+				RelativePath="..\..\tarstamp.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\cobc\tree.h"
+				RelativePath="..\..\libcob\cobgetopt.h"
 				>
 			</File>
 		</Filter>
@@ -443,12 +384,12 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\version_libcob.rc"
+				RelativePath="..\version_gcdiff.rc"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\libcob\ChangeLog"
+			RelativePath="..\..\bin\ChangeLog"
 			>
 		</File>
 	</Files>

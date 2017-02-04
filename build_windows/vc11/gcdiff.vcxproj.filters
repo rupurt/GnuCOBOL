@@ -15,15 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\bin\cobcrun.c">
+    <ClCompile Include="..\..\bin\gcdiff.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\defaults.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\libcob.h">
@@ -35,9 +32,12 @@
     <ClInclude Include="..\..\libcob\cobgetopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\version_cobcrun.rc">
+    <ResourceCompile Include="..\version_gcdiff.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

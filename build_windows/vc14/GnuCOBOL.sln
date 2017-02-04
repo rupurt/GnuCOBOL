@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.30110.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcob", "libcob.vcxproj", "{8BCB185E-CF30-40F2-95EC-9E09A4733C85}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -16,6 +16,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cobcrun", "cobcrun.vcxproj", "{6A0A5D13-C46F-48D9-8FEA-A55CCDFD7BCB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsupport", "libsupport.vcxproj", "{6D310774-FCE5-447B-93E3-BB8FAD3DA946}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gcdiff", "gcdiff.vcxproj", "{04AE4200-7622-4269-B3FA-51872E05DDE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,14 @@ Global
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|Win32.Build.0 = Release|Win32
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|x64.ActiveCfg = Release|x64
 		{6D310774-FCE5-447B-93E3-BB8FAD3DA946}.Release|x64.Build.0 = Release|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|Win32.Build.0 = Debug|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|x64.ActiveCfg = Debug|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Debug|x64.Build.0 = Debug|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|Win32.ActiveCfg = Release|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|Win32.Build.0 = Release|Win32
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|x64.ActiveCfg = Release|x64
+		{04AE4200-7622-4269-B3FA-51872E05DDE2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
