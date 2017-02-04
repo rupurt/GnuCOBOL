@@ -1,4 +1,9 @@
 
+2017-02-03  Ron Norman <rjn@inglenet.com>
+	* gcdiff.c    : New module for doing a 'diff' for test cases
+	* Makefile.am : Updated for gcdiff.c
+	* Makefile.in : Updated for gcdiff.c
+
 2016-01-30  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net> 
 
 	* cobcrun.c (cobcrun_print_version): changed generation of build stamp

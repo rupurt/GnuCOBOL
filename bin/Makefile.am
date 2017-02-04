@@ -20,8 +20,9 @@
 # along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
 bin_SCRIPTS = cob-config
-bin_PROGRAMS = cobcrun
+bin_PROGRAMS = cobcrun gcdiff
 cobcrun_SOURCES = cobcrun.c
+gcdiff_SOURCES = gcdiff.c
 dist_man_MANS = cobcrun.1
 
 AM_LDFLAGS = $(COB_EXPORT_DYN)
