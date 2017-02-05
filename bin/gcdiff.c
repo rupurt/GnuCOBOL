@@ -1,6 +1,6 @@
 /*
    Copyright (C) 2017 Free Software Foundation, Inc.
-   Written by Ron Norman, Simon Sobisch 
+   Written by Ron Norman, Simon Sobisch
 
    This file is part of GnuCOBOL.
 
@@ -265,30 +265,61 @@ gcd_print_version (void)
  * Display program usage information
 */
 static void
-gcd_usage(char *binname)
+gcd_usage (char *prog, char * referencefile)
 {
-	printf(_("Compare GnuCOBOL test case files\n"));
-	printf(_("  %s [opts] referencefile testfile\n"),binname);
-	printf(_("Where [opts] are: \n"));
-	printf(_("  -C x           Character 'x' indicates ignore"));
-	if (ign_char)
-		printf(_("; Default: '%c'"),ign_char);
-	putchar('\n');
-	printf(_("  -e STR         String STR is ignored\n"));
-	printf(_("  -n STR         String STR is ignored; Alpha chars are DIGITS in testfile\n"));
-	printf(_("  -f STR         STR is date/time pattern; Date/time in testfile must be\n"));
-	printf(_("                     close to modification time of testfile\n"));
-	printf(_("  -T STR         STR is date/time pattern; Date/time in testfile must be\n"));
-	printf(_("                     close to current time of day\n"));
-	printf(_("  -v STR         STR is date/time pattern; Verify Date/time in testfile \n"));
-	printf(_("  -I STR         If STR is on line of referencefile, ignore complete line\n"));
-	printf(_("  -x secs        Seconds of difference allowed in time compare; Default: %d\n"),time_tol);
-	printf(_("  -w             ignore all spaces\n"));
-	printf(_("  -h             Display this usage information\n"));
-	printf(_("  -V             Display version information\n"));
+	int		i, k;
+
+	puts (_("Compare GnuCOBOL test case files"));
 	putchar ('\n');
-	printf(_("  referencefile  base text file (reference case) to compare with\n"));
-	printf(_("  testfile       text file created by the test case to be compared\n"));
+	printf (_("usage: %s [options] referencefile testfile"), prog);
+	putchar ('\n');
+	putchar ('\n');
+	puts (_("Options:"));
+	printf (_("  -C x           character 'x' indicates ignore"));
+	if (ign_char) {
+		printf ("; %s: '%c'", _("default"), ign_char);
+	}
+	putchar('\n');
+	puts (_("  -e STR         string STR is ignored"));
+	puts (_("  -n STR         string STR is ignored; alpha chars are DIGITS in testfile"));
+	puts (_("  -f STR         STR is date/time pattern; date/time in testfile must be\n"
+	        "                     close to modification time of testfile"));
+	puts (_("  -T STR         STR is date/time pattern; date/time in testfile must be\n"
+	        "                     close to current time of day"));
+	puts (_("  -v STR         STR is date/time pattern; verify date/time in testfile"));
+	puts (_("  -I STR         if STR is on line of referencefile, ignore complete line"));
+	printf (_("  -x secs        seconds of difference allowed in time compare; default: %d"),time_tol);
+	putchar ('\n');
+	puts (_("  -w             ignore all spaces"));
+	puts (_("  -h, -help      display this help and exit"));
+	puts (_("  -V, -version   display version and exit"));
+	putchar ('\n');
+	puts (_("  referencefile  base text file (reference case) to compare with"));
+	puts (_("  testfile       text file created by the test case to be compared"));
+	if (referencefile) {
+		sort_templates();
+		putchar ('\n');
+		printf (_("patterns looked for in  '%s'"),
+						referencefile[0] > ' '?referencefile:"referencefile");
+		putchar ('\n');
+		print_template ("-T","current time",CURRENT_TIME);
+		print_template ("-v","verify time",VERIFY_TIME);
+		print_template ("-f","'testfile' time",MODIFY_TIME);
+		print_template ("-e","just ignore",NOT_TIME);
+		if (skip_lines[0].len > 0) {
+			putchar ('\n');
+			puts (_("default strings to cause line to be ignored"));
+			for (i=k=0; i < MAX_SKIP-1 && skip_lines[i].len > 0; i++) {
+				k += skip_lines[i].len;
+				if (k + skip_lines[i].len > 70) {
+					putchar('\n');
+					k = 0;
+				}
+				printf("%.*s  ",skip_lines[i].len,skip_lines[i].pat);
+			}
+			putchar ('\n');
+		}
+	}
 	putchar ('\n');
 	printf (_("Report bugs to: %s or\n"
 		"use the preferred issue tracker via home page"), "bug-gnucobol@gnu.org");
@@ -313,7 +344,7 @@ trim_line(char *buf)
 static int
 compare_file(FILE *ref, FILE *rslt, FILE *rpt)
 {
-	char	rbuf[4096], nbuf[4096]; 
+	char	rbuf[4096], nbuf[4096];
 	const char *tagout, *tagin;
 	int		i, j, k, n, t, val, numdiff, linenum;
 	struct tm tval, *ptm;
@@ -416,10 +447,10 @@ compare_file(FILE *ref, FILE *rslt, FILE *rpt)
 						else
 							time_diff = time_sec - nowis;
 						if (time_diff > time_tol) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d too far off current ",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d too far off current time"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
-							printf("%04d/%02d/%02d %02d:%02d:%02d\n",
+							printf(" %04d/%02d/%02d %02d:%02d:%02d\n",
 									ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
 									ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
 							goto mis_match;
@@ -432,10 +463,10 @@ compare_file(FILE *ref, FILE *rslt, FILE *rpt)
 							time_diff = time_sec - st_test.st_mtime;
 						if (time_diff > time_tol) {
 							ptm = localtime(&st_test.st_mtime);
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d too far off file ",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d too far off file time"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
-							printf("%04d/%02d/%02d %02d:%02d:%02d\n",
+							printf(" %04d/%02d/%02d %02d:%02d:%02d\n",
 									ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
 									ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
 							goto mis_match;
@@ -444,37 +475,42 @@ compare_file(FILE *ref, FILE *rslt, FILE *rpt)
 					if(templates[t].is_time == VERIFY_TIME) {
 						if (tval.tm_mon < 0
 						 || tval.tm_mon > 11) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid month\n",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid month"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
+							putchar ('\n');
 							goto mis_match;
 						}
 						if (tval.tm_mday < 1
 						 || tval.tm_mday > 31) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid day\n",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid day"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
+							putchar ('\n');
 							goto mis_match;
 						}
 						if (tval.tm_hour < 0
 						 || tval.tm_hour > 24) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid hour\n",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid hour"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
+							putchar ('\n');
 							goto mis_match;
 						}
 						if (tval.tm_min < 0
 						 || tval.tm_min > 60) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid minutes\n",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid minutes"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
+							putchar ('\n');
 							goto mis_match;
 						}
 						if (tval.tm_sec < 0
 						 || tval.tm_sec > 60) {
-							printf("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid seconds\n",
+							printf(_("Time: %04d/%02d/%02d %02d:%02d:%02d has invalid seconds"),
 									tval.tm_year+1900, tval.tm_mon+1, tval.tm_mday,
 									tval.tm_hour, tval.tm_min, tval.tm_sec);
+							putchar ('\n');
 							goto mis_match;
 						}
 					}
@@ -547,9 +583,9 @@ mis_match:
 }
 
 static void
-set_option(char *binary, int opt, char *arg)
+set_option (char *binary, int opt, char *arg)
 {
-	int		i,k;
+	int		i;
 	switch(opt) {
 	case 'w':
 		ign_spaces = 1;
@@ -606,34 +642,14 @@ set_option(char *binary, int opt, char *arg)
 
 	case '?':
 	default:
-		printf(_("Unknown parameter '%c' for %s\n"),opt,binary);
-		gcd_usage((char*)"gcdiff");
+		printf(_("unknown parameter '%c' for %s"),opt,binary);
+		putchar ('\n');
+		gcd_usage((char*)"gcdiff", NULL);
 		exit(2);
 		break;
 
 	case 'h':
-		gcd_usage((char*)"gcdiff");
-		sort_templates();
-		putchar('\n');
-		printf(_("Patterns looked for in  '%s'\n"),
-						referencefile[0] > ' '?referencefile:"referencefile");
-		print_template("-T","Current time",CURRENT_TIME);
-		print_template("-v","Verify time",VERIFY_TIME);
-		print_template("-f","'testfile' time",MODIFY_TIME);
-		print_template("-e","Just ignore",NOT_TIME);
-		if (skip_lines[0].len > 0) {
-			putchar('\n');
-			printf(_("Default strings to cause line to be ignored\n"));
-			for (i=k=0; i < MAX_SKIP-1 && skip_lines[i].len > 0; i++) {
-				k += skip_lines[i].len;
-				if (k + skip_lines[i].len > 70) {
-					putchar('\n');
-					k = 0;
-				}
-				printf("%.*s  ",skip_lines[i].len,skip_lines[i].pat);
-			}
-			putchar('\n');
-		}
+		gcd_usage((char*)"gcdiff", referencefile);
 		exit(2);
 		break;
 
@@ -707,46 +723,48 @@ main(
 		strcpy(testfile,argv[cob_optind++]);
 	}
 	if (referencefile[0] <= ' ') {
-		printf(_("Missing 'referencefile'\n"));
-		gcd_usage(argv[0]);
+		puts (_("missing 'referencefile'"));
+		putchar ('\n');
+		gcd_usage(argv[0], NULL);
 		exit(2);
 	}
 	if (testfile[0] <= ' ') {
-		printf(_("Missing 'testfile'\n"));
-		gcd_usage(argv[0]);
+		puts (_("missing 'testfile'"));
+		putchar ('\n');
+		gcd_usage(argv[0], NULL);
 		exit(2);
 	}
 
 	sort_templates();
 	time(&nowis);
 
-	if (strcmp(referencefile,GCD_DASH) == 0) {
+	if (strcmp(referencefile, GCD_DASH) == 0) {
 		ref = stdin;
 		st_ref.st_atime = nowis;
 		st_ref.st_ctime = nowis;
 		st_ref.st_mtime = nowis;
 	} else {
-		stat(referencefile, &st_ref);
+		stat (referencefile, &st_ref);
 		ref = fopen(referencefile,"r");
 	}
 	if (ref == NULL) {
 		perror(referencefile);
 		exit(2);
 	}
-	if (strcmp(testfile,GCD_DASH) == 0) {
+	if (strcmp(testfile, GCD_DASH) == 0) {
 		rslt = stdin;
 		st_test.st_atime = nowis;
 		st_test.st_ctime = nowis;
 		st_test.st_mtime = nowis;
 	} else {
-		stat(testfile, &st_test);
+		stat (testfile, &st_test);
 		rslt = fopen(testfile,"r");
 	}
 	if (rslt == NULL) {
 		perror(testfile);
 		exit(2);
 	}
-	k = compare_file( ref, rslt, stdout);
+	k = compare_file (ref, rslt, stdout);
 	if (ref != stdin)
 		fclose(ref);
 	if (rslt != stdin)
