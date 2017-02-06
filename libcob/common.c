@@ -2097,6 +2097,15 @@ cob_module_leave (cob_module *module)
 	COB_MODULE_PTR = COB_MODULE_PTR->next;
 }
 
+void
+cob_module_free (cob_module **module)
+{
+	if (*module != NULL) {
+		cob_cache_free (*module);
+		*module = NULL;
+	}
+}
+
 void *
 cob_save_func (cob_field **savefld, const int params,
 	       const int eparams, ...)
@@ -2891,6 +2900,31 @@ cob_external_addr (const char *exname, const int exlength)
 	basext = eptr;
 	cobglobptr->cob_initial_external = 1;
 	return eptr->ext_alloc;
+}
+
+void
+cob_file_external_addr (const char *exname,
+		cob_file **pfl, cob_file_key **pky,
+		const int nkeys, const int linage)
+{
+	cob_file	*fl;
+	fl = cob_external_addr (exname, sizeof(cob_file));
+	if (fl->file_version == 0)
+		fl->file_version = COB_FILE_VERSION;
+
+	if (nkeys > 0
+	 && fl->keys != NULL) {
+		fl->keys = cob_cache_malloc (sizeof(cob_file_key) * nkeys);
+	}
+	if (pky != NULL) {
+		*pky = fl->keys;
+	}
+
+	if (linage > 0
+	 && fl->linorkeyptr == NULL) {
+		fl->linorkeyptr = cob_cache_malloc (sizeof(cob_linage));
+	}
+	*pfl = fl;
 }
 
 /* Retrieving current date and time */
@@ -6237,6 +6271,54 @@ cob_init (const int argc, char **argv)
 	}
 	/* The above must be last in this function as we do early return */
 	/* from certain ifdef's */
+}
+
+/*
+ * Allocate memory for cob_file
+ */
+void
+cob_file_malloc (cob_file **pfl, cob_file_key **pky,
+		 const int nkeys, const int linage)
+{
+	cob_file	*fl;
+	fl = cob_cache_malloc (sizeof(cob_file));
+	fl->file_version = COB_FILE_VERSION;
+
+	if (nkeys > 0
+	 && pky != NULL) {
+		*pky = fl->keys = cob_cache_malloc (sizeof(cob_file_key) * nkeys);
+	}
+
+	if (linage > 0) {
+		fl->linorkeyptr = cob_cache_malloc (sizeof(cob_linage));
+	}
+	*pfl = fl;
+}
+
+/*
+ * Free memory for cob_file
+ */
+void
+cob_file_free (cob_file **pfl, cob_file_key **pky)
+{
+	cob_file	*fl;
+	if (pky != NULL) {
+		if (*pky != NULL) {
+			cob_cache_free (*pky);
+			*pky = NULL;
+		}
+	}
+	if (pfl != NULL) {
+		fl = *pfl;
+		if (fl->linorkeyptr) {
+			cob_cache_free (fl->linorkeyptr);
+			fl->linorkeyptr = NULL;
+		}
+		if (*pfl != NULL) {
+			cob_cache_free (*pfl);
+			*pfl = NULL;
+		}
+	}
 }
 
 /*
