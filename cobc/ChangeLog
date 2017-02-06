@@ -1,6 +1,11 @@
 
 2017-02-06  Ron Norman <rjn@inglenet.com>
 	* codegen.c:
+	  Emit code to set unused cob_procedure_params to NULL
+	  when a CALL statement has fewer parameters that other CALLS
+
+2017-02-06  Ron Norman <rjn@inglenet.com>
+	* codegen.c:
 	  Emit routines cob_file_external_addr,cob_file_malloc
 	  & cob_file_free so that 'cob_file' is allocated within libcob
 	  This will allow the stucture have fields added to the end
