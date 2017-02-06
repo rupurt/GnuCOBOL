@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2003-2016 Free Software Foundation, Inc.
+   Copyright (C) 2003-2017 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
 
    This file is part of GnuCOBOL.
@@ -4596,7 +4596,7 @@ output_perform_exit (struct cb_label *l)
 		if (cb_flag_stack_on_heap || current_prog->flag_recursive) {
 			output_line ("  cob_free (frame_stack);");
 			output_line ("  cob_free (cob_procedure_params);");
-			output_line ("  cob_cache_free (module);");
+			output_line ("  cob_module_free (&module);");
 		}
 		output_line ("  return 0;");
 		output_line ("}");
@@ -5876,39 +5876,35 @@ output_file_initialization (struct cb_file *f)
 	int			features;
 	int			i_keycomp;
 	struct cb_key_component *key_component;
+	char			key_ptr[64];
 
-	nkeys = 1;
-	if (f->flag_external) {
-		output_line ("%s%s = cob_external_addr (\"%s\", sizeof(cob_file));",
-			     CB_PREFIX_FILE, f->cname, f->cname);
-		output_line ("if (cob_glob_ptr->cob_initial_external)");
-		output_indent ("{");
-		if (f->linage) {
-			output_line ("%s%s->linorkeyptr = cob_cache_malloc (sizeof(cob_linage));", CB_PREFIX_FILE, f->cname);
-		}
-	} else {
-		output_line ("if (!%s%s)", CB_PREFIX_FILE, f->cname);
-		output_indent ("{");
-		/* 20 extra is allocated due to recent increase in size and possible problem
-		 * if an old common.h was lying around; RJN Apr 2015
-		 */
-		output_line ("%s%s = cob_cache_malloc (sizeof(cob_file)+20);", CB_PREFIX_FILE, f->cname);
-		if (f->linage) {
-			output_line ("%s%s->linorkeyptr = cob_cache_malloc (sizeof(cob_linage));", CB_PREFIX_FILE, f->cname);
-		}
-		output_indent ("}");
-	}
-	/* Output RELATIVE/RECORD KEY's */
 	if (f->organization == COB_ORG_RELATIVE
 	 || f->organization == COB_ORG_INDEXED) {
+		nkeys = 1;
 		for (l = f->alt_key_list; l; l = l->next) {
 			nkeys++;
 		}
-		output_line ("if (!%s%s)", CB_PREFIX_KEYS, f->cname);
+		sprintf (key_ptr,"&%s%s",CB_PREFIX_KEYS, f->cname);
+	} else {
+		nkeys = 0;
+		strcpy(key_ptr,"NULL");
+	}
+	if (f->flag_external) {
+		output_line ("cob_file_external_addr (\"%s\", &%s%s, %s, %d, %d);", 
+							f->cname,
+							CB_PREFIX_FILE, f->cname, 
+							key_ptr, nkeys, f->linage?1:0);
+		output_line ("if (cob_glob_ptr->cob_initial_external)");
 		output_indent ("{");
-		output_line ("%s%s = cob_cache_malloc (sizeof (cob_file_key) * %d);",
-			     CB_PREFIX_KEYS, f->cname, nkeys);
-		output_indent ("}");
+	} else {
+		output_line ("cob_file_malloc (&%s%s, %s, %d, %d);", 
+							CB_PREFIX_FILE, f->cname, 
+							key_ptr, nkeys, f->linage?1:0);
+	}
+	nkeys = 1;
+	/* Output RELATIVE/RECORD KEY's */
+	if (f->organization == COB_ORG_RELATIVE
+	 || f->organization == COB_ORG_INDEXED) {
 		nkeys = 1;
 		output_prefix ();
 		output ("%s%s->field = ", CB_PREFIX_KEYS, f->cname);
@@ -6071,13 +6067,6 @@ output_file_initialization (struct cb_file *f)
 		     f->optional);
 	output_line ("%s%s->flag_line_adv = %d;", CB_PREFIX_FILE, f->cname,
 		     f->flag_line_adv);
-	output_line ("%s%s->last_open_mode = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_operation = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_nonexistent = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_end_of_file = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_begin_of_file = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_first_read = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_read_done = 0;", CB_PREFIX_FILE, f->cname);
 	features = 0;
 	if (f->file_status) {
 		features |= COB_SELECT_FILE_STATUS;
@@ -6094,22 +6083,15 @@ output_file_initialization (struct cb_file *f)
 	}
 	output_line ("%s%s->flag_select_features = %d;", CB_PREFIX_FILE, f->cname,
 		     features);
-	output_line ("%s%s->flag_needs_nl = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->flag_needs_top = 0;", CB_PREFIX_FILE, f->cname);
-	output_line ("%s%s->file_version = %d;", CB_PREFIX_FILE, f->cname,
-		     COB_FILE_VERSION);
 
 	/* These may get set with values via some compile option in the future */
 	if (cb_mf_files) {
 		output_line ("%s%s->file_format = COB_FILE_IS_MF;", CB_PREFIX_FILE, f->cname);
 		if (f->organization == COB_ORG_LINE_SEQUENTIAL) {
 			output_line ("%s%s->file_features = COB_FILE_LS_NULLS;", CB_PREFIX_FILE, f->cname);
-		} else {
-			output_line ("%s%s->file_features = 0;", CB_PREFIX_FILE, f->cname);
 		}
 	} else {
 		output_line ("%s%s->file_format = 255;", CB_PREFIX_FILE, f->cname);
-		output_line ("%s%s->file_features = 0;", CB_PREFIX_FILE, f->cname);
 	}
 	/**********************************************************************/
 
@@ -7504,6 +7486,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	FILE			*savetarget;
 	const char		*s;
 	char			fdname[48];
+	char			key_ptr[64];
 	int			i;
 	cob_u32_t		inc;
 	int			parmnum;
@@ -8244,8 +8227,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	output_newline ();
 
 	if (prog->flag_recursive) {
-		output_line ("/* Free cob_module structure */");
-		output_line ("cob_cache_free (module);");
+		output_line ("cob_module_free (&module);");
 		output_newline ();
 	}
 
@@ -8594,21 +8576,13 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			output_line ("cob_close (%s%s, NULL, COB_CLOSE_NORMAL, 1);",
 					CB_PREFIX_FILE, fl->cname);
 			if (!fl->flag_external) {
-				if (fl->linage) {
-					output_line ("cob_cache_free (%s%s->linorkeyptr);",
-						     CB_PREFIX_FILE, fl->cname);
+				if (fl->organization == COB_ORG_RELATIVE
+				 || fl->organization == COB_ORG_INDEXED) {
+					sprintf (key_ptr,"&%s%s",CB_PREFIX_KEYS, fl->cname);
+				} else {
+					strcpy(key_ptr,"NULL");
 				}
-				if (fl->organization == COB_ORG_RELATIVE ||
-				    fl->organization == COB_ORG_INDEXED) {
-					output_line ("cob_cache_free (%s%s);",
-						     CB_PREFIX_KEYS, fl->cname);
-					output_line ("%s%s = NULL;",
-						     CB_PREFIX_KEYS, fl->cname);
-				}
-				output_line ("cob_cache_free (%s%s);",
-						CB_PREFIX_FILE, fl->cname);
-				output_line ("%s%s = NULL;",
-						CB_PREFIX_FILE, fl->cname);
+				output_line ("cob_file_free (&%s%s,%s);",CB_PREFIX_FILE, fl->cname,key_ptr);
 			}
 		} else {
 			output_line ("cob_cache_free (%s%s);",
@@ -8666,8 +8640,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		output (" = 0;\n");
 	}
 
-	output_line ("cob_cache_free (module);");
-	output_line ("module = NULL;");
+	output_line ("cob_module_free (&module);");
 	output_newline ();
 
 cancel_end:
