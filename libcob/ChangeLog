@@ -1,4 +1,13 @@
 
+2017-02-07  Ron Norman <rjn@inglenet.com>
+	* common.c,common.h,coblocal.h:
+	  Added COB_TRACE_IO to runtime.conf
+	* termio.c:
+	  Added cob_print_field to be used by fileio Trace code
+	* fileio.c:
+	  Added trace code to save_status.
+	  Added check for IO_fdname and check for 'trace' option
+
 2017-02-06  Ron Norman <rjn@inglenet.com>
 	* common.c,common.h:
 	  Added cob_module_free so that structure gets freed within libcob
