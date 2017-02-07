@@ -276,6 +276,7 @@ static struct config_tbl gc_conf[] = {
 	{"COB_TIMEOUT_SCALE","timeout_scale",	"0",	timeopts,GRP_SCREEN,ENV_INT,SETPOS(cob_timeout_scale)},
 	{"COB_TRACE_FILE","trace_file",		NULL,	NULL,GRP_MISC,ENV_FILE,SETPOS(cob_trace_filename)},
 	{"COB_TRACE_FORMAT","trace_format",	"%P%S%L",NULL,GRP_MISC,ENV_STR,SETPOS(cob_trace_format)},
+	{"COB_TRACE_IO","trace_io",		NULL,	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_trace_io)},
 	{"COB_DUMP_FILE","dump_file",		NULL,	NULL,GRP_MISC,ENV_FILE,SETPOS(cob_dump_filename)},
 	{"COB_DUMP_WIDTH","dump_width",		"100",	NULL,GRP_MISC,ENV_INT,SETPOS(cob_dump_width)},
 #ifdef  _WIN32
