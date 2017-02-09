@@ -1,4 +1,9 @@
 
+2017-02-09  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* HACKING, README: moved instructions for development/svn-builds
+	  from README to new file HACKING and added missing information
+
 2016-11-17  Ron Norman <rjn@inglenet.com>
 
 	* configure.ac: check for sys/wait.h (for CBL_GC_WAITPID)
