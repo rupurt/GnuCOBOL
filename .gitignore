@@ -3,6 +3,7 @@
 /Makefile
 /atlocal
 /autom4te.cache
+bin/*.1
 bin/*.exe
 bin/.deps
 bin/Makefile
@@ -77,6 +78,7 @@ build_windows/vc9/ia64
 build_windows/vc9/x64
 build_windows/x64
 /cob-config
+cobc/*.1
 cobc/*.dot
 cobc/*.exe
 cobc/*.output
@@ -85,6 +87,12 @@ cobc/.deps
 cobc/Makefile
 cobc/atlocal
 cobc/cobc
+cobc/parser.c
+cobc/parser.h
+cobc/pplex.c
+cobc/ppparse.c
+cobc/ppparse.h
+cobc/scanner.c
 /conf*.dir
 /conf*.file
 /confdefs.h
@@ -107,8 +115,10 @@ doc/atlocal
 doc/gnucobol.aux
 doc/gnucobol.cp
 doc/gnucobol.fn
+doc/gnucobol.info
 doc/gnucobol.ky
 doc/gnucobol.log
+doc/gnucobol.pdf
 doc/gnucobol.pg
 doc/gnucobol.t2p
 doc/gnucobol.toc
@@ -120,6 +130,7 @@ extras/Makefile
 lib/.deps
 lib/Makefile
 lib/atlocal
+libcob/*.3
 libcob/.deps
 libcob/Makefile
 libcob/atlocal
@@ -127,12 +138,15 @@ libcob/atlocal
 m4/.deps
 m4/Makefile
 m4/atlocal
+po/*.gmo
 po/*.po~
 po/.deps
 po/Makefile
 po/Makefile.in
 po/POTFILES
 po/atlocal
+po/en@boldquot.po
+po/en@quot.po
 po/remove-potcdate.sed
 /stamp-h1
 tests/.deps
@@ -160,6 +174,7 @@ tests/cobol85/ST
 tests/cobol85/copy
 tests/cobol85/copyalt
 tests/cobol85/newcob.val*
+tests/testsuite
 tests/testsuite.dir
 tests/testsuite.log
 tests/testsuite.src/Makefile
