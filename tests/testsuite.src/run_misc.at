@@ -6586,7 +6586,6 @@ Program-Id: prog
          Record : 'ALP00000 ALPHA ELECTRICAL CO. LTD.123 MAIN STREET          NEW YORK             '
                   '    N.Y.                     3131234432MR. DAVE HARRIS          UNI-90301MEG8417'
                   '    1600 BPI00085'
-            Key : 'ALP00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6609,7 +6608,6 @@ Program-Id: prog
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
                   '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
                   '    6250 BPI00034'
-            Key : 'BET00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6632,7 +6630,6 @@ Program-Id: prog
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
                   '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
                   '    1600 BPI00075'
-            Key : 'GAM00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6655,7 +6652,6 @@ Program-Id: prog
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
                   '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
                   '    6250 BPI00045'
-            Key : 'DEL00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6678,7 +6674,6 @@ Program-Id: prog
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
                   '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
                   '    1600 BPI00090'
-            Key : 'EPS00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6701,7 +6696,6 @@ Program-Id: prog
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
                   '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
                   '    6250 BPI00107'
-            Key : 'FOR00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6724,7 +6718,6 @@ Program-Id: prog
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
                   '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
                   '    1600 BPI00067'
-            Key : 'GIB00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6747,7 +6740,6 @@ Program-Id: prog
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
                   '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
                   '    6250 BPI00032'
-            Key : 'H&J00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6770,7 +6762,6 @@ Program-Id: prog
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
                   '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
                   '    1600 BPI00016'
-            Key : 'INC00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6793,7 +6784,6 @@ Program-Id: prog
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
                   '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
                   '    1600 BPI00034'
-            Key : 'JOH00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6816,7 +6806,6 @@ Program-Id: prog
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
                   '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
                   '    1600 BPI00128'
-            Key : 'KON00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6839,7 +6828,6 @@ Program-Id: prog
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
                   '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
                   '    6250 BPI00064'
-            Key : 'LEW00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6862,7 +6850,6 @@ Program-Id: prog
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
                   '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
                   '    6250 BPI00110'
-            Key : 'MOR00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6885,7 +6872,6 @@ Program-Id: prog
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
                   '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
                   '    6250 BPI00324'
-            Key : 'NEW00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6908,7 +6894,6 @@ Program-Id: prog
          Record : 'OLD00000 OLD TYME PIZZA MFG. CO.  1705 WISCONSIN ROAD      RICHMOND             '
                   '    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
                   '    6250 BPI00124'
-            Key : 'OLD00000'
  Line:    371             IF                             
  Line:    347 Paragraph: 1000-LOAD-RECORD                
  Line:    349             MOVE                           
@@ -6931,7 +6916,6 @@ Program-Id: prog
          Record : 'PRE00000 PRESTIGE OFFICE FURNITURE114A MAPLE GROVE         WHITEPLAIN           '
                   '    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
                   '    6250 BPI00086'
-            Key : 'PRE00000'
  Line:    371             IF                             
  Line:    339             DISPLAY                        
  Line:    341             CLOSE                          
@@ -7186,7 +7170,6 @@ Program-Id: prog
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
                   '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
                   '    1600 BPI00067'
-            Key :  6456445643
  Line:    506             IF                             
  Line:    510             DISPLAY                        
  Line:    513             MOVE                           
@@ -7204,7 +7187,6 @@ Program-Id: prog
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
                   '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
                   '    1600 BPI00080'
-            Key : 'GAM00000'
  Line:    522             IF                             
  Line:    527             DISPLAY                        
  Line:    532             MOVE                           
@@ -7223,7 +7205,6 @@ Program-Id: prog
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1090 2ND AVE. WEST       ATLANTA              '
                   '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
                   '    6250 BPI00034'
-            Key : 'GAM00000'
  Line:    542             IF                             
  Line:    547             DISPLAY                        
  Line:    551             MOVE                           
@@ -7241,7 +7222,6 @@ Program-Id: prog
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
                   '    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
                   '    6250 BPI00107'
-            Key : 'FOR00000'
  Line:    557             IF                             
  Line:    562             DISPLAY                        
  Line:    566             CLOSE                          
