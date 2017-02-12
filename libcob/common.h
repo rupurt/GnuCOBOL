@@ -2062,6 +2062,8 @@ typedef struct {
 	unsigned char	gcFlags; 			/* Local GNUCobol feature only */
 #define MF_CALLFH_GNUCOBOL	0x80			/* GNUCobol is being used */
 #define MF_CALLFH_BYPASS	0x40			/* Stop passing this file to 'callfh' */
+#define MF_CALLFH_TRACE		0x20			/* Trace I/O for this file */
+#define MF_CALLFH_STATS		0x10			/* Record Stats for this file */
 	unsigned char	eop[2];				/* Was reserverd: Use for cob_write eop value */
 	char		fsv2FileId[2];			/* Fileshare V2 file id */
 	char		retryOpenCount[2];

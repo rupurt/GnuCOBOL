@@ -1717,6 +1717,9 @@ void
 cob_ready_trace (void)
 {
 	cobsetptr->cob_line_trace = 1;
+	if (!cobsetptr->cob_trace_file) {
+		cob_check_trace_file ();
+	}
 }
 
 void

@@ -1,4 +1,14 @@
 
+2017-02-12  Ron Norman <rjn@inglenet.com>
+	* common.c,common.h:
+	  Added check to open trace file on READY TRACE
+	* common.h:
+	  Added flags to FCD3 for TRACE & STATS
+	* fileio.c:
+	  Added code to invoke trace and/or stats for EXTFH usage
+	  If -ftraceall not used, then open trace_file when defined
+	  and the file had 'trace_io' set true
+
 2017-02-07  Ron Norman <rjn@inglenet.com>
 	* common.c,common.h,coblocal.h:
 	  Added COB_STATS_RECORD & COB_STATS_FILE to runtime.conf
