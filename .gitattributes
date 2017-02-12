@@ -271,6 +271,7 @@ tests/cobol85/summary.pl -text
 tests/cobol85/summary.txt -text
 tests/cobol85/summarynoix.txt -text
 tests/package.m4 -text
+tests/testsuite -text
 tests/testsuite.at -text
 tests/testsuite.src/configuration.at -text
 tests/testsuite.src/data_binary.at -text
