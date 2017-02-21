@@ -5,6 +5,7 @@
 bin/Makefile.am eol=lf
 bin/Makefile.in eol=lf
 bin/cob-config.in eol=lf
+bin/cobcrun.1 eol=lf
 bin/cobcrun.c eol=lf
 build_aux/compile eol=lf
 build_aux/config.guess eol=lf
@@ -90,6 +91,7 @@ build_windows/version_cobcrun.rc eol=crlf
 build_windows/version_libcob.rc eol=crlf
 cobc/Makefile.am eol=lf
 cobc/Makefile.in eol=lf
+cobc/cobc.1 eol=lf
 /config.h.in eol=lf
 config/Makefile.am eol=lf
 config/Makefile.in eol=lf
@@ -110,6 +112,7 @@ doc/cbrunt.tex eol=lf
 doc/cbsyst.tex eol=lf
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
+doc/gnucobol.info eol=lf
 doc/gnucobol.texi eol=lf
 doc/mdate-sh eol=lf
 doc/stamp-vti eol=lf
@@ -166,13 +169,19 @@ po/Makevars -text
 po/POTFILES.in -text
 po/Rules-quot -text
 po/boldquot.sed -text
+po/en@boldquot.gmo -text
 po/en@boldquot.header -text
 po/en@boldquot.insert-header -text
+po/en@boldquot.po -text
+po/en@quot.gmo -text
 po/en@quot.header -text
 po/en@quot.insert-header -text
+po/en@quot.po -text
+po/es.gmo -text
 po/es.po -text
 po/gnucobol.pot -text
 po/insert-header.sin -text
+po/ja.gmo -text
 po/ja.po -text
 po/nl.po -text
 po/quot.sed -text
@@ -208,6 +217,7 @@ tests/cobol85/summary.txt -text
 tests/cobol85/summarynoix.txt -text
 tests/listings-sed.sh eol=lf
 tests/package.m4 eol=lf
+tests/testsuite eol=lf
 tests/testsuite.at eol=lf
 tests/testsuite.src/configuration.at eol=lf
 tests/testsuite.src/data_binary.at eol=lf
