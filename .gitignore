@@ -108,6 +108,7 @@ copy/Makefile
 copy/atlocal
 /defaults.h
 doc/*.cps
+doc/*.tex
 doc/*.vrs
 doc/.deps
 doc/Makefile
