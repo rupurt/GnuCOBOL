@@ -146,9 +146,10 @@ po/Makefile.in
 po/POTFILES
 po/atlocal
 po/en@boldquot.gmo
-po/en@boldquot.header
+po/en@boldquot.insert-header
 po/en@boldquot.po
 po/en@quot.gmo
+po/en@quot.insert-header
 po/en@quot.po
 po/remove-potcdate.sed
 /stamp-h1

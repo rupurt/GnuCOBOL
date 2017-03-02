@@ -22,6 +22,6 @@
 configdir = @COB_CONFIG_DIR@
 config_DATA = default.conf cobol85.conf cobol2002.conf cobol2014.conf \
 	acu.conf mf.conf ibm.conf mvs.conf bs2000.conf \
-	runtime.cfg
+	runtime.cfg runtime_empty.cfg
 
 EXTRA_DIST = $(config_DATA)
