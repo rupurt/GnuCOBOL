@@ -2766,7 +2766,7 @@ AT_CHECK([./prog], [0], [], [])
 AT_CLEANUP
 
 
-AT_SETUP([System routine CBL_OC_GETOPT])
+AT_SETUP([System routine CBL_GC_GETOPT])
 AT_KEYWORDS([extensions])
 
 AT_DATA([prog.cob], [
@@ -2804,7 +2804,7 @@ AT_DATA([prog.cob], [
             PERFORM WITH TEST AFTER
                     VARYING COUNTER FROM 0 BY 1
                     UNTIL RETURN-CODE = -1
-               CALL 'CBL_OC_GETOPT' USING 
+               CALL 'CBL_GC_GETOPT' USING
                   BY REFERENCE SO LO LONGIND
                   BY VALUE     LONG-ONLY
                   BY REFERENCE RETURN-CHAR OPT-VAL
@@ -2845,7 +2845,7 @@ AT_DATA([prog.cob], [
             
             IF COUNTER NOT = 5 THEN
                MOVE RETURN-CODE TO RET-DISP
-               DISPLAY 'CBL_OC_GETOPT returned -1 too early: ' COUNTER
+               DISPLAY 'CBL_GC_GETOPT returned -1 too early: ' COUNTER
                END-DISPLAY
             END-IF.
 
@@ -2888,7 +2888,7 @@ AT_DATA([prog2.cob], [
             PERFORM WITH TEST AFTER
                     VARYING COUNTER FROM 0 BY 1
                     UNTIL RETURN-CODE = -1
-               CALL 'CBL_OC_GETOPT' USING 
+               CALL 'CBL_GC_GETOPT' USING 
                   BY REFERENCE SO LO LONGIND
                   BY VALUE     LONG-ONLY
                   BY REFERENCE RETURN-CHAR OPT-VAL
@@ -2917,7 +2917,7 @@ AT_DATA([prog2.cob], [
             
             IF COUNTER NOT = 2 THEN
                MOVE RETURN-CODE TO RET-DISP
-               DISPLAY 'CBL_OC_GETOPT returned -1 too early: ' COUNTER
+               DISPLAY 'CBL_GC_GETOPT returned -1 too early: ' COUNTER
                END-DISPLAY
             END-IF.
 
@@ -2962,7 +2962,7 @@ AT_DATA([prog3.cob], [
             PERFORM WITH TEST AFTER
                     VARYING COUNTER FROM 0 BY 1
                     UNTIL RETURN-CODE = -1
-               CALL 'CBL_OC_GETOPT' USING 
+               CALL 'CBL_GC_GETOPT' USING 
                   BY REFERENCE SO LO LONGIND
                   BY VALUE     LONG-ONLY
                   BY REFERENCE RETURN-CHAR OPT-VAL
@@ -3014,7 +3014,7 @@ AT_DATA([prog3.cob], [
             
             IF COUNTER NOT = 6 THEN
                MOVE RETURN-CODE TO RET-DISP
-               DISPLAY 'CBL_OC_GETOPT returned -1 too early: ' COUNTER
+               DISPLAY 'CBL_GC_GETOPT returned -1 too early: ' COUNTER
                END-DISPLAY
             END-IF.
 
@@ -3063,7 +3063,7 @@ AT_DATA([prog4.cob], [
             PERFORM WITH TEST AFTER
                     VARYING COUNTER FROM 0 BY 1
                     UNTIL RETURN-CODE = -1
-               CALL 'CBL_OC_GETOPT' USING 
+               CALL 'CBL_GC_GETOPT' USING 
                   BY REFERENCE SO LO LONGIND
                   BY VALUE     LONG-ONLY
                   BY REFERENCE RETURN-CHAR OPT-VAL
@@ -3102,7 +3102,7 @@ AT_DATA([prog4.cob], [
             
             IF COUNTER NOT = 3 THEN
                MOVE RETURN-CODE TO RET-DISP
-               DISPLAY 'CBL_OC_GETOPT returned -1 too early: ' COUNTER
+               DISPLAY 'CBL_GC_GETOPT returned -1 too early: ' COUNTER
                END-DISPLAY
             END-IF.
 
@@ -3145,7 +3145,7 @@ AT_DATA([prog5.cob], [
             PERFORM WITH TEST AFTER
                     VARYING COUNTER FROM 0 BY 1
                     UNTIL RETURN-CODE = -1
-               CALL 'CBL_OC_GETOPT' USING 
+               CALL 'CBL_GC_GETOPT' USING 
                   BY REFERENCE SO LO LONGIND
                   BY VALUE     LONG-ONLY
                   BY REFERENCE RETURN-CHAR OPT-VAL
@@ -3176,7 +3176,7 @@ AT_DATA([prog5.cob], [
             
             IF COUNTER NOT = 3 THEN
                MOVE RETURN-CODE TO RET-DISP
-               DISPLAY 'CBL_OC_GETOPT returned -1 too early: ' COUNTER
+               DISPLAY 'CBL_GC_GETOPT returned -1 too early: ' COUNTER
                END-DISPLAY
             END-IF.
 
@@ -3195,7 +3195,8 @@ AT_CHECK([./prog4 --static --dynamic --usage=boringandtoolongtext], [0], [])
 # Again a long and system specific error message which we ignore. 
 # Return code 1 is sufficient as proof of hard return (as wanted).
 AT_CHECK([$COMPILE prog5.cob], [0], [], [])
-AT_CHECK([./prog5 --static], [1], [], [prog5.cob: 37: libcob: Call to CBL_OC_GETOPT with wrong longoption size.
+AT_CHECK([./prog5 --static], [1], [],
+[prog5.cob: 37: libcob: Call to CBL_GC_GETOPT with wrong longoption size.
 ])
 
 AT_CLEANUP

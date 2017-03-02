@@ -379,12 +379,9 @@ COBCINFOSH = . $(top_builddir)/tests/atconfig && . $(top_builddir)/tests/atlocal
 
 info_TEXINFOS = gnucobol.texi
 gnucobol_TEXINFOS = cbhelp.tex cbrese.tex cbintr.tex cbsyst.tex cbmnem.tex \
-	 cbconf.tex cbchelp.tex cbrunt.tex
+	 cbconf.tex cbchelp.tex cbrunt.tex fdl.texi
 
-EXTRA_DIST = gnucobol.pdf cobcinfo.sh \
-	cbhelp.tex cbrese.tex cbintr.tex cbsyst.tex cbmnem.tex cbconf.tex \
-	cbchelp.tex cbrunt.tex
-
+EXTRA_DIST = gnucobol.pdf cobcinfo.sh
 AM_MAKEINFOHTMLFLAGS = --no-headers --no-split
 CLEANFILES = *.aux  *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.vrs
 TEXI2DVI = texi2dvi -I $(srcdir)
@@ -856,14 +853,17 @@ cbchelp.tex: $(top_srcdir)/bin/cobcrun.c $(top_srcdir)/configure.ac \
 	$(top_srcdir)/doc/cobcinfo.sh
 	$(COBCINFOSH) $@
 
-cbconf.tex: $(top_srcdir)/config/default.conf $(top_srcdir)/doc/cobcinfo.sh
+cbconf.tex: $(top_srcdir)/config/default.conf \
+	$(top_srcdir)/doc/cobcinfo.sh
 	$(COBCINFOSH) $@
 
-cbrunt.tex: $(top_srcdir)/config/runtime.cfg $(top_srcdir)/doc/cobcinfo.sh
+cbrunt.tex: $(top_srcdir)/config/runtime.cfg \
+	$(top_srcdir)/doc/cobcinfo.sh
 	$(COBCINFOSH) $@
 
 cbrese.tex cbintr.tex cbsyst.tex cbmnem.tex: \
-	$(top_srcdir)/cobc/cobc.c $(top_srcdir)/cobc/reserved.c $(top_srcdir)/doc/cobcinfo.sh
+	$(top_srcdir)/cobc/cobc.c $(top_srcdir)/cobc/reserved.c \
+	$(top_srcdir)/doc/cobcinfo.sh
 	$(COBCINFOSH) $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
