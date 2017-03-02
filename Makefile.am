@@ -28,7 +28,7 @@ BUILT_SOURCES = defaults.h
 DISTCLEANFILES = $(BUILT_SOURCES)
 # CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = gnucobol.spec po/update_linguas.sh
+EXTRA_DIST = gnu-cobol.spec
 
 dist-hook:
 	echo "#define COB_TAR_DATE \"`date -u +'%b %d %Y %T'` UTC\"" > $(distdir)/tarstamp.h
@@ -46,12 +46,9 @@ dist-hook:
 	chmod 755 $(distdir)/build_aux/mdate-sh
 	chmod 755 $(distdir)/build_aux/missing
 	chmod 755 $(distdir)/build_aux/mkinstalldirs
-	chmod 755 $(distdir)/build_aux/ylwrap
 	chmod 755 $(distdir)/configure
 	chmod 755 $(distdir)/doc/cobcinfo.sh
 	chmod 755 $(distdir)/tests/testsuite
-	chmod 755 $(distdir)/tests/listings-sed.sh
-	chmod 755 $(distdir)/po/update_linguas.sh
 #	touch $(distdir)/cobc/ppparse.c
 #	touch $(distdir)/cobc/parser.c
 #	touch $(distdir)/cobc/pplex.c
