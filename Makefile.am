@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol
 #
-# Copyright (C) 2003-2012, 2014-2015 Free Software Foundation, Inc.
+# Copyright (C) 2003-2012, 2014-2017 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -28,15 +28,14 @@ BUILT_SOURCES = defaults.h
 DISTCLEANFILES = $(BUILT_SOURCES)
 # CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = gnu-cobol.spec po/en.translate \
-	lib/Makefile.am lib/ChangeLog lib/dummymac.c lib/gettext.h
+EXTRA_DIST = gnucobol.spec po/update_linguas.sh
 
 dist-hook:
 	echo "#define COB_TAR_DATE \"`date -u +'%b %d %Y %T'` UTC\"" > $(distdir)/tarstamp.h
 	echo "#define COB_NUM_TAR_DATE `date -u +'%Y%m%d'`" >> $(distdir)/tarstamp.h
 	echo "#define COB_NUM_TAR_TIME `date -u +'%H%M%S'`" >> $(distdir)/tarstamp.h
-	find $(distdir) -type d -print | xargs chmod 777
-	chmod 644 $(distdir)/bin/cob-config.in
+	find $(distdir) -type d -print | xargs chmod 755
+	find $(distdir) -type f -print | xargs chmod 644
 	chmod 755 $(distdir)/build_aux/compile
 	chmod 755 $(distdir)/build_aux/config.guess
 	chmod 755 $(distdir)/build_aux/config.sub
@@ -47,26 +46,20 @@ dist-hook:
 	chmod 755 $(distdir)/build_aux/mdate-sh
 	chmod 755 $(distdir)/build_aux/missing
 	chmod 755 $(distdir)/build_aux/mkinstalldirs
-	chmod 644 $(distdir)/ABOUT-NLS
-	chmod 644 $(distdir)/AUTHORS
-	chmod 644 $(distdir)/COPYING
-	chmod 644 $(distdir)/COPYING.DOC
-	chmod 644 $(distdir)/COPYING.LESSER
-	chmod 644 $(distdir)/INSTALL
-	chmod 644 $(distdir)/NEWS
-	chmod 644 $(distdir)/README
-	chmod 644 $(distdir)/THANKS
-	chmod 644 $(distdir)/TODO
-	chmod 644 $(distdir)/gnu-cobol.spec
+	chmod 755 $(distdir)/build_aux/ylwrap
+	chmod 755 $(distdir)/configure
 	chmod 755 $(distdir)/doc/cobcinfo.sh
-	$(distdir)/doc/cobcinfo.sh "fixtimestamps"
-	touch $(distdir)/bin/cobcrun.1
-	touch $(distdir)/cobc/cobc.1
-	touch $(distdir)/cobc/ppparse.c
-	touch $(distdir)/cobc/parser.c
-	touch $(distdir)/cobc/pplex.c
-	touch $(distdir)/cobc/scanner.c
+	chmod 755 $(distdir)/tests/testsuite
+	chmod 755 $(distdir)/tests/listings-sed.sh
+	chmod 755 $(distdir)/po/update_linguas.sh
+#	touch $(distdir)/cobc/ppparse.c
+#	touch $(distdir)/cobc/parser.c
+#	touch $(distdir)/cobc/pplex.c
+#	touch $(distdir)/cobc/scanner.c
+#	$(distdir)/doc/cobcinfo.sh "fixtimestamps"
 #	touch $(distdir)/libcob/libcob.3
+#	touch $(distdir)/bin/cobcrun.1
+#	touch $(distdir)/cobc/cobc.1
 
 defaults.h: Makefile.am $(top_builddir)/config.status
 	@echo "Creating defaults.h..."
