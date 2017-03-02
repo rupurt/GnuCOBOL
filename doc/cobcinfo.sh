@@ -1,7 +1,7 @@
 #!/bin/sh
 # cobcinfo.sh gnucobol/doc
 #
-# Copyright (C) 2010,2012, 2015 Free Software Foundation, Inc.
+# Copyright (C) 2010,2012, 2015-2017 Free Software Foundation, Inc.
 # Written by Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -29,46 +29,46 @@ _create_file () {
 	echo "$0: creating $1"
 	case "$1" in
 		"cbhelp.tex")
-			echo "@verbatim"               > $1.tmp
+			echo "@verbatim"               > $1
 			cobc --help \
 			| sed -e 's/\(: \).*\/\(cobc .\?options\)/\1\2/g' \
-			                               >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			                               >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbchelp.tex")
-			echo "@verbatim"               > $1.tmp
+			echo "@verbatim"               > $1
 			cobcrun --help \
 			| sed -e 's/\(: \).*\/\(cobcrun .\?options\)/\1\2/g' \
-			                               >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			                               >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbrese.tex")
-			echo "@verbatim"               > $1.tmp
-			cobc --list-reserved           >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			echo "@verbatim"               > $1
+			cobc --list-reserved           >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbintr.tex")
-			echo "@verbatim"               > $1.tmp
-			cobc --list-intrinsics         >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			echo "@verbatim"               > $1
+			cobc --list-intrinsics         >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbsyst.tex")
-			echo "@verbatim"               > $1.tmp
-			cobc --list-system             >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			echo "@verbatim"               > $1
+			cobc --list-system             >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbmnem.tex")
-			echo "@verbatim"               > $1.tmp
-			cobc --list-mnemonics          >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			echo "@verbatim"               > $1
+			cobc --list-mnemonics          >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbconf.tex")
-			echo "@verbatim"               > $1.tmp
+			echo "@verbatim"               > $1
 			cat $confdir/default.conf \
 			| grep -A9999 "http://www.gnu.org/licenses/" \
 			| tail -n +2 \
-			                               >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			                               >>$1
+			echo "@end verbatim"           >>$1
 			;;
 		"cbrunt.tex")
 			# First section, as it is formatted different
@@ -82,26 +82,18 @@ _create_file () {
 			      -e 's/  \([^ ].*\)  / @code{\1} /g' \
 			      -e 's/  \([^ ].*\)$/ @code{\1}/g' \
 			      -e 's/^$/@\*/g' \
-			                               > $1.tmp
-            lines=$(expr 20 + $(cat $1.tmp | wc -l))
+			                               > $1
+			lines=$(expr 20 + $(cat $1 | wc -l))
 			# All other sections
-			echo "@verbatim"               >>$1.tmp
+			echo "@verbatim"               >>$1
 			tail -n +$lines $confdir/runtime.cfg \
 			| cut -b2- \
 			| sed -e 's/^#\( .*\)/@end verbatim\n@section\1\n@verbatim/g' \
 			       -e 's/^ //g' \
-			                               >>$1.tmp
-			echo "@end verbatim"           >>$1.tmp
+			                               >>$1
+			echo "@end verbatim"           >>$1
 			;;
 	esac
-	echo ""                                >>$1.tmp
-	diff -N -q "$1.tmp" "$docdir/$1" 1>/dev/null
-	if test $? -eq 0; then
-		rm -f "$1.tmp"
-		echo "$0: $1 unchanged"
-	else
-		mv -f "$1.tmp" "$docdir/$1"
-	fi
 }
 
 docdir=`dirname $0`
@@ -159,13 +151,11 @@ case "$1" in
 	"fixtimestamps")
 		echo $0: touch tex-includes
 		for file in $docdir/*.tex; do
-			if test "$file" == "$docdir/texinfo.tex"; then continue; fi
 			echo " touch $file"
 			touch $file
 		done
 		echo $0: touch tex-results
 		for file in $docdir/gnucobol.*; do
-			if test "$file" == "$docdir/gnucobol.texi"; then continue; fi
 			echo " touch $file"
 			touch $file
 		done
@@ -174,4 +164,3 @@ case "$1" in
 		echo "$0: ERROR: called with unsupported option $1"
 		exit 1;
 esac
-

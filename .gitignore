@@ -108,10 +108,10 @@ copy/Makefile
 copy/atlocal
 /defaults.h
 doc/*.cps
+doc/*.tex
 doc/*.vrs
 doc/.deps
 doc/Makefile
-doc/atlocal
 doc/gnucobol.aux
 doc/gnucobol.cp
 doc/gnucobol.fn
