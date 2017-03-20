@@ -1,4 +1,8 @@
 
+2017-03-19  Ron Norman <rjn@inglenet.com>
+	* codegen.c:
+	  Fixed emision of decimal constants to go into  program.c.h 
+
 2017-03-11  Ron Norman <rjn@inglenet.com>
 	* codegen.c:
 	  Fixed to correctly emit parameter for CALL BY CONTENT

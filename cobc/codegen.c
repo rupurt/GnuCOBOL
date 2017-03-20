@@ -10163,12 +10163,12 @@ codegen (struct cb_program *prog, const int nested)
 	}
 
 	if (literal_cache) {
-		output_local ("\t/* Decimal constants */\n");
+		output_storage ("\t/* Decimal constants */\n");
 		for (m = literal_cache; m; m = m->next) {
 			if (CB_TREE_CLASS (m->x) == CB_CLASS_NUMERIC
 			 && m->make_decimal) {
-				output_local ("static\tcob_decimal\t%s%d;\n", CB_PREFIX_DEC_FIELD,m->id);
-				output_local ("static\tcob_decimal\t*%s%d = NULL;\n", CB_PREFIX_DEC_CONST,m->id);
+				output_storage ("static\tcob_decimal\t%s%d;\n", CB_PREFIX_DEC_FIELD,m->id);
+				output_storage ("static\tcob_decimal\t*%s%d = NULL;\n", CB_PREFIX_DEC_CONST,m->id);
 			}
 		}
 	}
