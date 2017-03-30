@@ -4324,15 +4324,12 @@ occurs_initialized:
 ;
 
 occurs_extra: 
-	occurs_keys occurs_indexed
-|	occurs_indexed occurs_keys 
-	{
-		if (!cb_relaxed_syntax_check) {
-			cb_error_x ($2, _("INDEXED should follow ASCENDING/DESCENDING"));
-		} else if(warningopt) {
-			cb_warning_x ($2, _("INDEXED should follow ASCENDING/DESCENDING"));
-		}
-	}
+|	occurs_extra_list occurs_extra
+;
+
+occurs_extra_list: 
+	occurs_keys
+|	occurs_indexed
 ;
 
 occurs_keys:
@@ -4373,6 +4370,13 @@ occurs_key_list:
 	}
 	keys_list = cb_list_append (keys_list, $4);
 	$$ = keys_list;
+	if(current_field->index_list) {
+		if (!cb_relaxed_syntax_check) {
+			cb_error (_("INDEXED should follow ASCENDING/DESCENDING"));
+		} else if(warningopt) {
+			cb_warning (_("INDEXED should follow ASCENDING/DESCENDING"));
+		}
+	}
   }
 ;
 
@@ -4382,7 +4386,7 @@ ascending_or_descending:
 ;
 
 occurs_indexed:
-  INDEXED _by occurs_index_list
+ INDEXED _by occurs_index_list
   {
 	current_field->index_list = $3;
   }
