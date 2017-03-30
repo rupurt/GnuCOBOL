@@ -1,4 +1,10 @@
 
+2017-01-17  Ron Norman <rjn@inglenet.com>
+	* parser.y:  
+	  Fixed to allow ASCENDING/DESCENING and INDEXED BY
+	  to follow OCCURS in any order with -frelax-syntax
+
+
 2017-03-19  Ron Norman <rjn@inglenet.com>
 	* codegen.c:
 	  Fixed emision of decimal constants to go into  program.c.h 
