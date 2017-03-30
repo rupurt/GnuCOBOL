@@ -7529,3 +7529,135 @@ AT_CHECK([gcdiff reference trace.txt], [0], [], [])
 
 AT_CLEANUP
 
+AT_SETUP([OCCURS INDEXED ASCENDING ])
+AT_KEYWORDS([occurs])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       01  DBI-RECORD-NAMEST.
+           05  FILLER.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ACM            0315 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-MGL            0303 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZBL            0304 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZCC            0308 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZGL            0305 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZOO            0306 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZTR            0307 '.  
+       01  DBI-RECORD-NAMESR REDEFINES DBI-RECORD-NAMEST.
+           05  DBI-RECORD-NAMES
+                  OCCURS 7 TIMES
+                  INDEXED BY REC-NAME-IDX
+                  ASCENDING KEY IS DBI-RECORD-NAME
+                  .
+             10  DBI-RECORD-NAME PIC X(30).
+             10  DBI-RECORD-CODE PIC 9(4).
+             10  DBI-RECORD-DIR  PIC X.     
+       01  REC-NAME   PIC X(30).
+       01  DBZ-RECORD-NAMEST.
+           05  FILLER.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ACM            0315 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-MGL            0303 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZBL            0304 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZCC            0308 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZGL            0305 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZOO            0306 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZTR            0307 '.  
+       01  DBZ-RECORD-NAMESR REDEFINES DBZ-RECORD-NAMEST.
+           05  DBZ-RECORD-NAMES
+                  OCCURS 7 TIMES .
+             10  DBZ-RECORD-NAME PIC X(30).
+             10  DBZ-RECORD-CODE PIC 9(4).
+             10  DBZ-RECORD-DIR  PIC X.     
+       01  DBX-RECORD-NAMEST.
+           05  FILLER.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ACM            0315 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-MGL            0303 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZBL            0304 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZCC            0308 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZGL            0305 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZOO            0306 '.
+             10 FILLER PIC X(35)
+                VALUE 'A-F-GEN-LEDGER-ZTR            0307 '.  
+       01  DBX-RECORD-NAMESR REDEFINES DBX-RECORD-NAMEST.
+           05  DBX-RECORD-NAMES
+                  OCCURS 7 TIMES
+                  ASCENDING KEY IS DBX-RECORD-NAME
+                  INDEXED BY REC-NAME-DBX
+                  .
+             10  DBX-RECORD-NAME PIC X(30).
+             10  DBX-RECORD-CODE PIC 9(4).
+             10  DBX-RECORD-DIR  PIC X.     
+       01 G.
+         02 X           PIC X OCCURS 10 INDEXED I.
+       01 K.
+         02 Y           PIC X OCCURS 10.
+       01 TAB3.
+          05 CNT3           PIC 9(9) COMP-5 VALUE 10.
+          05 ROW3 OCCURS 1 TO 10 DEPENDING CNT3
+                                  DESCENDING TAB3-NR
+                                  ASCENDING TAB3-DATA.
+             10 TAB3-NR     PIC 99.
+             10 TAB3-DATA   PIC XXXX.
+
+       PROCEDURE DIVISION.
+       MAIN. 
+           MOVE 2 TO TAB3-NR(1).
+           MOVE "A" TO TAB3-DATA(1).
+           MOVE 1 TO TAB3-NR(2).
+           MOVE "B" TO TAB3-DATA(2).
+           MOVE 'A-F-GEN-LEDGER-ZGL' TO REC-NAME. 
+           PERFORM FINDIT.
+           MOVE 'JUNK' TO REC-NAME. 
+           PERFORM FINDIT.
+           STOP RUN.
+
+       FINDIT. 
+           SEARCH DBI-RECORD-NAMES
+           AT END
+               DISPLAY 'A ' REC-NAME ' is invalid.' 
+           WHEN REC-NAME = DBI-RECORD-NAME (REC-NAME-IDX)
+               DISPLAY 'A ' REC-NAME ' is code ' 
+                         DBI-RECORD-CODE (REC-NAME-IDX) '.'.
+
+           SEARCH DBX-RECORD-NAMES
+           AT END
+               DISPLAY 'B ' REC-NAME ' is invalid.' 
+           WHEN REC-NAME = DBX-RECORD-NAME (REC-NAME-IDX)
+               DISPLAY 'B ' REC-NAME ' is code ' 
+                         DBX-RECORD-CODE (REC-NAME-DBX) '.'.
+])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob ], [0], [], [prog.cob: 27: Warning: INDEXED should follow ASCENDING/DESCENDING
+])
+
+AT_CHECK([./prog], [0], [A A-F-GEN-LEDGER-ZGL             is code 0305.
+B A-F-GEN-LEDGER-ZGL             is code 0315.
+A JUNK                           is invalid.
+B JUNK                           is invalid.
+], [])
+
+AT_CLEANUP
+
