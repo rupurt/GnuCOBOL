@@ -161,6 +161,7 @@ static enum cb_storage		current_storage;
 
 static cb_tree			perform_stack;
 static cb_tree			qualifier;
+static cb_tree			keys_list;
 
 static cb_tree			save_tree;
 static cb_tree			start_tree;
@@ -3714,18 +3715,21 @@ entry_name:
   {
 	$$ = cb_build_filler ();
 	qualifier = NULL;
+	keys_list = NULL;
 	non_const_word = 0;
   }
 | FILLER
   {
 	$$ = cb_build_filler ();
 	qualifier = NULL;
+	keys_list = NULL;
 	non_const_word = 0;
   }
 | WORD
   {
 	$$ = $1;
 	qualifier = $1;
+	keys_list = NULL;
 	non_const_word = 0;
   }
 ;
@@ -3735,6 +3739,7 @@ const_name:
   {
 	$$ = $1;
 	qualifier = $1;
+	keys_list = NULL;
 	non_const_word = 0;
   }
 ;
@@ -4245,7 +4250,7 @@ occurs_step:
 
 occurs_clause:
   OCCURS integer occurs_to_integer _times
-  occurs_depending occurs_keys occurs_indexed
+  occurs_depending occurs_extra
   {
 	check_repeated ("OCCURS", SYN_CLAUSE_7, &check_pic_duplicate);
 	if (current_field->depending && !($3)) {
@@ -4266,7 +4271,7 @@ occurs_clause:
 	current_field->flag_occurs = 1;
   }
 | OCCURS DYNAMIC capacity_in occurs_from_integer
-  occurs_to_integer occurs_initialized occurs_keys occurs_indexed
+  occurs_to_integer occurs_initialized occurs_extra
   {
 	check_repeated ("OCCURS", SYN_CLAUSE_7, &check_pic_duplicate);
 	current_field->occurs_min = $4 ? cb_get_int ($4) : 0;
@@ -4318,6 +4323,18 @@ occurs_initialized:
   }
 ;
 
+occurs_extra: 
+	occurs_keys occurs_indexed
+|	occurs_indexed occurs_keys 
+	{
+		if (!cb_relaxed_syntax_check) {
+			cb_error_x ($2, _("INDEXED should follow ASCENDING/DESCENDING"));
+		} else if(warningopt) {
+			cb_warning_x ($2, _("INDEXED should follow ASCENDING/DESCENDING"));
+		}
+	}
+;
+
 occurs_keys:
   occurs_key_list
   {
@@ -4343,20 +4360,19 @@ occurs_keys:
 ;
 
 occurs_key_list:
-  /* empty */			{ $$ = NULL; }
-| occurs_key_list
   ascending_or_descending _key _is reference_list
   {
 	cb_tree l;
 
-	for (l = $5; l; l = CB_CHAIN (l)) {
-		CB_PURPOSE (l) = $2;
+	for (l = $4; l; l = CB_CHAIN (l)) {
+		CB_PURPOSE (l) = $1;
 		if (qualifier && !CB_REFERENCE(CB_VALUE(l))->chain &&
 		    strcasecmp (CB_NAME(CB_VALUE(l)), CB_NAME(qualifier))) {
 			CB_REFERENCE(CB_VALUE(l))->chain = qualifier;
 		}
 	}
-	$$ = cb_list_append ($1, $5);
+	keys_list = cb_list_append (keys_list, $4);
+	$$ = keys_list;
   }
 ;
 
@@ -4366,7 +4382,7 @@ ascending_or_descending:
 ;
 
 occurs_indexed:
-| INDEXED _by occurs_index_list
+  INDEXED _by occurs_index_list
   {
 	current_field->index_list = $3;
   }
