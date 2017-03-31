@@ -4250,7 +4250,7 @@ occurs_step:
 
 occurs_clause:
   OCCURS integer occurs_to_integer _times
-  occurs_depending occurs_extra
+  occurs_depending occurs_keys_and_indexed
   {
 	check_repeated ("OCCURS", SYN_CLAUSE_7, &check_pic_duplicate);
 	if (current_field->depending && !($3)) {
@@ -4271,7 +4271,7 @@ occurs_clause:
 	current_field->flag_occurs = 1;
   }
 | OCCURS DYNAMIC capacity_in occurs_from_integer
-  occurs_to_integer occurs_initialized occurs_extra
+  occurs_to_integer occurs_initialized occurs_keys_and_indexed
   {
 	check_repeated ("OCCURS", SYN_CLAUSE_7, &check_pic_duplicate);
 	current_field->occurs_min = $4 ? cb_get_int ($4) : 0;
@@ -4323,13 +4323,18 @@ occurs_initialized:
   }
 ;
 
-occurs_extra: 
-|	occurs_extra_list occurs_extra
-;
-
-occurs_extra_list: 
-	occurs_keys
+occurs_keys_and_indexed: 
+|	occurs_keys 	occurs_indexed %prec SHIFT_PREFER
+|	occurs_indexed 	occurs_keys
+	{
+		if (!cb_relaxed_syntax_check) {
+			cb_error (_("INDEXED should follow ASCENDING/DESCENDING"));
+		} else if(warningopt) {
+			cb_warning (_("INDEXED should follow ASCENDING/DESCENDING"));
+		}
+	}
 |	occurs_indexed
+|	occurs_keys
 ;
 
 occurs_keys:
@@ -4357,6 +4362,11 @@ occurs_keys:
 ;
 
 occurs_key_list:
+	occurs_key_field
+|	occurs_key_field occurs_key_list
+;
+
+occurs_key_field:
   ascending_or_descending _key _is reference_list
   {
 	cb_tree l;
@@ -4370,13 +4380,6 @@ occurs_key_list:
 	}
 	keys_list = cb_list_append (keys_list, $4);
 	$$ = keys_list;
-	if(current_field->index_list) {
-		if (!cb_relaxed_syntax_check) {
-			cb_error (_("INDEXED should follow ASCENDING/DESCENDING"));
-		} else if(warningopt) {
-			cb_warning (_("INDEXED should follow ASCENDING/DESCENDING"));
-		}
-	}
   }
 ;
 
