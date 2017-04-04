@@ -5329,7 +5329,11 @@ AT_DATA([prog.cob], [
        01  GRPX. 
            05  FILLER  PIC  X(9)         VALUE 'Hello'.
            05  FILLER  PIC  X(9)         VALUE 'World'.
-       
+       01  MYOCC        PIC 9(8) COMP.
+       01  MYTAB.
+           03  MYBYTE   PIC XX OCCURS 1 TO 20
+                        DEPENDING ON MYOCC.
+
        PROCEDURE DIVISION.
            MOVE -512.77 TO NE.
            CALL "CAPI" USING 2560 BY VALUE 16.
@@ -5354,6 +5358,22 @@ AT_DATA([prog.cob], [
            DISPLAY "BINFLD5S is now " BINFLD5S ";".
            DISPLAY "CHRX     is now " CHRX ";".
            DISPLAY "NE       is now " NE ";".
+           MOVE 9 TO MYOCC.
+           CALL "CAPI" USING BY CONTENT 1.
+           DISPLAY "Now BY CONTENT LENGTH OF MYTAB;".
+           CALL "CAPI" USING BY CONTENT LENGTH OF MYTAB.
+           DISPLAY "Now BY CONTENT LENGTH OF MYOCC;".
+           CALL "CAPI" USING BY CONTENT LENGTH OF MYOCC.
+           MOVE 7 TO MYOCC.
+           DISPLAY "Now LENGTH OF MYTAB;".
+           CALL "CAPI" USING LENGTH OF MYTAB.
+           DISPLAY "Now LENGTH OF MYOCC;".
+           CALL "CAPI" USING LENGTH OF MYOCC.
+           MOVE 5 TO MYOCC.
+           DISPLAY "Now BY VALUE LENGTH OF MYTAB;".
+           CALL "CAPI" USING BY VALUE LENGTH OF MYTAB.
+           DISPLAY "Now BY VALUE LENGTH OF MYOCC;".
+           CALL "CAPI" USING BY VALUE LENGTH OF MYOCC.
            STOP RUN.
 ])
 
@@ -5447,9 +5467,9 @@ CAPI(void *p1, ...)
 }
 ]])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob cmod.c], [0], [], [prog.cob: 31: Warning: BY CONTENT assumed for alphanumeric item
-prog.cob: 32: Warning: BY CONTENT assumed for alphanumeric item
-prog.cob: 34: Warning: BY CONTENT assumed for alphanumeric item
+AT_CHECK([cobc -x -std=mf -w prog.cob cmod.c], [0], [], [prog.cob: 35: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 36: Warning: BY CONTENT assumed for alphanumeric item
+prog.cob: 38: Warning: BY CONTENT assumed for alphanumeric item
 ])
 
 AT_CHECK([./prog], [0], [CAPI called with 2 parameters
@@ -5499,6 +5519,26 @@ COMP4    is now 00001292;
 BINFLD5S is now +00001030;
 CHRX     is now Hello!   ;
 NE       is now   514.07-;
+CAPI called with 1 parameters
+ 1: COMP-4   BY VALUE     S9(9)       1;
+Now BY CONTENT LENGTH OF MYTAB;
+CAPI called with 1 parameters
+ 1: COMP-4   BY VALUE     S9(9)       18;
+Now BY CONTENT LENGTH OF MYOCC;
+CAPI called with 1 parameters
+ 1: COMP-4   BY VALUE     S9(9)       4;
+Now LENGTH OF MYTAB;
+CAPI called with 1 parameters
+ 1: COMP-4   BY VALUE     S9(9)       14;
+Now LENGTH OF MYOCC;
+CAPI called with 1 parameters
+ 1: COMP-4   BY VALUE     S9(9)       4;
+Now BY VALUE LENGTH OF MYTAB;
+CAPI called with 1 parameters
+ 1: COMP-5   BY VALUE     S9(9)       10;
+Now BY VALUE LENGTH OF MYOCC;
+CAPI called with 1 parameters
+ 1: DISPLAY  BY VALUE     9(1)        4;
 ], [libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 2563
 libcob: warning: cob_put_s64_param: attempt to over-write constant param 2 with 19
 libcob: warning: cob_put_s64_param: param 7 is not within range of 4
@@ -5509,9 +5549,17 @@ libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 
 libcob: warning: cob_put_grp_param: attempt to over-write constant param 1
 libcob: warning: cob_put_s64_param: attempt to over-write constant param 2 with 21
 libcob: warning: cob_put_picx_param: attempt to over-write constant param 1 with 'Bye!'
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 4
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 21
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 7
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 17
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 7
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 13
+libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 7
 ])
 
 AT_CLEANUP
+
 
 AT_SETUP([Test dump feature])
 AT_KEYWORDS([Dump])
