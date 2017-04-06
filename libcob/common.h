@@ -1857,12 +1857,10 @@ COB_EXPIMP cob_s64_t	cob_get_s64_param  ( int num_param );
 COB_EXPIMP cob_u64_t	cob_get_u64_param  ( int num_param );
 COB_EXPIMP char *	cob_get_picx_param ( int num_param, void *charfld, int charlen );
 COB_EXPIMP void *	cob_get_grp_param  ( int num_param, void *charfld, int charlen );
-COB_EXPIMP void *	cob_get_str_param  ( int num_param, void *str,     int strln );
 COB_EXPIMP void		cob_put_s64_param  ( int num_param, cob_s64_t value );
 COB_EXPIMP void		cob_put_u64_param  ( int num_param, cob_u64_t value );
 COB_EXPIMP void 	cob_put_picx_param ( int num_param, void *charfld );
 COB_EXPIMP void  	cob_put_grp_param  ( int num_param, void *charfld, int charlen );
-COB_EXPIMP void  	cob_put_str_param  ( int num_param, void *str );
 
 /*******************************/
 /* Functions in screenio.c */

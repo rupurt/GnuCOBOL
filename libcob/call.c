@@ -1785,57 +1785,6 @@ cob_put_grp_param ( int n, void *charfld, int len )
 	return ;
 }
 
-void *
-cob_get_str_param ( int n, void *charfld, int len )
-{
-	int		i;
-	cob_field	*f = cob_get_param_field (n, "cob_get_str_param");
-	if (f == NULL)
-		return NULL;
-	/* Data length without trailing SPACE or LOW-VALUE */
-	for (i = (int) f->size - 1; i >= 0; --i) {	
-		if (f->data[i] != ' ' && f->data[i] != 0) {
-			break;
-		}
-	}
-	i++;
-
-	if (charfld == NULL) {
-		len = i;
-		charfld = cob_malloc (len + 1);
-	} else {
-		if (len <= 0)
-			len = f->size + 1;
-		memset(charfld, 0, len);
-	}
-	if (i > 0)
-		memcpy (charfld, f->data, i);
-	else
-		memset (charfld, 0, 1);
-	return charfld;
-}
-
-void
-cob_put_str_param ( int n, void *charfld )
-{
-	int		len;
-	cob_field	*f = cob_get_param_field (n, "cob_put_str_param");
-	if (f == NULL)
-		return;
-	if (charfld == NULL)
-		return ;
-	if (COB_FIELD_CONSTANT(f)) {
-		cob_runtime_warning (_("%s: attempt to over-write constant param %d"),"cob_put_str_param",n);
-		return;
-	}
-	len = strlen (charfld);
-	if (len > f->size)
-		len = f->size;
-	memset (f->data, ' ', f->size);
-	memcpy (f->data, charfld, len);
-	return ;
-}
-
 /* Create copy of field and mark as a CONSTANT */
 void
 cob_field_constant (cob_field *f, cob_field *t, cob_field_attr *a, void *d)
