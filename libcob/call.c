@@ -1610,16 +1610,12 @@ cob_get_u64_param ( int n )
 }
 
 char *
-cob_get_picx_param ( int n, void *charfld, int charlen )
+cob_get_picx_param ( int n, void *charfld, size_t charlen )
 {
-	void	*cbldata;
-	int	size;
 	cob_field	*f = cob_get_param_field (n, "cob_get_picx_param");
 	if (f == NULL)
 		return NULL;
-	cbldata = f->data;
-	size    = f->size;
-	return cob_get_picx (cbldata, size, charfld, charlen);
+	return cob_get_picx (f->data, f->size, charfld, charlen);
 }
 
 void
@@ -1749,12 +1745,12 @@ cob_put_picx_param ( int n, void *charfld )
 }
 
 void *
-cob_get_grp_param ( int n, void *charfld, int len )
+cob_get_grp_param ( int n, void *charfld, size_t len )
 {
 	cob_field	*f = cob_get_param_field (n, "cob_get_grp_param");
 	if (f == NULL)
 		return NULL;
-	if (len <= 0)
+	if (len == 0)
 		len = f->size;
 	if (charfld == NULL) {
 		if (len < f->size)
@@ -1766,7 +1762,7 @@ cob_get_grp_param ( int n, void *charfld, int len )
 }
 
 void
-cob_put_grp_param ( int n, void *charfld, int len )
+cob_put_grp_param ( int n, void *charfld, size_t len )
 {
 	cob_field	*f = cob_get_param_field (n, "cob_put_grp_param");
 	if (f == NULL)
@@ -1777,7 +1773,7 @@ cob_put_grp_param ( int n, void *charfld, int len )
 		cob_runtime_warning (_("%s: attempt to over-write constant param %d"),"cob_put_grp_param",n);
 		return;
 	}
-	if (len <= 0)
+	if (len == 0)
 		len = f->size;
 	if (len > f->size)
 		len = f->size;

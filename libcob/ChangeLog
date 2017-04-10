@@ -1,4 +1,11 @@
 
+2017-04-10 Ron Norman <rjn@inglenet.com>
+
+	* move.c,call.c,common.h: 
+	  Changed 'len' variables from 'int' to 'size_t' in
+	  cob_get_picx, cob_put_picx, cob_get_picx_param, 
+	  cob_get_grp_param, cob_put_grp_param
+
 2017-04-07  Ron Norman <rjn@inglenet.com>
 	* common.c,coblocal.h,runtime.cfg:
 	  Added COB_MF_LS_NULLS,COB_MF_LS_VALIDATE,COB_SHARE_MODE
