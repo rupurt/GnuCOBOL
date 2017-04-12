@@ -3852,28 +3852,15 @@ cob_sys_error_proc (const void *dispo, const void *pptr)
 int
 cob_sys_system (const void *cmdline)
 {
-	const char	*cmd;
 	char		*buff;
 	int		i;
 
 	COB_CHK_PARMS (SYSTEM, 1);
 
-	if (COB_MODULE_PTR->cob_procedure_params[0]) {
-		cmd = cmdline;
-		i = (int)COB_MODULE_PTR->cob_procedure_params[0]->size;
-		if (unlikely(i > COB_MEDIUM_MAX)) {
-			cob_runtime_error (_("Parameter to SYSTEM call is larger than %d characters"), COB_MEDIUM_MAX);
-			cob_stop_run (1);
-		}
-		i--;
-		for (; i >= 0; --i) {
-			if (cmd[i] != ' ' && cmd[i] != 0) {
-				break;
-			}
-		}
+	COB_UNUSED (cmdline);
+	if ((buff = cob_get_picx_param(1, NULL, 0)) != NULL) {
+		i = strlen(buff);
 		if (i >= 0) {
-			buff = cob_malloc ((size_t)(i + 2));
-			memcpy (buff, cmd, (size_t)(i + 1));
 			if (cobglobptr->cob_screen_initialized) {
 				cob_screen_set_mode (0);
 			}
@@ -3891,13 +3878,19 @@ cob_sys_system (const void *cmdline)
 int
 cob_sys_and (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_AND, 3);
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
 
-	if (length <= 0) {
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3909,13 +3902,19 @@ cob_sys_and (const void *p1, void *p2, const int length)
 int
 cob_sys_or (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_OR, 3);
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
 
-	if (length <= 0) {
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3927,13 +3926,20 @@ cob_sys_or (const void *p1, void *p2, const int length)
 int
 cob_sys_nor (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_NOR, 3);
 
-	if (length <= 0) {
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3945,13 +3951,17 @@ cob_sys_nor (const void *p1, void *p2, const int length)
 int
 cob_sys_xor (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
 	COB_CHK_PARMS (CBL_XOR, 3);
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
 
-	if (length <= 0) {
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3963,13 +3973,20 @@ cob_sys_xor (const void *p1, void *p2, const int length)
 int
 cob_sys_imp (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_IMP, 3);
 
-	if (length <= 0) {
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3981,13 +3998,20 @@ cob_sys_imp (const void *p1, void *p2, const int length)
 int
 cob_sys_nimp (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_NIMP, 3);
 
-	if (length <= 0) {
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -3999,13 +4023,20 @@ cob_sys_nimp (const void *p1, void *p2, const int length)
 int
 cob_sys_eq (const void *p1, void *p2, const int length)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_EQ, 3);
 
-	if (length <= 0) {
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (length <= 0
+	 || data_1 == NULL
+	 || data_2 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -4017,12 +4048,16 @@ cob_sys_eq (const void *p1, void *p2, const int length)
 int
 cob_sys_not (void *p1, const int length)
 {
-	cob_u8_ptr	data_1 = p1;
+	cob_u8_ptr	data_1;
 	size_t		n;
 
+	COB_UNUSED (p1);
 	COB_CHK_PARMS (CBL_NOT, 2);
 
-	if (length <= 0) {
+	data_1 = cob_get_param_data (1);
+
+	if (length <= 0
+	 || data_1 == NULL) {
 		return 0;
 	}
 	for (n = 0; n < (size_t)length; ++n) {
@@ -4034,12 +4069,21 @@ cob_sys_not (void *p1, const int length)
 int
 cob_sys_xf4 (void *p1, const void *p2)
 {
-	cob_u8_ptr		data_1 = p1;
-	const cob_u8_ptr	data_2 = p2;
+	cob_u8_ptr		data_1;
+	const cob_u8_ptr	data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_XF4, 2);
 
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (data_1 == NULL
+	 || data_2 == NULL) {
+		return 0;
+	}
 	*data_1 = 0;
 	for (n = 0; n < 8; ++n) {
 		*data_1 |= (data_2[n] & 1) << (7 - n);
@@ -4050,12 +4094,21 @@ cob_sys_xf4 (void *p1, const void *p2)
 int
 cob_sys_xf5 (const void *p1, void *p2)
 {
-	const cob_u8_ptr	data_1 = p1;
-	cob_u8_ptr		data_2 = p2;
+	const cob_u8_ptr	data_1;
+	cob_u8_ptr		data_2;
 	size_t			n;
 
+	COB_UNUSED (p1);
+	COB_UNUSED (p2);
 	COB_CHK_PARMS (CBL_XF5, 2);
 
+	data_1 = cob_get_param_data (1);
+	data_2 = cob_get_param_data (2);
+
+	if (data_1 == NULL
+	 || data_2 == NULL) {
+		return 0;
+	}
 	for (n = 0; n < 8; ++n) {
 		data_2[n] = (*data_1 & (1 << (7 - n))) ? 1 : 0;
 	}
@@ -4107,10 +4160,12 @@ cob_sys_x91 (void *p1, const void *p2, void *p3)
 int
 cob_sys_toupper (void *p1, const int length)
 {
-	cob_u8_ptr	data = p1;
+	cob_u8_ptr	data;
 	size_t		n;
 
 	COB_CHK_PARMS (CBL_TOUPPER, 2);
+	COB_UNUSED (p1);
+	data = cob_get_param_data (1);
 
 	if (length > 0) {
 		for (n = 0; n < (size_t)length; ++n) {
@@ -4125,10 +4180,12 @@ cob_sys_toupper (void *p1, const int length)
 int
 cob_sys_tolower (void *p1, const int length)
 {
-	cob_u8_ptr	data = p1;
+	cob_u8_ptr	data;
 	size_t		n;
 
 	COB_CHK_PARMS (CBL_TOLOWER, 2);
+	COB_UNUSED (p1);
+	data = cob_get_param_data (1);
 
 	if (length > 0) {
 		for (n = 0; n < (size_t)length; ++n) {
@@ -4156,30 +4213,28 @@ cob_sys_oc_nanosleep (const void *data)
 
 	COB_CHK_PARMS (CBL_OC_NANOSLEEP, 1);
 
-	if (COB_MODULE_PTR->cob_procedure_params[0]) {
-		nsecs = cob_get_llint (COB_MODULE_PTR->cob_procedure_params[0]);
-		if (nsecs > 0) {
+	nsecs = cob_get_s64_param (1);
+	if (nsecs > 0) {
 #ifdef	_WIN32
-			msecs = (unsigned int)(nsecs / 1000000);
-			if (msecs > 0) {
-				Sleep (msecs);
-			}
-#elif	defined(__370__) || defined(__OS400__)
-			msecs = (unsigned int)(nsecs / 1000000000);
-			if (msecs > 0) {
-				sleep (msecs);
-			}
-#elif	defined(HAVE_NANO_SLEEP)
-			tsec.tv_sec = nsecs / 1000000000;
-			tsec.tv_nsec = nsecs % 1000000000;
-			nanosleep (&tsec, NULL);
-#else
-			msecs = (unsigned int)(nsecs / 1000000000);
-			if (msecs > 0) {
-				sleep (msecs);
-			}
-#endif
+		msecs = (unsigned int)(nsecs / 1000000);
+		if (msecs > 0) {
+			Sleep (msecs);
 		}
+#elif	defined(__370__) || defined(__OS400__)
+		msecs = (unsigned int)(nsecs / 1000000000);
+		if (msecs > 0) {
+			sleep (msecs);
+		}
+#elif	defined(HAVE_NANO_SLEEP)
+		tsec.tv_sec = nsecs / 1000000000;
+		tsec.tv_nsec = nsecs % 1000000000;
+		nanosleep (&tsec, NULL);
+#else
+		msecs = (unsigned int)(nsecs / 1000000000);
+		if (msecs > 0) {
+			sleep (msecs);
+		}
+#endif
 	}
 	return 0;
 }
@@ -4350,8 +4405,8 @@ cob_sys_parameter_size (void *data)
 		n = cob_get_int (COB_MODULE_PTR->cob_procedure_params[0]);
 		if (n > 0 && n <= COB_MODULE_PTR->module_num_params) {
 			n--;
-			if (COB_MODULE_PTR->next &&
-			    COB_MODULE_PTR->next->cob_procedure_params[n]) {
+			if (COB_MODULE_PTR->next 
+			 && COB_MODULE_PTR->next->cob_procedure_params[n]) {
 				return (int)COB_MODULE_PTR->next->cob_procedure_params[n]->size;
 			}
 		}
@@ -4553,15 +4608,13 @@ cob_sys_sleep (const void *data)
 
 	COB_CHK_PARMS (C$SLEEP, 1);
 
-	if (COB_MODULE_PTR->cob_procedure_params[0]) {
-		n = cob_get_int (COB_MODULE_PTR->cob_procedure_params[0]);
-		if (n > 0 && n < 3600*24*7) {
+	n = cob_get_s64_param (1);
+	if (n > 0 && n < 3600*24*7) {
 #ifdef	_WIN32
-			Sleep (n*1000);
+		Sleep (n*1000);
 #else
-			sleep ((unsigned int)n);
+		sleep ((unsigned int)n);
 #endif
-		}
 	}
 	return 0;
 }
@@ -4571,22 +4624,22 @@ cob_sys_printable (void *p1, ...)
 {
 	cob_u8_ptr		data;
 	unsigned char		*dotptr;
-	size_t			datalen;
+	int				datalen;
 	size_t			n;
 	unsigned char		dotrep;
-	va_list			args;
 
 	COB_CHK_PARMS (C$PRINTABLE, 1);
+	COB_UNUSED (p1);
 
 	if (!COB_MODULE_PTR->cob_procedure_params[0]) {
 		return 0;
 	}
-	data = p1;
-	datalen = COB_MODULE_PTR->cob_procedure_params[0]->size;
-	if (cobglobptr->cob_call_params > 1) {
-		va_start (args, p1);
-		dotptr = va_arg (args, unsigned char *);
-		va_end (args);
+	data = cob_get_param_data (1);
+	datalen = cob_get_param_size (1);
+	if (datalen <= 0)
+		return 0;
+	if (cob_get_num_params () > 1) {
+		dotptr = cob_get_param_data (2);
 		dotrep = *dotptr;
 	} else {
 		dotrep = (unsigned char)'.';
@@ -4611,16 +4664,16 @@ cob_sys_justify (void *p1, ...)
 	size_t		centrelen;
 	size_t		n;
 	size_t		shifting;
-	va_list		args;
 
 	COB_CHK_PARMS (C$JUSTIFY, 1);
+	COB_UNUSED (p1);
 
 	if (!COB_MODULE_PTR->cob_procedure_params[0]) {
 		return 0;
 	}
-	data = p1;
-	datalen = COB_MODULE_PTR->cob_procedure_params[0]->size;
-	if (datalen < 2) {
+	data = cob_get_param_data (1);
+	datalen = (size_t)cob_get_param_size (1);
+	if ((int)datalen < 2) {
 		return 0;
 	}
 	if (data[0] != ' ' && data[datalen - 1] != ' ') {
@@ -4631,7 +4684,7 @@ cob_sys_justify (void *p1, ...)
 			break;
 		}
 	}
-	if (left == datalen) {
+	if (left == (size_t)datalen) {
 		return 0;
 	}
 	right = 0;
@@ -4645,10 +4698,8 @@ cob_sys_justify (void *p1, ...)
 	}
 	movelen = datalen - left - right;
 	shifting = 0;
-	if (cobglobptr->cob_call_params > 1) {
-		va_start (args, p1);
-		direction = va_arg (args, unsigned char *);
-		va_end (args);
+	if (cob_get_num_params () > 1) {
+		direction = cob_get_param_data (2);
 		if (*direction == 'L') {
 			shifting = 1;
 		} else if (*direction == 'C') {
