@@ -4765,7 +4765,7 @@ page_line_column:
   {
 	if (CB_LITERAL_P ($1)) {
 		current_report->lines = cb_get_int ($1);
-		if(current_report->lines > 999)
+		if (current_report->lines > 999)
 			cb_error (_("PAGE LIMIT lines > 999"));
 	} else {
 		current_report->t_lines = $1;
@@ -4775,7 +4775,7 @@ page_line_column:
   {
 	if (CB_LITERAL_P ($1)) {
 		current_report->lines = cb_get_int ($1);
-		if(current_report->lines > 999)
+		if (current_report->lines > 999)
 			cb_error (_("PAGE LIMIT lines > 999"));
 	} else {
 		current_report->t_lines = $1;
@@ -4940,39 +4940,39 @@ type_clause:
 type_option:
   rh_keyword
   {
-      current_field->report_flag |= COB_REPORT_HEADING;
+	current_field->report_flag |= COB_REPORT_HEADING;
   }
 | ph_keyword
   {
-      current_field->report_flag |= COB_REPORT_PAGE_HEADING;
+	current_field->report_flag |= COB_REPORT_PAGE_HEADING;
   }
 | ch_keyword _on_for control_heading_final
 | cf_keyword _on_for control_footing_final
 | detail_keyword
   {
-	if(current_report != NULL) {
+	if (current_report != NULL) {
 		current_report->has_detail = 1;
 	}
-      current_field->report_flag |= COB_REPORT_DETAIL;
+	current_field->report_flag |= COB_REPORT_DETAIL;
   }
 | pf_keyword
   {
-      current_field->report_flag |= COB_REPORT_PAGE_FOOTING;
+	current_field->report_flag |= COB_REPORT_PAGE_FOOTING;
   }
 | rf_keyword
   {
-      current_field->report_flag |= COB_REPORT_FOOTING;
+	current_field->report_flag |= COB_REPORT_FOOTING;
   }
 ;
 
 control_heading_final:
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
+	current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
   }
 | identifier
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
-      current_field->report_control = $1;
+	current_field->report_flag |= COB_REPORT_CONTROL_HEADING;
+	current_field->report_control = $1;
   }
 | identifier OR PAGE
   {
@@ -4982,22 +4982,22 @@ control_heading_final:
   }
 | FINAL 
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_HEADING_FINAL;
+	current_field->report_flag |= COB_REPORT_CONTROL_HEADING_FINAL;
   }
 ;
 
 control_footing_final:
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_FOOTING;
+	current_field->report_flag |= COB_REPORT_CONTROL_FOOTING;
   }
 | identifier 
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_FOOTING;
-      current_field->report_control = $1;
+	current_field->report_flag |= COB_REPORT_CONTROL_FOOTING;
+	current_field->report_control = $1;
   }
 | FINAL 
   {
-      current_field->report_flag |= COB_REPORT_CONTROL_FOOTING_FINAL;
+	current_field->report_flag |= COB_REPORT_CONTROL_FOOTING_FINAL;
   }
 | ALL
   {
@@ -5021,21 +5021,21 @@ next_group_plus:
 	} else {
 		current_field->report_flag |= COB_REPORT_NEXT_GROUP_LINE;
 	}
-	current_field->next_group_line = cb_get_int($1);
+	current_field->next_group_line = cb_get_int ($1);
   }
 | PLUS integer
   {
-      current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
-      current_field->next_group_line = cb_get_int($2);
+	current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
+	current_field->next_group_line = cb_get_int ($2);
   }
 | TOK_PLUS integer
   {
-      current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
-      current_field->next_group_line = cb_get_int($2);
+	current_field->report_flag |= COB_REPORT_NEXT_GROUP_PLUS;
+	current_field->next_group_line = cb_get_int ($2);
   }
 | NEXT_PAGE
   {
-      current_field->report_flag |= COB_REPORT_NEXT_GROUP_PAGE;
+	current_field->report_flag |= COB_REPORT_NEXT_GROUP_PAGE;
   }
 ;
 
@@ -5050,7 +5050,7 @@ sum_clause_list:
   {
 	check_repeated ("SUM", SYN_CLAUSE_19, &check_pic_duplicate);
 	current_field->report_sum_list = $3;
-	build_sum_counter( current_report, current_field);
+	build_sum_counter (current_report, current_field);
   }
 ;
 
@@ -5058,18 +5058,18 @@ reset_clause:
 | RESET _on data_or_final
 | UPON identifier
   {
-      current_field->report_sum_upon = $2;
+	current_field->report_sum_upon = $2;
   }
 ;
 
 data_or_final:
   identifier
   {
-      current_field->report_reset = $1;
+	current_field->report_reset = $1;
   }
 | FINAL
   {
-      current_field->report_flag |= COB_REPORT_RESET_FINAL;
+	current_field->report_flag |= COB_REPORT_RESET_FINAL;
   }
 ;
 
@@ -5158,7 +5158,7 @@ line_clause_options:
 line_clause_option:
   line_clause_integer
   {
-	if(current_field->report_line == 0) {
+	if (current_field->report_line == 0) {
 		cb_warning (_("LINE 0 not implemented"));
 	}
   }
@@ -5169,22 +5169,22 @@ line_clause_option:
 | PLUS report_integer 
   {
 	current_field->report_flag |= COB_REPORT_LINE_PLUS;
-	current_field->report_line = cb_get_int($2);
-	if($2 != cb_int0
-	&& $2 != cb_int1) {
+	current_field->report_line = cb_get_int ($2);
+	if ($2 != cb_int0 &&
+	    $2 != cb_int1) {
 		if ((CB_LITERAL_P($2) && CB_LITERAL ($2)->sign < 0)
 		|| current_field->report_line < 0) {
 			cb_error (_("Positive Integer value expected"));
 		}
 	}
-	if(current_field->report_line == 0) {
+	if (current_field->report_line == 0) {
 		cb_warning (_("LINE PLUS 0 not implemented"));
 	}
   }
 | TOK_PLUS report_integer 
   {
 	current_field->report_flag |= COB_REPORT_LINE_PLUS;
-	current_field->report_line = cb_get_int($2);
+	current_field->report_line = cb_get_int ($2);
 	if($2 != cb_int0
 	&& $2 != cb_int1) {
 		if ((CB_LITERAL_P($2) && CB_LITERAL ($2)->sign < 0)
@@ -5192,7 +5192,7 @@ line_clause_option:
 			cb_error (_("Positive Integer value expected"));
 		}
 	}
-	if(current_field->report_line == 0) {
+	if (current_field->report_line == 0) {
 		cb_warning (_("LINE PLUS 0 not implemented"));
 	}
   }
@@ -5206,8 +5206,8 @@ number_is:
 line_clause_integer:
   report_integer
   {
-	current_field->report_line = cb_get_int($1);
-	if($1 != cb_int0) {
+	current_field->report_line = cb_get_int ($1);
+	if ($1 != cb_int0) {
 		if (CB_LITERAL_P($1) && CB_LITERAL ($1)->sign > 0) {
 			current_field->report_flag |= COB_REPORT_LINE_PLUS;
 		} else if ((CB_LITERAL_P($1) && CB_LITERAL ($1)->sign < 0)
@@ -5224,7 +5224,7 @@ line_clause_integer:
 line_clause_next_page:
   NEXT_PAGE
   {
-      current_field->report_flag |= COB_REPORT_LINE_NEXT_PAGE;
+	current_field->report_flag |= COB_REPORT_LINE_NEXT_PAGE;
   }
 ;
 */
@@ -5280,7 +5280,7 @@ col_or_plus:
 			if(current_field->step_count == 0)
 				current_field->step_count = colnum;
 		} else {
-			current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
+		current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
 		}
 	} else {
 		colnum = 0;
@@ -5330,7 +5330,7 @@ column_integer:
 ;
 
 source_clause:
-  SOURCE _is arith_x flag_rounded 
+  SOURCE _is arith_x flag_rounded
   {
 	check_repeated ("SOURCE", SYN_CLAUSE_22, &check_pic_duplicate);
 	current_field->report_source = $3;
@@ -7713,7 +7713,7 @@ generate_body:
   {
 	begin_implicit_statement ();
 	if ($1 != cb_error_node) {
-		cb_emit_generate($1);
+		cb_emit_generate ($1);
 	}
   }
 ;
@@ -7903,14 +7903,14 @@ initiate_body:
   {
 	begin_implicit_statement ();
 	if ($1 != cb_error_node) {
-	    cb_emit_initiate($1);
+		cb_emit_initiate ($1);
 	}
   }
 | initiate_body report_name
   {
 	begin_implicit_statement ();
 	if ($2 != cb_error_node) {
-	    cb_emit_initiate($2);
+		cb_emit_initiate ($2);
 	}
   }
 ;
@@ -8411,7 +8411,7 @@ perform_varying:
 		$$ = cb_int1;
 		dataTypeOk = 0;
 	} 
-	if(dataTypeOk) {
+	if (dataTypeOk) {
 		$$ = cb_build_perform_varying ($1, $3, $5, $7);
 	}
   }
@@ -9323,7 +9323,7 @@ suppress_statement:
 		cb_error_x (CB_TREE (current_statement),
 			    _("SUPPRESS statement must be within DECLARATIVES"));
 	}
-	cb_emit_suppress(control_field);
+	cb_emit_suppress (control_field);
   }
 ;
 
@@ -9346,14 +9346,14 @@ terminate_body:
   {
 	begin_implicit_statement ();
 	if ($1 != cb_error_node) {
-	    cb_emit_terminate($1);
+		cb_emit_terminate ($1);
 	}
   }
 | terminate_body report_name
   {
 	begin_implicit_statement ();
 	if ($2 != cb_error_node) {
-		cb_emit_terminate($2);
+		cb_emit_terminate ($2);
 	}
   }
 ;
@@ -9745,7 +9745,7 @@ use_reporting:
 	} else {
 		control_field = f = CB_FIELD (x);
 		f->report_decl_id = current_section->id;
-		if((r = f->report) != NULL) {
+		if ((r = f->report) != NULL) {
 			r->has_declarative = 1;
 		}
 	}
@@ -10222,13 +10222,13 @@ line_linage_page_counter:
   }
 | LINE_COUNTER
   {
-	if (report_count > 1
-	&& current_report != NULL) {
-		$$ = current_report->line_counter;
-	} else
 	if (report_count > 1) {
-		cb_error (_("LINE-COUNTER must be qualified here"));
-		$$ = cb_error_node;
+		if (current_report != NULL) {
+			$$ = current_report->line_counter;
+		} else {
+			cb_error (_("LINE-COUNTER must be qualified here"));
+			$$ = cb_error_node;
+		}
 	} else if (report_count == 0) {
 		cb_error (_("Invalid LINE-COUNTER usage"));
 		$$ = cb_error_node;
@@ -10247,13 +10247,13 @@ line_linage_page_counter:
   }
 | PAGE_COUNTER
   {
-	if (report_count > 1
-	&& current_report != NULL) {
-		$$ = current_report->page_counter;
-	} else
 	if (report_count > 1) {
-		cb_error (_("PAGE-COUNTER must be qualified here"));
-		$$ = cb_error_node;
+		if (current_report != NULL) {
+			$$ = current_report->page_counter;
+		} else {
+			cb_error (_("PAGE-COUNTER must be qualified here"));
+			$$ = cb_error_node;
+		}
 	} else if (report_count == 0) {
 		cb_error (_("Invalid PAGE-COUNTER usage"));
 		$$ = cb_error_node;

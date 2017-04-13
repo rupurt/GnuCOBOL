@@ -92,14 +92,14 @@
 	  will cause fileio.c (-with-db) to retian the old and incorrect
 	  method of computing the next duplicate sequence value
 
-2015-02-23  Ron Norman
+2015-02-23  Ron Norman <rjn@inglenet.com>
 
 	* Implemented INDEXED file support for sparse and split keys
 	  Most of the compiler code was borrowed from the fileio-rewrite
 	  fileio.c was updated to handle sparse and split keys
 	  This was tested with D-ISAM and VB-ISAM 2.0
 
-2015-02-16  Ron Norman
+2015-02-16  Ron Norman <rjn@inglenet.com>
 
 	* Implemented DEBUG logging for Compiler developers
 	  Added --enable-debug-log to configure.ac; 
@@ -109,7 +109,7 @@
 	  Logging can be turned and set to certain level using
 	  an environment variable COB_DEBUG_LOG
 
-2015-02-12  Ron Norman
+2015-02-12  Ron Norman <rjn@inglenet.com>
 
 	* Merged Report Writer code into 2.0 code base to create a new 2.x
 	  with all collective features
@@ -156,6 +156,11 @@
 
 	* configure.ac : bugfix for systems with prototype for finite function
 	  in ieeefp.h instead of math.h
+
+2013-11-18  Ron Norman <rjn@inglenet.com>
+
+	* Report Writer Module initial development
+	  including new source file libcob/reportio.c
 
 2013-09-29  Brian Tiffin & Simon Sobisch <sf-mensch@users.sf.net>
 

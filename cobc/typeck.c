@@ -672,9 +672,9 @@ cb_check_sum_field (cb_tree x)
 	}
 
 	f = CB_FIELD (cb_ref(x));
-	if(f->report) {		/* If part of a REPORT, check if it is a SUM */
+	if (f->report) {		/* If part of a REPORT, check if it is a SUM */
 		struct cb_field *sc = get_sum_data_field(f->report, f);
-		if(sc) {	/* Use the SUM variable instead of the print variable */
+		if (sc) {	/* Use the SUM variable instead of the print variable */
 			return cb_build_field_reference (sc, NULL);
 		}
 	}
@@ -702,9 +702,9 @@ cb_check_numeric_value (cb_tree x)
 		break;
 	case CB_CATEGORY_NUMERIC_EDITED:
 		f = CB_FIELD (cb_ref(x));
-		if(f->report) {
+		if (f->report) {
 			struct cb_field *sc = get_sum_data_field(f->report, f);
-			if(sc) {	/* Use the SUM variable instead of the print variable */
+			if (sc) {	/* Use the SUM variable instead of the print variable */
 				return cb_build_field_reference (sc, NULL);
 			}
 		}
@@ -2328,7 +2328,7 @@ cb_validate_program_data (struct cb_program *prog)
 	for (l = current_program->report_list; l; l = CB_CHAIN (l)) {
 		/* Set up LINE-COUNTER / PAGE-COUNTER */
 		rep = CB_REPORT (CB_VALUE (l));
-		if(rep->line_counter == NULL) {
+		if (rep->line_counter == NULL) {
 			snprintf (buff, (size_t)COB_MINI_MAX,
 				  "LINE-COUNTER %s", rep->cname);
 			x = cb_build_field (cb_build_reference (buff));
@@ -2339,7 +2339,7 @@ cb_validate_program_data (struct cb_program *prog)
 			rep->line_counter = cb_build_field_reference (CB_FIELD (x), NULL);
 			CB_FIELD_ADD (current_program->working_storage, CB_FIELD (x));
 		}
-		if(rep->page_counter == NULL) {
+		if (rep->page_counter == NULL) {
 			snprintf (buff, (size_t)COB_MINI_MAX,
 				  "PAGE-COUNTER %s", rep->cname);
 			x = cb_build_field (cb_build_reference (buff));
@@ -7323,8 +7323,8 @@ cb_build_move (cb_tree src, cb_tree dst)
 		CB_REFERENCE (src)->flag_receiving = 0;
 	}
 #endif
-	src = cb_check_sum_field(src);
-	dst = cb_check_sum_field(dst);
+	src = cb_check_sum_field (src);
+	dst = cb_check_sum_field (dst);
 
 	if (CB_REFERENCE_P (dst)) {
 		/* Clone reference */
@@ -7406,7 +7406,7 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 	}
 
 	cb_check_data_incompat (src);
-	src = cb_check_sum_field(src);
+	src = cb_check_sum_field (src);
 
 	tempval = 0;
 	if (cb_list_length (dsts) > 1) {
@@ -8853,9 +8853,10 @@ cobc_init_typeck (void)
  */
 static int report_in_footing = 0;
 static void
-cb_emit_report_moves(struct cb_report *r, struct cb_field *f, int forterminate)
+cb_emit_report_moves (struct cb_report *r, struct cb_field *f, int forterminate)
 {
 	struct cb_field         *p;
+
 	for (p = f; p; p = p->sister) {
 		if(p->report_flag & (COB_REPORT_FOOTING|COB_REPORT_CONTROL_FOOTING|COB_REPORT_CONTROL_FOOTING_FINAL)) {
 			report_in_footing = 1;
@@ -8893,7 +8894,7 @@ cb_emit_report_moves(struct cb_report *r, struct cb_field *f, int forterminate)
 }
 
 static void
-cb_emit_report_move_id(cb_tree rep)
+cb_emit_report_move_id (cb_tree rep)
 {
 	struct cb_report *r = CB_REPORT (cb_ref(rep));
 	if(r
