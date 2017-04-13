@@ -1,7 +1,6 @@
 /*
    Copyright (C) 2001-2016 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
-   Copyright (C) 2015 Simon Sobisch
 
    This file is part of GnuCOBOL.
 
@@ -710,7 +709,7 @@ struct cb_field {
 	int			report_num_col;	/* Number of COLUMNs defined */
 	int			report_decl_id;	/* Label id of USE FOR REPORTING */
 	int			step_count;	/* STEP in REPORT */
-	int			next_group_line;/* NEXT GROUP [PLUS] line# */
+	int			next_group_line;/* NEXT GROUP [PLUS] line */
 	unsigned int		vaddr;		/* Variable address cache */
 	cob_u32_t		special_index;	/* Special field */
 
@@ -1552,8 +1551,8 @@ extern int			cb_list_length (cb_tree);
 
 extern struct cb_report	*build_report (cb_tree);
 extern void				finalize_report (struct cb_report *, struct cb_field *);
-extern void 			build_sum_counter(struct cb_report *r, struct cb_field *f);
-extern struct cb_field *get_sum_data_field(struct cb_report *r, struct cb_field *f);
+extern void 			build_sum_counter (struct cb_report *r, struct cb_field *f);
+extern struct cb_field *get_sum_data_field (struct cb_report *r, struct cb_field *f);
 
 extern void			cb_add_common_prog (struct cb_program *);
 extern void			cb_insert_common_prog (struct cb_program *,
@@ -1579,7 +1578,7 @@ struct cb_literal	*build_literal (enum cb_category,
 extern cb_tree	cb_build_system_name (const enum cb_system_name_category,
 				      const int);
 
-extern cb_tree cb_field_dup(struct cb_field *f, struct cb_reference *ref);
+extern cb_tree cb_field_dup (struct cb_field *f, struct cb_reference *ref);
 
 /* parser.y */
 extern cb_tree		cobc_printer_node;

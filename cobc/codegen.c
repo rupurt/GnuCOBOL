@@ -2407,23 +2407,20 @@ output_funcall (cb_tree x)
 	p = CB_FUNCALL (x);
 	if (p->name[0] == '$') {
 		switch (p->name[1]) {
-		case 'E':
-			/* Set of one character */
+		case 'E':		/* Set of one character */
 			output ("*(");
 			output_data (p->argv[0]);
 			output (") = ");
 			output_param (p->argv[1], 1);
 			break;
-		case 'F':
-			/* Move of one character */
+		case 'F':		/* Move of one character */
 			output ("*(");
 			output_data (p->argv[0]);
 			output (") = *(");
 			output_data (p->argv[1]);
 			output (")");
 			break;
-		case 'G':
-			/* Test of one character */
+		case 'G':		/* Test of one character */
 			output ("(int)(*(");
 			output_data (p->argv[0]);
 			if (p->argv[1] == cb_space) {
@@ -2442,11 +2439,11 @@ output_funcall (cb_tree x)
 				output ("))");
 			}
 			break;
-		case 'R':	/* Generate REPORT line */
+		case 'R':		/* Generate REPORT line */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
 			generate_id++;
 			generate_bgn_lbl = -1;
-			if(r->has_declarative) {
+			if (r->has_declarative) {
 				output("{\n");
 				output("static\tint ctl;\n");
 				output("\tctl = 0;\n");
@@ -2454,7 +2451,7 @@ output_funcall (cb_tree x)
 				generate_bgn_lbl = add_new_label();
 				output("\tframe_ptr--;\n");
 				output("gen_%d:\n",generate_id);
-				if(r->id) {
+				if (r->id) {
 					output ("\tframe_ptr++;\n");
 					output ("\tframe_ptr->perform_through = 0;\n");
 					perform_label("rwmove_",r->id,-1);
@@ -2470,7 +2467,7 @@ output_funcall (cb_tree x)
 				output("\t}\n");
 				output("}");
 			} else {
-				if(r->id) {
+				if (r->id) {
 					output ("\tframe_ptr++;\n");
 					output ("\tframe_ptr->perform_through = 0;\n");
 					perform_label("rwmove_",r->id,-1);
@@ -2483,11 +2480,11 @@ output_funcall (cb_tree x)
 				output (", 0)");
 			}
 			break;
-		case 'T':	/* Terminate REPORT */
+		case 'T':		/* Terminate REPORT */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
 			generate_id++;
 			generate_bgn_lbl  = -1;
-			if(r->has_declarative) {
+			if (r->has_declarative) {
 				output("{\n");
 				output("static\tint ctl;\n");
 				output("\tctl = 0;\n");
@@ -2495,7 +2492,7 @@ output_funcall (cb_tree x)
 				generate_bgn_lbl = add_new_label();
 				output("\tframe_ptr--;\n");
 				output("gen_%d:\n",generate_id);
-				if(r->id) {
+				if (r->id) {
 					output ("\tframe_ptr++;\n");
 					output ("\tframe_ptr->perform_through = 0;\n");
 					perform_label("rwfoot_",r->id,-1);
@@ -2509,7 +2506,7 @@ output_funcall (cb_tree x)
 				output("\t}\n");
 				output("}");
 			} else {
-				if(r->id) {
+				if (r->id) {
 					output ("\tframe_ptr++;\n");
 					perform_label("rwfoot_",r->id,-1);
 					output("\tframe_ptr--;\n\t");
@@ -2519,16 +2516,16 @@ output_funcall (cb_tree x)
 				output (", 0)");
 			}
 			break;
-		case 'M':	/* Move data for REPORT */
+		case 'M':		/* Move data for REPORT */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
 			output("\tgoto rwexit_%d;\n",r->id);
 			output("rwmove_%d: ",r->id);
 			break;
-		case 't':	/* Label for MOVE for just Footings */
+		case 't':		/* Label for MOVE for just Footings */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
 			output("rwfoot_%d: ",r->id);
 			break;
-		case 'm':	/* End of Move data for REPORT */
+		case 'm':		/* End of Move data for REPORT */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
 			if (!cb_flag_computed_goto) {
 				output_line ("\tgoto P_switch;");
@@ -2537,45 +2534,45 @@ output_funcall (cb_tree x)
 			}
 			output("rwexit_%d: ",r->id);
 			break;
-		case 'I':	/* Initiate REPORT */
+		case 'I':		/* Initiate REPORT */
 			r = CB_REPORT(CB_VALUE(p->argv[0]));
-			if(r->t_lines) {
+			if (r->t_lines) {
 				output (" /* Page Limit is %s */\n",cb_name (r->t_lines));
 				output ("%s%s.def_lines = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_lines);
 				output (";\n");
 			}
-			if(r->t_columns) {
+			if (r->t_columns) {
 				output (" /* Page Limit is %s */\n",cb_name (r->t_columns));
 				output ("%s%s.def_cols = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_columns);
 				output (";\n");
 			}
-			if(r->t_heading) {
+			if (r->t_heading) {
 				output (" /* Heading is %s */\n",cb_name (r->t_heading));
 				output ("%s%s.def_heading = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_heading);
 				output (";\n");
 			}
-			if(r->t_footing) {
+			if (r->t_footing) {
 				output (" /* Footing is %s */\n",cb_name (r->t_footing));
 				output ("%s%s.def_footing = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_footing);
 				output (";\n");
 			}
-			if(r->t_first_detail) {
+			if (r->t_first_detail) {
 				output (" /* First Detail is %s */\n",cb_name (r->t_first_detail));
 				output ("%s%s.def_first_detail = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_first_detail);
 				output (";\n");
 			}
-			if(r->t_last_detail) {
+			if (r->t_last_detail) {
 				output (" /* Last Detail is %s */\n",cb_name (r->t_last_detail));
 				output ("%s%s.def_last_detail = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_last_detail);
 				output (";\n");
 			}
-			if(r->t_last_control) {
+			if (r->t_last_control) {
 				output (" /* Last Control is %s */\n",cb_name (r->t_last_control));
 				output ("%s%s.def_last_control = ", CB_PREFIX_REPORT, r->cname);
 				output_integer(r->t_last_control);
@@ -2585,7 +2582,7 @@ output_funcall (cb_tree x)
 			output_param (p->argv[0], 0);
 			output (")");
 			break;
-		case 'S':	/* Suppress flag on */
+		case 'S':		/* Suppress flag on */
 			output ("%s",CB_PREFIX_REPORT_LINE);
 			output_param (p->argv[1], 0);
 			output (".suppress = 1;\n");
@@ -5715,9 +5712,10 @@ output_stmt (cb_tree x)
 		gen_if_level++;
 		code = 0;
 		output_prefix ();
-		if(ip->is_if == 2
-		&& ip->stmt1 == NULL
-		&& ip->stmt2 != NULL) {	/* Really PRESENT WHEN for Report field */
+		/* Really PRESENT WHEN for Report field */
+		if (ip->is_if == 2    &&
+		    ip->stmt1 == NULL &&
+		    ip->stmt2 != NULL) {
 			struct cb_field *p = (struct cb_field *)ip->stmt2;
 			char	*px;
 			if((p->report_flag & COB_REPORT_LINE)) {
@@ -5739,9 +5737,10 @@ output_stmt (cb_tree x)
 			gen_if_level--;
 			break;
 		}
-		if(ip->is_if == 3
-		&& ip->stmt1 == NULL
-		&& ip->stmt2 != NULL) {	/* Really PRESENT WHEN for Report line */
+		/* Really PRESENT WHEN for Report line */
+		if (ip->is_if == 3    &&
+		    ip->stmt1 == NULL &&
+		    ip->stmt2 != NULL) {
 			struct cb_field *p = (struct cb_field *)ip->stmt2;
 			char	*px;
 			if((p->report_flag & COB_REPORT_LINE)) {
@@ -6312,6 +6311,7 @@ output_screen_init (struct cb_field *p)
 static void
 compute_report_rcsz (struct cb_field *p)
 {
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (p == NULL) {
 		return;
 	}
@@ -6336,6 +6336,7 @@ output_report_data (struct cb_field *p)
 	struct cb_field *pp;
 	cb_tree	x, l;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (p == NULL) {
 		return;
 	}
@@ -6423,6 +6424,7 @@ output_report_sum_control_field (struct cb_field *p)
 {
 	cb_tree	l, x;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (p == NULL) {
 		return;
 	}
@@ -6453,6 +6455,7 @@ output_report_sumed_field (struct cb_field *p)
 	cb_tree	l,x;
 	struct cb_field *f;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (p == NULL) {
 		return;
 	}
@@ -6478,12 +6481,12 @@ output_report_sumed_field (struct cb_field *p)
 /* Report definition */
 
 static void
-output_report_control(struct cb_report *p, int id, cb_tree ctl, cb_tree nx)
+output_report_control (struct cb_report *p, int id, cb_tree ctl, cb_tree nx)
 {
 	struct cb_field *s;
 	struct cb_field *f;
-	cb_tree	l,x;
-	int	i,bfound,prvid,seq;
+	cb_tree	l, x;
+	int	i, bfound, prvid, seq;
 
 	x = CB_VALUE (ctl);
 	s = cb_code_field(x);
@@ -6559,6 +6562,7 @@ output_report_def_fields (int bgn, int id, struct cb_field *f, struct cb_report 
 	int	idx, colnum;
 	cb_tree	l,x;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (f == NULL) {
 		return;
 	}
@@ -6748,6 +6752,7 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 	char	fname[64];
 	int	fld_id;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (f == NULL) {
 		return;
 	}
@@ -6872,9 +6877,10 @@ static int r_ctl_id = 0;
 
 /* Find data field for given internal SUM counter */
 struct cb_field *
-get_sum_data_field(struct cb_report *r, struct cb_field *f)
+get_sum_data_field (struct cb_report *r, struct cb_field *f)
 {
 	int	k;
+
 	for (k=0; k < r->num_sums; k++) {
 		if(r->sums[k*2 + 0] == f)
 			return r->sums[k*2 + 1];
@@ -6891,11 +6897,12 @@ static void
 output_report_sum_counters (int top, struct cb_field *f, struct cb_report *r)
 {
 	struct cb_field *n, *c, *p, *z;
-	cb_tree	l,x;
+	cb_tree	l, x;
 	char	fname[64];
-	int	rsid,rsseq,rsprv;
-	int	ctl_foot,sub_ttl,cross_foot;
+	int	rsid, rsseq, rsprv;
+	int	ctl_foot, sub_ttl, cross_foot;
 
+	/* shouldn't happen and if: should COBC_ABORT */
 	if (f == NULL) {
 		return;
 	}
@@ -7031,7 +7038,7 @@ output_report_definition (struct cb_report *p, struct cb_report *n)
 {
 	int	i;
 	struct cb_field *s = NULL;
-	cb_tree	l,x;
+	cb_tree	l, x;
 
 	output_local("\n");
 	for(i= p->num_lines-1; i >= 0; i--) {
@@ -7103,7 +7110,7 @@ output_report_definition (struct cb_report *p, struct cb_report *n)
 }
 
 static void
-output_report_list(cb_tree	l, cb_tree n)
+output_report_list (cb_tree	l, cb_tree n)
 {
 	cb_tree nl;
 	struct cb_report	*rep, *nxrep;
@@ -8554,7 +8561,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	}
 
 	/* Reports */
-	if(prog->report_list) {
+	if (prog->report_list) {
 		optimize_defs[COB_SET_REPORT] = 1;
 		output_line ("\n/* Init Reports */\n");
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
@@ -9359,6 +9366,9 @@ codegen (struct cb_program *prog, const int nested)
 	enum cb_optim		optidx;
 	time_t			sectime;
 
+	struct cb_field		*fld;
+	struct cb_report *rep;
+
 	/* Clear local program stuff */
 	current_prog = prog;
 	param_id = 0;
@@ -9672,9 +9682,8 @@ codegen (struct cb_program *prog, const int nested)
 	/* Report data fields */
 	if (prog->report_storage) {
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
-			struct cb_report *rep;
 			rep = CB_REPORT(CB_VALUE(l));
-			if(rep) {
+			if (rep) {
 				compute_report_rcsz (rep->records);
 			}
 		}
@@ -9769,9 +9778,8 @@ codegen (struct cb_program *prog, const int nested)
 	if (prog->report_storage) {
 		output_target = current_prog->local_include->local_fp;
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
-			struct cb_report *rep;
 			rep = CB_REPORT(CB_VALUE(l));
-			if(rep) {
+			if (rep) {
 				output_report_sum_control_field (rep->records);
 			}
 		}
@@ -9827,14 +9835,12 @@ codegen (struct cb_program *prog, const int nested)
 		}
 		/* Report special fields */
 		if (prog->report_storage) {
-			struct cb_field		*f;
-			struct cb_report *rep;
 			for (l = prog->report_list; l; l = CB_CHAIN (l)) {
 				rep = CB_REPORT(CB_VALUE(l));
-				for(f=rep->records; f; f=f->sister) {
-					if (f->storage == CB_STORAGE_WORKING
-					&& !(f->report_flag & COB_REPORT_REF_EMITED)) {
-						output_emit_field(cb_build_field_reference (f, NULL), NULL);
+				for (fld=rep->records; fld; fld=fld->sister) {
+					if (fld->storage == CB_STORAGE_WORKING
+					&& !(fld->report_flag & COB_REPORT_REF_EMITED)) {
+						output_emit_field(cb_build_field_reference (fld, NULL), NULL);
 					}
 				}
 			}
@@ -9853,7 +9859,6 @@ codegen (struct cb_program *prog, const int nested)
 
 	/* Report data fields */
 	if (prog->report_storage) {
-		struct cb_report	*rep;
 		output_target = current_prog->local_include->local_fp;
 		output_local ("\n/* Report data fields */\n\n");
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
