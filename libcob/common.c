@@ -36,12 +36,6 @@
 #include <ieeefp.h>
 #endif
 
-#ifdef HAVE_ISFINITE
-#define ISFINITE isfinite
-#else
-#define ISFINITE finite
-#endif
-
 #include <time.h>
 
 #ifdef	HAVE_UNISTD_H
