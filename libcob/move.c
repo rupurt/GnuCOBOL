@@ -2352,9 +2352,9 @@ cob_put_pointer(void *val, void *mem)
 char *
 cob_get_picx( void *cbldata, size_t len, void *charfld, size_t charlen)
 {
-	size_t	i;
+	int	i;
 	cob_u8_t	*p = cbldata;
-	for (i = len-1; i >= 0 && (p[i] == ' ' || p[i] == 0x00); i--);
+	for (i = (int)len-1; i >= 0 && (p[i] == ' ' || p[i] == 0x00); i--);
 	i++;
 	if (charfld == NULL) {
 		charfld = cob_malloc (i+1);
