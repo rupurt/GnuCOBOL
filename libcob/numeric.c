@@ -37,6 +37,11 @@
 #ifdef HAVE_FINITE_IEEEFP_H
 #include <ieeefp.h>
 #endif
+#ifdef HAVE_ISFINITE
+#define ISFINITE isfinite
+#else
+#define ISFINITE finite
+#endif
 
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP
@@ -842,7 +847,7 @@ cob_decimal_set_double (cob_decimal *d, const double v)
 
 	memset (&t1, ' ', sizeof(t1));
 	ud.d1 = v;
-	if (ud.l1 == 0 || ud.l1 == t1 || !finite (v)) {
+	if (ud.l1 == 0 || ud.l1 == t1 || !ISFINITE (v)) {
 		mpz_set_ui (d->value, 0UL);
 		d->scale = 0;
 		return;
@@ -907,7 +912,7 @@ cob_decimal_get_double (cob_decimal *d)
 	}
 
 	v = mpf_get_d (cob_mpft);
-	if (!finite (v)) {
+	if (!ISFINITE (v)) {
 		v = 0.0;
 	}
 	return v;

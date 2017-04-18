@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2016 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2017 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -34,6 +34,12 @@
 #include <math.h>
 #ifdef HAVE_FINITE_IEEEFP_H
 #include <ieeefp.h>
+#endif
+
+#ifdef HAVE_ISFINITE
+#define ISFINITE isfinite
+#else
+#define ISFINITE finite
 #endif
 
 #include <time.h>
@@ -2675,10 +2681,10 @@ cob_is_numeric (const cob_field *f)
 		return 1;
 	case COB_TYPE_NUMERIC_FLOAT:
 		memcpy (&fval.fpf, f->data, sizeof(float));
-		return !finite ((double)fval.fpf);
+		return !ISFINITE ((double)fval.fpf);
 	case COB_TYPE_NUMERIC_DOUBLE:
 		memcpy (&fval.fpd, f->data, sizeof(double));
-		return !finite (fval.fpd);
+		return !ISFINITE (fval.fpd);
 	case COB_TYPE_NUMERIC_PACKED:
 		/* Check digits */
 		for (i = 0; i < f->size - 1; ++i) {
