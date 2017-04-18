@@ -1832,7 +1832,7 @@ cob_display_formatted_text (const char *fmt, ...)
 	field.size = vsnprintf (buff, COB_NORMAL_BUFF, fmt, ap);
 	va_end (ap);
 
-	if (field.size < 0) return -1;
+	if ((int)(field.size) < 0) return -1;
 	if (buff[0] == 0) return 0;
 
 	if (field.size > COB_NORMAL_MAX) {

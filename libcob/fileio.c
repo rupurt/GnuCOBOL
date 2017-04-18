@@ -3770,7 +3770,7 @@ static int
 relative_write (cob_file *f, const int opt)
 {
 	off_t	off;
-	size_t	relsize;
+	int	relsize;
 	int	i,isdeleted=0;
 	int	kindex,rcsz;
 	struct stat	st;
@@ -3858,7 +3858,7 @@ static int
 relative_rewrite (cob_file *f, const int opt)
 {
 	off_t	off;
-	size_t	relsize;
+	int	relsize;
 	int	relnum,isdeleted=0,errsts;
 #ifdef	WITH_SEQRA_EXTFH
 	int	extfh_ret;
@@ -3946,7 +3946,7 @@ static int
 relative_delete (cob_file *f)
 {
 	off_t	off;
-	size_t	relsize;
+	int	relsize;
 	unsigned char rechdr[8];
 	int	relnum,isdeleted,errsts;
 #ifdef	WITH_SEQRA_EXTFH

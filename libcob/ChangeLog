@@ -1,4 +1,11 @@
 
+2017-04-18 Ron Norman <rjn@inglenet.com>
+
+	* fileio.c: relative_read_size returns an 'int' and not 'size_t'
+	* screenio.c: add (int) casts
+	* move.c: use 'int' instead of 'size_t' as it needs to be signed
+
+
 2017-04-12 Ron Norman <rjn@inglenet.com>
 
 	* fileio.c,common.c: 
