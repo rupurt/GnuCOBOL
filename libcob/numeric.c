@@ -37,11 +37,6 @@
 #ifdef HAVE_FINITE_IEEEFP_H
 #include <ieeefp.h>
 #endif
-#ifdef HAVE_ISFINITE
-#define ISFINITE isfinite
-#else
-#define ISFINITE finite
-#endif
 
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP

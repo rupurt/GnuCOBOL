@@ -30,10 +30,17 @@
    exported to user space
 */
 
+#ifdef HAVE_ISFINITE
+#define ISFINITE isfinite
+#else
+#define ISFINITE finite
+#endif
 #if	defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__)
 #include <float.h>
-#define	finite		_finite
+#undef ISFINITE
+#define	ISFINITE		_finite
 #endif
+
 
 #if	defined(ENABLE_NLS) && defined(COB_NLS_RUNTIME)
 #include "lib/gettext.h"
