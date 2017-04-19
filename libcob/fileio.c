@@ -9024,7 +9024,11 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 	if(f->flag_line_adv)
 		fcd->otherFlags |= OTH_LINE_ADVANCE; 
 
-	cob_field_to_string (f->assign, assignto, sizeof(assignto)-1);
+	if (f->assign) {
+		cob_field_to_string (f->assign, assignto, sizeof(assignto)-1);
+	} else {
+		strcpy(assignto, f->select_name);
+	}
 	STCOMPX2(sizeof(FCD3),fcd->fcdLen);
 	fcd->fcdVer = FCD_VER_64Bit;
 	fcd->gcFlags |= MF_CALLFH_GNUCOBOL;
@@ -9256,6 +9260,7 @@ find_file(FCD3 *fcd)
 		}
 	}
 	f = cob_malloc(sizeof(cob_file));
+	f->file_version = COB_FILE_VERSION;
 	copy_fcd_to_file(fcd, f);
 	ff = cob_malloc(sizeof(struct fcd_file));
 	ff->next = fcd_file_list;
