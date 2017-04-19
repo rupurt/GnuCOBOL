@@ -1,4 +1,12 @@
 
+2017-04-19 Ron Norman <rjn@inglenet.com>
+
+	* fileio.c: 
+	 For BDB, check that the size of a record read is not larger than
+	 what the FD has defined and return status 43 to the READ.
+	 For BDB, on OPEN, read the first record in the file and if its
+	 size is larger than the FD has defined then return status 39
+
 2017-04-18 Ron Norman <rjn@inglenet.com>
 
 	* numeric.c,common.c: 
