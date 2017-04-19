@@ -5607,6 +5607,14 @@ dobuild:
 	if (f->flag_optional && nonexistent) {
 		return COB_STATUS_05_SUCCESS_OPTIONAL;
 	}
+	if (indexed_start_internal (f, COB_FI, f->keys[0].field, 0, 0) == 0) {
+		if (p->data.data != NULL
+		 && p->data.size > 0
+		 && p->data.size > f->record_max) {
+			return COB_STATUS_39_CONFLICT_ATTRIBUTE;
+		}
+		p->data.data = NULL;
+	}
 	return 0;
 
 #else
@@ -5936,9 +5944,15 @@ indexed_read (cob_file *f, cob_field *key, const int read_opts)
 	}
 
 	f->record->size = p->data.size;
-	memcpy (f->record->data, p->data.data, (size_t)p->data.size);
+	if (f->record->size > f->record_max) {
+		f->record->size = f->record_max;
+		ret = COB_STATUS_43_READ_NOT_DONE;
+	} else {
+		ret = COB_STATUS_00_SUCCESS;
+	}
+	memcpy (f->record->data, p->data.data, f->record->size);
 
-	return COB_STATUS_00_SUCCESS;
+	return ret;
 
 #else
 
@@ -6479,9 +6493,15 @@ indexed_read_next (cob_file *f, const int read_opts)
 	}
 
 	f->record->size = p->data.size;
-	memcpy (f->record->data, p->data.data, (size_t)p->data.size);
+	if (f->record->size > f->record_max) {
+		f->record->size = f->record_max;
+		ret = COB_STATUS_43_READ_NOT_DONE;
+	} else {
+		ret = COB_STATUS_00_SUCCESS;
+	}
+	memcpy (f->record->data, p->data.data, f->record->size);
 
-	return COB_STATUS_00_SUCCESS;
+	return ret;
 
 #else
 
