@@ -1,4 +1,11 @@
 
+2017-04-27 Ron Norman <rjn@inglenet.com>
+	* move.c: added 'cob_alloc_move' used to copy data for BY VALUE params
+	* common.c,common.h: added 'cob_get_hase_name' used to create has value
+	  added 'cob_alloc_attr' to create working 'cob_field_attr'
+	* call.c: set 'cobglobptr->cob_call_from_c' &
+	  'cobglobptr->cob_call_name_hash' as required
+
 2017-04-19 Ron Norman <rjn@inglenet.com>
 
 	* fileio.c: 
