@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2002-2016 Free Software Foundation, Inc.
+   Copyright (C) 2002-2017 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -1040,24 +1040,6 @@ typedef struct {
 	const cob_field_attr	*attr;		/* Pointer to attribute */
 } cob_field;
 
-#if	0	/* RXWRXW - Constant field */
-/* Field structure for constants */
-
-typedef struct {
-	const size_t		size;		/* Field size */
-	const unsigned char	*data;		/* Pointer to field data */
-	const cob_field_attr	*attr;		/* Pointer to attribute */
-} cob_const_field;
-
-
-/* Union for field constants */
-
-typedef union {
-	const cob_const_field	cf;
-	cob_field		vf;
-} cob_fld_union;
-#endif
-
 /* Representation of 128 bit FP */
 
 typedef struct {
@@ -1170,8 +1152,20 @@ typedef struct __cob_module {
 
 	unsigned int		module_stmt;		/* Last statement executed */
 	const char		**module_sources;	/* Source module names compiled */
+	unsigned int		param_buf_size;		/* Size of 'param_buf' memory */
+	unsigned int		param_buf_used;		/* amount used from 'param_buf' memory */
+	unsigned char		*param_buf;		/* Memory allocated for storing BY VALUE parameters */
+	unsigned int		param_num;		/* Number of entries in 'param_field' */
+	unsigned int		param_max;		/* Max number of entries in 'param_field' */
+	cob_field		**param_field;		/* Array of pointers to parameter 'cob_field' */
 } cob_module;
 
+/* For 'module_type'
+ * Values identical to CB_PROGRAM_TYPE & CB_FUNCTION_TYPE in tree.h 
+ */
+#define COB_MODULE_PROGRAM	0
+#define COB_MODULE_FUNCTION	1
+#define COB_MODULE_C		2
 
 /* User function structure */
 
@@ -1457,14 +1451,16 @@ typedef struct __cob_global {
 	unsigned int		cob_got_exception;	/* Exception active */
 	unsigned int		cob_screen_initialized;	/* Screen initialized */
 
-												/* Library routine variables */
+							/* Library routine variables */
 
-												/* screenio / termio */
+							/* screenio / termio */
 	unsigned char		*cob_term_buff;		/* Screen I/O buffer */
 	int			cob_accept_status;	/* ACCEPT STATUS */
 
 	int			cob_max_y;		/* Screen max y */
 	int			cob_max_x;		/* Screen max x */
+	int			cob_call_from_c;	/* Recent CALL was via cob_call & not COBOL */
+	unsigned int		cob_call_name_hash;	/* Hash of subroutine name being CALLed */
 
 } cob_global;
 
@@ -1498,6 +1494,7 @@ COB_EXPIMP void print_info(void);
 COB_EXPIMP void print_version(void);
 COB_EXPIMP int cob_load_config(void);
 COB_EXPIMP void print_runtime_conf(void);
+COB_EXPIMP cob_field_attr *cob_alloc_attr(int type, int digits, int scale, int flags);
 
 char* cob_int_to_string(int, char*);
 char* cob_int_to_formatted_bytestring(int, char*);
@@ -1746,6 +1743,7 @@ COB_EXPIMP void		cob_move_ibm(void *, void *, const int);
 COB_EXPIMP void		cob_set_int(cob_field *, const int);
 COB_EXPIMP int		cob_get_int(cob_field *);
 COB_EXPIMP cob_s64_t	cob_get_llint(cob_field *);
+COB_EXPIMP void		cob_alloc_move(cob_field *, cob_field *, const int);
 /**************************************************/
 /* Functions in move.c for C access to COBOL data */
 /**************************************************/
@@ -1825,6 +1823,7 @@ COB_EXPIMP void	cob_gmp_free(void *);
 
 DECLNORET COB_EXPIMP void	cob_call_error(void) COB_A_NORETURN;
 COB_EXPIMP void		cob_field_constant (cob_field *f, cob_field *t, cob_field_attr *a, void *d);
+COB_EXPIMP unsigned int	cob_get_name_hash (const char *name);
 
 COB_EXPIMP void		cob_set_cancel(cob_module *);
 COB_EXPIMP void		*cob_resolve(const char *);
