@@ -1,4 +1,8 @@
 
+2017-04-30  Ron Norman <rjn@inglenet.com>
+	* codegen.c,typeck.c: Update to handle figurative constants on CALL;
+	   CALL xyz USING BY CONTENT ZERO and SPACES
+
 2017-04-27  Ron Norman <rjn@inglenet.com>
 	* tree.h: replaced 'flag_anylen_done' with 'flag_data_set'
 	* codegen.c: enhancements to handle ENTRY USING BY VALUE/CONTENT
