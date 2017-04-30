@@ -4896,7 +4896,10 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 			}
 			continue;
 		}
-		if (CB_CONST_P (x) && x != cb_null) {
+		if (CB_CONST_P (x) 
+		 && x != cb_null
+		 && x != cb_space
+		 && x != cb_zero) {
 			cb_error_x (x, _("Figurative constant invalid here"));
 			error_ind = 1;
 			continue;
