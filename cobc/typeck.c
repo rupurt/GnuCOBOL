@@ -98,9 +98,8 @@ static cb_tree			inspect_data;
 
 static int			expr_op;		/* Last operator */
 static cb_tree			expr_lh;		/* Last left hand */
-static int			expr_dmax = 17;		/* Max scale for expression result */
+static int			expr_dmax = -1;		/* Max scale for expression result */
 static int			expr_line = 0;		/* Line holding expression for warnings */
-static cb_tree			expr_dec = NULL;	/* Int value for decimal_align */
 static cb_tree			expr_rslt = NULL;	/* Expression result */
 
 static size_t			initialized = 0;
@@ -3249,7 +3248,8 @@ decimal_free (void)
 static void
 decimal_compute (const int op, cb_tree x, cb_tree y)
 {
-	const char *func;
+	const char	*func;
+	cb_tree		expr_dec = NULL;	/* Int value for decimal_align */
 
 	switch (op) {
 	case '+':
@@ -3273,8 +3273,33 @@ decimal_compute (const int op, cb_tree x, cb_tree y)
 	}
 	dpush (CB_BUILD_FUNCALL_2 (func, x, y));
 
-	if (expr_dmax >= 0
-	&&  expr_dec != NULL) {
+	if (expr_dmax >= 0) {
+		switch(expr_dmax) {
+		case 0:
+			expr_dec = cb_int0;
+			break;
+		case 1:
+			expr_dec = cb_int1;
+			break;
+		case 2:
+			expr_dec = cb_int2;
+			break;
+		case 3:
+			expr_dec = cb_int3;
+			break;
+		case 4:
+			expr_dec = cb_int4;
+			break;
+		case 5:
+			expr_dec = cb_int5;
+			break;
+		case 6:
+			expr_dec = cb_int6;
+			break;
+		default:
+			expr_dec = cb_int(expr_dmax);
+			break;
+		}
 		dpush (CB_BUILD_FUNCALL_2 ("cob_decimal_align", x, expr_dec));
 		if (cb_warn_arithmetic_osvs
 		&&  expr_line != cb_source_line) {
@@ -3440,30 +3465,7 @@ build_decimal_assign (cb_tree vars, const int op, cb_tree val)
 				}
 			}
 		}
-		if (expr_dmax >= 0) {
-			switch(expr_dmax) {
-			case 0:
-				expr_dec = cb_int0;
-				break;
-			case 1:
-				expr_dec = cb_int1;
-				break;
-			case 2:
-				expr_dec = cb_int2;
-				break;
-			case 3:
-				expr_dec = cb_int3;
-				break;
-			case 4:
-				expr_dec = cb_int4;
-				break;
-			default:
-				expr_dec = cb_int(expr_dmax);
-				break;
-			}
-		}
 	} else {
-		expr_dec = NULL;
 		expr_dmax = -1;
 	}
 
@@ -3507,7 +3509,6 @@ build_decimal_assign (cb_tree vars, const int op, cb_tree val)
 	}
 
 	decimal_free ();
-	expr_dec = NULL;
 	expr_dmax = -1;
 
 	return s1;
@@ -3785,6 +3786,44 @@ cb_chk_alpha_cond (cb_tree x)
 	return 1;
 }
 
+static void
+cb_walk_cond (cb_tree x)
+{
+	struct cb_binary_op	*p;
+	struct cb_field		*f;
+
+	if (x == NULL)
+		return;
+
+	switch (CB_TREE_TAG (x)) {
+	case CB_TAG_REFERENCE:
+		if (!CB_FIELD_P (cb_ref (x))) {
+			return;
+		}
+
+		f = CB_FIELD_PTR (x);
+
+		if (f->level == 88) {
+			return ;
+		}
+		if(f->pic
+		&& f->pic->scale > expr_dmax) {
+			expr_dmax = f->pic->scale;
+		}
+
+		break;
+
+	case CB_TAG_BINARY_OP:
+		p = CB_BINARY_OP (x);
+		cb_walk_cond (p->x);
+		cb_walk_cond (p->y);
+		break;
+
+	default:
+		return;
+	}
+}
+
 cb_tree
 cb_build_cond (cb_tree x)
 {
@@ -3799,9 +3838,15 @@ cb_build_cond (cb_tree x)
 		return cb_error_node;
 	}
 
-	/* REMIND: Disable changing alignment and revisit this at a future date */
-	expr_dec = NULL;
-	expr_dmax = -1;
+	if(cb_arithmetic_osvs) {
+		/* ARITHMETIC-OSVS: Determine largest scale used in condition */
+		if (expr_dmax == -1) {
+			expr_rslt = CB_VALUE(x);
+			cb_walk_cond (x);
+		}
+	} else {
+		expr_dmax = -1;
+	}
 
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
@@ -3926,6 +3971,13 @@ cb_build_cond (cb_tree x)
 	}
 	cb_error_x (x, _("Invalid expression"));
 	return cb_error_node;
+}
+
+/* Reset at end of emiting code for condition */
+void
+cb_end_cond(void)
+{
+	expr_dmax = -1;
 }
 
 /* ADD/SUBTRACT CORRESPONDING */
