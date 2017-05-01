@@ -5090,6 +5090,8 @@ AT_DATA([prog.cob], [
        01 NUM-A   PIC 9(3) VALUE 399.
        01 NUM-B   PIC 9(3) VALUE 211.
        01 NUM-C   PIC 9(3)V99 VALUE 212.34.
+       01 NUMV1   PIC 9(3)V9.
+       01 PICX    PIC X VALUE 'A'.
        01 RSLT    PIC 9(3).
        01 RSLTV1  PIC 9(3).9.
        01 RSLTV2  PIC 9(3).99.
@@ -5144,6 +5146,13 @@ AT_DATA([prog.cob], [
                                 -  (NUM-B / (10 * 10))) * (200 / 2)
            DISPLAY 'Reduced  RSLT    IS ' RSLT
                            ' RSLTv9  IS ' RSLTV1.
+           MOVE NUM-A TO NUMV1.
+           IF ((NUMV1 / (101 - 1)) 
+              -  (NUM-B / (10 * 10))) * (200 / 2) EQUAL 188
+              DISPLAY "Not Using ARITHMETIC-OSVS" 
+           ELSE
+              DISPLAY "Using ARITHMETIC-OSVS" 
+           END-IF.
            STOP RUN.
 ])
 
@@ -5168,6 +5177,7 @@ Divide   RSLT    IS 009
 Simple   RSLT    IS 188 RSLTv9  IS 188.0
 Complex  RSLT    IS 188 RSLTv9  IS 188.0
 Reduced  RSLT    IS 188 RSLTv9  IS 188.0
+Not Using ARITHMETIC-OSVS
 ], [])
 
 AT_CLEANUP
@@ -5183,6 +5193,8 @@ AT_DATA([prog.cob], [
        01 NUM-A   PIC 9(3) VALUE 399.
        01 NUM-B   PIC 9(3) VALUE 211.
        01 NUM-C   PIC 9(3)V99 VALUE 212.34.
+       01 NUMV1   PIC 9(3)V9.
+       01 PICX    PIC X VALUE 'A'.
        01 RSLT    PIC 9(3).
        01 RSLTV1  PIC 9(3).9.
        01 RSLTV2  PIC 9(3).99.
@@ -5237,24 +5249,32 @@ AT_DATA([prog.cob], [
                                 -  (NUM-B / (10 * 10))) * (200 / 2)
            DISPLAY 'Reduced  RSLT    IS ' RSLT
                            ' RSLTv9  IS ' RSLTV1.
+           MOVE NUM-A TO NUMV1.
+           IF ((NUMV1 / (101 - 1)) 
+              -  (NUM-B / (10 * 10))) * (200 / 2) EQUAL 188
+              DISPLAY "Not Using ARITHMETIC-OSVS" 
+           ELSE
+              DISPLAY "Using ARITHMETIC-OSVS" 
+           END-IF.
            STOP RUN.
 ])
 
 AT_CHECK([cobc -x -std=ibm -debug -Wall prog.cob ], [0], [], [prog.cob: In paragraph 'MAIN':
-prog.cob: 15: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 17: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 19: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 22: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 29: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 33: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 36: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 21: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 24: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 31: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 35: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 38: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 42: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 40: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 44: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 46: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 49: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 53: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 59: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 48: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 51: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 55: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 61: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 67: Warning: Precision of result may change with arithmetic_osvs
 ])
 
 AT_CHECK([./prog], [0], [Simple Compute  RSLT IS 400
@@ -5276,6 +5296,7 @@ Divide   RSLT    IS 009
 Simple   RSLT    IS 180 RSLTv9  IS 180.0
 Complex  RSLT    IS 180 RSLTv9  IS 180.0
 Reduced  RSLT    IS 180 RSLTv9  IS 180.0
+Using ARITHMETIC-OSVS
 ], [])
 
 AT_CLEANUP

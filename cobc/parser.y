@@ -10053,6 +10053,7 @@ condition:
   expr
   {
 	$$ = cb_build_cond ($1);
+	cb_end_cond ();
   }
 ;
 

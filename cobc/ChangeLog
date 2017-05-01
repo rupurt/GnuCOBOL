@@ -1,5 +1,10 @@
 
 2017-05-01  Ron Norman
+	* parser.y,typeck.c,tree.h: Implement arithmetic-osvs for
+	 IF conditions; Compute intermediate results to precision
+	 of variables used in expression
+
+2017-05-01  Ron Norman
 	* tree.c: Improved resolving constant expressions at compile time
 	          Now handles cases with decimal constants.
 
