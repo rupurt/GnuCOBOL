@@ -3218,10 +3218,10 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 {
 	struct cb_binary_op	*p;
 	enum cb_category	category = CB_CATEGORY_UNKNOWN;
-	cob_s64_t			xval,yval;
-	char				result[48];
-	cb_tree				relop, e;
-	int					i,j;
+	cob_s64_t		xval,yval,rslt;
+	char			result[48];
+	cb_tree			relop, e;
+	int			i,j, xscale,yscale,rscale;
 	struct cb_literal *xl, *yl;
 
 	e = relop = cb_any;
@@ -3253,40 +3253,80 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_NUMERIC_LITERAL_P(y)) {
 			xl = (void*)x;
 			yl = (void*)y;
+
 			if(xl->llit == 0
-			&& xl->scale == 0
+			&& xl->size - xl->scale >= 0
 			&& yl->llit == 0
-			&& yl->scale == 0
+			&& yl->size - yl->scale >= 0
 			&& xl->all == 0
 			&& yl->all == 0) {
 				xval = atoll((const char*)xl->data);
 				if(xl->sign == -1) xval = -xval;
 				yval = atoll((const char*)yl->data);
 				if(yl->sign == -1) yval = -yval;
+				xscale = xl->scale;
+				yscale = yl->scale;
+				rscale = 0;
+				rslt = 0;
+				if (op == '+' || op == '-') {
+					while (xscale < yscale) {
+						xval = xval * 10;
+						xscale++;
+					}
+					while (xscale > yscale) {
+						yval = yval * 10;
+						yscale++;
+					}
+					rscale = xscale;
+					if (op == '+')
+						rslt = xval + yval;
+					else
+						rslt = xval - yval;
+				} else if (op == '*') {
+					rscale = xscale + yscale;
+					rslt = xval * yval;
+				} else if (op == '/' && yval != 0) {
+					while (yscale > 0) {
+						xval = xval * 10;
+						yscale--;
+					}
+					rscale = xscale;
+					if((xval % yval) == 0) {
+						rslt = xval / yval;
+					}
+				}
+				while (rscale > 0
+				    && rslt != 0
+				    && (rslt % 10) == 0) {
+					rslt = rslt / 10;
+					rscale--;
+				}
 				switch(op) {
 				case '+':
-					sprintf(result,"%lld",xval + yval);
-					return cb_build_numeric_literal (0, result, 0);
-					break;
 				case '-':
-					sprintf(result,"%lld",xval - yval);
-					return cb_build_numeric_literal (0, result, 0);
-					break;
 				case '*':
-					sprintf(result,"%lld",xval * yval);
-					return cb_build_numeric_literal (0, result, 0);
+					sprintf(result,"%lld",rslt);
+					return cb_build_numeric_literal (0, result, rscale);
 					break;
 				case '/':
 					if(yval == 0) {				/* Avoid Divide by ZERO */
 						cb_warning_x (x, _("Divide by constant ZERO"));
 						break;
 					}
+					if(rslt != 0) {
+						sprintf(result,"%lld",rslt);
+						return cb_build_numeric_literal (0, result, rscale);
+					}
+					if (xl->scale != 0 || yl->scale != 0)
+						break;
 					if((xval % yval) == 0) {
 						sprintf(result,"%lld",xval / yval);
-						return cb_build_numeric_literal (0, result, 0);
+						return cb_build_numeric_literal (0, result, rscale);
 					}
 					break;
 				case '^':
+					if (xl->scale != 0 || yl->scale != 0)
+						break;
 					if(yval == 0
 					|| xval == 1) {
 						strcpy(result,"1");

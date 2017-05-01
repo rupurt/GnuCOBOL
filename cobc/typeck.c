@@ -3346,14 +3346,6 @@ decimal_expand (cb_tree d, cb_tree x)
 		 * OP d, t */
 		p = CB_BINARY_OP (x);
 		decimal_expand (d, p->x);
-#if 0
-		if (CB_TREE_TAG (p->x) == CB_TAG_LITERAL
-		&&  CB_TREE_CATEGORY (p->x) == CB_CATEGORY_NUMERIC
-		&&  CB_TREE_TAG (p->y) == CB_TAG_LITERAL
-		&&  CB_TREE_CATEGORY (p->y) == CB_CATEGORY_NUMERIC) {
-			/* TODO: Evaluation constant expression here */
-		}
-#endif
 
 		if (CB_TREE_TAG (p->y) == CB_TAG_LITERAL
 		&&  CB_TREE_CATEGORY (p->y) == CB_CATEGORY_NUMERIC) {
