@@ -326,7 +326,8 @@ static struct config_tbl gc_conf[] = {
 	{"COB_RETRY_SECONDS","retry_seconds",	"0",NULL,GRP_FILE,ENV_INT,SETPOS(cob_retry_seconds)},
 	{"COB_SORT_CHUNK","sort_chunk",		"256K",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_chunk),(128 * 1024),(16 * 1024 * 1024)},
 	{"COB_SORT_MEMORY","sort_memory",	"128M",	NULL,GRP_FILE,ENV_SIZE,SETPOS(cob_sort_memory),(1024*1024),4294967294 /* max. guaranteed - 1 */},
-	{"COB_SYNC","sync",			"false",syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
+	{"COB_SYNC","sync",				"false",syncopts,GRP_FILE,ENV_BOOL,SETPOS(cob_do_sync)},
+	{"COB_KEYCHECK","keycheck",		"on",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_keycheck)},
 #ifdef  WITH_DB
 	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_FILE,SETPOS(bdb_home)},
 #endif
@@ -343,10 +344,10 @@ static struct config_tbl gc_conf[] = {
 #define FUNC_NAME_IN_DEFAULT NUM_CONFIG + 1
 
 /* Local functions */
-static int		set_config_val	(char *value, int pos);
-static char		*get_config_val	(char *value, int pos, char *orgvalue);
 void		conf_runtime_error_value	(const char *value, const int conf_pos);
 void		conf_runtime_error	(const int finish_error, const char *fmt, ...);
+static int		set_config_val	(char *value, int pos);
+static char		*get_config_val	(char *value, int pos, char *orgvalue);
 static void	check_current_date();
 
 static void

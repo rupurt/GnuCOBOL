@@ -1,4 +1,11 @@
 
+2017-05-02 Ron Norman <rjn@inglenet.com>
+	* common.c,coblocal.h: added 'cob_keycheck' to indicate if INDEXED file
+	  keys must match exactly. Default is TRUE
+	* fileio.c: 
+	  Add code to handle 'keycheck' in IO_filename env var.
+	  Added code to indexed_open for C|D|VB-ISAM files to handle keycheck
+
 2017-04-27 Ron Norman <rjn@inglenet.com>
 	* move.c: added 'cob_alloc_move' used to copy data for BY VALUE params
 	* common.c,common.h: added 'cob_get_hase_name' used to create has value
