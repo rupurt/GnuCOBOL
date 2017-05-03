@@ -3305,7 +3305,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				case '+':
 				case '-':
 				case '*':
-					sprintf(result,"%lld",rslt);
+					sprintf(result, CB_FMT_LLD, rslt);
 					return cb_build_numeric_literal (0, result, rscale);
 					break;
 				case '/':
@@ -3314,13 +3314,13 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						break;
 					}
 					if(rslt != 0) {
-						sprintf(result,"%lld",rslt);
+						sprintf(result, CB_FMT_LLD, rslt);
 						return cb_build_numeric_literal (0, result, rscale);
 					}
 					if (xl->scale != 0 || yl->scale != 0)
 						break;
 					if((xval % yval) == 0) {
-						sprintf(result,"%lld",xval / yval);
+						sprintf(result, CB_FMT_LLD, xval / yval);
 						return cb_build_numeric_literal (0, result, rscale);
 					}
 					break;
@@ -3332,7 +3332,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						strcpy(result,"1");
 					} else {
 						errno = 0;
-						sprintf(result,"%lld",(cob_s64_t)pow((double)xval,(double)yval));
+						sprintf(result, CB_FMT_LLD,(cob_s64_t)pow((double)xval,(double)yval));
 						if(errno != 0)	/* 'pow' raised some error */
 							break;
 					}
