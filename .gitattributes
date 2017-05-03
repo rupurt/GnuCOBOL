@@ -114,7 +114,6 @@ doc/Makefile.in eol=lf
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
 doc/gnucobol.texi eol=lf
-doc/mdate-sh eol=lf
 doc/stamp-vti eol=lf
 doc/version.texi eol=lf
 extras/Makefile.am eol=lf
