@@ -662,6 +662,7 @@ chk_field_variable_size (struct cb_field *f)
 	return NULL;
 }
 
+/* Check if previous field on current or higher level has variable size */
 static unsigned int
 chk_field_variable_address (struct cb_field *fld)
 {
@@ -694,7 +695,7 @@ output_base (struct cb_field *f, const cob_u32_t no_output)
 	struct cb_field		*v;
 	struct base_list	*bl;
 
-	if (f->flag_item_78) {
+	if (unlikely(f->flag_item_78)) {
 		cobc_abort_pr (_("Unexpected CONSTANT item"));
 		COBC_ABORT ();
 	}
@@ -794,6 +795,8 @@ output_data (cb_tree x)
 	struct cb_literal	*l;
 	struct cb_reference	*r;
 	struct cb_field		*f;
+	struct cb_field		*o_slide;
+	struct cb_field		*o;
 	cb_tree			lsub;
 
 	switch (CB_TREE_TAG (x)) {
@@ -817,12 +820,31 @@ output_data (cb_tree x)
 		/* Subscripts */
 		if (r->subs) {
 			lsub = r->subs;
+			o_slide = NULL;
 			for (; f && lsub; f = f->parent) {
+				/* add current field size for OCCURS */
 				if (f->flag_occurs) {
-					output (" + ");
-					if (f->size != 1) {
-						output ("%d * ", f->size);
+					/* recalculate size for nested ODO ... */
+					if (unlikely(o_slide)) {
+						for (o = o_slide; o; o = o->children) {
+							if (o->depending) {
+								output (" + (%d * ", o->size);
+								output_integer (o->depending);
+								output (")");
+							}
+						}
+						output (" * ");
+					} else {
+					/* ... use field size otherwise */
+						output (" + ");
+						if (f->size != 1) {
+							output ("%d * ", f->size);
+						}
 					}
+					if (cb_flag_odoslide && f->depending) {
+						o_slide = f;
+					}
+
 					output_index (CB_VALUE (lsub));
 					lsub = CB_CHAIN (lsub);
 				}
@@ -897,9 +919,8 @@ output_size (const cb_tree x)
 		} else {
 			p = chk_field_variable_size (f);
 			q = f;
-
 again:
-			if (!cb_flag_odoslide && p && p->flag_odo_item) {
+			if (!cb_flag_odoslide && p && p->flag_odo_relative) {
 				q = p;
 				output ("%d", p->size * p->occurs_max);
 			} else if (p && (!r->flag_receiving ||
@@ -909,6 +930,19 @@ again:
 					output ("%d + ", p->offset - q->offset);
 				}
 				if (p->size != 1) {
+#if 0 /* draft from Simon - 
+		 works only if the ODOs are directly nested and
+		 have no "sister" elements,
+		 the content would only be correct if -fodoslide
+		 is active as we need a temporary field otherwise */
+					/* size for nested ODO */
+					if (p->odo_level > 1) {
+						output_integer (p->depending);
+						output (" * ");
+						p = q;
+						goto again;
+					}
+#endif
 					output ("%d * ", p->size);
 				}
 				output_integer (p->depending);

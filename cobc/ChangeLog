@@ -268,6 +268,38 @@
 	* pplex.l, config.def: reverted [r605]. Marked continuation of COBOL
 	  words as archaic in standard-conforming implementations.
 
+2016-01-01  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* tree.h: remove flag_odo_item, add odo_level instead
+	* parser.y (integer): return numeric literal -1 instead of cb_int1 for
+	  incorrect numerical literals
+	* parser.y: add check OCCURS max. must be greater than OCCURS min.
+	* typeck.c: compute odo_level in (cb_validate_program_data),
+	  add check for nested ODO to (cb_validate_one)
+
+2015-12-28  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	part fixed bug #177 - added missing ODO checks for subordinate items
+	* tree.h: renamed flag_odo_item to flag_odo_relative, add new flag_odo_item
+	* typeck.c, codegen.c: adjustments for changes to tree.h
+	* typeck.c (cb_validate_program_data): set flag_odo_item for ODO parents
+	* typeck.c (cb_build_identifier): generate cob_check_odo for all sub-items
+	  of items with flag_odo_item (instead of only for ODO fields of itself)
+
+2015-12-26  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	part fixed bug #177 - added missing ODO checks for subordinate items
+	* typeck.c (cb_validate_program_data): set flag_odo_item for ODO parents
+	* typeck.c (cb_build_identifier): generate cob_check_odo for all sub-items
+	  of items with flag_odo_item (instead of only for ODO fields of itself)
+	* tree.h, codegen.c: adjustments for changes to typeck.c
+
+2015-12-25  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	fixed bug #172 - NESTED OCCURS with DEPENDING not working
+	* field.c (validate_field_1): allow nested ODO with complex-odo = yes
+	* codegen.c (output_data): recalculate size for nested ODO by -fodoslide
+
 2015-12-24  Edward Hart <edward.dan.hart@gmail.com>
 
 	* parser.y: added checks of number of args passed to
@@ -323,8 +355,8 @@
 
 2015-08-30  Ron Norman
 
-	* In tree.c, for binary operations between integer constants, resolve 
-	  the value at compile time and reduce the expression down to the 
+	* In tree.c, for binary operations between integer constants, resolve
+	  the value at compile time and reduce the expression down to the
 	  computed value
 
 2015-08-19  Ron Norman
