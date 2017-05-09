@@ -176,6 +176,7 @@ po/gnucobol.pot -text
 po/insert-header.sin -text
 po/ja.po -text
 po/nl.po -text
+po/pt.po -text
 po/quot.sed -text
 po/remove-potcdate.sin -text
 po/stamp-po -text
