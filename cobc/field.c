@@ -1,7 +1,6 @@
 /*
-   Copyright (C) 2001-2012, 2014-2016 Free Software Foundation, Inc.
-   Written by Keisuke Nishida, Roger While, Simon Sobisch
-   Copyright (C) 2013-2015 Ron Norman
+   Copyright (C) 2001-2017 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
 
@@ -547,20 +546,22 @@ validate_field_1 (struct cb_field *f)
 
 	/* Validate OCCURS DEPENDING */
 	if (f->depending) {
-		/* The data item that contains a OCCURS DEPENDING clause shall not
-		   be subordinate to a data item that has an OCCURS clause */
-		for (p = f->parent; p; p = p->parent) {
-			if (p->flag_occurs) {
-				cb_error_x (CB_TREE (p),
-					    _("'%s' cannot have the OCCURS clause due to '%s'"),
-					    cb_name (CB_TREE (p)),
-					    cb_name (x));
-				break;
-			}
-		}
-
 		/* Cache field for later checking */
 		cb_depend_check = cb_list_add (cb_depend_check, x);
+
+		if (!cb_complex_odo) {
+			/* The data item that contains a OCCURS DEPENDING clause shall not
+			   be subordinate to a data item that has an OCCURS clause */
+			for (p = f->parent; p; p = p->parent) {
+				if (p->flag_occurs) {
+					cb_error_x (CB_TREE (p),
+							_("'%s' cannot have the OCCURS clause due to '%s'"),
+							cb_name (CB_TREE (p)),
+							cb_name (x));
+					break;
+				}
+			}
+		}
 	}
 
 	/* Validate REDEFINES */

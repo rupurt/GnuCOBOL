@@ -694,8 +694,8 @@ struct cb_field {
 	int			memory_size;	/* Memory size */
 	int			compx_size;	/* Original COMP-X byte size */
 	int			offset;		/* Byte offset from 01 level */
-	int			occurs_min;	/* OCCURS <max> */
-	int			occurs_max;	/* or OCCURS <min> TO <max> */
+	int			occurs_min;	/* OCCURS <max> (without <min> TO )*/
+	int			occurs_max;	/* OCCURS <min> TO <max> */
 	int			indexes;	/* Indices count (OCCURS) */
 
 	int			count;		/* Reference count */
@@ -711,6 +711,9 @@ struct cb_field {
 	int			step_count;	/* STEP in REPORT */
 	int			next_group_line;/* NEXT GROUP [PLUS] line */
 	unsigned int		vaddr;		/* Variable address cache */
+	unsigned int		odo_level;	/* ODO level (0 = no ODO item)
+									   could be direct ODO (check via depending) 
+									   or via subordinate) */
 	cob_u32_t		special_index;	/* Special field */
 
 	enum cb_storage		storage;	/* Storage section */
@@ -751,7 +754,8 @@ struct cb_field {
 
 	unsigned int flag_vsize_done	: 1;	/* Variable size cached */
 	unsigned int flag_vaddr_done	: 1;	/* Variable address cached */
-	unsigned int flag_odo_item	: 1;	/* ODO item */
+	unsigned int flag_odo_relative	: 1;	/* complex-odo: item address depends
+											on size of a different (ODO) item */
 	unsigned int flag_field_debug	: 1;	/* DEBUGGING */
 	unsigned int flag_all_debug	: 1;	/* DEBUGGING */
 	unsigned int flag_no_field	: 1;	/* SCREEN dummy field */
