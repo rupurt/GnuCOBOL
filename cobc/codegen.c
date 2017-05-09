@@ -648,6 +648,7 @@ chk_field_variable_size (struct cb_field *f)
 	}
 	for (fc = f->children; fc; fc = fc->sister) {
 		if (fc->depending) {
+			/* FIXME: does only cater for one ODO, not for the extension nested ones */
 			f->vsize = fc;
 			f->flag_vsize_done = 1;
 			return fc;
@@ -924,8 +925,7 @@ again:
 				q = p;
 				output ("%d", p->size * p->occurs_max);
 			} else if (p && (!r->flag_receiving ||
-				   !cb_field_subordinate (cb_code_field (p->depending),
-							  q))) {
+				   !cb_field_subordinate (cb_code_field (p->depending), q))) {
 				if (p->offset - q->offset > 0) {
 					output ("%d + ", p->offset - q->offset);
 				}
@@ -934,7 +934,8 @@ again:
 		 works only if the ODOs are directly nested and
 		 have no "sister" elements,
 		 the content would only be correct if -fodoslide
-		 is active as we need a temporary field otherwise */
+		 is active as we need a temporary field otherwise
+		 see FR #99 */
 					/* size for nested ODO */
 					if (p->odo_level > 1) {
 						output_integer (p->depending);

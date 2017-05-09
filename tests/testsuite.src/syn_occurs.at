@@ -58,7 +58,7 @@ prog.cob: 9: Error: Level 66 item 'X-66' can only have a RENAMES clause
 AT_CLEANUP
 
 AT_SETUP([OCCURS with variable-occurrence data item])
-AT_KEYWORDS([nested occurs extensions])
+AT_KEYWORDS([nested occurs depending extensions])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -91,12 +91,10 @@ AT_DATA([prog2.cob], [
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob: 7: Error: 'G-2' cannot have the OCCURS clause due to 'X'
 ])
-
 AT_CHECK([$COMPILE_ONLY -cb_conf=complex-odo:yes prog.cob], [0], [], [])
 
 AT_CHECK([$COMPILE_ONLY -cb_conf=complex-odo:yes prog2.cob], [1], [],
-[prog2.cob: 12: Error: 'Reference to item containing nested ODO' not implemented
-prog2.cob: 13: Error: 'Reference to item containing nested ODO' not implemented
+[prog2.cob: 8: Error: 'X' cannot have OCCURS DEPENDING
 ])
 
 AT_CLEANUP
