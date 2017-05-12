@@ -3604,14 +3604,14 @@ cob_sys_sleep_msec (unsigned int msecs)
 #endif
 
 	if (msecs > 0) {
-#ifdef	_WIN32
-		Sleep (msecs);
-#elif	defined(__370__) || defined(__OS400__)
-		sleep ((msecs+1000-1)/1000);
-#elif	defined(HAVE_NANO_SLEEP)
+#ifdef	HAVE_NANO_SLEEP
 		tsec.tv_sec = msecs / 1000;
 		tsec.tv_nsec = (msecs % 1000) * 1000000;
 		nanosleep (&tsec, NULL);
+#elif	defined(_WIN32)
+		Sleep (msecs);
+#elif	defined(__370__) || defined(__OS400__)
+		sleep ((msecs+1000-1)/1000);
 #else
 		sleep ((msecs+1000-1)/1000);
 #endif
