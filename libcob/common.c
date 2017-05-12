@@ -264,7 +264,7 @@ static char	fixrel_dflt[8] = "gc";	/* Default Fixed length Relative file format 
 /*
  * Table of possible environment variables and/or runtime.cfg parameters
    Env Var name, Name used in run-time config file, Default value (NULL for aliases), Table of Alternate values,
-   Grouping for display of run-time options, Data type, Location within structure, Length of referenced field,
+   Grouping for display of run-time options, Data type, Location within structure (adds computed length of referenced field),
    Set by which runtime.cfg file, value set by a different keyword,
    optional: Minimum accepted value, Maximum accepted value
  */
@@ -293,6 +293,7 @@ static struct config_tbl gc_conf[] = {
 	{"COB_STATS_RECORD","stats_record",	NULL,	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_stats_record)},
 	{"COB_STATS_FILE","stats_file",		NULL,	NULL,GRP_MISC,ENV_FILE,SETPOS(cob_stats_filename)},
 #ifdef  _WIN32
+	/* checked before configuration load if set from environment in cob_init() */
 	{"COB_UNIX_LF","unix_lf",		"0",	NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_unix_lf)},
 #endif
 	{"USERNAME","username",			"Unknown",	NULL,GRP_SYSENV,ENV_STR,SETPOS(cob_user_name)},
@@ -3604,7 +3605,7 @@ cob_sys_sleep_msec (unsigned int msecs)
 #endif
 
 	if (msecs > 0) {
-#ifdef	HAVE_NANO_SLEEP
+#if	defined(HAVE_NANO_SLEEP)
 		tsec.tv_sec = msecs / 1000;
 		tsec.tv_nsec = (msecs % 1000) * 1000000;
 		nanosleep (&tsec, NULL);
@@ -5250,7 +5251,7 @@ set_config_val(char *value, int pos)
 
 /* Set runtime setting by name with given value */
 static int					/* returns 1 if any error, else 0 */
-set_config_val_by_name(char *value, const char *name, const char *func)
+set_config_val_by_name (char *value, const char *name, const char *func)
 {
 	int	i;
 	int ret = 1;
@@ -5258,9 +5259,11 @@ set_config_val_by_name(char *value, const char *name, const char *func)
 	for (i = 0; i < NUM_CONFIG; i++) {
 		if (!strcmp(gc_conf[i].conf_name,name)) {
 			ret = set_config_val(value, i);
-			gc_conf[i].data_type |= STS_FNCSET;
-			gc_conf[i].set_by = FUNC_NAME_IN_DEFAULT;
-			gc_conf[i].default_val = func;
+			if (func) {
+				gc_conf[i].data_type |= STS_FNCSET;
+				gc_conf[i].set_by = FUNC_NAME_IN_DEFAULT;
+				gc_conf[i].default_val = func;
+			}
 			break;
 		}
 	}
@@ -5269,7 +5272,7 @@ set_config_val_by_name(char *value, const char *name, const char *func)
 
 /* Return setting value as a 'string' */
 static char *
-get_config_val(char *value, int pos, char *orgvalue)
+get_config_val (char *value, int pos, char *orgvalue)
 {
 	void 	*data;
 	char	*str;
@@ -6177,11 +6180,6 @@ cob_init (const int argc, char **argv)
 	}
 #endif
 
-	/* Load runtime configuration file */
-	if (unlikely(cob_load_config() < 0)) {
-		cob_stop_run (1);
-	}
-
 #ifdef	ENABLE_NLS
 	localedir = getenv("LOCALEDIR");
 	if (localedir != NULL) {
@@ -6193,12 +6191,22 @@ cob_init (const int argc, char **argv)
 #endif
 
 #ifdef	_WIN32
+	/* cob_unix_lf needs to be set before configuration load, 
+	   possible error messages would have wrong line endings otherwise */
+	if ((s = getenv("COB_UNIX_LF")) != NULL) {
+		set_config_val_by_name (s, "unix_lf", NULL);
+	}
 	if (cobsetptr->cob_unix_lf) {
 		(void)_setmode (_fileno (stdin), _O_BINARY);
 		(void)_setmode (_fileno (stdout), _O_BINARY);
 		(void)_setmode (_fileno (stderr), _O_BINARY);
 		}
 #endif
+
+	/* Load runtime configuration file */
+	if (unlikely(cob_load_config() < 0)) {
+		cob_stop_run (1);
+	}
 
 	/* Call inits with cobsetptr to get the adresses of all */
 	/* Screen-IO might be needed for error outputs */
