@@ -1375,6 +1375,9 @@ AT_CLEANUP
 AT_SETUP([SORT with SD, I/O SEQUENTIAL])
 AT_KEYWORDS([runfile using giving])
 
+# Note: We shouldn't use AT_DATA to create sequential record
+# data, because AT_DATA needs a \n at the end
+
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
@@ -1394,8 +1397,7 @@ AT_DATA([prog.cob], [
        01 WRK-REC       PIC X(6).
        PROCEDURE        DIVISION.
 
-      * We shouldn't use AT_DATA to create sequential record
-      * data, because AT_DATA needs a \n at the end
+      * Special case: write test data in COBOL, see note above
            OPEN OUTPUT SORT-IN.
            WRITE IN-REC FROM SPACES   END-WRITE.
            WRITE IN-REC FROM SPACES   END-WRITE.
@@ -1423,6 +1425,9 @@ AT_CLEANUP
 AT_SETUP([SORT with SD, I/O LINE SEQUENTIAL])
 AT_KEYWORDS([runfile using giving])
 
+# Note: We shouldn't use AT_DATA to create sequential record
+# data, because AT_DATA needs a \n at the end
+
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
@@ -1444,8 +1449,7 @@ AT_DATA([prog.cob], [
        01 WRK-REC       PIC X(6).
        PROCEDURE        DIVISION.
 
-      * We shouldn't use AT_DATA to create sequential record
-      * data, because AT_DATA needs a \n at the end
+      * Special case: write test data in COBOL, see note above
            OPEN OUTPUT SORT-IN.
            WRITE IN-REC FROM SPACES   END-WRITE.
            WRITE IN-REC FROM SPACES   END-WRITE.
@@ -1505,8 +1509,8 @@ AT_DATA([prog.cob], [
        01 sort-entry    PIC X(6).
        PROCEDURE        DIVISION.
 
-      * We shouldn't use : > to create sequential record
-      * data, because : > needs a \n at the end
+      * We can use normal test data as we want to
+      * create a line sequential file.
       *     OPEN OUTPUT SORT-IN.
       *     WRITE IN-REC FROM SPACES   END-WRITE.
       *     WRITE IN-REC FROM "world " END-WRITE.

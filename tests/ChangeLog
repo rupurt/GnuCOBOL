@@ -1,4 +1,9 @@
 
+2017-02-20  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* testsuite.src/run_file.at: fixed generation with old autoconf
+	  that trips on the string AT_DATA in AT_DATA definitions
+
 2016-12-30  Ron Norman <rjn@inglenet.com>
 
 	* run_file.at: Add test cases for fiel SHARING/RETRY 
@@ -28,6 +33,9 @@
 
 	* atlocal.in: pass COB_HAS_UTC_OFFSET, set PATHSEP and COB_HAS_CURSES
 	  for MinGW
+	* testsuite.src/run_misc.at: define NULL if needed
+  * testsuite.src/configuration.at: evaluate PATHSEP
+
 
 2016-09-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

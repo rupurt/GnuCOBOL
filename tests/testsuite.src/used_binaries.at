@@ -1,4 +1,4 @@
-## Copyright (C) 2014-2015 Free Software Foundation, Inc.
+## Copyright (C) 2014-2016 Free Software Foundation, Inc.
 ## Written by Simon Sobisch, Brian Tiffin
 ##
 ## This file is part of GnuCOBOL.
@@ -44,7 +44,7 @@ AT_CLEANUP
 
 
 AT_SETUP([Source file not found])
-AT_KEYWORDS([runmisc])
+AT_KEYWORDS([cobc runmisc])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [cobc: prog.cob: No such file or directory
@@ -79,7 +79,7 @@ AT_DATA([prog.cob], [
            EXIT PROGRAM.
 ])
 
-AT_CHECK([$COMPILE "$(_return_path "$(pwd)/prog.cob")"], [0], , [])
+AT_CHECK([$COMPILE "$(_return_path "$(pwd)/prog.cob")"], [0], [], [])
 AT_CHECK([./prog], [0], [OK], [])
 
 AT_CLEANUP
@@ -118,8 +118,8 @@ AT_DATA([caller.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_MODULE callee.cob], [0], , [])
-AT_CHECK([$COMPILE_MODULE caller.cob], [0], , [])
+AT_CHECK([$COMPILE_MODULE callee.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE caller.cob], [0], [], [])
 AT_CHECK([$COBCRUN caller], [0], [HelloWorld])
 
 AT_CLEANUP
