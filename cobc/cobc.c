@@ -2872,8 +2872,6 @@ line_contains (char* line_start, char* line_end, char* search_patterns) {
 	}
 
 	return 0;
-}
-#endif
 
 /** -j run job after build */
 static int
@@ -2892,7 +2890,7 @@ process_run (const char *name) {
 			file_basename(name));
 	} else {  /* executable */
 		snprintf (cobc_buffer, cobc_buffer_size, ".%c%s",
-			SLASH_INT, name);
+			SLASH_CHAR, name);
 	}
 	if (verbose_output) {
 		cobc_cmd_print (cobc_buffer);
@@ -2905,6 +2903,8 @@ process_run (const char *name) {
 	}
 	return ret;
 }
+}
+#endif
 
 #ifdef	__OS400__
 static int
@@ -3315,11 +3315,15 @@ preprocess (struct filename *fn)
 		cobc_terminate (fn->preprocess);
 	}
 
+#if 0 /* include when DASH is included */
 	if (fn->file_is_stdin) {
 		sourcename = COB_DASH;
 	} else {
 		sourcename = fn->source;
 	}
+#else
+	sourcename = fn->source;
+#endif
 	if (ppopen (sourcename, NULL) != 0) {
 		fclose (ppout);
 		ppout = NULL;
