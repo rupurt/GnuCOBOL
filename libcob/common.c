@@ -4266,10 +4266,10 @@ cob_sys_getpid (void)
 int
 cob_sys_fork (void)
 {
-#ifdef	_WIN32  /* cygwin does not define _WIN32, but implements fork() */
-	cob_runtime_warning (_("'%s' is not supported on this platform"), "CBL_GC_FORK");
-	return -1;
-#else
+ /* cygwin does not define _WIN32, but implements [slow] fork() and provides unistd.h
+    MSYS defines _WIN32, provides unistd.h and not implements fork()
+ */
+#if defined	(HAVE_UNISTD_H) && !(defined (_WIN32))
 	int	pid;
 	if ( (pid = fork()) == 0 ) {
 		cob_fork_fileio (cobglobptr, cobsetptr);
@@ -4280,6 +4280,9 @@ cob_sys_fork (void)
 		return -2;
 	}
 	return pid;			/* parent gets process id of child */
+#else
+	cob_runtime_warning (_("'%s' is not supported on this platform"), "CBL_GC_FORK");
+	return -1;
 #endif
 }
 
@@ -4327,11 +4330,15 @@ cob_sys_waitpid (const void *p_id)
 			status = 0 - ERROR_INVALID_DATA;
 			return status;
 		}
+#if defined(PROCESS_QUERY_LIMITED_INFORMATION)
 		process = OpenProcess (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
 #if 0  /* TODO: check what happens on WinXP / 2003 as PROCESS_QUERY_LIMITED_INFORMATION isn't available there */
 		if (!process && GetLastError () == UNKNOWN_CONSTANT) {
 			OpenProcess (SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid);
 		}
+#endif
+#else
+		process = OpenProcess (SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid);
 #endif
 		/* if we don't get access to query the process' exit status try to get at least
 			access to the process end (needed for WaitForSingleObject)

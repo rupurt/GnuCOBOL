@@ -1340,6 +1340,7 @@ cobc_getenv_path (const char *env)
 	if(strchr(p,PATHSEP_CHAR) != NULL) {
 		cb_error (_("Environment '%s' is '%s'. Should not contain '%c'"), env, p, PATHSEP_CHAR);
 		cobc_abort_terminate ();
+		/* NOT REACHED */
 		return NULL;
 	}
 	return cobc_main_strdup (p);

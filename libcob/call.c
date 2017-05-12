@@ -1636,7 +1636,7 @@ cob_put_s64_param ( int n, cob_s64_t val )
 	cbldata = f->data;
 	size    = f->size;
 	if (COB_FIELD_CONSTANT(f)) {
-		cob_runtime_warning (_("%s: attempt to over-write constant param %d with %lld"),
+		cob_runtime_warning (_("%s: attempt to over-write constant param %d with " CB_FMT_LLD),
 						"cob_put_s64_param",n,val);
 		return;
 	}
@@ -1691,7 +1691,7 @@ cob_put_u64_param ( int n, cob_u64_t val )
 	cbldata = f->data;
 	size    = f->size;
 	if (COB_FIELD_CONSTANT(f)) {
-		cob_runtime_warning (_("%s: attempt to over-write constant param %d with %lld"),
+		cob_runtime_warning (_("%s: attempt to over-write constant param %d with " CB_FMT_LLD),
 							"cob_put_u64_param",n,val);
 		return;
 	}
