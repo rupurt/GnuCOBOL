@@ -3068,7 +3068,7 @@ check_current_date()
 	int	yr,mm,dd,hh,mi,ss;
 	int	i,j;
 	time_t	t;
-	struct tm tim[1];
+	struct tm *tim;
 
 	if(cobsetptr == NULL
 	|| cobsetptr->cob_date == NULL) {
@@ -3150,7 +3150,7 @@ check_current_date()
 	cobsetptr->cob_cminute	= mi;
 	cobsetptr->cob_csecond	= ss;
 	time(&t);
-	localtime_r( &t, tim );
+	tim = localtime (&t);
 	tim->tm_sec	= ss;
 	tim->tm_min	= mi;
 	tim->tm_hour	= hh;
