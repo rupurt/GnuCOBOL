@@ -779,7 +779,9 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 
 	/* Check for BOM - *not* for input from stdin as rewind() clears the input
 	  buffer if used on stdin and output in console has normally no BOM at all */
+#if 0 /* include when DASH is included */
 	if (strcmp(name, COB_DASH) != 0) {
+#endif
 		if (fread (bom, 3, 1, ppin) == 1) {
 			if (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
 				rewind (ppin);
@@ -787,7 +789,9 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 		} else {
 			rewind (ppin);
 		}
+#if 0 /* include when DASH is included */
 	}
+#endif
 
 	/* Preserve the current buffer */
 	p = cobc_malloc (sizeof (struct copy_info));
