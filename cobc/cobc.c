@@ -179,6 +179,7 @@ int			cb_flag_main = 0;
 int			cobc_wants_debug = 0;
 int			cb_flag_functions_all = 0;
 int			cb_flag_dump = 0;
+int			cb_unix_lf = 0;
 
 int			errorcount = 0;
 int			warningcount = 0;
@@ -3310,7 +3311,11 @@ preprocess (struct filename *fn)
 
 	errorcount = 0;
 
-	ppout = fopen (fn->preprocess, "w");
+	if (cb_unix_lf) {
+		ppout = fopen(fn->preprocess, "wb");
+	} else {
+		ppout = fopen(fn->preprocess, "w");
+	}
 	if (!ppout) {
 		cobc_terminate (fn->preprocess);
 	}
@@ -3342,7 +3347,11 @@ preprocess (struct filename *fn)
 	}
 
 	if (cobc_gen_listing && !cobc_list_file) {
-		cb_listing_file = fopen (fn->listing_file, "w");
+		if (cb_unix_lf) {
+			cb_listing_file = fopen (fn->listing_file, "wb");
+		} else {
+			cb_listing_file = fopen (fn->listing_file, "w");
+		}
 		if (!cb_listing_file) {
 			cobc_terminate (fn->listing_file);
 		}
@@ -3524,14 +3533,22 @@ process_translate (struct filename *fn)
 	}
 
 	/* Open the output file */
-	yyout = fopen (fn->translate, "w");
+	if (cb_unix_lf) {
+		yyout = fopen (fn->translate, "wb");
+	} else {
+		yyout = fopen (fn->translate, "w");
+	}
 	if (!yyout) {
 		cobc_terminate (fn->translate);
 	}
 
 	/* Open the common storage file */
 	cb_storage_file_name = fn->trstorage;
-	cb_storage_file = fopen (cb_storage_file_name, "w");
+	if (cb_unix_lf) {
+		cb_storage_file = fopen (cb_storage_file_name, "wb");
+	} else {
+		cb_storage_file = fopen (cb_storage_file_name, "w");
+	}
 	if (!cb_storage_file) {
 		cobc_terminate (cb_storage_file_name);
 	}
@@ -3549,7 +3566,11 @@ process_translate (struct filename *fn)
 		} else {
 			sprintf (lf->local_name, "%s.l%d.h", fn->translate, ret);
 		}
-		lf->local_fp = fopen (lf->local_name, "w");
+		if (cb_unix_lf) {
+			lf->local_fp = fopen (lf->local_name, "wb");
+		} else {
+			lf->local_fp = fopen (lf->local_name, "w");
+		}
 		if (!lf->local_fp) {
 			cobc_terminate (lf->local_name);
 		}
@@ -4308,7 +4329,11 @@ main (int argc, char **argv)
 #ifdef	_WIN32
 	/* Allows running tests under Win */
 	p = getenv ("COB_UNIX_LF");
-	if (p && (*p == 'Y' || *p == 'y' || *p == '1')) {
+	if (p && (*p == 'Y' || *p == 'y' ||
+		*p == 'O' || *p == 'o' ||
+		*p == 'T' || *p == 't' || 
+		*p == '1')) {
+		cb_unix_lf = 1;
 		(void)_setmode (_fileno (stdin), _O_BINARY);
 		(void)_setmode (_fileno (stdout), _O_BINARY);
 		(void)_setmode (_fileno (stderr), _O_BINARY);
@@ -4569,7 +4594,11 @@ main (int argc, char **argv)
 
 	/* If -P=file specified, all lists go to this file */
 	if (cobc_list_file) {
-		cb_listing_file = fopen (cobc_list_file, "w");
+		if (cb_unix_lf) {
+			cb_listing_file = fopen (cobc_list_file, "wb");
+		} else {
+			cb_listing_file = fopen (cobc_list_file, "w");
+		}
 		if (!cb_listing_file) {
 			cobc_terminate (cobc_list_file);
 		}
