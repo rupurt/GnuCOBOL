@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol/bin
 #
-# Copyright (C) 2001-2012, 2014 Free Software Foundation, Inc.
+# Copyright (C) 2001-2012, 2014, 2017 Free Software Foundation, Inc.
 # Written by Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -28,6 +28,8 @@ dist_man_MANS = cobcrun.1
 AM_LDFLAGS = $(COB_EXPORT_DYN)
 cobcrun_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)
 cobcrun_LDADD = $(top_builddir)/lib/libsupport.a $(top_builddir)/libcob/libcob.la
+gcdiff_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)
+gcdiff_LDADD = $(top_builddir)/lib/libsupport.a $(top_builddir)/libcob/libcob.la
 
 cobcrun.1: cobcrun.c $(top_srcdir)/configure.ac
 	$(MAKE) $(AM_MAKEFLAGS) cobcrun$(EXEEXT)
