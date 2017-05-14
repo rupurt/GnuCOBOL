@@ -1,4 +1,4 @@
-## Copyright (C) 2003-2012, 2014-2015 Free Software Foundation, Inc.
+## Copyright (C) 2003-2012, 2014-2015, 2017 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart, Ron Norman
 ## 
 ## This file is part of GnuCOBOL.
@@ -3558,7 +3558,7 @@ AT_CLEANUP
 
 
 AT_SETUP([Numeric operations (7)])
-AT_KEYWORDS([fundamental add compute])
+AT_KEYWORDS([fundamental add compute literal])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -3848,3 +3848,190 @@ AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
 
+
+AT_SETUP([Numeric operations (8)])
+AT_KEYWORDS([fundamental compute literal])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+          1 COMPUTE-DATA.
+           2 COMPUTE-8             PICTURE 999       VALUE ZERO.
+       PROCEDURE        DIVISION.
+           COMPUTE COMPUTE-8 = (((24.0 + 1) * (60 - 10)) / 125) ** 2
+           IF COMPUTE-8 NOT = 100
+              DISPLAY 'COMPUTE with wrong result: ' COMPUTE-8
+              END-DISPLAY
+           END-IF
+           COMPUTE COMPUTE-8 = 55 / (1 - 2 + 1)
+              NOT ON SIZE ERROR
+                 DISPLAY 'SIZE ERROR not set from divide by zero!'
+                 END-DISPLAY
+           END-COMPUTE
+           COMPUTE COMPUTE-8 = 0 ** 1
+           IF COMPUTE-8 NOT = 0
+              DISPLAY '0 ** 1 <> 0: ' COMPUTE-8
+              END-DISPLAY
+           END-IF
+           COMPUTE COMPUTE-8 = 55 ** 0
+           IF COMPUTE-8 NOT = 1
+              DISPLAY '55 ** 0 <> 1: ' COMPUTE-8
+              END-DISPLAY
+           END-IF
+           COMPUTE COMPUTE-8 = 1 ** 55
+           IF COMPUTE-8 NOT = 1
+              DISPLAY '11 ** 55 <> 1: ' COMPUTE-8
+              END-DISPLAY
+           END-IF
+           
+           GOBACK.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 14: warning: divide by constant ZERO
+])
+AT_CHECK([./prog], [0], [], [])
+
+AT_CLEANUP
+
+
+# CORRESPONDING
+
+AT_SETUP([ADD CORRESPONDING])
+AT_KEYWORDS([fundamental corresponding])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 GROUP-1.
+          05 FIELD-A           PIC 9 VALUE 1.
+          05 FIELD-B           USAGE BINARY-CHAR VALUE 2.
+          05 INNER-GROUP.
+             10 FIELD-C        USAGE FLOAT-SHORT VALUE 3.
+          05 FIELD-D           PIC X VALUE "A".
+       01 GROUP-2.
+          05 FIELD-A           PIC 9.
+          05 FIELD-B           USAGE BINARY-LONG.
+          05 INNER-GROUP.
+             10 FIELD-C        PIC 9.
+          05 FIELD-D           PIC 9.
+
+       PROCEDURE DIVISION.
+       ADD CORRESPONDING GROUP-1 TO GROUP-2.
+       IF FIELD-A IN GROUP-2 NOT EQUAL 1 THEN
+           DISPLAY "BAD FIELD-A " FIELD-A IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-B IN GROUP-2 NOT EQUAL 2 THEN
+           DISPLAY "BAD FIELD-B " FIELD-B IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-C IN GROUP-2 NOT EQUAL 3 THEN
+           DISPLAY "BAD FIELD-C " FIELD-C IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-D IN GROUP-2 NOT EQUAL 0 THEN
+           DISPLAY "BAD FIELD-D " FIELD-D IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0], [], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([ADD CORRESPONDING no match])
+AT_KEYWORDS([fundamental corresponding])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 GROUP-1.
+          05 FIELD-A           PIC X.
+          05 FIELD-B           PIC Z9.
+          05 INNER-GROUP.
+             10 FIELD-C        PIC X.
+          05 FIELD-D           PIC 9.
+       01 GROUP-2.
+          05 FIELD-A           PIC 9 VALUE 1.
+          05 FIELD-B           USAGE BINARY-CHAR VALUE 2.
+          05 INNER-GROUP.
+             10 FIELD-C        USAGE FLOAT-SHORT VALUE 3.
+          05 FIELD-D           PIC X VALUE "A".
+
+       PROCEDURE DIVISION.
+       SUBTRACT CORRESPONDING GROUP-2 FROM GROUP-1.
+       IF FIELD-A IN GROUP-2 NOT EQUAL 1 THEN
+           DISPLAY "BAD FIELD-A " FIELD-A IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-B IN GROUP-2 NOT EQUAL 2 THEN
+           DISPLAY "BAD FIELD-B " FIELD-B IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-C IN GROUP-2 NOT EQUAL 3 THEN
+           DISPLAY "BAD FIELD-C " FIELD-C IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       IF FIELD-D IN GROUP-2 NOT EQUAL "A" THEN
+           DISPLAY "BAD FIELD-D " FIELD-D IN GROUP-2
+           END-DISPLAY
+       END-IF.
+       STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [],
+[prog.cob: 20: warning: no CORRESPONDING items found
+])
+AT_CHECK([./prog], [0], [], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([SYNC in OCCURS])
+AT_KEYWORDS([fundamental SYNCHRONIZE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.     prog.
+
+       DATA            DIVISION.
+       WORKING-STORAGE SECTION.
+       01 x.
+           03  ptrs                     OCCURS 5 TIMES.
+               05  misalign-1           PIC X.
+               05  ptr                  POINTER, SYNC.
+               05  ptr-num              REDEFINES ptr,
+       >>IF P64 SET
+                                        USAGE BINARY-DOUBLE UNSIGNED.
+       >>ELSE
+                                        USAGE BINARY-LONG UNSIGNED.
+       >>END-IF
+               05  misalign-2           PIC X.
+
+       01  num                          BINARY-LONG.
+
+       PROCEDURE       DIVISION.
+           SET ptr (2) TO ADDRESS OF ptr (2)
+           SET ptr (3) TO ADDRESS OF ptr (3)
+
+           SUBTRACT ptr-num (2) FROM ptr-num (3) GIVING num
+           DISPLAY FUNCTION MOD (num, FUNCTION LENGTH (ptr (1)))
+           .
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([./prog], [0],
+[000000000
+])
+
+AT_CLEANUP
