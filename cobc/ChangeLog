@@ -1,18 +1,27 @@
 
-2017-05-01  Ron Norman
-	* parser.y,typeck.c,tree.h: Implement arithmetic-osvs for
+2017-05-14  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c (cb_build_binary_op): use integer arithmetic for compile
+	  time configuration instead of (pow)
+
+2017-05-01  Ron Norman <rjn@inglenet.com>
+
+	* parser.y, typeck.c, tree.h: Implement arithmetic-osvs for
 	 IF conditions; Compute intermediate results to precision
 	 of variables used in expression
 
-2017-05-01  Ron Norman
+2017-05-01  Ron Norman <rjn@inglenet.com>
+
 	* tree.c: Improved resolving constant expressions at compile time
 	          Now handles cases with decimal constants.
 
 2017-04-30  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c,typeck.c: Update to handle figurative constants on CALL;
 	   CALL xyz USING BY CONTENT ZERO and SPACES
 
 2017-04-27  Ron Norman <rjn@inglenet.com>
+
 	* tree.h: replaced 'flag_anylen_done' with 'flag_data_set'
 	* codegen.c: enhancements to handle ENTRY USING BY VALUE/CONTENT
 	Emit code to check if being called from COBOL or C by checking
@@ -28,6 +37,7 @@
 	* field.c: Specific error messages for ANY NUMERIC
 
 2017-04-04  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c:
 	  For LENGTH OF passed as parameter on CALL, build temporary
 	  field so that the internal field is passed as S9(9) COMP-4
@@ -35,6 +45,7 @@
 	  CALL parameters.
 
 2017-03-30  Ron Norman <rjn@inglenet.com>
+
 	* parser.y:  
 	  Fixed to allow ASCENDING/DESCENING and INDEXED BY
 	  to follow OCCURS in any order with -frelax-syntax
