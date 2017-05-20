@@ -3890,7 +3890,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob: 14: warning: divide by constant ZERO
+[prog.cob: 14: Warning: divide by constant ZERO
 ])
 AT_CHECK([./prog], [0], [], [])
 
@@ -3990,7 +3990,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob: 20: warning: no CORRESPONDING items found
+[prog.cob: 20: Warning: no CORRESPONDING items found
 ])
 AT_CHECK([./prog], [0], [], [])
 

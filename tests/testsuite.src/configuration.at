@@ -1,18 +1,18 @@
 ## Copyright (C) 2014-2016 Free Software Foundation, Inc.
 ## Written by Simon Sobisch
-## 
+##
 ## This file is part of GnuCOBOL.
-## 
+##
 ## The GnuCOBOL compiler is free software: you can redistribute it
 ## and/or modify it under the terms of the GNU General Public License
 ## as published by the Free Software Foundation, either version 3 of the
 ## License, or (at your option) any later version.
-## 
+##
 ## GnuCOBOL is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
 ## along with GnuCOBOL.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -436,7 +436,7 @@ AT_CHECK([$COBCRUN --runtime-conf], [0], ignore, [])
 # into two lines
 AT_CHECK([$COBCRUN --runtime-conf | tr -d '\n ' | \
 grep "runtime_empty.cfg"], [0], ignore, [])
-AT_CHECK([COB_RUNTIME_CONFIG="" $COBCRUN --runtime-conf | tr -d '\n ' \
+AT_CHECK([export COB_RUNTIME_CONFIG=""; $COBCRUN --runtime-conf | tr -d '\n ' \
 | grep "runtime.cfg"],
 [0], ignore, [])
 
@@ -460,7 +460,7 @@ setenv COB_PHYSICAL_CANCEL=true
 
 
 # check if default for physical cancel is still false
-AT_CHECK([$COBCRUN --runtime-conf |
+AT_CHECK([$COBCRUN --runtime-conf | \
 grep "COB_PHYSICAL_CANCEL" | grep "false" | grep "default"], [0], ignore, [])
 
 # check if override via -c works and if include works
@@ -550,7 +550,7 @@ defunc.cfg: 5: Invalid value 'big' for configuration tag 'varseq_format';
 	should be one of the following values: 0, 1, 2, 3, mf, gc, b4, b32, l4, l32
 defunc.cfg: 6: Invalid value '4K' for configuration tag 'sort_chunk';
 	minimum value: 131072
-defunc.cfg: 8: Invalid value '/tmp:/tmp' for configuration tag 'trace_file';
+defunc.cfg: 8: Invalid value '/tmp:/temp' for configuration tag 'trace_file';
 	should not contain ':'
 ])
 
@@ -641,7 +641,6 @@ AT_CHECK([echo "$PATHSEP"], [0], [;
 
 AT_CHECK([export COB_CONFIG_DIR="/temp:/tmp"; \
 $COMPILE prog.cob], [99], [],
-AT_CHECK([export COB_CONFIG_DIR=/temp:/tmp; $COMPILE prog.cob], [99], [], 
 [Error: Environment 'COB_CONFIG_DIR' is '/temp:/tmp'. Should not contain ':'
 ])
 
@@ -651,7 +650,6 @@ AT_CHECK([export COB_CONFIG_DIR=/temp:/tmp; $COMPILE prog.cob], [99], [],
 
 AT_CHECK([export COB_CONFIG_DIR="C:\temp;C:\tmp"; \
 $COMPILE prog.cob], [99], [],
-AT_CHECK([export COB_CONFIG_DIR=/temp:/tmp; $COMPILE prog.cob], [99], [], 
 [Error: Environment 'COB_CONFIG_DIR' is 'C:\temp;C:\tmp'. Should not contain ';'
 ])
 
