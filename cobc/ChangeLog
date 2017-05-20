@@ -1,4 +1,9 @@
 
+2017-05-20  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c,tree.c,tree.h,typeck.c,codeoptim.c: 
+	  Enhancements to handle nested OCCURS DEPENDING ON including -fodoslide
+
 2017-05-14  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c (cb_build_binary_op): use integer arithmetic for compile
