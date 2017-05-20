@@ -315,7 +315,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[prog.cob: 11: Warning: No CORRESPONDING items found
+[prog.cob: 11: Warning: no CORRESPONDING items found
 ])
 
 AT_CLEANUP

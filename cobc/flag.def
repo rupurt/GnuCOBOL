@@ -121,7 +121,7 @@ CB_FLAG (cb_flag_notrunc, 1, "notrunc",
 	 _("allow numeric field overflow\n\t\t\t- non-ANSI behaviour"))
 
 CB_FLAG (cb_flag_odoslide, 1, "odoslide",
-	 _("adjust items following OCCURS DEPENDING\n\t\t\t- requires implicit/explicit relaxed syntax"))
+	 _("adjust items following OCCURS DEPENDING"))
 
 CB_FLAG (cb_flag_apostrophe, 1, "single-quote",
 	 _("use a single quote (apostrophe) for QUOTE\n\t\t\t- default: double quote"))
