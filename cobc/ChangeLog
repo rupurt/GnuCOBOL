@@ -1,6 +1,11 @@
 
 2017-05-21  Ron Norman <rjn@inglenet.com>
 
+	* parser.y: Accept SET vars TO SIZE OF field
+	     and handle as MOVE LENGTH OF field TO vars
+	  
+2017-05-21  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c: create LENGTH OF field as unsigned
 	  
 2017-05-20  Ron Norman <rjn@inglenet.com>

@@ -8901,6 +8901,10 @@ set_to:
   {
 	cb_emit_set_to ($1, $3);
   }
+| target_x_list TO SIZE OF x
+  {
+	cb_emit_move (cb_build_length ($5), $1);
+  }
 ;
 
 /* SET name ... UP/DOWN BY expr */

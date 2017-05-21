@@ -5625,6 +5625,35 @@ libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 
 AT_CLEANUP
 
 
+AT_SETUP([SIZE OF])
+AT_KEYWORDS([LENGTH])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       01  TST    PIC X(10) VALUE "abcdefghij".
+       01  LN     PIC 99.
+
+       PROCEDURE DIVISION.
+           DISPLAY "LENGTH OF TST is " LENGTH OF TST UPON CONSOLE.
+           SET LN TO SIZE OF TST.
+           DISPLAY "SIZE OF TST is " LN UPON CONSOLE.
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -w prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [LENGTH OF TST is 10
+SIZE OF TST is 10
+], [])
+
+AT_CLEANUP
+
+
 AT_SETUP([Test dump feature])
 AT_KEYWORDS([Dump])
 
