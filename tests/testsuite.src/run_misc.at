@@ -5587,19 +5587,19 @@ CAPI called with 1 parameters
  1: COMP-4   BY VALUE     S9(9)       1;
 Now BY CONTENT LENGTH OF MYTAB;
 CAPI called with 1 parameters
- 1: COMP-4   BY VALUE     S9(9)       18;
+ 1: COMP-4   BY VALUE     9(9)        18;
 Now BY CONTENT LENGTH OF MYOCC;
 CAPI called with 1 parameters
  1: COMP-4   BY VALUE     S9(9)       4;
 Now LENGTH OF MYTAB;
 CAPI called with 1 parameters
- 1: COMP-4   BY VALUE     S9(9)       14;
+ 1: COMP-4   BY VALUE     9(9)        14;
 Now LENGTH OF MYOCC;
 CAPI called with 1 parameters
  1: COMP-4   BY VALUE     S9(9)       4;
 Now BY VALUE LENGTH OF MYTAB;
 CAPI called with 1 parameters
- 1: COMP-5   BY VALUE     S9(9)       10;
+ 1: COMP-5   BY VALUE     9(9)        10;
 Now BY VALUE LENGTH OF MYOCC;
 CAPI called with 1 parameters
  1: DISPLAY  BY VALUE     9(1)        4;
