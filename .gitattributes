@@ -168,9 +168,7 @@ po/POTFILES.in -text
 po/Rules-quot -text
 po/boldquot.sed -text
 po/en@boldquot.header -text
-po/en@boldquot.insert-header -text
 po/en@quot.header -text
-po/en@quot.insert-header -text
 po/es.po -text
 po/gnucobol.pot -text
 po/insert-header.sin -text
