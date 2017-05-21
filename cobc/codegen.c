@@ -1432,6 +1432,9 @@ output_attr (const cb_tree x)
 #endif
 					flags |= COB_FLAG_IS_FP;
 					break;
+				case CB_USAGE_LENGTH:
+					flags &= ~COB_FLAG_HAVE_SIGN;
+					break;
 				default:
 					break;
 				}
