@@ -120,10 +120,14 @@ pretty_display_numeric (cob_field *f, FILE *fp)
 	memset (q, 0, 256);
 #endif
 	if (COB_FIELD_HAVE_SIGN (f)) {
-		*p++ = '+';
-		i = 1;
-		memcpy (p, (unsigned char *)&i, sizeof(int));
-		p += sizeof(int);
+		if (COB_FIELD_SIGN_SEPARATE (f)
+		 && !COB_FIELD_SIGN_LEADING(f)) {
+		} else {
+			*p++ = '+';
+			i = 1;
+			memcpy (p, (unsigned char *)&i, sizeof(int));
+			p += sizeof(int);
+		}
 	}
 	if (scale > 0) {
 		i = digits - scale;
@@ -145,6 +149,15 @@ pretty_display_numeric (cob_field *f, FILE *fp)
 		i = digits;
 		memcpy (p, (unsigned char *)&i, sizeof(int));
 		p += sizeof(int);
+	}
+	if (COB_FIELD_HAVE_SIGN (f)) {
+		if (COB_FIELD_SIGN_SEPARATE (f)
+		 && !COB_FIELD_SIGN_LEADING(f)) {
+			*p++ = '+';
+			i = 1;
+			memcpy (p, (unsigned char *)&i, sizeof(int));
+			p += sizeof(int);
+		}
 	}
 	*p = 0;
 
