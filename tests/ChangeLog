@@ -1,4 +1,7 @@
 
+2017-05-22  Ron Norman <rjn@inglenet.com>
+	* testsuite.src: Updates to match mf.conf having 'pretty-display: yes'
+
 2017-05-20  Ron Norman <rjn@inglenet.com>
 	* testsuite.src/run_extensions.at: Test added for -fodoslide 
 

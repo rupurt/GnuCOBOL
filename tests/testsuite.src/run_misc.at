@@ -5073,12 +5073,12 @@ AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [])
 
 AT_CHECK([./prog], [0], [Zero subcript test
 UNUP: 00000000 is :CCCC:
-SNUP: 00000000+ is :CCCC:
-SBIN: +0000000000 is :CCCC:
-SBIN: -0000000001 is :BBBB:
-SBIN: -0000000001 is :xxx :
-UBIN: 0000000000 is :CCCC:
-UBIN: 0000000001 is :1111:
+SNUP: +00000000 is :CCCC:
+SBIN: +00000000 is :CCCC:
+SBIN: -00000001 is :BBBB:
+SBIN: -00000001 is :xxx :
+UBIN: 00000000 is :CCCC:
+UBIN: 00000001 is :1111:
 ], [])
 
 AT_CLEANUP
@@ -5580,7 +5580,7 @@ CAPI called with 1 parameters
 CAPI called with 0 parameters
 COMP3    is now 00004105;
 COMP4    is now 00001292;
-BINFLD5S is now +00001030;
+BINFLD5S is now +01030;
 CHRX     is now Hello!   ;
 NE       is now   514.07-;
 CAPI called with 1 parameters
