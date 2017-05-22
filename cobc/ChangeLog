@@ -1,4 +1,10 @@
 
+2017-05-22  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: create numeric literals with correct attributes
+	   COB_FLAG_HAVE_SIGN | COB_FLAG_SIGN_SEPARATE | COB_FLAG_SIGN_LEADING 
+	   As this is how the literal is coded in the COBOL code.
+	  
 2017-05-21  Ron Norman <rjn@inglenet.com>
 
 	* parser.y: Accept SET vars TO SIZE OF field
