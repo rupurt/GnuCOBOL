@@ -1757,6 +1757,105 @@ cb_build_const_length (cb_tree x)
 }
 
 cb_tree
+cb_build_const_from (cb_tree x)
+{
+	struct cb_define_struct *p;
+
+	if (x == cb_error_node) {
+		return cb_error_node;
+	}
+	p = ppp_search_lists (CB_NAME(x));
+	if (p == NULL
+	 || p->deftype == PLEX_DEF_DEL) {
+			cb_error (_("'%s' has not been DEFINEd"),CB_NAME(x));
+			return cb_error_node;
+	}
+
+	return cb_build_alphanumeric_literal (p->value, (size_t)strlen(p->value));
+}
+
+cb_tree
+cb_build_const_start (cb_tree x)
+{
+	struct cb_field		*f, *p;
+	char			buff[32];
+
+	if (x == cb_error_node) {
+		return cb_error_node;
+	}
+	if (CB_INTEGER_P (x)) {
+		sprintf (buff, "%d", CB_INTEGER(x)->val);
+		return cb_build_numeric_literal (0, buff, 0);
+	}
+	if (CB_REFERENCE_P (x)) {
+		if (cb_ref (x) == cb_error_node) {
+			return cb_error_node;
+		}
+		if (CB_REFERENCE (x)->offset) {
+			cb_error (_("Reference modification not allowed here"));
+			return cb_error_node;
+		}
+	}
+
+	memset (buff, 0, sizeof (buff));
+	f = CB_FIELD (cb_ref (x));
+	if (f->flag_any_length) {
+		cb_error (_("ANY LENGTH item not allowed here"));
+		return cb_error_node;
+	}
+	if (f->level == 88) {
+		cb_error (_("88 level item not allowed here"));
+		return cb_error_node;
+	}
+	if (cb_field_variable_size (f)) {
+		cb_error (_("Variable length item not allowed here"));
+		return cb_error_node;
+	}
+	for (p = f; p; p = p->parent) {
+		p->flag_is_verified = 0;		/* Force redo compute_size */
+		cb_validate_field (p);
+		if (cb_field_variable_size (p)) {
+			cb_error (_("Variable length item not allowed here"));
+			return cb_error_node;
+		}
+	}
+	sprintf (buff, "%d", f->offset);
+	for (p = f; p; p = p->parent) {
+		p->flag_is_verified = 0;		/* Force redo compute_size */
+	}
+	return cb_build_numeric_literal (0, buff, 0);
+}
+
+cb_tree
+cb_build_const_next (struct cb_field *c)
+{
+	struct cb_field		*p;
+	char			buff[32];
+
+	memset (buff, 0, sizeof (buff));
+	for (p = c; p; p = p->parent) {
+		p->flag_is_verified = 0;		/* Force redo compute_size */
+		cb_validate_field (p);
+		if (cb_field_variable_size (p)) {
+			cb_error (_("Variable length item not allowed here"));
+			return cb_error_node;
+		}
+		if (p->parent == NULL)
+			break;
+	}
+	if (p)
+		sprintf (buff, "%d", p->size);
+	else if (c)
+		sprintf (buff, "%d", c->size);
+	else
+		sprintf (buff, "%d", 0);
+	for (p = c; p; p = p->parent) {
+		p->flag_is_verified = 0;		/* Force redo compute_size */
+	}
+	return cb_build_numeric_literal (0, buff, 0);
+}
+
+cb_tree
 cb_build_length (cb_tree x)
 {
 	struct cb_field		*f;

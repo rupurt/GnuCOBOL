@@ -1,4 +1,11 @@
 
+2017-04-24  Ron Norman <rjn@inglenet.com>
+
+	* New compiler option '78-precedence' added to indicate
+	  if evaluation of 78 VALUE expressions should follow
+	  normal operator precedence or not.	All but mf.conf have
+	  78-precedence: yes
+
 2017-04-07  Ron Norman <rjn@inglenet.com>
 
 	* Add mf_ls_nulls, mf_ls_validate, share_mode, retry_mode,

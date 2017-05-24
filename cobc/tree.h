@@ -755,12 +755,14 @@ struct cb_field {
 	unsigned int flag_vsize_done	: 1;	/* Variable size cached */
 	unsigned int flag_vaddr_done	: 1;	/* Variable address cached */
 	unsigned int flag_odo_relative	: 1;	/* complex-odo: item address depends
-											on size of a different (ODO) item */
+							on size of a different (ODO) item */
 	unsigned int flag_field_debug	: 1;	/* DEBUGGING */
 	unsigned int flag_all_debug	: 1;	/* DEBUGGING */
 	unsigned int flag_no_field	: 1;	/* SCREEN dummy field */
 	unsigned int flag_any_numeric	: 1;	/* Is ANY NUMERIC */
 	unsigned int flag_is_returning	: 1;	/* Is RETURNING item */
+
+	unsigned int flag_constant	: 1;	/* Is 01 AS CONSTANT */
 };
 
 #define CB_FIELD(x)		(CB_TREE_CAST (CB_TAG_FIELD, struct cb_field, x))
@@ -1656,6 +1658,9 @@ extern cb_tree		cb_build_index (cb_tree, cb_tree,
 extern cb_tree		cb_build_identifier (cb_tree, const int);
 extern cb_tree		cb_build_length (cb_tree);
 extern cb_tree		cb_build_const_length (cb_tree);
+extern cb_tree		cb_build_const_from (cb_tree);
+extern cb_tree		cb_build_const_start (cb_tree);
+extern cb_tree		cb_build_const_next (struct cb_field *);
 extern cb_tree		cb_build_address (cb_tree);
 extern cb_tree		cb_build_ppointer (cb_tree);
 

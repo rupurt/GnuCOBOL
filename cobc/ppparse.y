@@ -53,8 +53,8 @@
 
 /* Local variables */
 
-static struct cb_define_struct	*ppp_setvar_list;
-static unsigned int		current_cmd;
+static struct cb_define_struct	*ppp_setvar_list = NULL;
+static unsigned int		current_cmd = 0;
 
 #if	0	/* RXWRXW OPT */
 static const char	* const compopts[] = {
@@ -358,12 +358,20 @@ ppp_define_del (const char *name)
 	}
 }
 
-static struct cb_define_struct *
+void
+ppp_clear_lists ( void )
+{
+	ppp_setvar_list = NULL;
+}
+
+struct cb_define_struct *
 ppp_search_lists (const char *name)
 {
 	struct cb_define_struct	*p;
 
 	for (p = ppp_setvar_list; p; p = p->next) {
+		if (p->name == NULL)
+			continue;
 		if (!strcasecmp (name, p->name)) {
 			if (p->deftype != PLEX_DEF_DEL) {
 				return p;
