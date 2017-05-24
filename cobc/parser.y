@@ -3862,7 +3862,9 @@ constant_entry:
 	} else if ($5) {
 		x = cb_build_constant ($2, $5);
 		CB_FIELD (x)->flag_item_78 = 1;
+		CB_FIELD (x)->flag_constant = 1;
 		CB_FIELD (x)->level = 1;
+		CB_FIELD (x)->values = $5;
 		cb_needs_01 = 1;
 		if ($4) {
 			CB_FIELD (x)->flag_is_global = 1;
@@ -3874,14 +3876,13 @@ constant_entry:
 ;
 
 constant_source:
-  _as lit_or_length
+  _as value_item_list 
   {
 	$$ = $2;
   }
-| FROM WORD
-  {
-	PENDING ("CONSTANT FROM clause");
-	$$ = NULL;
+| FROM WORD	
+  { 
+	$$ = CB_LIST_INIT(cb_build_const_from ($2));
   }
 ;
 
@@ -4518,8 +4519,31 @@ value_item_list:
 ;
 
 value_item:
-  literal			{ $$ = $1; }
-| literal THRU literal		{ $$ = CB_BUILD_PAIR ($1, $3); }
+  lit_or_length			{ $$ = $1; }
+| lit_or_length THRU lit_or_length		{ $$ = CB_BUILD_PAIR ($1, $3); }
+| TOK_OPEN_PAREN		{ $$ = cb_build_alphanumeric_literal ("(", 1); }
+| TOK_CLOSE_PAREN		{ $$ = cb_build_alphanumeric_literal (")", 1); }
+| TOK_PLUS				{ $$ = cb_build_alphanumeric_literal ("+", 1); }
+| TOK_MINUS				{ $$ = cb_build_alphanumeric_literal ("-", 1); }
+| TOK_MUL				{ $$ = cb_build_alphanumeric_literal ("*", 1); }
+| TOK_DIV				{ $$ = cb_build_alphanumeric_literal ("/", 1); }
+| AND					{ $$ = cb_build_alphanumeric_literal ("&", 1); }
+| OR					{ $$ = cb_build_alphanumeric_literal ("|", 1); }
+| EXPONENTIATION		{ $$ = cb_build_alphanumeric_literal ("^", 1); }
+| START _of identifier			
+  { current_field->flag_item_78 = 1; 
+	$$ = cb_build_const_start ($3);
+	if (current_storage == CB_STORAGE_WORKING) {
+		PENDING ("78 VALUE START OF identifier");
+	}
+  }
+| NEXT 					
+  { current_field->flag_item_78 = 1; 
+	$$ = cb_build_const_next (cb_get_real_field()); 
+	if (current_storage == CB_STORAGE_WORKING) {
+		PENDING ("78 VALUE NEXT ");
+	}
+  }
 ;
 
 false_is:

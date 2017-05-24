@@ -1,4 +1,9 @@
 
+2017-05-24  Ron Norman <rjn@inglenet.com>
+	* ppparse.y,parser.y,typeck.c,cobc.c,cobc.h,tree.h,field.c:
+	  Changes for 78 & 01 CONSTANT to handle constant expressions
+	  in the VALUE clase.
+
 2017-05-22  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: create numeric literals with correct attributes
