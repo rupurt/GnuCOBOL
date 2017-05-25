@@ -2877,6 +2877,7 @@ line_contains (char* line_start, char* line_end, char* search_patterns) {
 	}
 
 	return 0;
+}
 
 /** -j run job after build */
 static int
@@ -2907,7 +2908,6 @@ process_run (const char *name) {
 		fflush (stderr);
 	}
 	return ret;
-}
 }
 #endif
 
@@ -4089,7 +4089,7 @@ process_link (struct filename *l)
 	if (output_name) {
 #if	defined(_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
 		name = cobc_main_strdup (output_name);
-		file_stripext (name);
+		file_stripext ((char *)name);
 #else
 		name = output_name;
 #endif
