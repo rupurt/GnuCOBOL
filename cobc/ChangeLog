@@ -1,8 +1,19 @@
 
+2017-05-25  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	Work on constant values:
+	* parser.y, typeck.c, tree.h: tightened syntax checks for NEXT /
+	  START OF as 78 VALUE
+	* typeck.c: set correct values for NEXT / START OF as 78 VALUE
+
 2017-05-24  Ron Norman <rjn@inglenet.com>
-	* ppparse.y,parser.y,typeck.c,cobc.c,cobc.h,tree.h,field.c:
-	  Changes for 78 & 01 CONSTANT to handle constant expressions
-	  in the VALUE clase.
+
+	Work on constant values:
+	* parser.y, typeck.c, tree.h: 78/CONSTANT accepts VALUE expression
+	* parser.y, typeck.c, tree.h: implemented NEXT / START OF as 78 VALUE
+	* ppparse.y, cobc.c, cobc.h: allow define list to be
+	  searched outside of ppparse
+	* parser.y, typeck.c: implemented CONSTANT FROM
 
 2017-05-22  Ron Norman <rjn@inglenet.com>
 
