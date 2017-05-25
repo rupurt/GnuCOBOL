@@ -4530,18 +4530,22 @@ value_item:
 | AND					{ $$ = cb_build_alphanumeric_literal ("&", 1); }
 | OR					{ $$ = cb_build_alphanumeric_literal ("|", 1); }
 | EXPONENTIATION		{ $$ = cb_build_alphanumeric_literal ("^", 1); }
-| START _of identifier			
-  { current_field->flag_item_78 = 1; 
-	$$ = cb_build_const_start ($3);
-	if (current_storage == CB_STORAGE_WORKING) {
-		PENDING ("78 VALUE START OF identifier");
+| START _of identifier
+  {
+	if (!current_field->flag_item_78) {
+		cb_error (_("VALUE START OF identifier only valid for level 78 items"));
+		$$ = cb_error_node;
+	} else {
+		$$ = cb_build_const_start (current_field, $3);
 	}
   }
-| NEXT 					
-  { current_field->flag_item_78 = 1; 
-	$$ = cb_build_const_next (cb_get_real_field()); 
-	if (current_storage == CB_STORAGE_WORKING) {
-		PENDING ("78 VALUE NEXT ");
+| NEXT
+  {
+	if (!current_field->flag_item_78) {
+		cb_error (_("VALUE NEXT only valid for level 78 items"));
+		$$ = cb_error_node;
+	} else {
+		$$ = cb_build_const_next (current_field);
 	}
   }
 ;

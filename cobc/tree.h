@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2016 Free Software Foundation, Inc.
+   Copyright (C) 2001-2017 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
 
    This file is part of GnuCOBOL.
@@ -1659,7 +1659,7 @@ extern cb_tree		cb_build_identifier (cb_tree, const int);
 extern cb_tree		cb_build_length (cb_tree);
 extern cb_tree		cb_build_const_length (cb_tree);
 extern cb_tree		cb_build_const_from (cb_tree);
-extern cb_tree		cb_build_const_start (cb_tree);
+extern cb_tree		cb_build_const_start (struct cb_field *, cb_tree);
 extern cb_tree		cb_build_const_next (struct cb_field *);
 extern cb_tree		cb_build_address (cb_tree);
 extern cb_tree		cb_build_ppointer (cb_tree);
