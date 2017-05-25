@@ -244,6 +244,17 @@
 	* codgen.c, tree.c, tree.h added code to optimize handling of 
 	  'decimal constants' in expressions
 
+2016-06-30  Edward Hart <edward.dan.hart@gmail.com>
+
+	* pplex.l (is_condition_directive_clause): fixed bug #263 where >>IF's
+	  where not detected inside false >>IF's.
+
+2016-06-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* pplex.l: fixed bug #248, where any directive was evaluated inside the
+	  false part of a conditional directive. Restricted this to ELSE,
+	  END(-IF), WHEN, etc.
+
 2016-06-21  Ron Norman <rjn@inglenet.com>
 
 	* error.c, print_error fixed to verify 'file' is NOT NULL before using
