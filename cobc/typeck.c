@@ -1774,7 +1774,6 @@ cb_build_const_from (cb_tree x)
 	return cb_build_alphanumeric_literal (p->value, (size_t)strlen(p->value));
 }
 
-
 /**
  * build numeric literal for level 78 VALUE START OF with the offset
  * of the given item
@@ -1791,12 +1790,6 @@ cb_build_const_start (struct cb_field *f, cb_tree x)
 	if (x == cb_error_node) {
 		return cb_error_node;
 	}
-#if 0 /* Simon: we only allow fields, don't we? */
-	if (CB_INTEGER_P (x)) {
-		sprintf (buff, "%d", CB_INTEGER(x)->val);
-		return cb_build_numeric_literal (0, buff, 0);
-	}
-#endif
 	if (CB_REFERENCE_P (x)) {
 		if (cb_ref (x) == cb_error_node) {
 			return cb_error_node;
@@ -1805,17 +1798,17 @@ cb_build_const_start (struct cb_field *f, cb_tree x)
 			cb_error (_("Reference modification not allowed here"));
 			return cb_error_node;
 		}
-#if 1 /* Simon: we only allow fields, don't we? */
 	} else {
 		cb_error (_("Only field names allowed here"));
 		return cb_error_node;
-#endif
 	}
+
 	target = CB_FIELD (cb_ref (x));
-	if (!target->flag_external && target->storage != CB_STORAGE_FILE
-	&& target->storage != CB_STORAGE_LINKAGE) {
+	if (!target->flag_external 
+	 && target->storage != CB_STORAGE_FILE
+	 && target->storage != CB_STORAGE_LINKAGE) {
 		cb_error (_("VALUE of '%s': %s target '%s' is invalid"),
-			f->name, "START OF", target->name);
+					f->name, "START OF", target->name);
 		cb_error (_("target must be in FILE SECTION or LINKAGE SECTION or have the EXTERNAL clause"));
 		return cb_build_numeric_literal (0, "1", 0);
 	}
@@ -1877,7 +1870,8 @@ cb_build_const_next (struct cb_field *f)
 		cb_error (_ ("no previous data-item found"));
 		return cb_build_numeric_literal (0, "1", 0);
 	}
-	if (previous->storage != CB_STORAGE_FILE && previous->storage != CB_STORAGE_LINKAGE) {
+	if (previous->storage != CB_STORAGE_FILE 
+	 && previous->storage != CB_STORAGE_LINKAGE) {
 		p = previous;
 		while (p->parent) {
 			p = p->parent;
@@ -1889,14 +1883,15 @@ cb_build_const_next (struct cb_field *f)
 		}
 	}
 
-	/* Compute the size of the last and all its parent fields,
-	later fields aren't parsed yet and are therefore not counted
+	/* 
+	 * Compute the size of the last and all its parent fields,
+	 * later fields aren't parsed yet and are therefore not counted
 	*/
 	sav_min = previous->occurs_min;
 	sav_max = previous->occurs_max;
 	previous->occurs_min = previous->occurs_max = 1;
 	for (p = previous; p; p = p->parent) {
-		p->flag_is_verified = 0; /* Force compute_size */
+		p->flag_is_verified = 0;	/* Force compute_size */
 		cb_validate_field (p);
 		if (cb_field_variable_size (p)) {
 			cb_error (_("Variable length item not allowed here"));

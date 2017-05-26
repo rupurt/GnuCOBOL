@@ -1,4 +1,9 @@
 
+2017-04-26  Ron Norman <rjn@inglenet.com>
+	* Removed compiler option '78-precedence' and added
+	  compiler option 'constant-78' to indicate if 78 is allowed
+	  compiler option 'constant-01' to indicate if 01 CONSTANT is allowed
+
 2017-04-24  Ron Norman <rjn@inglenet.com>
 
 	* New compiler option '78-precedence' added to indicate

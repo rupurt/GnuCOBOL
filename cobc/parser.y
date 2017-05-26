@@ -3860,17 +3860,19 @@ constant_entry:
 	if (level != 1) {
 		cb_error (_("CONSTANT item not at 01 level"));
 	} else if ($5) {
-		x = cb_build_constant ($2, $5);
-		CB_FIELD (x)->flag_item_78 = 1;
-		CB_FIELD (x)->flag_constant = 1;
-		CB_FIELD (x)->level = 1;
-		CB_FIELD (x)->values = $5;
-		cb_needs_01 = 1;
-		if ($4) {
-			CB_FIELD (x)->flag_is_global = 1;
+		if (cb_verify(cb_constant_01, "01 CONSTANT")) {
+			x = cb_build_constant ($2, $5);
+			CB_FIELD (x)->flag_item_78 = 1;
+			CB_FIELD (x)->flag_constant = 1;
+			CB_FIELD (x)->level = 1;
+			CB_FIELD (x)->values = $5;
+			cb_needs_01 = 1;
+			if ($4) {
+				CB_FIELD (x)->flag_is_global = 1;
+			}
+			/* Ignore return value */
+			(void)cb_validate_78_item (CB_FIELD (x), 0);
 		}
-		/* Ignore return value */
-		(void)cb_validate_78_item (CB_FIELD (x), 0);
 	}
   }
 ;
@@ -4530,8 +4532,8 @@ value_item:
 | AND					{ $$ = cb_build_alphanumeric_literal ("&", 1); }
 | OR					{ $$ = cb_build_alphanumeric_literal ("|", 1); }
 | EXPONENTIATION		{ $$ = cb_build_alphanumeric_literal ("^", 1); }
-| START _of identifier
-  {
+| START _of identifier			
+  { 
 	if (!current_field->flag_item_78) {
 		cb_error (_("VALUE START OF identifier only valid for level 78 items"));
 		$$ = cb_error_node;
@@ -4539,8 +4541,8 @@ value_item:
 		$$ = cb_build_const_start (current_field, $3);
 	}
   }
-| NEXT
-  {
+| NEXT 					
+  { 
 	if (!current_field->flag_item_78) {
 		cb_error (_("VALUE NEXT only valid for level 78 items"));
 		$$ = cb_error_node;
