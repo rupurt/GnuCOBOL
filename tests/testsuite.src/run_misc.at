@@ -8078,7 +8078,7 @@ AT_DATA([prog.cob], [
        01  THEDOG    PIC X(6) VALUE DOGGY.
        78  DIV1      VALUE 100 / 3.
        78  NUM2      VALUE 1 + 2 * 3.
-       01  CON3      CONSTANT (((1 + 2) * NUM2) - 4)).
+       01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
        01  CON4      CONSTANT 3.1416 + CON3.
        01  CON5      CONSTANT 1 + 2 * 3.
        01  DOGNAME   CONSTANT FROM MYDOG.
