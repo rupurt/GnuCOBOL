@@ -480,7 +480,7 @@ AT_DATA([prog.cob], [
        PROGRAM-ID.      prog.
        DATA             DIVISION.
        WORKING-STORAGE  SECTION.
-	   77 STR           PIC X(05).
+       77 STR           PIC X(05).
        PROCEDURE        DIVISION.
            MOVE "OK" & " "
             & "OK"
@@ -2185,7 +2185,7 @@ AT_DATA([prog.cob], [
            SORT ROW1.
            
            PERFORM VARYING K FROM 1 BY 1 UNTIL K > 4
-		     DISPLAY TAB1-NR(K) NO ADVANCING END-DISPLAY
+             DISPLAY TAB1-NR(K) NO ADVANCING END-DISPLAY
            END-PERFORM           
            
            STOP RUN.
@@ -5854,7 +5854,7 @@ AT_DATA([prog.cob], [
             ADD 1 TO X.
             DISPLAY "X is " X.
             COPY cpyabrt.
-	    GOBACK.
+        GOBACK.
        END PROGRAM sub1.
 
        IDENTIFICATION DIVISION.
@@ -7978,9 +7978,78 @@ ANY NUMERIC is   4510.66CR Length 0000000011
 
 AT_CLEANUP
 
+AT_SETUP([78 VALUE])
+AT_KEYWORDS([CONSTANT])
 
-AT_SETUP([level 78 NEXT / START OF and CONSTANT])
-AT_KEYWORDS([extensions])
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       >>DEFINE CONSTANT MYDOG AS "Piper"
+       >>SET CONSTANT DOGGY AS "Barky"
+       WORKING-STORAGE SECTION.
+       01  MYREC.
+          05  FLD1   PIC 9(2).
+          05  FLD2   PIC X(7).
+          05  FLD3   PIC X(2) OCCURS 5 TIMES.
+          05  FLD4   PIC X(4).
+          05  FLD5   PIC X(4).
+       01  PICX      PIC XXX VALUE 'Abc'.
+       78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+       78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+       01  THEDOG    PIC X(6) VALUE DOGGY.
+       78  DIV1      VALUE 100 / 3.
+       78  NUM2      VALUE 1 + 2 * 3.
+       LINKAGE SECTION.
+       01  XMYREC.
+          05  XFLD1   PIC 9(2).
+          05  XFLD2   PIC X(7).
+             78  XPOS3    VALUE NEXT.
+          05  XFLD3   PIC X(2) OCCURS 5 TIMES.
+             78  XPOS4    VALUE NEXT.
+          05  XFLD4   PIC X(4).
+          05  XFLD5   PIC X(4).
+       78  XSTRT4     VALUE START OF XFLD4.
+      *
+       PROCEDURE DIVISION.
+       MAIN.
+           DISPLAY "DIV1 is " DIV1.
+           DISPLAY "HUN  is " HUN.
+           DISPLAY "HUN2 is " HUN2.
+           MOVE NUM2 TO FLD1
+           IF FLD1 = 9
+             DISPLAY "NUM2 is " NUM2 " left to right precedence."
+           ELSE
+             DISPLAY "NUM2 is " NUM2 " normal precedence."
+           END-IF.
+           DISPLAY "XFLD3 starts at " XPOS3.
+           DISPLAY "XFLD4 starts at " XSTRT4.
+           DISPLAY "XFLD4 starts at " XPOS4.
+           DISPLAY "My Dog's name is " MYDOG ";".
+           DISPLAY "Your Dog's name is " DOGGY ";".
+           DISPLAY "The Dog's name is " THEDOG ";".
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [DIV1 is 33
+HUN  is 143
+HUN2 is 1855
+NUM2 is 9 left to right precedence.
+XFLD3 starts at 10
+XFLD4 starts at 20
+XFLD4 starts at 12
+My Dog's name is Piper;
+Your Dog's name is Barky;
+The Dog's name is Barky ;
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([01 CONSTANT])
+AT_KEYWORDS([CONSTANT])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
@@ -7995,6 +8064,11 @@ AT_DATA([prog.cob], [
           05  FLD3   PIC X(2) OCCURS 5 TIMES.
           05  FLD4   PIC X(4).
           05  FLD5   PIC X(4).
+       >>IF HORSE = "WHITE"
+       >>SET CONSTANT PONY AS "White"
+       >>ELSE
+       >>SET CONSTANT PONY AS "Dusty"
+       >>END-IF
        01  PICX      PIC XXX VALUE 'Abc'.
        01  CAT       CONSTANT  'Cat '.
        01  DOG       CONSTANT  'Dog '.
@@ -8003,17 +8077,19 @@ AT_DATA([prog.cob], [
        78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
        01  THEDOG    PIC X(6) VALUE DOGGY.
        78  DIV1      VALUE 100 / 3.
-       78  NUM       VALUE 9.
-       01  CON3      CONSTANT (((1 + 2) * NUM) - 4).
+       78  NUM2      VALUE 1 + 2 * 3.
+       01  CON3      CONSTANT (((1 + 2) * NUM2) - 4)).
        01  CON4      CONSTANT 3.1416 + CON3.
+       01  CON5      CONSTANT 1 + 2 * 3.
        01  DOGNAME   CONSTANT FROM MYDOG.
+       77  MYHORSE   PIC X(7) VALUE PONY.
        LINKAGE SECTION.
        01  XMYREC.
           05  XFLD1   PIC 9(2).
           05  XFLD2   PIC X(7).
-             78  XPOSA2    VALUE NEXT.
+             78  XPOS3    VALUE NEXT.
           05  XFLD3   PIC X(2) OCCURS 5 TIMES.
-             78  XPOSA3    VALUE NEXT.
+             78  XPOS4    VALUE NEXT.
           05  XFLD4   PIC X(4).
           05  XFLD5   PIC X(4).
        78  XSTRT4     VALUE START OF XFLD4.
@@ -8025,89 +8101,54 @@ AT_DATA([prog.cob], [
            DISPLAY "DIV1 is " DIV1.
            DISPLAY "HUN  is " HUN.
            DISPLAY "HUN2 is " HUN2.
+           MOVE NUM2 TO FLD1
+           IF FLD1 = 9
+             DISPLAY "78 VALUE has simple left to right precedence."
+           ELSE
+             DISPLAY "78 VALUE is " NUM2 " normal precedence."
+           END-IF.
+           MOVE CON5 TO FLD1
+           IF FLD1 = 7
+             DISPLAY "01 CONSTANT has normal operator precedence."
+           ELSE
+             DISPLAY "01 CONSTANT is " CON5 " left to right precedence."
+           END-IF.
            DISPLAY "CON3 is " CON3.
            DISPLAY "CON4 is " CON4 " vs " 3.141596 
                    " & " -2.189 " & " +12.
-           DISPLAY "XFLD2 is over at " XPOSA2.
-           DISPLAY "XFLD3 is over at " XPOSA3.
-           DISPLAY "XFLD4 starts at "  XSTRT4.
+           DISPLAY "XFLD3 starts at " XPOS3.
+           DISPLAY "XFLD4 starts at " XSTRT4.
+           DISPLAY "XFLD4 starts at " XPOS4.
            DISPLAY "My Dog's name is " DOGNAME ";".
            DISPLAY "Your Dog's name is " DOGGY ";".
            DISPLAY "The Dog's name is " THEDOG ";".
+           DISPLAY "My Horse is " MYHORSE ";".
+       >>DEFINE CONSTANT PONYX AS "Purple" OVERRIDE
+       >>IF PONYX IS DEFINED
+           DISPLAY "My little pony is " PONYX.
+       >>END-IF
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([cobc -x -std=default -w prog.cob ], [0], [], [])
 
-AT_CHECK([./prog], [0],
-[CAT  is 'Cat '
+AT_CHECK([./prog], [0], [CAT  is 'Cat '
 Yard is 'Cat & Dog '
 DIV1 is 33
 HUN  is 143
 HUN2 is 1855
+78 VALUE has simple left to right precedence.
+01 CONSTANT has normal operator precedence.
 CON3 is 23
 CON4 is 26 vs 3.141596 & -2.189 & +12
-XFLD2 is over at 10
-XFLD3 is over at 12
+XFLD3 starts at 10
 XFLD4 starts at 20
+XFLD4 starts at 12
 My Dog's name is Piper;
 Your Dog's name is Barky;
 The Dog's name is Barky ;
-], [])
-
-AT_CLEANUP
-
-
-AT_SETUP([78 and CONSTANT operator precedence])
-AT_KEYWORDS([extensions])
-
-AT_DATA([prog.cob], [
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. prog.
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       77  FLD1      PIC 9(2).
-       01  PICX      PIC XXX VALUE 'Abc'.
-       78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
-       78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-       78  DIV1      VALUE 100 / 3.
-       78  NUM2      VALUE 1 + 2 * 3.
-       01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-       01  CON4      CONSTANT 3.1416 + CON3.
-       01  CON5      CONSTANT 1 + 2 * 3.
-       PROCEDURE DIVISION.
-       MAIN.
-           DISPLAY "DIV1 is " DIV1.
-           DISPLAY "HUN  is " HUN.
-           DISPLAY "HUN2 is " HUN2.
-           MOVE NUM2 TO FLD1
-           IF FLD1 = 7
-             DISPLAY "NUM2 is " NUM2 " normal precedence."
-           ELSE
-             DISPLAY "NUM2 is " NUM2 " left to right precedence."
-           END-IF.
-           DISPLAY "CON3 is " CON3.
-           DISPLAY "CON4 is " CON4 " vs " 3.141596 
-                   " & " -2.189 " & " +12.
-           MOVE CON5 TO FLD1
-           IF FLD1 = 7
-             DISPLAY "CON5 is " CON5 " normal precedence."
-           ELSE
-             DISPLAY "CON5 is " CON5 " left to right precedence."
-           END-IF.
-           STOP RUN.
-])
-
-AT_CHECK([$COMPILE prog.cob ], [0], [], [])
-
-AT_CHECK([./prog], [0],
-[DIV1 is 33
-HUN  is 143
-HUN2 is 1855
-NUM2 is 9 left to right precedence.
-CON3 is 17
-CON4 is 20 vs 3.141596 & -2.189 & +12
-CON5 is 7 normal precedence.
+My Horse is Dusty  ;
+My little pony is Purple
 ], [])
 
 AT_CLEANUP

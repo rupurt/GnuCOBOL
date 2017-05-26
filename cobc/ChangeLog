@@ -1,4 +1,11 @@
 
+2017-05-26  Ron Norman <rjn@inglenet.com>
+
+	Work on constant values: checks for application 78 versus internal 78
+	and allow internal 78 to get handled
+	Delete 78-precendence & add constant-01 and constant-78 compile options
+
+
 2017-05-25  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	Work on constant values:

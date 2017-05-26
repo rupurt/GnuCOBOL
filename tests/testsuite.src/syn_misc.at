@@ -1915,3 +1915,4 @@ prog.cob: 24: Error: target must be in FILE SECTION or LINKAGE SECTION or have t
 ])
 
 AT_CLEANUP
+

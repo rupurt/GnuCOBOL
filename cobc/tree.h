@@ -763,6 +763,7 @@ struct cb_field {
 	unsigned int flag_is_returning	: 1;	/* Is RETURNING item */
 
 	unsigned int flag_constant	: 1;	/* Is 01 AS CONSTANT */
+	unsigned int flag_internal_constant	: 1;	/* Is an internally generated CONSTANT */
 };
 
 #define CB_FIELD(x)		(CB_TREE_CAST (CB_TAG_FIELD, struct cb_field, x))

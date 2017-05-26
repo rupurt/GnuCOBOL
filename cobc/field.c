@@ -171,6 +171,10 @@ cb_eval_op ( void )
 			xscale = 0;
 			xval = (lval != rval);
 			break;
+		case '(':
+			cb_warning (_("Missing right parenthesis"));
+			op_pos--;
+			return;
 		default:
 			op_pos--;
 			return;
@@ -207,7 +211,7 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 {
 	cb_tree			t, l;
 	cob_s64_t		xval;
-	int				unop = 0, xscale;
+	int				unop = 0, xscale, k;
 	char			result[48];
 	struct cb_literal	*lp;
 
@@ -245,6 +249,9 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 					break;
 				case ')':
 					unop = 0;
+					for (k=op_pos; k >= 0 && op_type[k] != '('; k--);
+					if (op_type [k] != '(')
+						cb_warning (_("Missing left parenthesis"));
 					while (op_pos >= 0
 					   &&  op_val_pos > 0) {
 						if (op_type [op_pos] == '(') {
@@ -288,10 +295,15 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 	}
 	while (op_pos >= 0
 	   &&  op_val_pos > 0) {
+		if (op_type [op_pos] == '(') {
+			cb_warning (_("Missing right parenthesis"));
+			op_pos--;
+			continue;
+		}
 		cb_eval_op ();
 	}
-	xval =	op_val [0];
-	xscale = op_scale [0];
+	xval	= op_val [0];
+	xscale	= op_scale [0];
 	while (xscale > 0) { 		/* Reduce to 'fixed point numeric' */
 		xscale--;
 		xval = xval / 10;
@@ -1775,14 +1787,20 @@ cb_validate_78_item (struct cb_field *f, const cob_u32_t no78add)
 	cb_tree			x;
 	cob_u32_t		noadd, prec;
 
+	if (f->flag_internal_constant) {	/* Keep all internal CONSTANTs */
+		prec = 1;
+	} else if (f->flag_constant) {		/* 01 CONSTANT is verified in parser.y */
+		prec = 1;
+	} else {
+		if (!cb_verify (cb_constant_78, "78 VALUE")) 
+			return last_real_field;
+		prec = 0;
+	}
+
 	if (cb_is_expr (f->values) ) {
-		if (f->flag_constant) {
-			prec = 1;
-		} else {
-			prec = cb_78_precedence;
-		}
 		f->values = CB_LIST_INIT(cb_evaluate_expr (f->values, prec));
 	}
+
 	x = CB_TREE (f);
 	noadd = no78add;
 	if (CB_INVALID_TREE(f->values) 
