@@ -172,7 +172,7 @@ cb_eval_op ( void )
 			xval = (lval != rval);
 			break;
 		case '(':
-			cb_warning (_("Missing right parenthesis"));
+			cb_error (_("missing right parenthesis"));
 			op_pos--;
 			return;
 		default:
@@ -211,7 +211,7 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 {
 	cb_tree			t, l;
 	cob_s64_t		xval;
-	int				unop = 0, xscale, k;
+	int				unop = 1, xscale, k;
 	char			result[48];
 	struct cb_literal	*lp;
 
@@ -251,15 +251,17 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 					unop = 0;
 					for (k=op_pos; k >= 0 && op_type[k] != '('; k--);
 					if (op_type [k] != '(')
-						cb_warning (_("Missing left parenthesis"));
+						cb_error (_("missing left parenthesis"));
 					while (op_pos >= 0
 					   &&  op_val_pos > 0) {
 						if (op_type [op_pos] == '(') {
-							op_pos--;
 							break;
 						}
 						cb_eval_op ();
 					}
+					if (op_pos >= 0
+					 && op_type [op_pos] == '(')
+						op_pos--;
 					break;
 				case '+':
 					cb_push_op ('+', 4);
@@ -289,6 +291,9 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 					cb_push_op ('^', normal_prec ? 7 : 4);
 					unop = 1;
 					break;
+				default:
+					cb_error (_("invalid operator '%s' in expression"),lp->data);
+					break;
 				}
 			}
 		}
@@ -296,11 +301,17 @@ cb_evaluate_expr (cb_tree ch, int normal_prec)
 	while (op_pos >= 0
 	   &&  op_val_pos > 0) {
 		if (op_type [op_pos] == '(') {
-			cb_warning (_("Missing right parenthesis"));
+			cb_error (_("missing right parenthesis"));
 			op_pos--;
 			continue;
 		}
 		cb_eval_op ();
+	}
+	if (op_pos >= 0
+	 && op_type [op_pos] == '(') {
+		cb_error (_("missing right parenthesis"));
+	} else if (op_pos >= 0) {
+		cb_error (_("'%c' operator misplaced"),op_type [op_pos]);
 	}
 	xval	= op_val [0];
 	xscale	= op_scale [0];

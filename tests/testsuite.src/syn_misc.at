@@ -1916,3 +1916,62 @@ prog.cob: 24: Error: target must be in FILE SECTION or LINKAGE SECTION or have t
 
 AT_CLEANUP
 
+AT_SETUP([01 CONSTANT])
+AT_KEYWORDS([CONSTANT])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  NUM2      CONSTANT 3.
+       01  CON3      CONSTANT ((1 + 2) * NUM2 - 4.
+       01  CON4      CONSTANT (1 + 2) * NUM2 - 4).
+       01  CON5      CONSTANT (1 + 2) // NUM2.
+       01  CON6      CONSTANT (1 + 2 + 3 + (4)) / (NUM2).
+       78  CON7      VALUE    (1 + 2 + 3)* (4).
+      *
+       PROCEDURE DIVISION.
+       MAIN.
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=cobol2002 -w prog.cob ], [1], [],
+[prog.cob: 7: Error: missing right parenthesis
+prog.cob: 8: Error: missing left parenthesis
+prog.cob: 9: Error: '/' operator misplaced
+prog.cob: 11: Error: 78 VALUE used
+])
+
+AT_CLEANUP
+
+AT_SETUP([78 VALUE])
+AT_KEYWORDS([CONSTANT])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78  NUM2      VALUE   3.
+       78  NEG1      VALUE   -1.
+       78  CON3      VALUE   ((1 + 2) * NUM2 - 4.
+       78  CON4      VALUE   (1 + 2) * NUM2 - 4).
+       78  CON5      VALUE   (1 + 2) // NUM2.
+       78  CON6      VALUE   (1 + 2 + 3 + (4)) / (NUM2).
+       01  CON7      CONSTANT (1 + 2 + 3)* (4).
+      *
+       PROCEDURE DIVISION.
+       MAIN.
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=mf -w prog.cob ], [1], [],
+[prog.cob: 8: Error: missing right parenthesis
+prog.cob: 9: Error: missing left parenthesis
+prog.cob: 10: Error: '/' operator misplaced
+prog.cob: 12: Error: 01 CONSTANT used
+])
+
+AT_CLEANUP
+
