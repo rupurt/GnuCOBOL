@@ -1813,7 +1813,6 @@ cb_build_const_start (struct cb_field *f, cb_tree x)
 		return cb_build_numeric_literal (0, "1", 0);
 	}
 
-	memset (buff, 0, sizeof (buff));
 	if (target->flag_any_length) {
 		cb_error (_("ANY LENGTH item not allowed here"));
 		return cb_build_numeric_literal (0, "1", 0);
@@ -1828,16 +1827,17 @@ cb_build_const_start (struct cb_field *f, cb_tree x)
 	}
 	for (p = target; p; p = p->parent) {
 		p->flag_is_verified = 0;		/* Force redo compute_size */
+		p->flag_invalid = 0;
 		cb_validate_field (p);
 		if (cb_field_variable_size (p)) {
 			cb_error (_("Variable length item not allowed here"));
 			return cb_build_numeric_literal (0, "1", 0);
 		}
 	}
-	target->offset++; /* we want to COBOL view, 1 based */
 	snprintf (buff, sizeof(buff), "%d", target->offset);
 	for (p = target; p; p = p->parent) {
 		p->flag_is_verified = 0;		/* Force redo compute_size */
+		p->flag_invalid = 0;
 	}
 	return cb_build_numeric_literal (0, buff, 0);
 }
@@ -1887,30 +1887,35 @@ cb_build_const_next (struct cb_field *f)
 	 * Compute the size of the last and all its parent fields,
 	 * later fields aren't parsed yet and are therefore not counted
 	*/
-	sav_min = previous->occurs_min;
-	sav_max = previous->occurs_max;
-	previous->occurs_min = previous->occurs_max = 1;
-	for (p = previous; p; p = p->parent) {
-		p->flag_is_verified = 0;	/* Force compute_size */
-		cb_validate_field (p);
-		if (cb_field_variable_size (p)) {
-			cb_error (_("Variable length item not allowed here"));
-			p->size = 0;
-			break;
+	if (previous->level != 1) {
+		sav_min = previous->occurs_min;
+		sav_max = previous->occurs_max;
+		previous->occurs_min = previous->occurs_max = 1;
+		for (p = previous; p; p = p->parent) {
+			p->flag_is_verified = 0;	/* Force compute_size */
+			p->flag_invalid = 0;
+			cb_validate_field (p);
+			if (cb_field_variable_size (p)) {
+				cb_error (_("Variable length item not allowed here"));
+				p->size = 0;
+				break;
+			}
+			if (!p->parent) {
+				break;
+			}
 		}
-		if (!p->parent) {
-			break;
-		}
+		previous->occurs_min = sav_min;
+		previous->occurs_max = sav_max;
+	} else {
+		p = previous;
 	}
-	previous->occurs_min = sav_min;
-	previous->occurs_max = sav_max;
-	p->size++; /* we want one byte past the data-item */
 
 	snprintf (buff, sizeof (buff), "%d", p->size);
 
 	/* Force compute_size for later access */
 	for (p = previous; p; p = p->parent) {
 		p->flag_is_verified = 0;
+		p->flag_invalid = 0;
 	}
 
 	return cb_build_numeric_literal (0, buff, 0);

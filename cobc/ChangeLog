@@ -1,4 +1,8 @@
 
+2017-05-28  Ron Norman <rjn@inglenet.com>
+
+	* field.c,typeck.c: check for misplaced operators in constant expressions
+
 2017-05-26  Ron Norman <rjn@inglenet.com>
 
 	Work on constant values: checks for application 78 versus internal 78
