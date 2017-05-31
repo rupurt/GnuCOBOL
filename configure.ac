@@ -1087,6 +1087,21 @@ if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "y
 	COB_HAS_ISAM=no
 else
 	COB_HAS_ISAM=yes
+	if test "$with_cisam" = "yes"; then
+		COB_HAS_ISAM=cisam
+	fi
+	if test "$with_disam" = "yes"; then
+		COB_HAS_ISAM=disam
+	fi
+	if test "$with_vbisam" = "yes"; then
+		COB_HAS_ISAM=vbisam
+	fi
+	if test "$with_db" = "yes"; then
+		COB_HAS_ISAM=db
+	fi
+	if test "$with_index_extfh" = "yes"; then
+		COB_HAS_ISAM=index_extfh
+	fi
 fi
 
 if test "$USE_NCURSES" = "not_found" -o "$USE_NCURSES" = "no"; then
@@ -1104,7 +1119,7 @@ unset MYOCLIBS
 
 # Generate the output
 
-AM_CONDITIONAL([COB_MAKE_IX], [test "$COB_HAS_ISAM" = yes])
+AM_CONDITIONAL([COB_MAKE_IX], [test "$COB_HAS_ISAM" != no])
 
 AC_DEFINE_UNQUOTED([COB_EXPORT_DYN], ["$COB_EXPORT_DYN"])
 AC_DEFINE_UNQUOTED([COB_PIC_FLAGS], ["$COB_PIC_FLAGS"])

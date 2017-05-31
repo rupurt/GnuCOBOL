@@ -1,4 +1,7 @@
 
+2017-05-31  Ron Norman <rjn@inglenet.com>
+	* testsuite.src/run_file.at: Skip KEYCHECK test when BDB is used
+
 2017-05-22  Ron Norman <rjn@inglenet.com>
 	* testsuite.src: Updates to match mf.conf having 'pretty-display: yes'
 
