@@ -1,4 +1,10 @@
 
+2017-05-31 Ron Norman <rjn@inglenet.com>
+
+	* fileio.c: 
+	 For BDB, on OPEN, if the first record in the file has a size
+	 larger than the FD has defined then return status 39
+
 2017-05-22  Ron Norman <rjn@inglenet.com>
 	* termio.c:
 	  pretty_display_numeric updated to handle 
@@ -28,8 +34,6 @@
 	* fileio.c: 
 	 For BDB, check that the size of a record read is not larger than
 	 what the FD has defined and return status 43 to the READ.
-	 For BDB, on OPEN, read the first record in the file and if its
-	 size is larger than the FD has defined then return status 39
 
 2017-04-18 Ron Norman <rjn@inglenet.com>
 

@@ -58,7 +58,7 @@ AT_CLEANUP
 AT_SETUP([First READ on empty SEQUENTIAL INDEXED file])
 AT_KEYWORDS([runfile])
 
-AT_CHECK([test "$COB_HAS_ISAM" = "yes" || exit 77])
+AT_CHECK([test "$COB_HAS_ISAM" != "no" || exit 77])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -166,7 +166,7 @@ AT_SETUP([INDEXED File KEYCHECK])
 AT_KEYWORDS([FileIo])
 
 # skip if not configured with ISAM
-AT_SKIP_IF([test "$COB_HAS_ISAM" != "yes"])
+AT_SKIP_IF([test "$COB_HAS_ISAM" = "db"])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
@@ -857,7 +857,7 @@ AT_SETUP([INDEXED File Sparse/Split keys])
 AT_KEYWORDS([runfile])
 
 # skip if not configured with ISAM
-AT_SKIP_IF([test "$COB_HAS_ISAM" != "yes"])
+AT_SKIP_IF([test "$COB_HAS_ISAM" = "no"])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.

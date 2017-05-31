@@ -5638,6 +5638,11 @@ dobuild:
 	bdb_close_cursor (f);
 	if (!ret) {
 		memcpy (p->last_readkey[0], p->key.data, (size_t)p->key.size);
+		if (p->data.data != NULL
+		 && p->data.size > 0
+		 && p->data.size > f->record_max) {
+			return COB_STATUS_39_CONFLICT_ATTRIBUTE;
+		}
 	} else {
 		p->data.data = NULL;
 	}
@@ -5646,14 +5651,7 @@ dobuild:
 	if (f->flag_optional && nonexistent) {
 		return COB_STATUS_05_SUCCESS_OPTIONAL;
 	}
-	if (indexed_start_internal (f, COB_FI, f->keys[0].field, 0, 0) == 0) {
-		if (p->data.data != NULL
-		 && p->data.size > 0
-		 && p->data.size > f->record_max) {
-			return COB_STATUS_39_CONFLICT_ATTRIBUTE;
-		}
-		p->data.data = NULL;
-	}
+
 	return 0;
 
 #else
