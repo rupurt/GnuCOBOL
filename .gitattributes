@@ -104,6 +104,7 @@ cobc/Makefile.in eol=lf
 /config.h.in eol=lf
 config/Makefile.am eol=lf
 config/Makefile.in eol=lf
+config/rm.conf -text
 /configure eol=lf
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
