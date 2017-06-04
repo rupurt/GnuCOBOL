@@ -5997,6 +5997,10 @@ print_runtime_conf()
 					}
 					printf(": %-*s : ",hdlen,gc_conf[i].env_name);
 				} else if((gc_conf[i].data_type & STS_CNFSET)) {
+					if ((gc_conf[i].data_type & STS_ENVCLR)) {
+						printf("    : %-*s : ",hdlen,gc_conf[i].env_name);
+						puts(_("... removed from environment"));
+					}
 					if (gc_conf[i].config_num > 0) {
 						printf("  %d ", gc_conf[i].config_num);
 					} else {
@@ -6022,6 +6026,10 @@ print_runtime_conf()
 						printf("    ");
 					}
 					printf(": %-*s : ",hdlen,gc_conf[i].env_name);
+					if ((gc_conf[i].data_type & STS_ENVCLR)) {
+						puts(_("... removed from environment"));
+						continue;
+					}
 				} else {
 					printf("    : %-*s : ",hdlen,gc_conf[i].conf_name);
 				}
@@ -6053,10 +6061,6 @@ print_runtime_conf()
 					}
 				}
 				putchar('\n');
-				if ((gc_conf[i].data_type & STS_ENVCLR)) {
-					puts("    :  ");
-					puts(_("... removed from environment"));
-				}
 			}
 		}
 	}
