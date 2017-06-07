@@ -173,7 +173,7 @@ unset cob_keyw
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset setlocale fcntl strerror strcasecmp \
-	strchr strrchr strdup strstr strtol gettimeofday localeconv \
+	strchr strrchr strdup strstr atol strtol atoll strtoll gettimeofday localeconv \
 	readlink getexecname canonicalize_file_name realpath \
 	strcoll strxfrm setenv raise])
 

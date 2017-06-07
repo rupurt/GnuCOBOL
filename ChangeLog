@@ -1,4 +1,9 @@
 
+2017-06-07  Ron Norman <rjn@inglenet.com> 
+
+	* configure.ac,configure,config.h.in: Add check for atoll, strtoll
+	* coblocal.h: if 'atoll' is not available, then use strtoll in #define
+	  
 2017-05-31  Ron Norman <rjn@inglenet.com> 
 
 	* configure.ac,configure: Set COB_HAS_ISAM to type of ISAM handler 
