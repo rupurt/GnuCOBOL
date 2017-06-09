@@ -1,4 +1,8 @@
 
+2017-06-09  Ron Norman <rjn@inglenet.com>
+	* ppparse.y,scanner.l: Fix so that OVERRIDE is passed thru the
+	  preprocessor to allow variables to be redefined
+
 2017-05-28  Ron Norman <rjn@inglenet.com>
 
 	* field.c,typeck.c: check for misplaced operators in constant expressions

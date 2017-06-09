@@ -309,7 +309,7 @@ ppp_define_add (struct cb_define_struct *list, const char *name,
 	for (l = list; l; l = l->next) {
 		if (!strcasecmp (name, l->name)) {
 			if (!override && l->deftype != PLEX_DEF_DEL) {
-				cb_error (_("Duplicate define"));
+				cb_error (_("Duplicate define of %s"),name);
 				return NULL;
 			}
 			if (l->value) {
@@ -801,7 +801,7 @@ define_directive:
 	p = ppp_define_add (ppp_setvar_list, $2, $4, $5);
 	if (p) {
 		ppp_setvar_list = p;
-		fprintf (ppout, "#DEFLIT %s %s\n", $2, $4);
+		fprintf (ppout, "#DEFLIT %s %s%s\n", $2, $4, $5 ? " OVERRIDE" : "");
 	}
   }
 | variable_or_literal
