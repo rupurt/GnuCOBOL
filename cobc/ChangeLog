@@ -1,5 +1,10 @@
 
+2017-06-13  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c: check for misplaced operators and report error
+
 2017-06-09  Ron Norman <rjn@inglenet.com>
+
 	* ppparse.y,scanner.l: Fix so that OVERRIDE is passed thru the
 	  preprocessor to allow variables to be redefined
 
