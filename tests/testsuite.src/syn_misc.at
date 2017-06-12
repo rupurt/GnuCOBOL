@@ -1975,3 +1975,54 @@ prog.cob: 12: Error: 01 CONSTANT used
 
 AT_CLEANUP
 
+AT_SETUP([Invalue Expression])
+AT_KEYWORDS([EXPRESSION])
+
+AT_DATA([prog.cob], [
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 WRKN  PIC S999 VALUE 123.
+        01 WRKX  PIC X(8) VALUE 'House'.
+        PROCEDURE DIVISION.
+        MAIN.
+            EVALUATE WRKN
+              GREATER ZERO
+              < 0
+              > 0
+            WHEN TRUE
+              DISPLAY "WHAT IS IT?"
+            END-EVALUATE.
+            IF WRKN = 123 EQUAL 456
+              DISPLAY "Strange brew! " WRKN
+            END-IF.
+            IF WRKN NOT EQUAL 123 NOT = 456
+              DISPLAY "Strange brew! " WRKN
+            END-IF.
+            IF WRKN = 123 OR 456
+              DISPLAY "Home brew! " WRKN
+            END-IF.
+            IF WRKX = "Red" OR "White"
+              DISPLAY "Home wine! " WRKX
+            END-IF.
+            IF WRKX <= "Red" = "White"
+              DISPLAY "Home wine! " WRKX
+            END-IF.
+            IF WRKX = "Red" NOT "White"
+              DISPLAY "Home wine! " WRKX
+            END-IF.
+            STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=default -w prog.cob ], [1], [],
+[prog.cob: In paragraph 'MAIN':
+prog.cob: 10: Error: GREATER operator may be misplaced
+prog.cob: 17: Error: EQUAL operator may be misplaced
+prog.cob: 20: Error: NOT EQUAL operator may be misplaced
+prog.cob: 29: Error: LESS OR EQUAL operator may be misplaced
+prog.cob: 33: Error: Invalid expression
+])
+
+AT_CLEANUP
+

@@ -95,6 +95,7 @@ static cb_tree			decimal_stack = NULL;
 
 static const char		*inspect_func;
 static cb_tree			inspect_data;
+struct cb_statement		*error_statement = NULL;
 
 static int			expr_op;		/* Last operator */
 static cb_tree			expr_lh;		/* Last left hand */
@@ -3447,6 +3448,8 @@ decimal_compute (const int op, cb_tree x, cb_tree y)
 	const char	*func;
 	cb_tree		expr_dec = NULL;	/* Int value for decimal_align */
 
+	if (error_statement == current_statement)
+		return;
 	switch (op) {
 	case '+':
 		func = "cob_decimal_add";
@@ -3464,7 +3467,31 @@ decimal_compute (const int op, cb_tree x, cb_tree y)
 		func = "cob_decimal_pow";
 		break;
 	default:
-		cobc_abort_pr (_("Unexpected operation %d"), op);
+		func = NULL;
+		if (op == '>')
+			func = "GREATER";
+		else if (op == '<')
+			func = "LESS";
+		else if (op == ']')
+			func = "GREATER OR EQUAL";
+		else if (op == '[')
+			func = "LESS OR EQUAL";
+		else if (op == '=')
+			func = "EQUAL";
+		else if (op == '~')
+			func = "NOT EQUAL";
+		else if (op == '!')
+			func = "NOT";
+		else if (op == '&')
+			func = "AND";
+		else if (op == '|')
+			func = "OR";
+		if (func) {
+			error_statement = current_statement;
+			cb_error_x (CB_TREE(current_statement),_("%s operator may be misplaced"),func);
+			return;
+		}
+		cobc_abort_pr (_("Unexpected operation %c (%d)"), op, op);
 		COBC_ABORT ();
 	}
 	dpush (CB_BUILD_FUNCALL_2 (func, x, y));
@@ -3513,6 +3540,8 @@ decimal_expand (cb_tree d, cb_tree x)
 	struct cb_binary_op	*p;
 	cb_tree			t;
 
+	if (error_statement == current_statement)
+		return;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		if (x == cb_zero) {
