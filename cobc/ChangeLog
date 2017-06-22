@@ -1,4 +1,9 @@
 
+2017-06-22  Ron Norman <rjn@inglenet.com>
+
+	* codgen.c: emit dummy reference to 'frame_overflow' to avoid
+	  C compiler warnings
+
 2017-06-13  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c: check for misplaced operators and report error
