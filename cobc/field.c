@@ -1580,6 +1580,14 @@ compute_size (struct cb_field *f)
 					case CB_USAGE_BINARY:
 					case CB_USAGE_COMP_5:
 					case CB_USAGE_FLOAT:
+						if (c->size == 2) {
+							align_size = 2;
+						} else if (c->size == 4 
+							|| c->size == 8 
+							|| c->size == 16) {
+							align_size = 4;
+						}
+						break;
 					case CB_USAGE_DOUBLE:
 					case CB_USAGE_LONG_DOUBLE:
 					case CB_USAGE_FP_BIN32:
@@ -1587,12 +1595,11 @@ compute_size (struct cb_field *f)
 					case CB_USAGE_FP_BIN128:
 					case CB_USAGE_FP_DEC64:
 					case CB_USAGE_FP_DEC128:
-						if (c->size == 2) {
-							align_size = 2;
-						} else if (c->size == 4 
-							|| c->size == 8 
-							|| c->size == 16) {
-							align_size = 4;
+						if (c->size == 2
+						 || c->size == 4 
+						 || c->size == 8 
+						 || c->size == 16) {
+							align_size = c->size;
 						}
 						break;
 					case CB_USAGE_INDEX:
