@@ -1,4 +1,8 @@
 
+2017-07-02  Ron Norman <rjn@inglenet.com>
+
+	* field.c: Additional fix so that SYNC with -std=mf works as MF does
+
 2017-06-24  Ron Norman <rjn@inglenet.com>
 
 	* field.c: For COMP-2 and a few other align to 8 byte boundary

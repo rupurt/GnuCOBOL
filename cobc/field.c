@@ -1032,18 +1032,24 @@ validate_field_1 (struct cb_field *f)
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-SHORT", 4, 1);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_SIGNED_INT:
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-LONG", 9, 1);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_SIGNED_LONG:
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-DOUBLE", 18, 1);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_UNSIGNED_CHAR:
@@ -1056,18 +1062,24 @@ validate_field_1 (struct cb_field *f)
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-SHORT", 4, 0);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_UNSIGNED_INT:
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-LONG", 9, 0);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_UNSIGNED_LONG:
 			f->usage = CB_USAGE_COMP_5;
 			f->pic = cb_build_binary_picture ("BINARY-DOUBLE", 18, 0);
 			f->flag_real_binary = 1;
+			if(cb_mf_ibm_comp == 1) 
+				f->flag_synchronized = 0;
 			validate_field_clauses (x, f);
 			break;
 		case CB_USAGE_BINARY:
@@ -1573,22 +1585,31 @@ compute_size (struct cb_field *f)
 				}
 
 				/* Word alignment */
-				if (c->flag_synchronized &&
-				    cb_verify (cb_synchronized_clause, "SYNC")) {
+				if (c->flag_synchronized 
+				 && cb_verify (cb_synchronized_clause, "SYNC")) {
 					align_size = 1;
 					switch (c->usage) {
 					case CB_USAGE_BINARY:
 					case CB_USAGE_COMP_5:
 					case CB_USAGE_FLOAT:
-						if (c->size == 2) {
-							align_size = 2;
-						} else if (c->size == 4 
-							|| c->size == 8 
+					case CB_USAGE_DOUBLE:
+						if (c->size == 2
+						 || c->size == 4) {
+							align_size = c->size;
+						} else if (c->size == 8 
 							|| c->size == 16) {
-							align_size = 4;
+							if(cb_mf_ibm_comp == 1) {
+								if (c->usage == CB_USAGE_DOUBLE)
+									align_size = 8;	/* COMP-2 */
+								else
+									align_size = 4;
+							} else if (sizeof (void *) == 4) {
+								align_size = 4; 	/* 32 bit mode */
+							} else {
+								align_size = 8;		/* 64 bit mode */
+							}
 						}
 						break;
-					case CB_USAGE_DOUBLE:
 					case CB_USAGE_LONG_DOUBLE:
 					case CB_USAGE_FP_BIN32:
 					case CB_USAGE_FP_BIN64:
