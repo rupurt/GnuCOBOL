@@ -1,4 +1,8 @@
 
+2017-07-02  Ron Norman <rjn@inglenet.com>
+	* mf.conf corrected to have 
+	  synchronized-clause: ignore
+
 2017-04-26  Ron Norman <rjn@inglenet.com>
 	* Removed compiler option '78-precedence' and added
 	  compiler option 'constant-78' to indicate if 78 is allowed
