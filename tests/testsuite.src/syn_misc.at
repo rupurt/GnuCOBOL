@@ -45,7 +45,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
 [prog.cob: 11: Warning: Suggest parentheses around AND within OR
-prog.cob: 15: Warning: Suggest parentheses around AND within OR
+prog.cob: 15: Warning: Suggest parentheses around OR within AND
 ])
 
 AT_CLEANUP
