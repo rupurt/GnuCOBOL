@@ -239,6 +239,7 @@ tests/testsuite.src/syn_move.at eol=lf
 tests/testsuite.src/syn_multiply.at eol=lf
 tests/testsuite.src/syn_occurs.at eol=lf
 tests/testsuite.src/syn_redefines.at eol=lf
+tests/testsuite.src/syn_refmod.at eol=lf
 tests/testsuite.src/syn_reportwriter.at eol=lf
 tests/testsuite.src/syn_screen.at eol=lf
 tests/testsuite.src/syn_set.at eol=lf
