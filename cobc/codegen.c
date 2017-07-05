@@ -5686,7 +5686,7 @@ output_stmt (cb_tree x)
 	struct cb_cast		*cp;
 #endif
 	size_t			size;
-	int			code, skipit;
+	int			code, skipit, skip_else;
 	char			assgn[80];
 
 	stack_id = 0;
@@ -6053,6 +6053,15 @@ output_stmt (cb_tree x)
 		break;
 	case CB_TAG_IF:
 		ip = CB_IF (x);
+		if (ip->stmt1 == NULL
+		 && ip->stmt2 == NULL) {
+			if (!ip->is_if) {
+				output_line ("/* WHEN has code omitted */");
+			} else {
+				output_line ("/* IF has code omitted */");
+			}
+			break;
+		}
 		if (!ip->is_if) {
 			output_newline ();
 			output_line ("/* WHEN */");
@@ -6111,27 +6120,35 @@ output_stmt (cb_tree x)
 			gen_if_level--;
 			break;
 		}
-		output ("if (");
-		output_cond (ip->test, 0);
-		output (")\n");
-		output_line ("{");
-		output_indent_level += 2;
-		if (ip->stmt1) {
-			output_stmt (ip->stmt1);
+		if (ip->test == cb_false
+		 && ip->stmt1 == NULL) {
+			output_line (" /* FALSE condition and code omitted */");
+			skip_else = 1;
 		} else {
-			output_line ("; /* Nothing */");
-		}
-		if (gen_if_level > cb_if_cutoff) {
-			if (ip->stmt2) {
-				code = cb_id++;
-				output_line ("goto l_%d;", code);
+			skip_else = 0;
+			output ("if (");
+			output_cond (ip->test, 0);
+			output (")\n");
+			output_line ("{");
+			output_indent_level += 2;
+			if (ip->stmt1) {
+				output_stmt (ip->stmt1);
+			} else {
+				output_line ("; /* Nothing */");
 			}
+			if (gen_if_level > cb_if_cutoff) {
+				if (ip->stmt2) {
+					code = cb_id++;
+					output_line ("goto l_%d;", code);
+				}
+			}
+			output_indent_level -= 2;
+			output_line ("}");
 		}
-		output_indent_level -= 2;
-		output_line ("}");
 		if (ip->stmt2) {
 			if (gen_if_level <= cb_if_cutoff) {
-				output_line ("else");
+				if (!skip_else)
+					output_line ("else");
 				output_line ("{");
 				output_indent_level += 2;
 			}
