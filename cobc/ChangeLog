@@ -1,4 +1,11 @@
 
+2017-07-05  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c,typeck.c,error.c,parser.y,tree.c,tree.h: 
+	  Updates to skip emiting code for IF, WHEN in cases where
+	  the condition is resolved down to TRUE or FALSE at compile time
+	  cb_error reports as 'Error (ignored)' when code is not being emitted
+
 2017-07-03  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c: Move check for cb_warn_parentheses to cb_build_expr routine

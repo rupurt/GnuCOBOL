@@ -38,6 +38,7 @@ static struct cb_label	*last_paragraph = NULL;
 static unsigned int conf_error_displayed = 0;
 static unsigned int last_error_line = 0;
 static const char	*last_error_file = "unknown";
+static int		ignore_error = 0;
 
 
 size_t				cb_msg_style;
@@ -91,6 +92,14 @@ print_error (const char *file, int line, const char *prefix,
 	putc ('\n', stderr);
 }
 
+int
+cb_set_ignore_error (int state)
+{
+	int prev = ignore_error;
+	ignore_error = state;
+	return prev;
+}
+
 void
 cb_warning (const char *fmt, ...)
 {
@@ -112,10 +121,14 @@ cb_error (const char *fmt, ...)
 	cobc_cs_check = 0;
 #endif
 	va_start (ap, fmt);
-	print_error (NULL, 0, _("Error: "), fmt, ap);
+	print_error (NULL, 0, ignore_error?_("Error (ignored): "):_("Error: "), fmt, ap);
 	va_end (ap);
-	if (++errorcount > 100) {
-		cobc_too_many_errors ();
+	if (ignore_error) {
+		warningcount++;
+	} else {
+		if (++errorcount > 100) {
+			cobc_too_many_errors ();
+		}
 	}
 }
 
@@ -209,10 +222,14 @@ cb_error_x (cb_tree x, const char *fmt, ...)
 	va_list ap;
 
 	va_start (ap, fmt);
-	print_error (x->source_file, x->source_line, _("Error: "), fmt, ap);
+	print_error (x->source_file, x->source_line, ignore_error?_("Error (ignored): "):_("Error: "), fmt, ap);
 	va_end (ap);
-	if (++errorcount > 100) {
-		cobc_too_many_errors ();
+	if (ignore_error) {
+		warningcount++;
+	} else {
+		if (++errorcount > 100) {
+			cobc_too_many_errors ();
+		}
 	}
 }
 
