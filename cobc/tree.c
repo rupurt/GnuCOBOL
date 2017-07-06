@@ -3583,8 +3583,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		break;
 
 	default:
-		cobc_abort_pr (_("Unexpected operator -> %d"), op);
-		COBC_ABORT ();
+		return cb_error_node;
 	}
 
 	if (relop == cb_true) {
