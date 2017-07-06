@@ -3582,8 +3582,14 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		category = CB_TREE_CATEGORY (x);
 		break;
 
-	default:
+	case 0:
+		/* Operation on invalid elements */
+		cb_error_x (e, _("invalid expression"));
 		return cb_error_node;
+
+	default:
+		cobc_abort_pr (_("unexpected operator: %d"), op);
+		COBC_ABORT ();
 	}
 
 	if (relop == cb_true) {
