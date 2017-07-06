@@ -1,4 +1,9 @@
 
+2017-07-06  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: In cb_build_binary_op just return cb_error_node
+	  instead of aborting compile on an invalid 'op' value
+	
 2017-07-05  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c,typeck.c,error.c,parser.y,tree.c,tree.h: 
