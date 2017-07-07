@@ -1,4 +1,9 @@
 
+2017-07-07  Edward Hart <edward.dan.hart@gmail.com>
+
+	* common.h (COB_REPORT_*): prevent undefined behaviour caused by 1 << 31
+	  and fixed typos.
+
 2017-06-04 Ron Norman <rjn@inglenet.com>
 	* common.c: Improved 'cobcrun -r' display for when
 	  unsetenv is used in runtime.cfg to show environment variable
