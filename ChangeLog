@@ -33,9 +33,22 @@
 	* HACKING, README: moved instructions for development/svn-builds
 	  from README to new file HACKING and added missing information
 
+2017-02-04  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: fixed bug where -g3 in CFLAGS was replaced by 3,
+	  instead of being removed.
+
+2016-12-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: added -Qunused-arguments to clang CFLAGS.
+
 2016-11-17  Ron Norman <rjn@inglenet.com>
 
 	* configure.ac: check for sys/wait.h (for CBL_GC_WAITPID)
+
+2016-08-10  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: added -g3 to CFLAGS with --enable-debug and GCC.
 
 2016-05-04  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 

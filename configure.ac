@@ -194,10 +194,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]],
 	[AC_DEFINE([HAVE_DESIGNATED_INITS], [1]) AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])])
 
-# Check gcc/icc
+# Check gcc/icc/clang
 COB_USES_GCC_ICC=no
 COB_USES_GCC_ONLY=no
 COB_USES_ICC_ONLY=no
+COB_USES_CLANG_ONLY=no
 
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 	#ifdef __GNUC__
@@ -229,6 +230,16 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 	[],
 	[])
 
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
+	#ifdef __clang__
+	return 0;
+	#else
+	return 1;
+	#endif]])],
+	[COB_USES_CLANG_ONLY=yes],
+	[],
+	[])
+                                      
 COB_CC="$CC"
 if test "$COB_USES_ICC_ONLY" = "yes"; then
 	LIBCOB_LIBS="-limf -lm"
@@ -267,7 +278,7 @@ AC_ARG_ENABLE([param-check],
 
 AC_ARG_WITH([patch-level],
   [  --with-patch-level      (GnuCOBOL) Define a patch level (default 0)],
-  [case $with_patch_level in  
+  [case $with_patch_level in
     yes)	AC_MSG_ERROR([[You must give --with-patch-level an argument.]])
 		;;
     no)		AC_MSG_ERROR([[--without-patch-level not supported.]])
@@ -370,7 +381,7 @@ AC_ARG_ENABLE([bdbdupno],
 
 AC_ARG_WITH([dl],
   [  --with-dl               (GnuCOBOL) Use system dynamic loader (default)],
-  [case $with_dl in  
+  [case $with_dl in
     yes)
 		;;
     no)
@@ -382,7 +393,7 @@ AC_ARG_WITH([dl],
 
 AC_ARG_WITH([varseq],
   [  --with-varseq           (GnuCOBOL) Define variable sequential format (default 0)],
-  [case $with_varseq in  
+  [case $with_varseq in
     yes)	AC_MSG_ERROR([[You must give --with-varseq an argument.]])
 		;;
     no)		AC_MSG_ERROR([[--without-varseq not supported.]])
@@ -403,7 +414,7 @@ AC_CHECK_HEADERS([gmp.h], [], AC_MSG_ERROR([gmp.h (GMP) is required]), [])
 AC_CHECK_LIB([gmp], [__gmpz_init],
 	[LIBCOB_LIBS="$LIBCOB_LIBS -lgmp"],
 	AC_MSG_ERROR([GMP is required]), [])
-	
+
 # Check just major/minor levels between header and library
 MYOLDLIBS=$LIBS
 LIBS="$MYOLDLIBS -lgmp"
@@ -560,7 +571,7 @@ if test "$USE_NCURSES" = "ncursesw" -o "$USE_NCURSES" = "check"; then
       [AC_CHECK_HEADERS([ncursesw/curses.h], [USE_NCURSES="ncursesw"],
         [if test "$USE_NCURSES" = "ncursesw"; then
            USE_NCURSES="missing_header"
-         fi], [])], [])      
+         fi], [])], [])
     if test "$USE_NCURSES" = "ncursesw"; then
       LIBCOB_LIBS="$LIBCOB_LIBS -lncursesw"
     fi
@@ -928,24 +939,52 @@ COB_SHARED_OPT="-shared"
 COB_EXEEXT="$EXEEXT"
 
 if test "$enable_cflags_setting" = yes; then
-	# Remove -O2 option added by AC_PROG_CC and add -O0 
+	# Remove -O2 option added by AC_PROG_CC and add -O0
 	CFLAGS=`echo "$CFLAGS" | sed -e 's/ *-O@<:@0-9a-zA-Z@:>@* */ /g' -e 's/ $//' -e 's/^ //'`
 	if test "$COB_USES_GCC_ICC" = "yes"; then
 		CFLAGS="$CFLAGS -O0"
+	fi
+
+	# Add -g3 if using GCC.
+	if test "$COB_USES_GCC_ONLY" = "yes"; then
+		MYOLDCFLAGS="$CFLAGS"		     
+		CFLAGS="$CFLAGS -g3"
+		AC_MSG_CHECKING([for gcc -g3 option])
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+			[AC_MSG_RESULT([yes])],
+			[CFLAGS="$MYOLDCFLAGS"; AC_MSG_RESULT([no])])
+		unset MYOLDCFLAGS
+	fi
+
+        # Add -Qunused-arguments if using clang.
+	if test "$COB_USES_CLANG_ONLY" = "yes"; then
+		CFLAGS="$CFLAGS -Qunused-arguments"
 	fi
 fi
 
 unset enable_cflags_setting
 
 if test "$enable_debug" != "yes" -a "x$CFLAGS" != "x"; then
-	CFLAGS=`echo "$CFLAGS" | sed -e 's/-g//' -e 's/^ //' -e 's/ $//'`
+	CFLAGS=`echo "$CFLAGS" | sed -e 's/-g3//' -e 's/-g//' -e 's/^ //' -e 's/ $//'`
 fi
 
 # Include CFLAGS in COB_CFLAGS without optimization/debug options
 
 cob_temp_flags=""
 if test "x$CFLAGS" != "x"; then
-	cob_temp_flags=`echo "$CFLAGS" | sed -e 's/-g//' -e 's/ $//' -e 's/^ //'`
+	cob_temp_flags="$CFLAGS"
+else
+	cob_temp_flags=""
+fi
+if test "x$CPPFLAGS" != "x"; then
+	if test "x$cob_temp_flags" != "x"; then
+		cob_temp_flags="$CPPFLAGS $cob_temp_flags"
+	else
+		cob_temp_flags="$CPPFLAGS"
+	fi
+fi
+if test "x$cob_temp_flags" != "x"; then
+	cob_temp_flags=`echo "$cob_temp_flags" | sed -e 's/-g3//' -e 's/-g//' -e 's/ $//' -e 's/^ //'`
 	cob_temp_flags=`echo "$cob_temp_flags" | sed -e 's/@<:@+-@:>@O@<:@0-9s@:>@//' -e 's/ $//' -e 's/^ //'`
 	cob_temp_flags=`echo "$cob_temp_flags" | sed -e 's/-O//' -e 's/ $//' -e 's/^ //'`
 	cob_temp_flags=`echo "$cob_temp_flags" | sed -e 's/-fmessage-length=0//'`
@@ -987,8 +1026,8 @@ COB_FIX_LIBTOOL=""
 case $host_os in
   mingw*)
 	if test "$prefix" = "NONE"; then
-	COB_CONFIG_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/config"
-	COB_COPY_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/copy"
+		COB_CONFIG_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/config"
+		COB_COPY_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/copy"
 	fi
 	COB_EXPORT_DYN="-Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--enable-auto-image-base"
 	COB_FIX_LIB=""
@@ -1113,6 +1152,7 @@ fi
 unset COB_USES_GCC_ICC
 unset COB_USES_GCC_ONLY
 unset COB_USES_ICC_ONLY
+unset COB_USES_CLANG_ONLY
 unset MYOLDCFLAGS
 unset MYOLDLIBS
 unset MYOCLIBS
