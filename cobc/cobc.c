@@ -673,7 +673,7 @@ cobc_free(void * mptr)
 {
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!mptr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_free"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_free");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -688,7 +688,7 @@ cobc_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_strdup"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_strdup");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -739,7 +739,7 @@ cobc_main_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_main_strdup"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_main_strdup");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -846,7 +846,7 @@ cobc_parse_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_parse_strdup"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_parse_strdup");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -952,7 +952,7 @@ cobc_plex_strdup (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_plex_strdup"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_plex_strdup");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -969,7 +969,7 @@ cobc_check_string (const char *dupstr)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!dupstr)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_check_string"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_check_string");
 		cobc_abort_terminate ();
 	}
 #endif
@@ -1306,7 +1306,7 @@ cobc_stradd_dup (const char *str1, const char *str2)
 
 #ifdef	COB_TREE_DEBUG
 	if (unlikely(!str1 || !str2)) {
-		cobc_abort_pr (_("Call to %s with NULL pointer", "cobc_stradd_dup"));
+		cobc_abort_pr (_("Call to %s with NULL pointer"), "cobc_stradd_dup");
 		cobc_abort_terminate ();
 	}
 #endif
