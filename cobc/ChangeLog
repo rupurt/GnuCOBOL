@@ -4,6 +4,8 @@
 	* tree.c: In cb_build_binary_op provide details on why an
 	expression is always TRUE or FALSE and better indicate which
 	line this happened on
+	* tree.c: In cb_build_binary_op check for '@' parens operator
+	with a numeric literal inside the parens 
 
 2017-07-06  Ron Norman <rjn@inglenet.com>
 

@@ -3247,6 +3247,11 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	int			i,j, xscale,yscale,rscale;
 	struct cb_literal	*xl, *yl;
 
+	if (op == '@' 
+	 && y == NULL
+	 && CB_NUMERIC_LITERAL_P(x) )	/* Parens around a Numeric Literal */
+		return x;
+
 	e = relop = cb_any;
 	e->source_file = NULL;
 	e->source_line = cb_exp_line;
