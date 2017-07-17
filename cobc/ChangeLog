@@ -1,4 +1,10 @@
 
+2017-07-17  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: In cb_build_binary_op provide details on why an
+	expression is always TRUE or FALSE and better indicate which
+	line this happened on
+
 2017-07-06  Ron Norman <rjn@inglenet.com>
 
 	* tree.c: In cb_build_binary_op just return cb_error_node

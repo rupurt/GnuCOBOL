@@ -107,9 +107,9 @@ prog.cob: 28: Warning: Literal is longer than field
 prog.cob: 28: Warning: Expression is always FALSE
 prog.cob: 31: Warning: Literal is longer than field
 prog.cob: 31: Warning: Expression is always FALSE
-prog.cob: 33: Warning: Expression is always FALSE
-prog.cob: 35: Warning: Expression is always TRUE
-prog.cob: 37: Warning: Expression is always TRUE
+prog.cob: 33: Warning: Expression 'CAT     ' EQUALS 'CAT+DOG' is always FALSE
+prog.cob: 35: Warning: Expression 'CAT     ' EQUALS 'CAT' is always TRUE
+prog.cob: 37: Warning: Expression '00000001234' EQUALS '1234' is always TRUE
 ])
 
 AT_CHECK([./prog], [0], [], [])
@@ -2104,26 +2104,25 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY -std=mf prog.cob ], [0], [],
-[prog.cob: 15: Warning: Expression is always FALSE
+[prog.cob: 15: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 17: Error (ignored): Offset of 'var' out of bounds: -98
-prog.cob: 22: Warning: Expression is always FALSE
-prog.cob: 25: Warning: Expression is always TRUE
+prog.cob: 22: Warning: Expression '2' EQUALS '3' is always FALSE
+prog.cob: 25: Warning: Expression '1' EQUALS '1' is always TRUE
 prog.cob: 29: Error (ignored): Offset of 'var' out of bounds: -98
-prog.cob: 30: Warning: Expression is always TRUE
-prog.cob: 37: Warning: Expression is always FALSE
+prog.cob: 30: Warning: Expression '1' EQUALS '1' is always TRUE
+prog.cob: 37: Warning: Expression '1' EQUALS '3' is always FALSE
 prog.cob: 37: Warning: PERFORM FOREVER since UNTIL is always FALSE
-prog.cob: 41: Warning: Expression is always TRUE
+prog.cob: 41: Warning: Expression '1' EQUALS '1' is always TRUE
 prog.cob: 41: Warning: PERFORM NEVER since UNTIL is always TRUE
-prog.cob: 45: Warning: Expression is always FALSE
+prog.cob: 45: Warning: Expression '1' EQUALS '3' is always FALSE
 prog.cob: 45: Warning: PERFORM FOREVER since UNTIL is always FALSE
-prog.cob: 49: Warning: Expression is always TRUE
+prog.cob: 49: Warning: Expression '1' EQUALS '1' is always TRUE
 prog.cob: 49: Warning: PERFORM ONCE since UNTIL is always TRUE
-prog.cob: 54: Warning: Expression is always FALSE
-prog.cob: 56: Warning: Expression is always TRUE
-prog.cob: 67: Warning: Expression is always TRUE
-prog.cob: 67: Warning: Expression is always FALSE
-prog.cob: 67: Warning: Expression is always TRUE
-prog.cob: 67: Warning: Expression is always TRUE
+prog.cob: 54: Warning: Expression '115' LESS THAN '16' is always FALSE
+prog.cob: 56: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 67: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 63: Warning: Expression '115' EQUALS '15' is always FALSE
+prog.cob: 64: Warning: Expression '115' EQUALS '115' is always TRUE
 ])
 
 AT_CLEANUP
