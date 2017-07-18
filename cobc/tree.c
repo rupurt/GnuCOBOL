@@ -3657,7 +3657,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		if (cb_warn_constant_expr
 		 && !was_prev_warn (e->source_line)) {
 			if(rlit && llit && bop)
-				cb_warning_x (e, _("Expression '%s' %s '%s' is always TRUE"),llit,bop,rlit);
+				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always TRUE"),llit,bop,rlit);
 			else
 				cb_warning_x (e, _("Expression is always TRUE"));
 		}
@@ -3668,7 +3668,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		if (cb_warn_constant_expr
 		 && !was_prev_warn (e->source_line)) {
 			if(rlit && llit && bop)
-				cb_warning_x (e, _("Expression '%s' %s '%s' is always FALSE"),llit,bop, rlit);
+				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always FALSE"),llit,bop, rlit);
 			else
 				cb_warning_x (e, _("Expression is always FALSE"));
 		}
