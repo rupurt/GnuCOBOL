@@ -101,7 +101,7 @@ static int			expr_op;		/* Last operator */
 static cb_tree			expr_lh;		/* Last left hand */
 static int			expr_dmax = -1;		/* Max scale for expression result */
 static int			cond_fixed = -1;	/* 0 means TRUE, 1 means FALSE, -1 unknown */
-#define MAX_NESTED_IF	128
+#define MAX_NESTED_IF	512
 static int			if_nest = 0;
 static int			if_cond[MAX_NESTED_IF];
 static int			expr_line = 0;		/* Line holding expression for warnings */
