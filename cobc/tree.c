@@ -3976,6 +3976,15 @@ cb_build_perform_varying (cb_tree name, cb_tree from, cb_tree by, cb_tree until)
 		}
 		cb_source_line++;
 	}
+
+	if (until) {
+		cb_save_cond ();
+	}
+	if (until == cb_true
+	 && !after_until) {
+		cb_false_side ();	/* PERFORM body is NEVER executed */
+	}
+
 	after_until = 0;
 	if (name) {
 		if (name == cb_error_node) {
