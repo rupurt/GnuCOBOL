@@ -1,4 +1,15 @@
 
+2017-07-23  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: 
+	  Improve line number used in warnings about 'always TRUE/FALSE'
+	  Check for IF/WHEN with NOT condition to resolve compile time expr
+	* typeck.c: 
+	  Turn off ignore of errors as required
+	* codegen.c: 
+	  Emit line# in C code for WHEN statements
+
+
 2017-07-19  Ron Norman <rjn@inglenet.com>
 
 	* tree.c: 

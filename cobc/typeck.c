@@ -4242,6 +4242,8 @@ cb_true_side (void)
 {
 	if (cond_fixed == 1) {
 		cb_set_ignore_error (1);
+	} else {
+		cb_set_ignore_error (0);
 	}
 }
 

@@ -5673,6 +5673,8 @@ output_alter_check (struct cb_label *lp)
 static void
 output_stmt (cb_tree x)
 {
+	struct cb_binary_op	*bop;
+	cb_tree			w;
 	struct cb_statement	*p;
 	struct cb_label		*lp;
 	struct cb_assign	*ap;
@@ -6064,7 +6066,56 @@ output_stmt (cb_tree x)
 		}
 		if (!ip->is_if) {
 			output_newline ();
-			output_line ("/* WHEN */");
+			if (ip->test == cb_true) {
+				output_line ("/* WHEN  is always TRUE */");
+			} else if (ip->test == cb_false) {
+				output_line ("/* WHEN  is always FALSE */");
+			} else
+			if (ip->test
+			 && CB_TREE_TAG (ip->test) == CB_TAG_BINARY_OP) {
+				bop = CB_BINARY_OP (ip->test);
+				w = NULL;
+				if (bop->op == '!') 
+					w = bop->x;
+				else if (bop->y)
+					w = bop->y;
+				else if (bop->x)
+					w = bop->x;
+				if (w == cb_true) {
+					output_line ("/* WHEN  is always %s */",bop->op == '!'?"FALSE":"TRUE");
+				} else if (w == cb_false) {
+					output_line ("/* WHEN  is always %s */",bop->op != '!'?"FALSE":"TRUE");
+				} else if (w && w->source_line) {
+					output_prefix ();
+					output ("/* Line: %-10d: %-19s",w->source_line,"WHEN");
+					if (w->source_file) {
+						output (": %s ", w->source_file);
+					}
+					output ("*/\n");
+					if (cb_flag_source_location 
+					 || cb_flag_dump) {
+						if (last_line != w->source_line) {
+							output_line ("module->module_stmt = 0x%08X;",
+								COB_SET_LINE_FILE(w->source_line, 
+									lookup_source(w->source_file)));
+						}
+					}
+				} else {
+					output_line ("/* WHEN */");
+				}
+			} else if (ip->test->source_line) {
+				output_line ("/* Line: %-10d: WHEN */",ip->test->source_line);
+				if (cb_flag_source_location 
+				 || cb_flag_dump) {
+					if (last_line != ip->test->source_line) {
+						output_line ("module->module_stmt = 0x%08X;",
+							COB_SET_LINE_FILE(ip->test->source_line, 
+								lookup_source(ip->test->source_file)));
+					}
+				}
+			} else {
+				output_line ("/* WHEN */");
+			}
 			output_newline ();
 		}
 		gen_if_level++;

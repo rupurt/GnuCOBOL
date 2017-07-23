@@ -2083,6 +2083,20 @@ AT_DATA([prog.cob], [
                  to var (17 - var-len:var-len - 8)
            WHEN  var-len > 16
                move othervar to var
+           WHEN  A = B
+               move othervar to var
+           WHEN OTHER
+               move othervar to var
+           END-EVALUATE.
+
+           EVALUATE FALSE
+           WHEN  var-len < 16
+               move othervar (1:var-len - 9)
+                 to var (16 - var-len:var-len - 9)
+           WHEN  var-len > 16
+               move othervar to var
+           WHEN  A = B
+               move othervar to var
            WHEN OTHER
                move othervar to var
            END-EVALUATE.
@@ -2104,7 +2118,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY -std=mf prog.cob ], [0], [],
+AT_CHECK([$COMPILE_ONLY -std=mf prog.cob ], [1], [],
 [prog.cob: 15: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 17: Error (ignored): Offset of 'var' out of bounds: -98
 prog.cob: 22: Warning: Expression '2' EQUALS '3' is always FALSE
@@ -2126,11 +2140,16 @@ prog.cob: 54: Warning: PERFORM ONCE since UNTIL is always TRUE
 prog.cob: 59: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 61: Error (ignored): Offset of 'var' out of bounds: -98
 prog.cob: 62: Warning: Expression '115' GREATER THAN '16' is always TRUE
-prog.cob: 73: Warning: Expression '115' LESS THAN '16' is always FALSE
-prog.cob: 75: Error (ignored): Offset of 'var' out of bounds: -98
-prog.cob: 76: Warning: Expression '115' GREATER THAN '16' is always TRUE
-prog.cob: 69: Warning: Expression '115' EQUALS '15' is always FALSE
-prog.cob: 70: Warning: Expression '115' EQUALS '115' is always TRUE
+prog.cob: 71: Warning: Expression '115' LESS THAN '16' is always FALSE
+prog.cob: 73: Error: Offset of 'var' out of bounds: -99
+prog.cob: 74: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 74: Warning: Expression is always TRUE
+prog.cob: 74: Warning: Expression is always FALSE
+prog.cob: 87: Warning: Expression '115' LESS THAN '16' is always FALSE
+prog.cob: 89: Error (ignored): Offset of 'var' out of bounds: -98
+prog.cob: 90: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 83: Warning: Expression '115' EQUALS '15' is always FALSE
+prog.cob: 84: Warning: Expression '115' EQUALS '115' is always TRUE
 ])
 
 AT_CLEANUP

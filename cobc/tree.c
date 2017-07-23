@@ -148,28 +148,56 @@ unsigned int	gen_screen_ptr = 0;
 
 static struct cb_report *report_checked = NULL;
 
+static	int	save_expr_line = 0;
+static	char	*save_expr_file = NULL;
 static	int	prev_expr_line = 0;
 static	int	prev_expr_pos = 0;
-static	int	prev_expr_warn[4] = {0,0,0,0};
+static	int	prev_expr_warn[6] = {0,0,0,0,0,0};
+static	int	prev_expr_tf[6] = {0,0,0,0,0,0};
 
 /* Local functions */
 
 static int
-was_prev_warn (int linen)
+was_prev_warn (int linen, int tf)
 {
 	int	i;
 	if (cb_exp_line != prev_expr_line) {
 		prev_expr_line = cb_exp_line;
-		for (i=0; i < 4; i++) 
+		for (i=0; i < 6; i++) {
 			prev_expr_warn[i] = 0;
+			prev_expr_tf[i] = -1;
+		}
 	}
-	for (i=0; i < 4; i++) {
-		if (prev_expr_warn[i] == linen)
-			return 1;
+	for (i=0; i < 6; i++) {
+		if (prev_expr_warn[i] == linen) {
+			if (prev_expr_tf[i] == tf)
+				return 1;
+			prev_expr_tf [i] = tf;
+			return 0;
+		}
 	}
-	prev_expr_pos = (prev_expr_pos + 1) % 4;
+	prev_expr_pos = (prev_expr_pos + 1) % 6;
 	prev_expr_warn [prev_expr_pos] = linen;
+	prev_expr_tf [prev_expr_pos] = tf;
 	return 0;
+}
+
+static void
+copy_file_line(cb_tree e, struct cb_literal *yl)
+{
+	if (yl && yl->common.source_line) {
+		e->source_file = yl->common.source_file;
+		e->source_line = yl->common.source_line;
+		e->source_column = yl->common.source_column;
+		save_expr_file = (char *)yl->common.source_file;
+		save_expr_line = yl->common.source_line;
+	} else if (save_expr_line) {
+		e->source_file = save_expr_file;
+		e->source_line = save_expr_line;
+	} else {
+		e->source_line = cb_exp_line;
+		e->source_file = cb_source_file;
+	}
 }
 
 static size_t
@@ -3253,8 +3281,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		return x;
 
 	e = relop = cb_any;
-	e->source_file = NULL;
-	e->source_line = cb_exp_line;
+	copy_file_line (e, NULL);
 	llit = rlit = NULL;
 	bop = (const char*)NULL;
 
@@ -3399,11 +3426,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		}
 		xl = (void*)x;
 		yl = (void*)y;
-		if (yl->common.source_line) {
-			e->source_file = yl->common.source_file;
-			e->source_line = yl->common.source_line;
-			e->source_column = yl->common.source_column;
-		}
 		if (CB_REF_OR_FIELD_P (y)
 		&&  CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
 		&&  !CB_FIELD (cb_ref (y))->flag_any_length
@@ -3418,7 +3440,9 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				for(j=0; xl->data[j] == '0'; j++,i--);
 			}
 			if (i > CB_FIELD (cb_ref (y))->size) {
-				if (cb_warn_constant_expr) {
+				copy_file_line (e, yl);
+				if (cb_warn_constant_expr
+		 		&& !was_prev_warn (e->source_line, 2)) {
 					cb_warning_x (e, _("Literal is longer than field"));
 				}
 				switch(op) {
@@ -3457,7 +3481,9 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				for(j=0; yl->data[j] == '0'; j++,i--);
 			}
 			if (i > CB_FIELD (cb_ref (x))->size) {
-				if (cb_warn_constant_expr) {
+				copy_file_line (e, yl);
+				if (cb_warn_constant_expr
+		 		&& !was_prev_warn (e->source_line, 2)) {
 					cb_warning_x (e, _("Literal is longer than field"));
 				}
 				switch(op) {
@@ -3490,11 +3516,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_NUMERIC_LITERAL_P(y)) {
 			xl = (void*)x;
 			yl = (void*)y;
-			if (yl->common.source_line) {
-				e->source_file = yl->common.source_file;
-				e->source_line = yl->common.source_line;
-				e->source_column = yl->common.source_column;
-			}
 			llit = (char*)xl->data;
 			rlit = (char*)yl->data;
 			if(xl->llit == 0
@@ -3514,6 +3535,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				case '~':
 					bop = "NOT EQUAL";
@@ -3521,6 +3543,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				case '>':
 					bop = "GREATER THAN";
@@ -3528,6 +3551,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				case '<':
 					bop = "LESS THAN";
@@ -3535,6 +3559,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				case ']':
 					bop = "GREATER OR EQUAL";
@@ -3542,6 +3567,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				case '[':
 					bop = "LESS OR EQUAL";
@@ -3549,6 +3575,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
+					copy_file_line (e, yl);
 					break;
 				default:
 					/* never happens */
@@ -3566,11 +3593,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&& !CB_NUMERIC_LITERAL_P(y)) {
 			xl = (void*)x;
 			yl = (void*)y;
-			if (yl->common.source_line) {
-				e->source_file = yl->common.source_file;
-				e->source_line = yl->common.source_line;
-				e->source_column = yl->common.source_column;
-			}
 			llit = (char*)xl->data;
 			rlit = (char*)yl->data;
 			for(i=j=0; xl->data[i] != 0 && yl->data[j] != 0; i++,j++) {
@@ -3592,6 +3614,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			case '~':
 				bop = "NOT EQUAL";
@@ -3599,6 +3622,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			case '>':
 				bop = "GREATER THAN";
@@ -3606,6 +3630,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			case '<':
 				bop = "LESS THAN";
@@ -3613,6 +3638,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			case ']':
 				bop = "GREATER OR EQUAL";
@@ -3620,6 +3646,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			case '[':
 				bop = "LESS OR EQUAL";
@@ -3627,6 +3654,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
+				copy_file_line (e, yl);
 				break;
 			default:
 				/* never happens */
@@ -3658,6 +3686,12 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				else
 					relop = cb_false;
 			}
+		} else if (op == '!') {
+			if (x == cb_true) {
+				relop = cb_false;
+			} else if (x == cb_false) {
+				relop = cb_true;
+			}
 		}
 		category = CB_CATEGORY_BOOLEAN;
 		break;
@@ -3679,22 +3713,24 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 
 	if (relop == cb_true) {
 		if (cb_warn_constant_expr
-		 && !was_prev_warn (e->source_line)) {
+		 && !was_prev_warn (e->source_line, 1)) {
 			if(rlit && llit && bop)
 				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always TRUE"),llit,bop,rlit);
 			else
 				cb_warning_x (e, _("Expression is always TRUE"));
+			prev_expr_line = cb_exp_line = e->source_line;
 		}
 		category = CB_CATEGORY_BOOLEAN;
 		return cb_true;
 	}
 	if (relop == cb_false) {
 		if (cb_warn_constant_expr
-		 && !was_prev_warn (e->source_line)) {
+		 && !was_prev_warn (e->source_line, 0)) {
 			if(rlit && llit && bop)
 				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always FALSE"),llit,bop, rlit);
 			else
 				cb_warning_x (e, _("Expression is always FALSE"));
+			prev_expr_line = cb_exp_line = e->source_line;
 		}
 		category = CB_CATEGORY_BOOLEAN;
 		return cb_false;
@@ -3941,16 +3977,28 @@ cb_build_if (const cb_tree test, const cb_tree stmt1, const cb_tree stmt2,
 	     const unsigned int is_if)
 {
 	struct cb_if *p;
+	struct cb_binary_op	*bop;
 
 	p = make_tree (CB_TAG_IF, CB_CATEGORY_UNKNOWN,
 		       sizeof (struct cb_if));
 	p->test = test;
 	p->stmt1 = stmt1;
 	p->stmt2 = stmt2;
-	if (test == cb_true) {	/* Always TRUE so skip 'else code' */
+	if (test == cb_true) {		/* Always TRUE so skip 'else code' */
 		p->stmt2 = NULL;
 	} else if (test == cb_false) {	/* Always FALSE, so skip 'true code' */
 		p->stmt1 = NULL;
+	}
+	if (p->test
+	 && CB_TREE_TAG (p->test) == CB_TAG_BINARY_OP) {
+		bop = CB_BINARY_OP (p->test);
+		if (bop->op == '!') {
+			if (bop->x == cb_true) {
+				p->stmt1 = NULL;
+			} else if (bop->x == cb_false) {
+				p->stmt2 = NULL;
+			}
+		}
 	}
 	p->is_if = is_if;
 	return CB_TREE (p);

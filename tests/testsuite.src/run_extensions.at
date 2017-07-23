@@ -187,6 +187,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
 [prog.cob: 5: Warning: Expression '1' EQUALS '2' is always FALSE
+prog.cob: 5: Warning: Expression '1' EQUALS '1' is always TRUE
 ])
 AT_CHECK([./prog], [0], [OK], [])
 
