@@ -65,6 +65,7 @@ AT_DATA([prog.cob], [
        01 PIC-9-NOT-SIGNED  PIC 9(3) VALUE 5.
        01 PIC-9-NOT-DECIMAL PIC 9(3) VALUE 5.
        01 PIC-9-DECIMAL     PIC 9(3)V9 VALUE 5.
+       01 COMPUTE-1         PIC 999V9999 VALUE 654.1873.
        01 GROUP-ITEM-X6     PIC X(6) VALUE 'CAT'.
        PROCEDURE DIVISION.
        MAIN.
@@ -120,40 +121,51 @@ AT_DATA([prog.cob], [
               CONTINUE.
            IF 'DOG+CAT' NOT = WS-TEXT
               CONTINUE.
+           IF ( COMPUTE-1 < 654.20038) AND 
+              ( COMPUTE-1 > 654.17422) THEN
+              CONTINUE.
            STOP RUN RETURNING 0.
 ])
 
 AT_CHECK([$COMPILE -std=cobol2002 prog.cob ], [0], [], [prog.cob: In paragraph 'MAIN':
-prog.cob: 16: Warning: Literal '1234567' is longer than GROUP-ITEM-X6
-prog.cob: 16: Warning: Expression is always FALSE
-prog.cob: 18: Warning: Literal '1.1' has more decimals than PIC-9-NOT-DECIMAL
-prog.cob: 18: Warning: Expression is always FALSE
-prog.cob: 28: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
-prog.cob: 30: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
-prog.cob: 32: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN -25
-prog.cob: 34: Warning: Literal '1.12' has more decimals than PIC-9-DECIMAL
-prog.cob: 34: Warning: Expression is always FALSE
-prog.cob: 38: Warning: Literal '1B0' is alphanumeric but PIC-9-NOT-DECIMAL is numeric
-prog.cob: 42: Warning: Literal 'Hot Doggy' is longer than PIC-9-NOT-DECIMAL
-prog.cob: 42: Warning: Expression is always TRUE
-prog.cob: 48: Warning: Literal '123.999' has more decimals than WS-NUMBER
-prog.cob: 48: Warning: Expression is always TRUE
-prog.cob: 50: Warning: Literal '1234' is longer than WS-LINE-NUMBER
-prog.cob: 50: Warning: Expression is always TRUE
-prog.cob: 52: Warning: Literal '1234' is longer than WS-LINE-NUMBER
-prog.cob: 52: Warning: Expression is always FALSE
-prog.cob: 54: Warning: Literal '1234' is longer than WS-LINE-NUMBER
-prog.cob: 54: Warning: Expression is always TRUE
-prog.cob: 56: Warning: Literal '1234' is longer than WS-LINE-NUMBER
-prog.cob: 56: Warning: Expression is always FALSE
-prog.cob: 58: Warning: Literal '1234' is longer than WS-LINE-NUMBER
-prog.cob: 58: Warning: Expression is always TRUE
-prog.cob: 60: Warning: Literal 'DOGGY++' is longer than WS-TEXT
-prog.cob: 62: Warning: Literal '3.141596' is longer than WS-TEXT
-prog.cob: 64: Warning: Literal '3.141596' is longer than WS-TEXT
-prog.cob: 64: Warning: Expression is always FALSE
-prog.cob: 66: Warning: Literal 'DOG+CAT' is longer than WS-TEXT
-prog.cob: 66: Warning: Expression is always TRUE
+prog.cob: 17: Warning: Literal '1234567' is longer than GROUP-ITEM-X6
+prog.cob: 17: Warning: Expression is always FALSE
+prog.cob: 19: Warning: Literal '1.1' has more decimals than PIC-9-NOT-DECIMAL
+prog.cob: 19: Warning: Expression is always FALSE
+prog.cob: 29: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
+prog.cob: 31: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
+prog.cob: 33: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN -25
+prog.cob: 35: Warning: Literal '1.12' has more decimals than PIC-9-DECIMAL
+prog.cob: 35: Warning: Expression is always FALSE
+prog.cob: 39: Warning: Literal '1B0' is alphanumeric but PIC-9-NOT-DECIMAL is numeric
+prog.cob: 43: Warning: Literal 'Hot Doggy' is longer than PIC-9-NOT-DECIMAL
+prog.cob: 43: Warning: Expression is always TRUE
+prog.cob: 49: Warning: Literal '123.999' has more decimals than WS-NUMBER
+prog.cob: 49: Warning: Literal '123.999' is longer than WS-NUMBER
+prog.cob: 49: Warning: Expression is always TRUE
+prog.cob: 51: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 51: Warning: Expression is always TRUE
+prog.cob: 53: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 53: Warning: Expression is always FALSE
+prog.cob: 55: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 55: Warning: Expression is always TRUE
+prog.cob: 57: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 57: Warning: Expression is always FALSE
+prog.cob: 59: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 59: Warning: Expression is always TRUE
+prog.cob: 61: Warning: Literal 'DOGGY++' is longer than WS-TEXT
+prog.cob: 63: Warning: Literal '3.141596' is longer than WS-TEXT
+prog.cob: 65: Warning: Literal '3.141596' is longer than WS-TEXT
+prog.cob: 65: Warning: Expression is always FALSE
+prog.cob: 67: Warning: Literal 'DOG+CAT' is longer than WS-TEXT
+prog.cob: 67: Warning: Expression is always TRUE
+prog.cob: 69: Warning: Literal '654.20038' has more decimals than COMPUTE-1
+prog.cob: 69: Warning: Literal '654.20038' is longer than COMPUTE-1
+prog.cob: 69: Warning: Expression is always FALSE
+prog.cob: 70: Warning: Literal '654.17422' has more decimals than COMPUTE-1
+prog.cob: 70: Warning: Literal '654.17422' is longer than COMPUTE-1
+prog.cob: 70: Warning: Expression is always TRUE
+prog.cob: 70: Warning: Expression is always FALSE
 ])
 
 AT_CHECK([./prog], [0], [], [])
