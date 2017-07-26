@@ -3360,12 +3360,14 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 		case '~':
 			return cb_true;
 		}
+		if (!cb_warn_constant_expr)
+			return cb_any;
 	}
 
 	if (alph_lit) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 2)) {
+		&& !was_prev_warn (e->source_line, 3)) {
 			cb_warning_x (e, _("Literal '%s' is alphanumeric but %s is numeric"),
 						display_literal(lit_disp,l),f->name);
 		}
@@ -3379,7 +3381,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	if (i > f->size) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 2)) {
+		&& !was_prev_warn (e->source_line, 4)) {
 			cb_warning_x (e, _("Literal '%s' is longer than %s"),
 						display_literal(lit_disp,l),f->name);
 		}
@@ -3408,7 +3410,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	 && f->pic->have_sign == 0) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 2)) {
+		&& !was_prev_warn (e->source_line, 5)) {
 			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN ZERO"),f->name);
 		}
 	} else
@@ -3417,7 +3419,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	 && l->sign < 0) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 2)) {
+		&& !was_prev_warn (e->source_line, 5)) {
 			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN %s"),
 					f->name,display_literal(lit_disp,l));
 		}
