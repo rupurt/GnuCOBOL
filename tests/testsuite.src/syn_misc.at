@@ -58,49 +58,102 @@ AT_DATA([prog.cob], [
        PROGRAM-ID. prog.
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-LINE-NUMBER PIC 9(3) VALUE ZERO.
-       01 WS-NUMBER      PIC 9(3)V99 VALUE ZERO.
-       01 WS-TEXT        PIC X(5) VALUE 'CAT'.
+       01 WS-LINE-NUMBER    PIC 9(3) VALUE ZERO.
+       01 WS-NUMBER         PIC 9(3)V99 VALUE ZERO.
+       01 WS-TEXT           PIC X(5) VALUE 'CAT'.
+       01 PIC-9-SIGNED      PIC S9(2) VALUE 5.
+       01 PIC-9-NOT-SIGNED  PIC 9(3) VALUE 5.
+       01 PIC-9-NOT-DECIMAL PIC 9(3) VALUE 5.
+       01 PIC-9-DECIMAL     PIC 9(3)V9 VALUE 5.
+       01 GROUP-ITEM-X6     PIC X(6) VALUE 'CAT'.
        PROCEDURE DIVISION.
-       IF WS-LINE-NUMBER > '123'
-          CONTINUE.
-       IF WS-TEXT > 'DOGGY'
-          CONTINUE.
-       IF WS-NUMBER > 123.999
-          CONTINUE.
-       IF WS-LINE-NUMBER > 1234
-          CONTINUE.
-       IF WS-LINE-NUMBER <= 1234
-          CONTINUE.
-       IF WS-LINE-NUMBER > '1234'
-          CONTINUE.
-       IF 1234 < WS-LINE-NUMBER 
-          CONTINUE.
-       IF 1234 >= WS-LINE-NUMBER 
-          CONTINUE.
-       IF WS-TEXT > 'DOGGY++'
-          CONTINUE.
-       IF WS-TEXT > 3141596
-          CONTINUE.
-       IF 'DOG+CAT' NOT = WS-TEXT
-          CONTINUE.
-       STOP RUN RETURNING 0.
+       MAIN.
+           IF GROUP-ITEM-X6 = '1234567' 
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL = 1.1
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL = 1.0
+               CONTINUE.
+           IF PIC-9-DECIMAL = 1.1
+               CONTINUE.
+           IF PIC-9-DECIMAL = 1.100
+               CONTINUE.
+           IF PIC-9-SIGNED NOT = 11.0
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED < 0
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED < ZERO
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED < (25 - 50)
+               CONTINUE.
+           IF PIC-9-DECIMAL = (2.24 / 2)
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL = "123"
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL = "1B0"
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL (1:3) = "1B0"
+               CONTINUE.
+           IF PIC-9-NOT-DECIMAL (1:3) NOT = "Hot Doggy"
+               CONTINUE.
+           IF WS-LINE-NUMBER > '123'
+              CONTINUE.
+           IF WS-TEXT > 'DOGGY'
+              CONTINUE.
+           IF WS-NUMBER > 123.999
+              CONTINUE.
+           IF WS-LINE-NUMBER > 1234
+              CONTINUE.
+           IF WS-LINE-NUMBER <= 1234
+              CONTINUE.
+           IF WS-LINE-NUMBER > '1234'
+              CONTINUE.
+           IF 1234 < WS-LINE-NUMBER 
+              CONTINUE.
+           IF 1234 >= WS-LINE-NUMBER 
+              CONTINUE.
+           IF WS-TEXT > 'DOGGY++'
+              CONTINUE.
+           IF WS-TEXT > 3.141596
+              CONTINUE.
+           IF WS-TEXT = 3.141596
+              CONTINUE.
+           IF 'DOG+CAT' NOT = WS-TEXT
+              CONTINUE.
+           STOP RUN RETURNING 0.
 ])
 
-AT_CHECK([$COMPILE -std=cobol2002 prog.cob ], [0], [], [prog.cob: 16: Warning: Literal is longer than field
+AT_CHECK([$COMPILE -std=cobol2002 prog.cob ], [0], [], [prog.cob: In paragraph 'MAIN':
+prog.cob: 16: Warning: Literal '1234567' is longer than GROUP-ITEM-X6
 prog.cob: 16: Warning: Expression is always FALSE
-prog.cob: 18: Warning: Literal is longer than field
-prog.cob: 18: Warning: Expression is always TRUE
-prog.cob: 20: Warning: Literal is longer than field
-prog.cob: 20: Warning: Expression is always FALSE
-prog.cob: 22: Warning: Literal is longer than field
-prog.cob: 22: Warning: Expression is always FALSE
-prog.cob: 24: Warning: Literal is longer than field
-prog.cob: 24: Warning: Expression is always TRUE
-prog.cob: 26: Warning: Literal is longer than field
-prog.cob: 28: Warning: Literal is longer than field
-prog.cob: 30: Warning: Literal is longer than field
-prog.cob: 30: Warning: Expression is always TRUE
+prog.cob: 18: Warning: Literal '1.1' has more decimals than PIC-9-NOT-DECIMAL
+prog.cob: 18: Warning: Expression is always FALSE
+prog.cob: 28: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
+prog.cob: 30: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
+prog.cob: 32: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN -25
+prog.cob: 34: Warning: Literal '1.12' has more decimals than PIC-9-DECIMAL
+prog.cob: 34: Warning: Expression is always FALSE
+prog.cob: 38: Warning: Literal '1B0' is alphanumeric but PIC-9-NOT-DECIMAL is numeric
+prog.cob: 42: Warning: Literal 'Hot Doggy' is longer than PIC-9-NOT-DECIMAL
+prog.cob: 42: Warning: Expression is always TRUE
+prog.cob: 48: Warning: Literal '123.999' has more decimals than WS-NUMBER
+prog.cob: 48: Warning: Expression is always TRUE
+prog.cob: 50: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 50: Warning: Expression is always TRUE
+prog.cob: 52: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 52: Warning: Expression is always FALSE
+prog.cob: 54: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 54: Warning: Expression is always TRUE
+prog.cob: 56: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 56: Warning: Expression is always FALSE
+prog.cob: 58: Warning: Literal '1234' is longer than WS-LINE-NUMBER
+prog.cob: 58: Warning: Expression is always TRUE
+prog.cob: 60: Warning: Literal 'DOGGY++' is longer than WS-TEXT
+prog.cob: 62: Warning: Literal '3.141596' is longer than WS-TEXT
+prog.cob: 64: Warning: Literal '3.141596' is longer than WS-TEXT
+prog.cob: 64: Warning: Expression is always FALSE
+prog.cob: 66: Warning: Literal 'DOG+CAT' is longer than WS-TEXT
+prog.cob: 66: Warning: Expression is always TRUE
 ])
 
 AT_CHECK([./prog], [0], [], [])

@@ -1,4 +1,9 @@
 
+2017-07-26  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: 
+	  Improve warning messages for comparing literals to fields
+
 2017-07-23  Ron Norman <rjn@inglenet.com>
 
 	* tree.c: 
@@ -8,7 +13,6 @@
 	  Turn off ignore of errors as required
 	* codegen.c: 
 	  Emit line# in C code for WHEN statements
-
 
 2017-07-19  Ron Norman <rjn@inglenet.com>
 
