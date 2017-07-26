@@ -141,8 +141,6 @@ prog.cob: 39: Warning: Literal '1B0' is alphanumeric but PIC-9-NOT-DECIMAL is nu
 prog.cob: 43: Warning: Literal 'Hot Doggy' is longer than PIC-9-NOT-DECIMAL
 prog.cob: 43: Warning: Expression is always TRUE
 prog.cob: 49: Warning: Literal '123.999' has more decimals than WS-NUMBER
-prog.cob: 49: Warning: Literal '123.999' is longer than WS-NUMBER
-prog.cob: 49: Warning: Expression is always TRUE
 prog.cob: 51: Warning: Literal '1234' is longer than WS-LINE-NUMBER
 prog.cob: 51: Warning: Expression is always TRUE
 prog.cob: 53: Warning: Literal '1234' is longer than WS-LINE-NUMBER
@@ -160,12 +158,7 @@ prog.cob: 65: Warning: Expression is always FALSE
 prog.cob: 67: Warning: Literal 'DOG+CAT' is longer than WS-TEXT
 prog.cob: 67: Warning: Expression is always TRUE
 prog.cob: 69: Warning: Literal '654.20038' has more decimals than COMPUTE-1
-prog.cob: 69: Warning: Literal '654.20038' is longer than COMPUTE-1
-prog.cob: 69: Warning: Expression is always FALSE
 prog.cob: 70: Warning: Literal '654.17422' has more decimals than COMPUTE-1
-prog.cob: 70: Warning: Literal '654.17422' is longer than COMPUTE-1
-prog.cob: 70: Warning: Expression is always TRUE
-prog.cob: 70: Warning: Expression is always FALSE
 ])
 
 AT_CHECK([./prog], [0], [], [])

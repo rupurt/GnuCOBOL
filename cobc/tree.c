@@ -3350,7 +3350,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	 && f->pic->scale < scale) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 2)) {
+		&& !was_prev_warn (e->source_line, 4)) {
 			cb_warning_x (e, _("Literal '%s' has more decimals than %s"),
 						display_literal(lit_disp,l),f->name);
 		}
@@ -3360,8 +3360,6 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 		case '~':
 			return cb_true;
 		}
-		if (!cb_warn_constant_expr)
-			return cb_any;
 	}
 
 	if (alph_lit) {
@@ -3393,7 +3391,9 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 			return cb_true;
 			break;
 		}
-		if (f->pic->category == CB_CATEGORY_NUMERIC) {
+		if (f->pic->category == CB_CATEGORY_NUMERIC
+		 && scale == 0
+		 && f->pic->scale == 0) {
 			switch(op) {
 			case '>':
 			case ']':
