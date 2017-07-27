@@ -3288,7 +3288,7 @@ display_literal (char *disp, struct cb_literal *l)
 
 /* Check if comparing field to literal is always TRUE or FALSE */
 static cb_tree
-compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
+compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_literal *l)
 {
 	int	i, j, scale;
 	int	alph_lit, ref_mod, zero_val;
@@ -3322,7 +3322,8 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	if ((f->pic->category != CB_CATEGORY_NUMERIC
 	  && f->pic->category != CB_CATEGORY_NUMERIC_EDITED)
 	 || ref_mod) {
-		if (i > f->size) {
+		if (i > f->size
+		 && !ref_mod) {	/* Leave reference mod to run-time */
 			copy_file_line (e, l);
 			if (cb_warn_constant_expr
 			&& !was_prev_warn (e->source_line, 2)) {
@@ -3339,7 +3340,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 		return cb_any;
 	}
 
-	if (f->pic->scale < 0)
+	if (f->pic->scale < 0)		/* Leave for run-time */
 		return cb_any;
 
 	scale = l->scale;
@@ -3347,6 +3348,7 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 		scale--;
 
 	if (scale > 0
+	 && f->pic->scale >= 0
 	 && f->pic->scale < scale) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
@@ -3365,42 +3367,47 @@ compare_field_literal (cb_tree e, cb_tree x, const int op, struct cb_literal *l)
 	if (alph_lit) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 3)) {
+		 && f->pic->category == CB_CATEGORY_NUMERIC
+		 && !was_prev_warn (e->source_line, 3)) {
 			cb_warning_x (e, _("Literal '%s' is alphanumeric but %s is numeric"),
 						display_literal(lit_disp,l),f->name);
 		}
+		return cb_any;
 	}
 
+	/* Adjust for leading ZERO & trailing ZEROS|SPACES in literal */
+	for (i = strlen ((const char *)l->data); i>0 && l->data[i-1] == ' '; i--);
 	for(j=0; l->data[j] == '0'; j++,i--);
 	scale = l->scale;
 	for (j = strlen ((const char *)l->data); scale > 0 && j > 0 && l->data[j-1] == '0'; j--,i--)
 		scale--;
 
-	if (i > f->size) {
+	/* If Literal has more digits in whole portion than field can hold
+	 * Then the literal value will never match the field contents 
+	 */
+	if ((i - scale) >= 0
+	 && (f->size - f->pic->scale) >= 0
+	 && (i - scale) > (f->size - f->pic->scale)) {
 		copy_file_line (e, l);
 		if (cb_warn_constant_expr
 		&& !was_prev_warn (e->source_line, 4)) {
-			cb_warning_x (e, _("Literal '%s' is longer than %s"),
+			cb_warning_x (e, _("Literal '%s' has more digits than %s"),
 						display_literal(lit_disp,l),f->name);
 		}
 		switch(op) {
 		case '=':
 			return cb_false;
-			break;
 		case '~':
 			return cb_true;
-			break;
 		}
-		if (f->pic->category == CB_CATEGORY_NUMERIC
-		 && scale == 0
-		 && f->pic->scale == 0) {
+		if (f->pic->category == CB_CATEGORY_NUMERIC) {
 			switch(op) {
 			case '>':
 			case ']':
-				return cb_true;
+				return swap ? cb_true : cb_false;
 			case '<':
 			case '[':
-				return cb_false;
+				return swap ? cb_false : cb_true;
 			}
 		}
 	}
@@ -3604,13 +3611,13 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		&&  CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
 		&&  (CB_LITERAL_P(x) || x == cb_zero)
 		&&  xl->all == 0) {
-			relop = compare_field_literal (e, y, op, xl);
+			relop = compare_field_literal (e, 1, y, op, xl);
 		} else
 		if (CB_REF_OR_FIELD_P (x)
 		&&  CB_FIELD (cb_ref (x))->usage == CB_USAGE_DISPLAY
 		&&  (CB_LITERAL_P(y) || y == cb_zero)
 		&&  yl->all == 0) {
-			relop = compare_field_literal (e, x, op, yl);
+			relop = compare_field_literal (e, 0, x, op, yl);
 		} else
 		/*
 		 * If this is an operation between two simple integer numerics
