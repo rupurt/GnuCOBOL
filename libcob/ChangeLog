@@ -1,4 +1,7 @@
 
+2017-08-06 Ron Norman <rjn@inglenet.com>
+	* fileio.c: fix coding error testing fl->keys
+
 2017-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
 	* common.h (COB_REPORT_*): prevent undefined behaviour caused by 1 << 31
@@ -10,7 +13,6 @@
 	  was removed and runtime.cfg variable was then present
 
 2017-05-31 Ron Norman <rjn@inglenet.com>
-
 	* fileio.c: 
 	 For BDB, on OPEN, if the first record in the file has a size
 	 larger than the FD has defined then return status 39
