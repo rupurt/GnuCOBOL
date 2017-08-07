@@ -6947,7 +6947,7 @@ cob_file_external_addr (const char *exname,
 		fl->file_version = COB_FILE_VERSION;
 
 	if (nkeys > 0
-	 && fl->keys != NULL) {
+	 && fl->keys == NULL) {
 		fl->keys = cob_cache_malloc (sizeof(cob_file_key) * nkeys);
 	}
 	if (pky != NULL) {
