@@ -1800,10 +1800,29 @@ void
 cob_stop_run (const int status)
 {
 	struct exit_handlerlist	*h;
+	cob_module	*mod;
+	int		k;
+	int		(*cancel_func)(const int);
 
 	if (!cob_initialized) {
 		exit (1);
 	}
+	/* Call each module to release 'decimal' memory */
+	for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
+		mod->flag_did_cancel = 0;
+		/* Recursive modules create a loop in the module chain */
+		/* Avoid an infinite processing loop */
+	}
+
+	for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
+		if (mod->module_cancel.funcint
+		 && !mod->flag_did_cancel) {
+			mod->flag_did_cancel = 1;
+			cancel_func = mod->module_cancel.funcint;
+			(void)cancel_func (-20);	/* Special value to indicate, just decimals */
+		}
+	}
+
 	if (exit_hdlrs != NULL) {
 		h = exit_hdlrs;
 		while (h != NULL) {
@@ -6437,7 +6456,7 @@ cob_dump_module(char *reason)
 	cob_module	*mod;
 	FILE		*fp;
 	int		(*cancel_func)(const int);
-	int		num_stmts = 0;
+	int		num_stmts = 0, k;
 	if (COB_MODULE_PTR
 	 && COB_MODULE_PTR->flag_dump_ready) {		/* Was it compiled with -fdump= */
 		fp = cob_get_dump_file(COB_DUMP_TO_FILE);
@@ -6454,8 +6473,15 @@ cob_dump_module(char *reason)
 		if(num_stmts == 0)
 			return;
 		fprintf(fp,"\n");
-		for(mod = COB_MODULE_PTR; mod; mod = mod->next) {
-			if(mod->module_cancel.funcint) {
+
+		for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
+			mod->flag_did_cancel = 0;
+		}
+
+		for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
+			if (mod->module_cancel.funcint
+			 && !mod->flag_did_cancel) {
+				mod->flag_did_cancel = 1;
 				cancel_func = mod->module_cancel.funcint;
 				fprintf(fp,_("Dump Program-Id %s from %s compiled %s\n"),
 						mod->module_name,mod->module_source,mod->module_formatted_date);

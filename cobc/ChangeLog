@@ -1,4 +1,10 @@
 
+2017-08-12  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: 
+	  Place all code to clear Decimal Constant values under
+	  P_clear_decimal: and invoke that code when 'entry' is -20
+
 2017-07-27  Ron Norman <rjn@inglenet.com>
 
 	* tree.c: 
