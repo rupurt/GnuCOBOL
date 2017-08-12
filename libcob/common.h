@@ -1161,7 +1161,8 @@ typedef struct __cob_module {
 	unsigned char		flag_exit_program;	/* Exit after CALL */
 
 	unsigned char		flag_dump_ready;	/* Module was compiled with -fdump */
-	unsigned char		unused[3];		/* Use these flags up later */
+	unsigned char		flag_did_cancel;	/* Module has been canceled */
+	unsigned char		unused[2];		/* Use these flags up later */
 
 	unsigned int		module_stmt;		/* Last statement executed */
 	const char		**module_sources;	/* Source module names compiled */
