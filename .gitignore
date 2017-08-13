@@ -5,6 +5,7 @@
 /*.tmp
 /.deps
 /Makefile
+/Makefile.in
 /atlocal
 /autom4te.cache
 bin/*.1
@@ -14,6 +15,7 @@ bin/*.gcda
 bin/*.gcno
 bin/.deps
 bin/Makefile
+bin/Makefile.in
 bin/atlocal
 bin/cob-config
 bin/cobcrun
@@ -104,6 +106,7 @@ cobc/*.output
 cobc/*.vcg
 cobc/.deps
 cobc/Makefile
+cobc/Makefile.in
 cobc/atlocal
 cobc/cobc
 cobc/parser.c
@@ -116,14 +119,17 @@ cobc/scanner.c
 /conf*.file
 /confdefs.h
 /config.h
+/config.h.in
 /config.log
 /config.status
 config/.deps
 config/Makefile
+config/Makefile.in
 config/atlocal
 /conftest*
 copy/.deps
 copy/Makefile
+copy/Makefile.in
 copy/atlocal
 /defaults.h
 doc/*.cps
@@ -131,6 +137,7 @@ doc/*.tex
 doc/*.vrs
 doc/.deps
 doc/Makefile
+doc/Makefile.in
 doc/atlocal
 doc/gnucobol.aux
 doc/gnucobol.cp
@@ -146,9 +153,11 @@ doc/gnucobol.tp
 doc/gnucobol.vr
 extras/*.dll
 extras/Makefile
+extras/Makefile.in
 /gnu-cobol-*
 lib/.deps
 lib/Makefile
+lib/Makefile.in
 lib/atlocal
 libcob/*.3
 libcob/*.edited
@@ -156,6 +165,7 @@ libcob/*.gcda
 libcob/*.gcno
 libcob/.deps
 libcob/Makefile
+libcob/Makefile.in
 libcob/atlocal
 /libtool
 m4/.deps
@@ -172,8 +182,10 @@ po/en@boldquot.po
 po/en@quot.po
 po/remove-potcdate.sed
 /stamp-h1
+/tarstamp.h
 tests/.deps
 tests/Makefile
+tests/Makefile.in
 tests/atconfig
 tests/atlocal*
 tests/cobol85/*.cob
@@ -186,6 +198,7 @@ tests/cobol85/IC
 tests/cobol85/IF
 tests/cobol85/IX
 tests/cobol85/Makefile
+tests/cobol85/Makefile.in
 tests/cobol85/NC
 tests/cobol85/OB
 tests/cobol85/RL
