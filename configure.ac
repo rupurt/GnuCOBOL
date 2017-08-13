@@ -413,11 +413,9 @@ AC_CHECK_HEADERS([gmp.h], [], AC_MSG_ERROR([gmp.h (GMP) is required]), [])
 
 AC_CHECK_LIB([gmp], [__gmpz_init],
 	[LIBCOB_LIBS="$LIBCOB_LIBS -lgmp"],
-	AC_MSG_ERROR([GMP is required]), [])
+	AC_MSG_ERROR([GMP library is required]), [])
 
 # Check just major/minor levels between header and library
-MYOLDLIBS=$LIBS
-LIBS="$MYOLDLIBS -lgmp"
 # get GMP version from header
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	#include <stdio.h>
@@ -434,9 +432,11 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	[AC_MSG_ERROR([Unable to extract GMP version information from gmp.h])],
 	[])
 if test "x$COB_GMP_HEADER" = "x"; then
-	AC_MSG_ERROR([Unable to extract GMP version information])
+	AC_MSG_ERROR([Unable to extract GMP version information (header)])
 fi
 
+MYOLDLIBS=$LIBS
+LIBS="$MYOLDLIBS -lgmp"
 # get GMP version from lib
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	#include <stdio.h>
@@ -453,7 +453,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 	[AC_MSG_ERROR([Unable to extract GMP version information from gmp_version])],
 	[])
 if test "x$COB_GMP_LIB" = "x"; then
-	AC_MSG_ERROR([Unable to extract GMP version information])
+	AC_MSG_ERROR([Unable to extract GMP version information (library)])
 fi
 
 AC_MSG_CHECKING([matching GMP version])
@@ -865,6 +865,20 @@ if test "$COB_USES_GCC_ONLY" = "yes"; then
 	CFLAGS="$MYOLDCFLAGS"
 fi
 
+
+COB_HAS_64_BIT_POINTER="no"
+AC_MSG_CHECKING([if pointer is longer than 32 bits])
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
+	if (sizeof (void *) > 4U)
+		return 0;
+	return 1;
+	]])],
+	[COB_HAS_64_BIT_POINTER="yes"
+	 AC_DEFINE([COB_64_BIT_POINTER], [1])
+	 AC_MSG_RESULT([yes])],
+	[AC_MSG_RESULT([no])],
+	[])
+
 #if test "$enable_debug" != "yes" -a "$COB_USES_GCC_ONLY" = "yes"; then
 #	MYOLDCFLAGS="$CFLAGS"
 #	CFLAGS="$CFLAGS -fno-asynchronous-unwind-tables"
@@ -1196,7 +1210,8 @@ else
 	COB_HAS_UTC_OFFSET="yes"
 fi
 AC_SUBST([COB_HAS_UTC_OFFSET])
-AC_SUBST([COB_PATCH_LEVEL], [$with_patch_level])
+AC_SUBST([COB_HAS_64_BIT_POINTER])
+AC_SUBST([COB_PATCH_LEVEL], [$with_patch_level]) # needed for bin/cob-config
 
 AC_CONFIG_FILES([bin/cob-config Makefile libcob/Makefile lib/Makefile
 	cobc/Makefile bin/Makefile po/Makefile.in doc/Makefile
