@@ -153,6 +153,8 @@ doc/gnucobol.t2p
 doc/gnucobol.toc
 doc/gnucobol.tp
 doc/gnucobol.vr
+doc/stamp-vti
+doc/version.texi
 extras/*.dll
 extras/Makefile
 extras/Makefile.in
