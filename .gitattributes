@@ -1,8 +1,6 @@
 * text=auto !eol
 /Makefile.am eol=lf
-/Makefile.in eol=lf
 bin/Makefile.am eol=lf
-bin/Makefile.in eol=lf
 bin/cob-config.in eol=lf
 bin/cobcrun.c eol=lf
 build_aux/bootstrap eol=lf
@@ -100,7 +98,6 @@ build_windows/vs2017/libcob.vcxproj.filters eol=crlf
 build_windows/vs2017/libsupport.vcxproj eol=crlf
 build_windows/vs2017/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
-cobc/Makefile.in eol=lf
 config/Makefile.am eol=lf
 config/rm-strict.conf -text
 config/rm.conf -text
@@ -120,7 +117,6 @@ extras/Makefile.am eol=lf
 lib/Makefile.am eol=lf
 /libcob.h eol=lf
 libcob/Makefile.am eol=lf
-libcob/Makefile.in eol=lf
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
