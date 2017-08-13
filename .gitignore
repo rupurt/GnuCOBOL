@@ -6,6 +6,7 @@
 /.deps
 /Makefile
 /Makefile.in
+/aclocal.m4
 /atlocal
 /autom4te.cache
 bin/*.1
@@ -126,6 +127,7 @@ config/.deps
 config/Makefile
 config/Makefile.in
 config/atlocal
+/configure
 /conftest*
 copy/.deps
 copy/Makefile

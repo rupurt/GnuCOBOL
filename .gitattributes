@@ -1,6 +1,5 @@
 * text=auto !eol
 /Makefile.am eol=lf
-/aclocal.m4 eol=lf
 bin/Makefile.am eol=lf
 bin/cob-config.in eol=lf
 bin/cobcrun.c eol=lf
@@ -103,7 +102,6 @@ config/Makefile.am eol=lf
 config/rm-strict.conf -text
 config/rm.conf -text
 config/rm.words -text
-/configure eol=lf
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
 /create_win_dist.sh eol=lf
