@@ -1,4 +1,8 @@
 
+2017-08-14  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* tree.c: fixed tree cast error for literals
+
 2017-08-12  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: 
