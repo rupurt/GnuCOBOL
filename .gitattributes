@@ -102,7 +102,6 @@ config/Makefile.am eol=lf
 config/rm-strict.conf -text
 config/rm.conf -text
 config/rm.words -text
-/configure eol=lf
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
 /create_win_dist.sh eol=lf
@@ -110,8 +109,6 @@ doc/Makefile.am eol=lf
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
 doc/gnucobol.texi eol=lf
-doc/stamp-vti eol=lf
-doc/version.texi eol=lf
 extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
