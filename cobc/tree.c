@@ -1,7 +1,6 @@
 /*
-   Copyright (C) 2001-2012, 2014-2015 Free Software Foundation, Inc.
-   Written by Keisuke Nishida, Roger While, Simon Sobisch
-   Copyright (C) 2013-2016 Ron Norman
+   Copyright (C) 2001-2017 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
 
@@ -3597,16 +3596,24 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			cb_error_x (e, _("Invalid expression"));
 			return cb_error_node;
 		}
-		xl = CB_LITERAL(x);
+
 		if (x == cb_zero) {
 			xl = CB_LITERAL(cb_zero_lit);
 			xl->common.source_line = prev_expr_line = cb_exp_line;
+		} else if (CB_LITERAL_P(x)) {
+			xl = CB_LITERAL(x);
+		} else {
+			xl = NULL;
 		}
-		yl = CB_LITERAL(y);
 		if (y == cb_zero) {
 			yl = CB_LITERAL(cb_zero_lit);
 			yl->common.source_line = prev_expr_line = cb_exp_line;
+		} else if (CB_LITERAL_P(y)) {
+			yl = CB_LITERAL(y);
+		} else {
+			yl = NULL;
 		}
+
 		if (CB_REF_OR_FIELD_P (y)
 		&&  CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
 		&&  (CB_LITERAL_P(x) || x == cb_zero)
