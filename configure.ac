@@ -873,8 +873,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 		return 0;
 	return 1;
 	]])],
-	[COB_HAS_64_BIT_POINTER="yes"
-	 AC_DEFINE([COB_64_BIT_POINTER], [1])
+	[COB_HAS_64_BIT_POINTER="yes"], [1])
 	 AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])],
 	[])
