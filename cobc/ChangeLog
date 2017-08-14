@@ -2,6 +2,7 @@
 2017-08-14  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* tree.c: fixed tree cast error for literals
+	* typeck.c (cb_build_cond): fixed tree cast error with cb_arithmetic_osvs
 
 2017-08-12  Ron Norman <rjn@inglenet.com>
 
