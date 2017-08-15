@@ -5278,7 +5278,7 @@ prog.cob: 48: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 51: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 55: Warning: Precision of result may change with arithmetic_osvs
 prog.cob: 61: Warning: Precision of result may change with arithmetic_osvs
-prog.cob: 67: Warning: Precision of result may change with arithmetic_osvs
+prog.cob: 66: Warning: Precision of result may change with arithmetic_osvs
 ])
 
 AT_CHECK([./prog], [0], [Simple Compute  RSLT IS 400
@@ -8181,8 +8181,8 @@ AT_DATA([prog.cob], [
       *
        PROCEDURE DIVISION.
        MAIN.
-	       DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-	       ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
+           DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
+           ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
            DISPLAY "ENVPONY env var set to " MYPONYENV ";".
            DISPLAY "1st Dog's name is " DOGGY ";".
            DISPLAY "2nd Dog's name is " PONY ";".
@@ -8246,8 +8246,8 @@ AT_DATA([prog.cob], [
       *
        PROCEDURE DIVISION.
        MAIN.
-	       DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-	       ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
+           DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
+           ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
            DISPLAY "ENVPONY env var set to " MYPONYENV ";".
            DISPLAY "1st Dog's name is " DOGGY ";".
            DISPLAY "2nd Dog's name is " PONY ";".
@@ -8884,7 +8884,7 @@ AT_DATA([prog.cob], [
                GO TO CHECK-EXIT
            END-IF.
            MOVE TEST-RESULT (TESTNUM, TESTMODE) TO TESTRESULT.
-		   COMPUTE TESTIDX = TESTMODE + 3.
+    	   COMPUTE TESTIDX = TESTMODE + 3.
            IF BIT-MODE = 32
            AND TEST-RESULT (TESTNUM, TESTIDX) NOT = SPACES
                MOVE TEST-RESULT (TESTNUM, TESTIDX) TO TESTRESULT.
@@ -9515,7 +9515,7 @@ AT_DATA([prog.cob], [
                GO TO CHECK-EXIT
            END-IF.
            MOVE TEST-RESULT (TESTNUM, TESTMODE) TO TESTRESULT.
-		   COMPUTE TESTIDX = TESTMODE + 3.
+    	   COMPUTE TESTIDX = TESTMODE + 3.
            IF BIT-MODE = 32
            AND TEST-RESULT (TESTNUM, TESTIDX) NOT = SPACES
                MOVE TEST-RESULT (TESTNUM, TESTIDX) TO TESTRESULT.
@@ -10146,7 +10146,7 @@ AT_DATA([prog.cob], [
                GO TO CHECK-EXIT
            END-IF.
            MOVE TEST-RESULT (TESTNUM, TESTMODE) TO TESTRESULT.
-		   COMPUTE TESTIDX = TESTMODE + 3.
+    	   COMPUTE TESTIDX = TESTMODE + 3.
            IF BIT-MODE = 32
            AND TEST-RESULT (TESTNUM, TESTIDX) NOT = SPACES
                MOVE TEST-RESULT (TESTNUM, TESTIDX) TO TESTRESULT.
