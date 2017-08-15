@@ -182,18 +182,35 @@ was_prev_warn (int linen, int tf)
 	return 0;
 }
 
+/* get best position (note: in the case of constants y/x point to DATA-DIVISION) */
 static void
-copy_file_line(cb_tree e, struct cb_literal *yl)
+copy_file_line (cb_tree e, cb_tree y, cb_tree x)
 {
-	if (yl 
-	 && yl->common.source_line) {
-		e->source_file = yl->common.source_file;
-		e->source_line = yl->common.source_line;
-		e->source_column = yl->common.source_column;
-		save_expr_file = (char *)yl->common.source_file;
-		save_expr_line = yl->common.source_line;
-	} else if (yl 
-		&& yl->common.source_line == 0) {
+	if (y == cb_zero) {
+		e->source_line = prev_expr_line = cb_exp_line;
+		e->source_file = cb_source_file;
+	} else if (x == cb_zero) {
+		e->source_line = prev_expr_line = cb_exp_line;
+		e->source_file = cb_source_file;
+	} else if (y && x && y->source_line > x->source_line) {
+		e->source_file = y->source_file;
+		e->source_line = y->source_line;
+		e->source_column = y->source_column;
+		save_expr_file = (char *)y->source_file;
+		save_expr_line = y->source_line;
+	} else if (y && y->source_line) {
+		e->source_file = y->source_file;
+		e->source_line = y->source_line;
+		e->source_column = y->source_column;
+		save_expr_file = (char *)y->source_file;
+		save_expr_line = y->source_line;
+	} else if (x && x->source_line) {
+		e->source_file = x->source_file;
+		e->source_line = x->source_line;
+		e->source_column = x->source_column;
+		save_expr_file = (char *)x->source_file;
+		save_expr_line = x->source_line;
+	} else if (y && y->source_line == 0) {
 		e->source_line = cb_exp_line;
 		e->source_file = cb_source_file;
 	} else if (save_expr_line) {
@@ -3323,7 +3340,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	 || ref_mod) {
 		if (i > f->size
 		 && !ref_mod) {	/* Leave reference mod to run-time */
-			copy_file_line (e, l);
+			copy_file_line (e, CB_TREE(l), NULL);
 			if (cb_warn_constant_expr
 			&& !was_prev_warn (e->source_line, 2)) {
 				cb_warning_x (e, _("Literal '%.38s' is longer than %s"),
@@ -3349,7 +3366,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	if (scale > 0
 	 && f->pic->scale >= 0
 	 && f->pic->scale < scale) {
-		copy_file_line (e, l);
+		copy_file_line (e, CB_TREE(l), NULL);
 		if (cb_warn_constant_expr
 		&& !was_prev_warn (e->source_line, 4)) {
 			cb_warning_x (e, _("Literal '%s' has more decimals than %s"),
@@ -3364,7 +3381,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	}
 
 	if (alph_lit) {
-		copy_file_line (e, l);
+		copy_file_line (e, CB_TREE(l), NULL);
 		if (cb_warn_constant_expr
 		 && f->pic->category == CB_CATEGORY_NUMERIC
 		 && !was_prev_warn (e->source_line, 3)) {
@@ -3387,7 +3404,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	if ((i - scale) >= 0
 	 && (f->size - f->pic->scale) >= 0
 	 && (i - scale) > (f->size - f->pic->scale)) {
-		copy_file_line (e, l);
+		copy_file_line (e, CB_TREE(l), NULL);
 		if (cb_warn_constant_expr
 		&& !was_prev_warn (e->source_line, 4)) {
 			cb_warning_x (e, _("Literal '%s' has more digits than %s"),
@@ -3414,7 +3431,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	if (zero_val
 	 && op == '<'
 	 && f->pic->have_sign == 0) {
-		copy_file_line (e, l);
+		copy_file_line (e, CB_TREE(l), NULL);
 		if (cb_warn_constant_expr
 		&& !was_prev_warn (e->source_line, 5)) {
 			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN ZERO"),f->name);
@@ -3423,7 +3440,7 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 	if (op == '<'
 	 && f->pic->have_sign == 0
 	 && l->sign < 0) {
-		copy_file_line (e, l);
+		copy_file_line (e, CB_TREE(l), NULL);
 		if (cb_warn_constant_expr
 		&& !was_prev_warn (e->source_line, 5)) {
 			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN %s"),
@@ -3453,7 +3470,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		return x;
 
 	e = relop = cb_any;
-	copy_file_line (e, NULL);
+	copy_file_line (e, NULL, NULL);
 	llit = rlit = NULL;
 	bop = (const char*)NULL;
 
@@ -3615,15 +3632,15 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		}
 
 		if (CB_REF_OR_FIELD_P (y)
-		&&  CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
-		&&  (CB_LITERAL_P(x) || x == cb_zero)
-		&&  xl->all == 0) {
+		 && CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
+		 && (CB_LITERAL_P(x) || x == cb_zero)
+		 && xl->all == 0) {
 			relop = compare_field_literal (e, 1, y, op, xl);
 		} else
 		if (CB_REF_OR_FIELD_P (x)
-		&&  CB_FIELD (cb_ref (x))->usage == CB_USAGE_DISPLAY
-		&&  (CB_LITERAL_P(y) || y == cb_zero)
-		&&  yl->all == 0) {
+		 && CB_FIELD (cb_ref (x))->usage == CB_USAGE_DISPLAY
+		 && (CB_LITERAL_P(y) || y == cb_zero)
+		 && yl->all == 0) {
 			relop = compare_field_literal (e, 0, x, op, yl);
 		} else
 		/*
@@ -3631,19 +3648,19 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		 * then resolve the value here at compile time
 		 */
 		if (CB_NUMERIC_LITERAL_P(x) 
-		&&  CB_NUMERIC_LITERAL_P(y)) {
+		 && CB_NUMERIC_LITERAL_P(y)) {
 			xl = CB_LITERAL(x);
 			yl = CB_LITERAL(y);
 			llit = (char*)xl->data;
 			rlit = (char*)yl->data;
-			if(xl->llit == 0
-			&& xl->scale == 0
-			&& yl->llit == 0
-			&& yl->scale == 0
-			&& xl->sign == 0
-			&& yl->sign == 0
-			&& xl->all == 0
-			&& yl->all == 0) {
+			if (xl->llit == 0
+			 && xl->scale == 0
+		 	 && yl->llit == 0
+			 && yl->scale == 0
+			 && xl->sign == 0
+			 && yl->sign == 0
+			 && xl->all == 0
+			 && yl->all == 0) {
 				xval = atoll((const char*)xl->data);
 				yval = atoll((const char*)yl->data);
 				switch(op) {
@@ -3653,7 +3670,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				case '~':
 					bop = "NOT EQUAL";
@@ -3661,7 +3678,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				case '>':
 					bop = "GREATER THAN";
@@ -3669,7 +3686,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				case '<':
 					bop = "LESS THAN";
@@ -3677,7 +3694,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				case ']':
 					bop = "GREATER OR EQUAL";
@@ -3685,7 +3702,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				case '[':
 					bop = "LESS OR EQUAL";
@@ -3693,7 +3710,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 						relop = cb_true;
 					else
 						relop = cb_false;
-					copy_file_line (e, yl);
+					copy_file_line (e, y, x);
 					break;
 				default:
 					/* never happens */
@@ -3706,9 +3723,9 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		 * then resolve the value here at compile time
 		 */
 		if (CB_LITERAL_P(x) 
-		&&  CB_LITERAL_P(y)
-		&& !CB_NUMERIC_LITERAL_P(x) 
-		&& !CB_NUMERIC_LITERAL_P(y)) {
+		 && CB_LITERAL_P(y)
+		 && !CB_NUMERIC_LITERAL_P(x) 
+		 && !CB_NUMERIC_LITERAL_P(y)) {
 			xl = (void*)x;
 			yl = (void*)y;
 			llit = (char*)xl->data;
@@ -3732,7 +3749,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			case '~':
 				bop = "NOT EQUAL";
@@ -3740,7 +3757,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			case '>':
 				bop = "GREATER THAN";
@@ -3748,7 +3765,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			case '<':
 				bop = "LESS THAN";
@@ -3756,7 +3773,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			case ']':
 				bop = "GREATER OR EQUAL";
@@ -3764,7 +3781,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			case '[':
 				bop = "LESS OR EQUAL";
@@ -3772,7 +3789,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					relop = cb_true;
 				else
 					relop = cb_false;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				break;
 			default:
 				/* never happens */
@@ -3794,15 +3811,15 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				yl = (void*)y;
 				llit = (char*)xl->data;
 				rlit = (char*)yl->data;
-				copy_file_line (e, yl);
+				copy_file_line (e, y, x);
 				cb_error_x (e, _("Invalid expression: %s %s %s"),llit,op=='&'?"AND":"OR",rlit);
 			} else {
 				cb_error_x (e, _("Invalid expression"));
 			}
 			return cb_error_node;
 		}
-		if((x == cb_true || x == cb_false)
-		&& (y == cb_true || y == cb_false)) {
+		if ((x == cb_true || x == cb_false)
+		 && (y == cb_true || y == cb_false)) {
 			if(op == '&') {
 				if(x == cb_true && y == cb_true)
 					relop = cb_true;
