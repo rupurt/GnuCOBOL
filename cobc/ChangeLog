@@ -1,6 +1,11 @@
 
 2017-08-17  Ron Norman <rjn@inglenet.com>
 
+	* scanner.l: Added SET_LOCATION when returning 'literal' 
+	             which is a 78/01 constant
+
+2017-08-17  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c: 
 	  Emit cob_module_global_entry instead of cob_module_enter and
 	  pass the 'entry' value.

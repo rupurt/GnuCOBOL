@@ -824,6 +824,7 @@ H\"[^\"\n]*\" {
 				break;
 			}
 			yylval = CB_VALUE (p78->fld78->values);
+			SET_LOCATION (yylval);
 			return LITERAL;
 		}
 	}
