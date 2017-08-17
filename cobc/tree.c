@@ -152,8 +152,9 @@ static	cb_tree cb_zero_lit;
 static	char	*save_expr_file = NULL;
 static	int	prev_expr_line = 0;
 static	int	prev_expr_pos = 0;
-static	int	prev_expr_warn[6] = {0,0,0,0,0,0};
-static	int	prev_expr_tf[6] = {0,0,0,0,0,0};
+#define EXPR_WARN_PER_LINE 8
+static	int	prev_expr_warn[EXPR_WARN_PER_LINE] = {0,0,0,0,0,0,0,0};
+static	int	prev_expr_tf[EXPR_WARN_PER_LINE] = {0,0,0,0,0,0,0,0};
 
 /* Local functions */
 
@@ -163,15 +164,16 @@ was_prev_warn (int linen, int tf)
 	int	i;
 	if (cb_exp_line != prev_expr_line) {
 		prev_expr_line = cb_exp_line;
-		for (i=0; i < 6; i++) {
+		for (i=0; i < EXPR_WARN_PER_LINE; i++) {
 			prev_expr_warn[i] = 0;
 			prev_expr_tf[i] = -1;
 		}
 	}
-	for (i=0; i < 6; i++) {
+	for (i=0; i < EXPR_WARN_PER_LINE; i++) {
 		if (prev_expr_warn[i] == linen) {
-			if (prev_expr_tf[i] == tf)
+			if (prev_expr_tf[i] == tf) {
 				return 1;
+			}
 			prev_expr_tf [i] = tf;
 			return 0;
 		}
@@ -186,10 +188,7 @@ was_prev_warn (int linen, int tf)
 static void
 copy_file_line (cb_tree e, cb_tree y, cb_tree x)
 {
-	if (y == cb_zero) {
-		e->source_line = prev_expr_line = cb_exp_line;
-		e->source_file = cb_source_file;
-	} else if (x == cb_zero) {
+	if (y == cb_zero || x == cb_zero) {
 		e->source_line = prev_expr_line = cb_exp_line;
 		e->source_file = cb_source_file;
 	} else if (y && x && y->source_line > x->source_line) {
@@ -198,19 +197,19 @@ copy_file_line (cb_tree e, cb_tree y, cb_tree x)
 		e->source_column = y->source_column;
 		save_expr_file = (char *)y->source_file;
 		save_expr_line = y->source_line;
-	} else if (y && y->source_line) {
+	} else if (!x && y && y->source_line) {
 		e->source_file = y->source_file;
 		e->source_line = y->source_line;
 		e->source_column = y->source_column;
-		save_expr_file = (char *)y->source_file;
-		save_expr_line = y->source_line;
+		save_expr_file = (char *)e->source_file;
+		save_expr_line = e->source_line;
 	} else if (x && x->source_line) {
 		e->source_file = x->source_file;
 		e->source_line = x->source_line;
 		e->source_column = x->source_column;
-		save_expr_file = (char *)x->source_file;
-		save_expr_line = x->source_line;
-	} else if (y && y->source_line == 0) {
+		save_expr_file = (char *)e->source_file;
+		save_expr_line = e->source_line;
+	} else if (y || x) {
 		e->source_line = cb_exp_line;
 		e->source_file = cb_source_file;
 	} else if (save_expr_line) {
@@ -3661,56 +3660,57 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			 && yl->sign == 0
 			 && xl->all == 0
 			 && yl->all == 0) {
+				copy_file_line (e, y, x);
 				xval = atoll((const char*)xl->data);
 				yval = atoll((const char*)yl->data);
 				switch(op) {
 				case '=':
 					bop = "EQUALS";
-					if(xval == yval)
+					if (xval == yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				case '~':
 					bop = "NOT EQUAL";
-					if(xval != yval)
+					if (xval != yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				case '>':
 					bop = "GREATER THAN";
-					if(xval > yval)
+					if (xval > yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				case '<':
 					bop = "LESS THAN";
-					if(xval < yval)
+					if (xval < yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				case ']':
 					bop = "GREATER OR EQUAL";
-					if(xval >= yval)
+					if (xval >= yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				case '[':
 					bop = "LESS OR EQUAL";
-					if(xval <= yval)
+					if (xval <= yval) {
 						relop = cb_true;
-					else
+					} else {
 						relop = cb_false;
-					copy_file_line (e, y, x);
+					}
 					break;
 				default:
 					/* never happens */
@@ -3726,70 +3726,72 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		 && CB_LITERAL_P(y)
 		 && !CB_NUMERIC_LITERAL_P(x) 
 		 && !CB_NUMERIC_LITERAL_P(y)) {
-			xl = (void*)x;
-			yl = (void*)y;
+			copy_file_line (e, y, x);
+			xl = CB_LITERAL(x);
+			yl = CB_LITERAL(y);
 			llit = (char*)xl->data;
 			rlit = (char*)yl->data;
-			for(i=j=0; xl->data[i] != 0 && yl->data[j] != 0; i++,j++) {
-				if(xl->data[i] != yl->data[j])
+			for (i=j=0; xl->data[i] != 0 && yl->data[j] != 0; i++,j++) {
+				if (xl->data[i] != yl->data[j]) {
 					break;
+				}
 			}
 			if(xl->data[i] == 0
 			&& yl->data[j] == ' ') {
-				while(yl->data[j] == ' ') j++;
+				while (yl->data[j] == ' ') j++;
 			} else
 			if(xl->data[i] == ' '
 			&& yl->data[j] == 0) {
-				while(xl->data[i] == ' ') i++;
+				while (xl->data[i] == ' ') i++;
 			}
 			switch(op) {
 			case '=':
 				bop = "EQUALS";
-				if(xl->data[i] == yl->data[j])
+				if (xl->data[i] == yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			case '~':
 				bop = "NOT EQUAL";
-				if(xl->data[i] != yl->data[j])
+				if (xl->data[i] != yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			case '>':
 				bop = "GREATER THAN";
-				if(xl->data[i] > yl->data[j])
+				if (xl->data[i] > yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			case '<':
 				bop = "LESS THAN";
-				if(xl->data[i] < yl->data[j])
+				if (xl->data[i] < yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			case ']':
 				bop = "GREATER OR EQUAL";
-				if(xl->data[i] >= yl->data[j])
+				if (xl->data[i] >= yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			case '[':
 				bop = "LESS OR EQUAL";
-				if(xl->data[i] <= yl->data[j])
+				if (xl->data[i] <= yl->data[j]) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
-				copy_file_line (e, y, x);
+				}
 				break;
 			default:
 				/* never happens */
@@ -3804,6 +3806,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		/* Logical operators */
 		if (CB_TREE_CLASS (x) != CB_CLASS_BOOLEAN 
 		 || (y && CB_TREE_CLASS (y) != CB_CLASS_BOOLEAN)) {
+			copy_file_line (e, y, x);
 			if (CB_NUMERIC_LITERAL_P(x) 
 			 && y
 			 && CB_NUMERIC_LITERAL_P(y)) {
@@ -3811,7 +3814,6 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				yl = (void*)y;
 				llit = (char*)xl->data;
 				rlit = (char*)yl->data;
-				copy_file_line (e, y, x);
 				cb_error_x (e, _("Invalid expression: %s %s %s"),llit,op=='&'?"AND":"OR",rlit);
 			} else {
 				cb_error_x (e, _("Invalid expression"));
@@ -3820,17 +3822,19 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		}
 		if ((x == cb_true || x == cb_false)
 		 && (y == cb_true || y == cb_false)) {
-			if(op == '&') {
-				if(x == cb_true && y == cb_true)
+			if (op == '&') {
+				if (x == cb_true && y == cb_true) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
+				}
 			} else
-			if(op == '|') {
-				if(x == cb_true || y == cb_true)
+			if (op == '|') {
+				if (x == cb_true || y == cb_true) {
 					relop = cb_true;
-				else
+				} else {
 					relop = cb_false;
+				}
 			}
 		} else if (op == '!') {
 			if (x == cb_true) {
@@ -3858,24 +3862,32 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	}
 
 	if (relop == cb_true) {
-		if (cb_warn_constant_expr
-		 && !was_prev_warn (e->source_line, 1)) {
-			if(rlit && llit && bop)
-				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always TRUE"),llit,bop,rlit);
-			else
-				cb_warning_x (e, _("Expression is always TRUE"));
+		if (cb_warn_constant_expr) {
+			if (rlit && llit && bop) {
+				if (!was_prev_warn (e->source_line, 1)) {
+					cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always TRUE"),llit,bop,rlit);
+				}
+			} else {
+				if (!was_prev_warn (e->source_line, -1)) {
+					cb_warning_x (e, _("Expression is always TRUE"));
+				}
+			}
 			prev_expr_line = cb_exp_line = e->source_line;
 		}
 		category = CB_CATEGORY_BOOLEAN;
 		return cb_true;
 	}
 	if (relop == cb_false) {
-		if (cb_warn_constant_expr
-		 && !was_prev_warn (e->source_line, 0)) {
-			if(rlit && llit && bop)
-				cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always FALSE"),llit,bop, rlit);
-			else
-				cb_warning_x (e, _("Expression is always FALSE"));
+		if (cb_warn_constant_expr) {
+			if (rlit && llit && bop) {
+				if (!was_prev_warn (e->source_line, 0)) {
+					cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always FALSE"),llit,bop, rlit);
+				}
+			} else {
+				if (!was_prev_warn (e->source_line, -2)) {
+					cb_warning_x (e, _("Expression is always FALSE"));
+				}
+			}
 			prev_expr_line = cb_exp_line = e->source_line;
 		}
 		category = CB_CATEGORY_BOOLEAN;
