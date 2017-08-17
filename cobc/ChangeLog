@@ -1,7 +1,17 @@
 
+2017-08-17  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: 
+	  Emit cob_module_global_entry instead of cob_module_enter and
+	  pass the 'entry' value.
+
 2017-08-17  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* tree.c: work on expression warning messages
+
+2017-08-15  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: fixed copy_file_line routine as Simon suggested 
 
 2017-08-14  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
@@ -16,7 +26,8 @@
 
 2017-07-27  Ron Norman <rjn@inglenet.com>
 
-	* tree.c: Improve warning messages for comparing literals to fields
+	* tree.c: 
+	  Improve warning messages for comparing literals to fields
 
 2017-07-23  Ron Norman <rjn@inglenet.com>
 
