@@ -128,6 +128,7 @@ static int			cob_initialized = 0;
 static int			cob_argc = 0;
 static char			**cob_argv = NULL;
 static struct cob_alloc_cache	*cob_alloc_base = NULL;
+static struct cob_alloc_cache	*cob_module_list = NULL;
 static const char		*cob_last_sfile = NULL;
 static const char		*cob_last_progid = NULL;
 
@@ -1801,25 +1802,20 @@ cob_stop_run (const int status)
 {
 	struct exit_handlerlist	*h;
 	cob_module	*mod;
-	int		k;
+	struct cob_alloc_cache	*ptr;
 	int		(*cancel_func)(const int);
 
 	if (!cob_initialized) {
 		exit (1);
 	}
-	/* Call each module to release 'decimal' memory */
-	for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
-		mod->flag_did_cancel = 0;
-		/* Recursive modules create a loop in the module chain */
-		/* Avoid an infinite processing loop */
-	}
 
-	for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
-		if (mod->module_cancel.funcint
-		 && !mod->flag_did_cancel) {
-			mod->flag_did_cancel = 1;
+	/* Call each module to release 'decimal' memory */
+	for (ptr = cob_module_list; ptr; ptr = ptr->next) {
+		mod = ptr->cob_pointer;
+		if (mod->module_cancel.funcint) {
+			mod->module_active = 0;
 			cancel_func = mod->module_cancel.funcint;
-			(void)cancel_func (-20);	/* Special value to indicate, just decimals */
+			(void)cancel_func (-20);	/* Clear just decimals */
 		}
 	}
 
@@ -2101,9 +2097,13 @@ cob_get_global_ptr (void)
 }
 
 void
-cob_module_enter (cob_module **module, cob_global **mglobal,
-		  const int auto_init)
+cob_module_global_enter (cob_module **module, cob_global **mglobal,
+		  const int auto_init, const int entry)
 {
+	cob_module	*mod;
+	int		k;
+	struct cob_alloc_cache	*cache_ptr;
+
 	/* Check initialized */
 	if (unlikely(!cob_initialized)) {
 		if (auto_init) {
@@ -2119,17 +2119,32 @@ cob_module_enter (cob_module **module, cob_global **mglobal,
 	/* Check module pointer */
 	if (!*module) {
 		*module = cob_cache_malloc (sizeof(cob_module));
+		/* Add to list of all modules activated */
+		cache_ptr = cob_malloc (sizeof (struct cob_alloc_cache));
+		cache_ptr->cob_pointer = *module;
+		cache_ptr->next = cob_module_list;
+		cob_module_list = cache_ptr;
+	} else if (entry == 0) {
+		for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
+			if (*module == mod) {
+				cob_runtime_error (_("Recursive CALL from %s to %s which is NOT RECURSIVE"),
+							COB_MODULE_PTR->module_name, mod->module_name);
+				cob_stop_run (1);
+			}
+		}
 	}
-
-#if	0	/* RXWRXW - Params */
-	/* Save parameter count */
-	(*module)->module_num_params = cobglobptr->cob_call_params;
-#endif
 
 	/* Push module pointer */
 	(*module)->next = COB_MODULE_PTR;
 	COB_MODULE_PTR = *module;
 	COB_MODULE_PTR->module_stmt = 0;
+}
+
+void
+cob_module_enter (cob_module **module, cob_global **mglobal,
+		  const int auto_init)
+{
+	cob_module_global_enter (module, mglobal, auto_init, 0);
 }
 
 void
@@ -2145,7 +2160,23 @@ cob_module_leave (cob_module *module)
 void
 cob_module_free (cob_module **module)
 {
+	struct cob_alloc_cache	*ptr, *prv;
 	if (*module != NULL) {
+		prv = NULL;
+		/* Remove from list of all modules activated */
+		for (ptr = cob_module_list; ptr; ptr = ptr->next) {
+			if (ptr->cob_pointer == *module) {
+				if (prv == NULL) {
+					cob_module_list = ptr->next;
+				} else {
+					prv->next = ptr->next;
+				}
+				cob_cache_free (ptr);
+				break;
+			}
+			prv = ptr;
+		}
+
 		if ((*module)->param_buf != NULL)
 			cob_cache_free ((*module)->param_buf);
 		if ((*module)->param_field != NULL)
@@ -5846,7 +5877,7 @@ print_version (void)
 
 	printf ("libcob (%s) %s.%d\n",
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	puts ("Copyright (C) 2016 Free Software Foundation, Inc.");
+	puts ("Copyright (C) 2017 Free Software Foundation, Inc.");
 	puts (_("License LGPLv3+: GNU LGPL version 3 or later <http://gnu.org/licenses/lgpl.html>"));
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
 	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));

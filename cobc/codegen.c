@@ -8247,29 +8247,18 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	}
 
 	/* Module initialization indicator */
-	output_local ("/* Module initialization indicator */\n");
-	output_local ("static unsigned int\tinitialized = 0;\n\n");
 
-	output_local ("/* Module structure pointer */\n");
-#if	0	/* RXWRXW - MODULE */
+	output_local ("/* Module initialization indicator & structure pointer */\n");
 	if (prog->flag_recursive) {
-		output_local ("cob_module\t\t*module;\n\n");
+		output_local ("\tunsigned int\tinitialized = 0;\n\n");
+		output_local ("\tcob_module\t*module = NULL;\n\n");
 	} else {
-		output_local ("static cob_module\tmodule_data;\n");
-		output_local ("static cob_module\t*module = &module_data;\n\n");
-	}
-#else
-	if (prog->flag_recursive) {
-		output_local ("cob_module\t\t*module = NULL;\n\n");
-	} else {
+		output_local ("static unsigned int\tinitialized = 0;\n\n");
 		output_local ("static cob_module\t*module = NULL;\n\n");
 	}
-#endif
 
-#if	1	/* RXWRXW - GLOBPTR */
 	output_local ("/* Global variable pointer */\n");
 	output_local ("cob_global\t\t*cob_glob_ptr;\n\n");
-#endif
 
 	/* Decimal structures */
 	if (prog->decimal_index_max) {
@@ -8477,26 +8466,16 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		output_newline ();
 	}
 
-#if	0	/* RXWRXW - MODULEALL */
-	/* Recursive module initialization */
-	if (prog->flag_recursive) {
-		output_line ("/* Allocate cob_module structure */");
-		output_line ("module = cob_malloc (sizeof(cob_module));");
-		output_newline ();
-	}
-#endif
-
-
 	output_line ("/* Check initialized, check module allocated, */");
 	output_line ("/* set global pointer, */");
 	output_line ("/* push module stack, save call parameter count */");
-#if	0	/* RXWRXW - MODULEALL */
-	output_line ("cob_module_enter (module, &cob_glob_ptr, %d);",
-		      cb_flag_implicit_init);
-#else
-	output_line ("cob_module_enter (&module, &cob_glob_ptr, %d);",
-		      cb_flag_implicit_init);
-#endif
+	if (prog->global_list) {
+		output_line ("cob_module_global_enter (&module, &cob_glob_ptr, %d, entry);",
+			      cb_flag_implicit_init);
+	} else {
+		output_line ("\tcob_module_enter (&module, &cob_glob_ptr, %d);",
+			      cb_flag_implicit_init);
+	}
 	output_newline ();
 
 	/* Check INITIAL programms being non-recursive */

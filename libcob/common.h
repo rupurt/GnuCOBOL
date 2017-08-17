@@ -1521,6 +1521,7 @@ char* cob_strjoin(char**, int, char*);
 COB_EXPIMP cob_global		*cob_get_global_ptr	(void);
 
 COB_EXPIMP void	cob_init(const int, char **);
+COB_EXPIMP void	cob_module_global_enter(cob_module **, cob_global **, const int, const int);
 COB_EXPIMP void	cob_module_enter(cob_module **, cob_global **, const int);
 COB_EXPIMP void	cob_module_leave(cob_module *);
 COB_EXPIMP void	cob_module_free(cob_module **);
