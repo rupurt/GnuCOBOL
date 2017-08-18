@@ -350,9 +350,18 @@
 	* typeck.c cobc.c flag.def config.def: added code for
 	  'move-ibm' option which does MOVE same as IBM MVC instruction 
 
+2016-10-25  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
+
+	* cobc.c. cobc.h: moved multiple #undef of internal used macros to cobc.h
+
 2016-10-16  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
 
 	* typeck.c (cb_list_system): simplified, removed hard-coded values
+
+2016-10-13  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* flags.def, cobc.c: added CB_FLAG_ON for compiler flags that are
+	  active by default
 
 2016-10-13  Ron Norman <rjn@inglenet.com>
 
