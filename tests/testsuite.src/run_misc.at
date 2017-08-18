@@ -806,6 +806,61 @@ AT_CHECK([./caller], [1], [], [callee2.cob: 5: libcob: Recursive CALL from calle
 
 AT_CLEANUP
 
+AT_SETUP([Recursive CALL with ON EXCEPTION])
+# Having trouble getting the compare of the output so skip this for now. RJN
+AT_SKIP_IF(true)
+AT_KEYWORDS([runmisc])
+
+AT_DATA([caller.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      caller.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       77  STOPPER      PIC 9 EXTERNAL.
+       PROCEDURE        DIVISION.
+           MOVE 0 TO STOPPER
+           CALL "callee" END-CALL.
+           GOBACK.
+])
+
+AT_DATA([callee.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      callee IS INITIAL.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       77  STOPPER      PIC 9 EXTERNAL.
+       PROCEDURE        DIVISION.
+           IF STOPPER = 1
+              DISPLAY 'INITIAL prog was called RECURSIVE'
+              END-DISPLAY
+              STOP RUN RETURNING 1
+           ELSE
+              MOVE 1 TO STOPPER
+              CALL "callee2" END-CALL
+           END-IF.
+           GOBACK.
+])
+
+AT_DATA([callee2.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      callee2.
+       PROCEDURE        DIVISION.
+           CALL "callee"
+           ON EXCEPTION 
+              DISPLAY "Exception " FUNCTION EXCEPTION-STATUS ";"
+              STOP RUN RETURNING 1
+           END-CALL.
+           GOBACK.
+])
+
+AT_CHECK([$COMPILE -o caller caller.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE callee.cob], [0], [], [])
+AT_CHECK([$COMPILE_MODULE callee2.cob], [0], [], [])
+AT_CHECK([./caller], [1], [], [Exception EC-PROGRAM-RECURSIVE-CALL      ;
+])
+
+AT_CLEANUP
+
 
 AT_SETUP([Multiple calls of INITIAL program])
 AT_KEYWORDS([runmisc CALL])
