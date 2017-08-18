@@ -1,4 +1,4 @@
-/* config.h, tested with Win32/x64 VS2005-2015 */
+/* config.h, tested with Win32/x64 VS2005-2017 */
 
 #define NOISAM 0
 #define BDB    1
@@ -59,24 +59,20 @@
 /* Strip command */
 /* #undef COB_STRIP_CMD */
 
-/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
-   systems. This function is required for `alloca.c' support on those systems.
-   */
-/* #undef CRAY_STACKSEG_END */
-
-/* Define to 1 if using `alloca.c'. */
-/* #undef C_ALLOCA */
-
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 /* #undef ENABLE_NLS */
 
-/* Define to 1 if you have `alloca', as a function or macro. */
-#define HAVE_ALLOCA 1
+/* Define to 1 if you have the `atol' function. */
+#define HAVE_ATOL 1
 
-/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
-   */
-/* #undef HAVE_ALLOCA_H */
+/* Define to 1 if you have the `atoll' function. */
+/* MSC doesn't have `atoll` but we define it to _atoi64 */
+#if defined(_MSC_VER) && _MSC_VER >= 1800 /* = COB_USE_VC2013_OR_GREATER [which is defined later] */
+#define HAVE_ATOLL 1
+#else
+/* #undef HAVE_ATOLL */
+#endif
 
 /* Has __attribute__((aligned)) */
 /* #undef HAVE_ATTRIBUTE_ALIGNED */
@@ -173,6 +169,9 @@
 #else
 /* #undef HAVE_ISAM_H */
 #endif
+
+/* Has isfinite function */
+/* #undef HAVE_ISFINITE */
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 /* #undef HAVE_LANGINFO_CODESET */
@@ -307,6 +306,10 @@
 /* Define to 1 if you have the `strtol' function. */
 #define HAVE_STRTOL 1
 
+/* Define to 1 if you have the `strtoll' function. */
+/* old MSC doesn't have this but we define it as _strtoi64 in this case */
+#define HAVE_STRTOLL 1
+
 /* Define to 1 if you have the `strxfrm' function. */
 #define HAVE_STRXFRM 1
 
@@ -344,40 +347,29 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 /* #undef LT_OBJDIR */
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
 /* Name of package */
-#define PACKAGE "gnu-cobol"
+#define PACKAGE "gnucobol"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "open-cobol-list@lists.sourceforge.net"
+#define PACKAGE_BUGREPORT "bug-gnucobol@gnu.org"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "GnuCOBOL"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GnuCOBOL 2.0"
+#define PACKAGE_STRING "GnuCOBOL 2.0-RW"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "gnu-cobol"
+#define PACKAGE_TARNAME "gnucobol"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "http://www.opencobol.org"
+#define PACKAGE_URL "https://www.gnu.org/software/gnucobol/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.0"
+#define PACKAGE_VERSION "2.0-RW"
 
 /* Define a patch level */
 #define PATCH_LEVEL COB_NUM_TAR_DATE
-
-/* If using the C implementation of alloca, define if you know the
-   direction of stack growth for your system; otherwise it will be
-   automatically deduced at runtime.
-	STACK_DIRECTION > 0 => grows toward higher addresses
-	STACK_DIRECTION < 0 => grows toward lower addresses
-	STACK_DIRECTION = 0 => direction of growth unknown */
-/* #undef STACK_DIRECTION */
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -411,7 +403,7 @@
 
 
 /* Version number of package */
-#define VERSION "2.0"
+#define VERSION "2.0-RW"
 
 /* Use CISAM as ISAM handler */
 #if CONFIGURED_ISAM == BDB
