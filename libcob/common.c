@@ -129,6 +129,7 @@ static int			cob_argc = 0;
 static char			**cob_argv = NULL;
 static struct cob_alloc_cache	*cob_alloc_base = NULL;
 static struct cob_alloc_cache	*cob_module_list = NULL;
+static cob_module		*cob_module_err = NULL;
 static const char		*cob_last_sfile = NULL;
 static const char		*cob_last_progid = NULL;
 
@@ -1943,6 +1944,16 @@ cob_fatal_error (const int fatal_error)
 		cob_runtime_error (_("Invalid recursive COBOL CALL to '%s'"),
 				   COB_MODULE_PTR->module_name);
 		break;
+	case COB_EC_PROGRAM_RECURSIVE_CALL:
+		if (cob_module_err) {
+			cob_runtime_error (_("Recursive CALL from %s to %s which is NOT RECURSIVE"),
+					COB_MODULE_PTR->module_name, cob_module_err->module_name);
+			cob_module_err = NULL;
+		} else {
+			cob_runtime_error (_("Invalid recursive COBOL CALL to '%s'"),
+					   COB_MODULE_PTR->module_name);
+		}
+		break;
 	case COB_FERROR_FREE:
 		cob_runtime_error (_("Call to %s with NULL pointer"), "cob_free");
 		break;
@@ -2096,9 +2107,13 @@ cob_get_global_ptr (void)
 	return cobglobptr;
 }
 
-void
-cob_module_global_enter (cob_module **module, cob_global **mglobal,
-		  const int auto_init, const int entry)
+int
+cob_module_global_enter (
+	cob_module **module, 
+	cob_global **mglobal,
+	const int auto_init, 
+	const int entry, 
+	const unsigned int *name_hash)
 {
 	cob_module	*mod;
 	int		k;
@@ -2116,6 +2131,21 @@ cob_module_global_enter (cob_module **module, cob_global **mglobal,
 	/* Set global pointer */
 	*mglobal = cobglobptr;
 
+	/* Was caller a COBOL module */
+	if (name_hash != NULL
+	 && cobglobptr->cob_call_name_hash != 0) {
+		cobglobptr->cob_call_from_c = 1;
+		k = 0;
+		while (*name_hash != 0) {	/* Scan table of values */
+			if (cobglobptr->cob_call_name_hash == *name_hash) {
+				cobglobptr->cob_call_from_c = 0;
+				break;
+			}
+			name_hash++;
+			k++;
+		}
+	}
+
 	/* Check module pointer */
 	if (!*module) {
 		*module = cob_cache_malloc (sizeof(cob_module));
@@ -2124,11 +2154,18 @@ cob_module_global_enter (cob_module **module, cob_global **mglobal,
 		cache_ptr->cob_pointer = *module;
 		cache_ptr->next = cob_module_list;
 		cob_module_list = cache_ptr;
-	} else if (entry == 0) {
+	} else if (entry == 0
+		&& !cobglobptr->cob_call_from_c) {
 		for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
 			if (*module == mod) {
-				cob_runtime_error (_("Recursive CALL from %s to %s which is NOT RECURSIVE"),
-							COB_MODULE_PTR->module_name, mod->module_name);
+				if (cobglobptr->cob_stmt_exception) {
+					/* CALL has ON EXCEPTION so return to caller */
+					cob_set_exception (COB_EC_PROGRAM_RECURSIVE_CALL);
+					cobglobptr->cob_stmt_exception = 0;
+					return 1;
+				}
+				cob_module_err = mod;
+				cob_fatal_error(COB_EC_PROGRAM_RECURSIVE_CALL);
 				cob_stop_run (1);
 			}
 		}
@@ -2138,13 +2175,15 @@ cob_module_global_enter (cob_module **module, cob_global **mglobal,
 	(*module)->next = COB_MODULE_PTR;
 	COB_MODULE_PTR = *module;
 	COB_MODULE_PTR->module_stmt = 0;
+	cobglobptr->cob_stmt_exception = 0;
+	return 0;
 }
 
 void
 cob_module_enter (cob_module **module, cob_global **mglobal,
 		  const int auto_init)
 {
-	cob_module_global_enter (module, mglobal, auto_init, 0);
+	cob_module_global_enter (module, mglobal, auto_init, 0, 0);
 }
 
 void

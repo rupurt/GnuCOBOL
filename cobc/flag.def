@@ -126,8 +126,11 @@ CB_FLAG (cb_flag_odoslide, 1, "odoslide",
 CB_FLAG (cb_flag_apostrophe, 1, "single-quote",
 	 _("use a single quote (apostrophe) for QUOTE\n\t\t\t- default: double quote"))
 
-CB_FLAG (cb_flag_recursive, 1, "recursive-check",
-	 _("check recursive program call"))
+CB_FLAG (cb_flag_recursive_check, 1, "recursive-check",
+	 _("check recursive program call; Obsolete"))
+
+CB_FLAG (cb_flag_recursive, 1, "recursive",
+	 _("compile as a recursive program"))
 
 CB_FLAG (cb_flag_relaxed_syntax, 1, "relax-syntax",
 	 _("relax syntax checking\n\t\t\t- eg. REDEFINES position"))

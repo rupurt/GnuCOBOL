@@ -4157,6 +4157,7 @@ output_call (struct cb_call *p)
 	size_t				dynamic_link;
 	size_t				need_brace;
 	unsigned int 			pval;
+	int				except_id;
 #if	0	/* RXWRXW - Clear params */
 	cob_u32_t			parmnum;
 #endif
@@ -4165,6 +4166,7 @@ output_call (struct cb_call *p)
 	retptr = 0;
 	gen_exit_program = 0;
 	dynamic_link = 1;
+	except_id = 0;
 	if (p->call_returning && p->call_returning != cb_null &&
 	    CB_TREE_CLASS(p->call_returning) == CB_CLASS_POINTER) {
 		retptr = 1;
@@ -4545,6 +4547,12 @@ output_call (struct cb_call *p)
 	/* Set number of parameters */
 	output_prefix ();
 	output ("cob_glob_ptr->cob_call_params = %u;\n", n);
+	output_prefix ();
+	if (p->stmt1) {
+		output ("cob_glob_ptr->cob_stmt_exception = 1;\n");
+	} else {
+		output ("cob_glob_ptr->cob_stmt_exception = 0;\n");
+	}
 	if (recent_prog != NULL
 	 && recent_prog->max_call_param > n) {
 		if ((recent_prog->max_call_param - n) > 1) {
@@ -4685,6 +4693,8 @@ output_call (struct cb_call *p)
 			}
 			output_line ("{");
 			output_indent_level += 2;
+			except_id = cb_id++;
+			output_line ("%s%d:", CB_PREFIX_LABEL, except_id);
 			output_stmt (p->stmt1);
 			output_indent_level -= 2;
 			output_line ("}");
@@ -4769,6 +4779,11 @@ output_call (struct cb_call *p)
 	}
 
 	output (");\n");
+
+	if (except_id > 0) {
+		output_line ("if (unlikely(cob_glob_ptr->cob_exception_code != 0))");
+		output_line ("\tgoto %s%d;", CB_PREFIX_LABEL, except_id);
+	}
 
 	if (p->call_returning) {
 		if (p->call_returning == cb_null) {
@@ -8204,6 +8219,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			prog->program_id);
 #endif
 	} else if (!prog->nested_level) {
+		if (cb_flag_recursive)
+			prog->flag_recursive = 1;
 		output ("static int\n%s_ (const int entry",
 			prog->program_id);
 	} else {
@@ -8246,14 +8263,29 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		}
 	}
 
+	output_line ("/* Entry point name_hash values */");
+	output_line ("static const unsigned int %sname_hash [] = {",CB_PREFIX_STRING);
+	name_hash = cob_get_name_hash (prog->orig_program_id);
+	if (cb_list_length (prog->entry_list) > 1) {
+		for (i = 0, l = prog->entry_list; l; l = CB_CHAIN (l)) {
+			name_hash = cob_get_name_hash (CB_LABEL (CB_PURPOSE (l))->name);
+			output_line ("\t0x%X,\t/* %d: %s */",name_hash, i, CB_LABEL (CB_PURPOSE (l))->name);
+			i++;
+		}
+	} else {
+		output_line ("\t0x%X,\t/* %s */",name_hash, prog->orig_program_id);
+	}
+	output_line ("0};");
+
 	/* Module initialization indicator */
 
-	output_local ("/* Module initialization indicator & structure pointer */\n");
+	output_local ("/* Module initialization indicator */\n");
+	output_local ("static unsigned int\tinitialized = 0;\n\n");
 	if (prog->flag_recursive) {
-		output_local ("\tunsigned int\tinitialized = 0;\n\n");
+		output_local ("/* Module structure pointer for recursive */\n");
 		output_local ("\tcob_module\t*module = NULL;\n\n");
 	} else {
-		output_local ("static unsigned int\tinitialized = 0;\n\n");
+		output_local ("/* Module structure pointer */\n");
 		output_local ("static cob_module\t*module = NULL;\n\n");
 	}
 
@@ -8469,24 +8501,28 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	output_line ("/* Check initialized, check module allocated, */");
 	output_line ("/* set global pointer, */");
 	output_line ("/* push module stack, save call parameter count */");
-	if (prog->global_list) {
-		output_line ("cob_module_global_enter (&module, &cob_glob_ptr, %d, entry);",
-			      cb_flag_implicit_init);
+	name_hash = cob_get_name_hash (prog->orig_program_id);
+	output_line ("if (cob_module_global_enter (&module, &cob_glob_ptr, %d, entry, %sname_hash))",
+				      cb_flag_implicit_init, CB_PREFIX_STRING);
+	if (prog->prog_type == CB_FUNCTION_TYPE) {
+		output_line ("\treturn NULL;");
 	} else {
-		output_line ("\tcob_module_enter (&module, &cob_glob_ptr, %d);",
-			      cb_flag_implicit_init);
+		output_line ("\treturn -1;");
 	}
 	output_newline ();
 
+#if 0
+	/* Check in 'cob_module_global_enter' makes this code redundant: RJN Aug 18, 2017 */
 	/* Check INITIAL programms being non-recursive */
 	if (CB_EXCEPTION_ENABLE (COB_EC_PROGRAM_RECURSIVE_CALL)
-		&& prog->flag_initial) {
+	 && prog->flag_initial) {
 		output_line ("/* Check active count */");
 		output_line ("if (unlikely(module->module_active)) {");
 		/* FIXME: Should raise COB_EC_PROGRAM_RECURSIVE_CALL instead */
 		output_line ("\tcob_fatal_error (COB_FERROR_RECURSIVE);");
 		output_line ("}");
 	}
+#endif
 
 	/* Recursive module initialization */
 	if (prog->flag_recursive) {
@@ -8644,12 +8680,15 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		output_newline ();
 	}
 
-	if (cb_flag_recursive && !prog->flag_recursive) {
+#if 0
+	/* Not needed as check is done in cob_module_global_enter; RJN Aug 2017 */
+	if (cb_flag_recursive_check && !prog->flag_recursive) {
 		output_line ("/* Check active count */");
 		output_line ("if (unlikely(module->module_active)) {");
 		output_line ("\tcob_fatal_error (COB_FERROR_RECURSIVE);");
 		output_line ("}");
 	}
+#endif
 	if (!prog->flag_recursive) {
 		output_line ("/* Increment module active */");
 		output_line ("module->module_active++;");
@@ -8718,6 +8757,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		name_hash = cob_get_name_hash (prog->orig_program_id);
 		output_line ("if (cob_glob_ptr->cob_call_name_hash != 0x%X)",name_hash);
 		output_line ("    cob_glob_ptr->cob_call_from_c = 1;");
+		output_line ("else");
+		output_line ("    cob_glob_ptr->cob_call_from_c = 0;");
 		for (i = 0, l = parameter_list; l; l = CB_CHAIN (l), i++) {
 			pickup_param (l, i, 0);
 		}
@@ -8773,6 +8814,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 				name_hash = cob_get_name_hash (CB_LABEL (CB_PURPOSE (l))->name);
 				output_line ("if (cob_glob_ptr->cob_call_name_hash != 0x%X)",name_hash);
 				output_line ("    cob_glob_ptr->cob_call_from_c = 1;");
+				output_line ("else");
+				output_line ("    cob_glob_ptr->cob_call_from_c = 0;");
 				for (j=0,l2 = using_list; l2; l2 = CB_CHAIN (l2), j++) {
 					pickup_param (l2, j, 0);
 				}
@@ -8782,6 +8825,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 				name_hash = cob_get_name_hash (CB_LABEL (CB_PURPOSE (l))->name);
 				output_line ("if (cob_glob_ptr->cob_call_name_hash != 0x%X)",name_hash);
 				output_line ("    cob_glob_ptr->cob_call_from_c = 1;");
+				output_line ("else");
+				output_line ("    cob_glob_ptr->cob_call_from_c = 0;");
 			}
 			output_indent_level -= 4;
 			output_line ("    goto %s%d;", CB_PREFIX_LABEL,
@@ -8906,6 +8951,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	output_newline ();
 
 	if (prog->flag_recursive) {
+		output_line ("/* Free for recursive module */");
 		output_line ("cob_module_free (&module);");
 		output_newline ();
 	}

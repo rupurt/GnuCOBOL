@@ -1,4 +1,10 @@
 
+2017-08-18  Ron Norman <rjn@inglenet.com>
+	* codegen.c: 
+	  Call cob_module_global_entry with COBOL routine signature
+	  So it can verify if being called from C or COBOL
+	  Emit code for CALL to handle ON EXCEPTION
+
 2017-08-17  Ron Norman <rjn@inglenet.com>
 
 	* scanner.l: Added SET_LOCATION when returning 'literal' 

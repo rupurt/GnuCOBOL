@@ -1476,6 +1476,7 @@ typedef struct __cob_global {
 	int			cob_max_x;		/* Screen max x */
 	int			cob_call_from_c;	/* Recent CALL was via cob_call & not COBOL */
 	unsigned int		cob_call_name_hash;	/* Hash of subroutine name being CALLed */
+	unsigned int		cob_stmt_exception;	/* Statement has 'On Exception' */
 
 } cob_global;
 
@@ -1521,8 +1522,8 @@ char* cob_strjoin(char**, int, char*);
 COB_EXPIMP cob_global		*cob_get_global_ptr	(void);
 
 COB_EXPIMP void	cob_init(const int, char **);
-COB_EXPIMP void	cob_module_global_enter(cob_module **, cob_global **, const int, const int);
-COB_EXPIMP void	cob_module_enter(cob_module **, cob_global **, const int);
+COB_EXPIMP int	cob_module_global_enter(cob_module **, cob_global **, const int, const int, const unsigned int *);
+COB_EXPIMP void	cob_module_enter(cob_module **, cob_global **, const int);	/* Obsoleted */
 COB_EXPIMP void	cob_module_leave(cob_module *);
 COB_EXPIMP void	cob_module_free(cob_module **);
 
