@@ -1,5 +1,11 @@
 
+2017-08-18  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* flag.def: always activate cb_flag_recursive_check by CB_FLAG_ON
+	* tree.c, codegen.c: assume RECURSIVE for -fno-recursive-check
+
 2017-08-18  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c: 
 	  Call cob_module_global_entry with COBOL routine signature
 	  So it can verify if being called from C or COBOL

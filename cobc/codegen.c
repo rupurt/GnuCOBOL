@@ -8219,8 +8219,6 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			prog->program_id);
 #endif
 	} else if (!prog->nested_level) {
-		if (cb_flag_recursive)
-			prog->flag_recursive = 1;
 		output ("static int\n%s_ (const int entry",
 			prog->program_id);
 	} else {
@@ -8680,15 +8678,6 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		output_newline ();
 	}
 
-#if 0
-	/* Not needed as check is done in cob_module_global_enter; RJN Aug 2017 */
-	if (cb_flag_recursive_check && !prog->flag_recursive) {
-		output_line ("/* Check active count */");
-		output_line ("if (unlikely(module->module_active)) {");
-		output_line ("\tcob_fatal_error (COB_FERROR_RECURSIVE);");
-		output_line ("}");
-	}
-#endif
 	if (!prog->flag_recursive) {
 		output_line ("/* Increment module active */");
 		output_line ("module->module_active++;");
