@@ -309,6 +309,7 @@ GLib is licensed under the GNU Lesser General Public License.
 
 #if !COB_USE_VC2013_OR_GREATER
 #define atoll			_atoi64
+#define strtoll			_strtoi64
 #endif
 
 #define __attribute__(x)

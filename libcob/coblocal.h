@@ -36,6 +36,12 @@
 #define ISFINITE finite
 #endif
 
+#if	defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__)
+#include <float.h>
+#undef ISFINITE
+#define	ISFINITE		_finite
+#endif
+
 #ifndef HAVE_ATOLL
 #ifdef  HAVE_STRTOLL
 #ifndef atoll
@@ -50,12 +56,6 @@
 #define atol(x) strtol(x, NULL, 10)
 #endif
 #endif
-#endif
-
-#if	defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__)
-#include <float.h>
-#undef ISFINITE
-#define	ISFINITE		_finite
 #endif
 
 
