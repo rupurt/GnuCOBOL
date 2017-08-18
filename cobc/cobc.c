@@ -433,7 +433,7 @@ static const struct option long_options[] = {
 #define	CB_FLAG(var,pdok,name,doc)			\
 	{"f"name,		CB_NO_ARG, &var, 1},	\
 	{"fno-"name,		CB_NO_ARG, &var, 0},
-#define	CB_FLAG(var,pdok,name,doc)			\
+#define	CB_FLAG_ON(var,pdok,name,doc)			\
 	{"f"name,		CB_NO_ARG, &var, 1},	\
 	{"fno-"name,		CB_NO_ARG, &var, 0},
 #define	CB_FLAG_RQ(var,pdok,name,def,opt,doc)		\
@@ -1885,7 +1885,7 @@ cobc_print_usage (char * prog)
 #define	CB_FLAG(var,pdok,name,doc)		\
 	cobc_print_flag (name, doc, pdok, 0);
 /* currently shown with their initial version in rw-branch */
-#define	CB_FLAG_ON(var,pdok,name,doc)
+#define	CB_FLAG_ON(var,pdok,name,doc)	\
 	cobc_print_flag (name, doc, pdok, 0);
 #define	CB_FLAG_RQ(var,pdok,name,def,opt,doc)	\
 	cobc_print_flag (name, doc, pdok, 1);
