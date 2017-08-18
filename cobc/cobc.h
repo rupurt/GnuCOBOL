@@ -236,29 +236,46 @@ extern struct cb_exception	cb_exception_table[];
 #define CB_EXCEPTION_CODE(id)	cb_exception_table[id].code
 #define CB_EXCEPTION_ENABLE(id)	cb_exception_table[id].enable
 
+/* undef macros that are only for internal use with def-files */
+
 #undef	CB_FLAG
+#undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+
+#undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
+#undef	CB_NOWARNDEF
+
+#undef	CB_OPTIM_DEF
+
+#undef	CB_CONFIG_ANY
+#undef	CB_CONFIG_INT
+#undef	CB_CONFIG_STRING
+#undef	CB_CONFIG_BOOLEAN
+#undef	CB_CONFIG_SUPPORT
+
+#undef	COB_EXCEPTION
+
+
 #define	CB_FLAG(var,pdok,name,doc)		extern int var;
+#define	CB_FLAG_ON(var,pdok,name,doc)		extern int var;
 #define CB_FLAG_RQ(var,pdok,name,def,opt,doc)	extern int var;
 #define CB_FLAG_NQ(pdok,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
+#undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_nQ
 
-/* Flag to emit Old style: cob_set_location, cob_trace_section */  
-extern int cb_old_trace;
-
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)	extern int var;
 #define	CB_NOWARNDEF(var,name,doc)	extern int var;
 #include "warning.def"
 #undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
 #undef	CB_NOWARNDEF
 
-#undef	CB_OPTIM_DEF
+
 #define	CB_OPTIM_DEF(x)			x,
 enum cb_optim {
 	COB_OPTIM_MIN = 0,
@@ -266,6 +283,9 @@ enum cb_optim {
 	COB_OPTIM_MAX
 };
 #undef	CB_OPTIM_DEF
+
+/* Flag to emit Old style: cob_set_location, cob_trace_section */  
+extern int cb_old_trace;
 
 extern int			cb_id;
 extern int			cb_attr_id;
@@ -358,12 +378,6 @@ extern size_t			cobc_check_valid_name (const char *,
 						       const unsigned int);
 
 /* config.c */
-
-#undef	CB_CONFIG_ANY
-#undef	CB_CONFIG_INT
-#undef	CB_CONFIG_STRING
-#undef	CB_CONFIG_BOOLEAN
-#undef	CB_CONFIG_SUPPORT
 
 #define	CB_CONFIG_ANY(type,var,name)	extern type var;
 #define	CB_CONFIG_INT(var,name)		extern unsigned int var;

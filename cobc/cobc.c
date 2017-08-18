@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2015 Free Software Foundation, Inc.
+   Copyright (C) 2001-2017 Free Software Foundation, Inc.
 
    Authors:
    Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Brian Tiffin
@@ -147,6 +147,7 @@ struct strcache {
 #define	CB_COPT_S	" -Os"
 #endif
 
+
 /* Global variables */
 
 const char		*cb_source_file = NULL;
@@ -192,7 +193,6 @@ unsigned int		cobc_gen_listing = 0;
 
 cob_u32_t		optimize_defs[COB_OPTIM_MAX] = { 0 };
 
-#undef	COB_EXCEPTION
 #define	COB_EXCEPTION(code,tag,name,critical) {name, 0x##code, 0},
 struct cb_exception cb_exception_table[] = {
 	{NULL, 0, 0},		/* CB_EC_ZERO */
@@ -201,22 +201,19 @@ struct cb_exception cb_exception_table[] = {
 };
 #undef	COB_EXCEPTION
 
-#undef	CB_FLAG
-#undef	CB_FLAG_RQ
-#undef	CB_FLAG_NQ
 #define	CB_FLAG(var,pdok,name,doc)	int var = 0;
+#define	CB_FLAG_ON(var,pdok,name,doc)	int var = 1;
 #define	CB_FLAG_RQ(var,pdok,name,def,opt,doc)	int var = def;
 #define	CB_FLAG_NQ(pdok,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
+#undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
 
 /* Flag to emit Old style: cob_set_location, cob_trace_section */
 int	cb_old_trace = 0;
 
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)	int var = 0;
 #define	CB_NOWARNDEF(var,name,doc)	int var = 0;
 #include "warning.def"
@@ -433,9 +430,9 @@ static const struct option long_options[] = {
 	{"W",			CB_NO_ARG, NULL, 'Z'},
 	{"use-extfh",		CB_RQ_ARG, NULL, 7},	/* This is used by COBOL-IT; Same is -fcallfh= */
 
-#undef	CB_FLAG
-#undef	CB_FLAG_RQ
-#undef	CB_FLAG_NQ
+#define	CB_FLAG(var,pdok,name,doc)			\
+	{"f"name,		CB_NO_ARG, &var, 1},	\
+	{"fno-"name,		CB_NO_ARG, &var, 0},
 #define	CB_FLAG(var,pdok,name,doc)			\
 	{"f"name,		CB_NO_ARG, &var, 1},	\
 	{"fno-"name,		CB_NO_ARG, &var, 0},
@@ -445,11 +442,10 @@ static const struct option long_options[] = {
 	{"f"name,		CB_RQ_ARG, NULL, opt},
 #include "flag.def"
 #undef	CB_FLAG
+#undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
 
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)			\
 	{"W"name,		CB_NO_ARG, &var, 1},	\
 	{"Wno-"name,		CB_NO_ARG, &var, 0},
@@ -463,10 +459,9 @@ static const struct option long_options[] = {
 	{NULL,			0, NULL, 0}
 };
 
-#undef	CB_ARG_NO
-#undef	CB_ARG_RQ
-#undef	CB_ARG_NQ
-#undef	CB_ARG_OP
+#undef	CB_NO_ARG
+#undef	CB_RQ_ARG
+#undef	CB_OP_ARG
 
 /* Prototype */
 DECLNORET static void COB_A_NORETURN	cobc_abort_terminate (void);
@@ -1877,8 +1872,6 @@ cobc_print_usage (char * prog)
 
 	puts (_("  -W                    enable ALL warnings"));
 	puts (_("  -Wall                 enable all warnings except as noted below"));
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)		\
 	cobc_print_warn (name, doc, 1);
 #define	CB_NOWARNDEF(var,name,doc)		\
@@ -1889,10 +1882,10 @@ cobc_print_usage (char * prog)
 
 	putchar ('\n');
 
-#undef	CB_FLAG
-#undef	CB_FLAG_RQ
-#undef	CB_FLAG_NQ
 #define	CB_FLAG(var,pdok,name,doc)		\
+	cobc_print_flag (name, doc, pdok, 0);
+/* currently shown with their initial version in rw-branch */
+#define	CB_FLAG_ON(var,pdok,name,doc)
 	cobc_print_flag (name, doc, pdok, 0);
 #define	CB_FLAG_RQ(var,pdok,name,def,opt,doc)	\
 	cobc_print_flag (name, doc, pdok, 1);
@@ -1900,6 +1893,7 @@ cobc_print_usage (char * prog)
 	cobc_print_flag (name, doc, pdok, 1);
 #include "flag.def"
 #undef	CB_FLAG
+#undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
 
@@ -2430,8 +2424,6 @@ process_command_line (const int argc, char **argv)
 
 		case 'w':
 			/* -w(xx) : Turn off warnings */
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)	var = 0;
 #define	CB_NOWARNDEF(var,name,doc)	var = 0;
 #include "warning.def"
@@ -2442,8 +2434,6 @@ process_command_line (const int argc, char **argv)
 		case 'W':
 			/* -W : Turn on warnings */
 			warningopt = 1;
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)	var = 1;
 #define	CB_NOWARNDEF(var,name,doc)
 #include "warning.def"
@@ -2454,8 +2444,6 @@ process_command_line (const int argc, char **argv)
 		case 'Z':
 			/* -W : Turn on all warnings */
 			warningopt = 1;
-#undef	CB_WARNDEF
-#undef	CB_NOWARNDEF
 #define	CB_WARNDEF(var,name,doc)	var = 1;
 #define	CB_NOWARNDEF(var,name,doc)	var = 1;
 #include "warning.def"
