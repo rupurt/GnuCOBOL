@@ -3431,23 +3431,65 @@ compare_field_literal (cb_tree e, int swap, cb_tree x, const int op, struct cb_l
 		}
 	}
 
-	if (zero_val
-	 && op == '<'
-	 && f->pic->have_sign == 0) {
-		copy_file_line (e, CB_TREE(l), NULL);
-		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 5)) {
-			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN ZERO"),f->name);
-		}
-	} else
-	if (op == '<'
-	 && f->pic->have_sign == 0
-	 && l->sign < 0) {
-		copy_file_line (e, CB_TREE(l), NULL);
-		if (cb_warn_constant_expr
-		&& !was_prev_warn (e->source_line, 5)) {
-			cb_warning_x (e, _("Unsigned '%s' is never LESS THAN %s"),
-					f->name,display_literal(lit_disp,l));
+	if (f->pic->have_sign == 0 && cb_warn_constant_expr) {
+		/* note: the actual result may be different if non-numeric
+		         data is stored in the numeric fields - and may (later)
+		         be dependent on compiler configuration flags;
+		         therefore we don't set cb_true/cb_false here */
+		/* comparision with zero */
+		if (zero_val) {
+			switch (op) {
+			case '<':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (!was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may not be LESS THAN %s"),
+							f->name, "ZERO");
+				}
+				break;
+			case ']':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (cb_warn_constant_expr
+					&& !was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may always be GREATER OR EQUAL %s"),
+						f->name, "ZERO");
+				}
+			default:
+				break;
+			}
+		/* comparision with negative literal */
+		} else if (l->sign < 0) {
+			switch (op) {
+			case '<':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (!was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may not be LESS THAN %s"),
+							f->name, display_literal (lit_disp, l));
+				}
+				break;
+			case '[':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (!was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may not be LESS OR EQUAL %s"),
+						f->name, display_literal (lit_disp, l));
+				}
+				break;
+			case '>':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (!was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may always be GREATER THAN %s"),
+						f->name, display_literal (lit_disp, l));
+				}
+				break;
+			case ']':
+				copy_file_line (e, CB_TREE(l), NULL);
+				if (!was_prev_warn (e->source_line, 5)) {
+					cb_warning_x (e, _("Unsigned '%s' may always be GREATER OR EQUAL %s"),
+						f->name, display_literal (lit_disp, l));
+				}
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	return cb_any;

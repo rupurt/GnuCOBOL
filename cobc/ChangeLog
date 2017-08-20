@@ -1,4 +1,8 @@
 
+2017-08-20  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* tree.c: work on expression warning messages and added more
+
 2017-08-18  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* flag.def: always activate cb_flag_recursive_check by CB_FLAG_ON

@@ -144,6 +144,18 @@ AT_DATA([prog.cob], [
               CONTINUE.
            IF IF-D16 NOT NEGATIVE
               CONTINUE.
+           IF PIC-9-NOT-SIGNED > (25 - 50)
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED >= -1
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED > 0.0
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED > ZERO
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED >= 0.0
+               CONTINUE.
+           IF PIC-9-NOT-SIGNED >= ZERO
+               CONTINUE.
            STOP RUN RETURNING 0.
 ])
 
@@ -152,9 +164,9 @@ prog.cob: 19: Warning: Literal '1234567' is longer than GROUP-ITEM-X6
 prog.cob: 19: Warning: Expression is always FALSE
 prog.cob: 21: Warning: Literal '1.1' has more decimals than PIC-9-NOT-DECIMAL
 prog.cob: 21: Warning: Expression is always FALSE
-prog.cob: 31: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
-prog.cob: 33: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN ZERO
-prog.cob: 35: Warning: Unsigned 'PIC-9-NOT-SIGNED' is never LESS THAN -25
+prog.cob: 31: Warning: Unsigned 'PIC-9-NOT-SIGNED' may not be LESS THAN ZERO
+prog.cob: 33: Warning: Unsigned 'PIC-9-NOT-SIGNED' may not be LESS THAN ZERO
+prog.cob: 35: Warning: Unsigned 'PIC-9-NOT-SIGNED' may not be LESS THAN -25
 prog.cob: 37: Warning: Literal '1.12' has more decimals than PIC-9-DECIMAL
 prog.cob: 37: Warning: Expression is always FALSE
 prog.cob: 41: Warning: Literal '1B0' is alphanumeric but PIC-9-NOT-DECIMAL is numeric
@@ -185,8 +197,12 @@ prog.cob: 80: Warning: Literal '5654.20' has more digits than COMPUTE-1
 prog.cob: 80: Warning: Expression is always TRUE
 prog.cob: 82: Warning: Literal '5654.20' has more digits than COMPUTE-1
 prog.cob: 82: Warning: Expression is always FALSE
-prog.cob: 88: Warning: Unsigned 'IF-D16' is never LESS THAN ZERO
-prog.cob: 90: Warning: Unsigned 'IF-D16' is never LESS THAN ZERO
+prog.cob: 88: Warning: Unsigned 'IF-D16' may not be LESS THAN ZERO
+prog.cob: 90: Warning: Unsigned 'IF-D16' may not be LESS THAN ZERO
+prog.cob: 92: Warning: Unsigned 'PIC-9-NOT-SIGNED' may always be GREATER THAN -25
+prog.cob: 94: Warning: Unsigned 'PIC-9-NOT-SIGNED' may always be GREATER OR EQUAL -1
+prog.cob: 100: Warning: Unsigned 'PIC-9-NOT-SIGNED' may always be GREATER OR EQUAL ZERO
+prog.cob: 102: Warning: Unsigned 'PIC-9-NOT-SIGNED' may always be GREATER OR EQUAL ZERO
 ])
 
 AT_CHECK([./prog], [0], [], [])
