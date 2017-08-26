@@ -111,6 +111,11 @@ struct cob_alloc_cache {
 	size_t			size;		/* Item size */
 };
 
+struct cob_alloc_module {
+	struct cob_alloc_module	*next;		/* Pointer to next */
+	void			*cob_pointer;	/* Pointer to malloced space */
+};
+
 /* EXTERNAL structure */
 
 struct cob_external {
@@ -128,7 +133,7 @@ static int			cob_initialized = 0;
 static int			cob_argc = 0;
 static char			**cob_argv = NULL;
 static struct cob_alloc_cache	*cob_alloc_base = NULL;
-static struct cob_alloc_cache	*cob_module_list = NULL;
+static struct cob_alloc_module	*cob_module_list = NULL;
 static cob_module		*cob_module_err = NULL;
 static const char		*cob_last_sfile = NULL;
 static const char		*cob_last_progid = NULL;
@@ -1803,7 +1808,7 @@ cob_stop_run (const int status)
 {
 	struct exit_handlerlist	*h;
 	cob_module	*mod;
-	struct cob_alloc_cache	*ptr;
+	struct cob_alloc_module	*ptr, *nxt;
 	int		(*cancel_func)(const int);
 
 	if (!cob_initialized) {
@@ -1811,14 +1816,17 @@ cob_stop_run (const int status)
 	}
 
 	/* Call each module to release 'decimal' memory */
-	for (ptr = cob_module_list; ptr; ptr = ptr->next) {
+	for (ptr = cob_module_list; ptr; ptr = nxt) {
 		mod = ptr->cob_pointer;
+		nxt = ptr->next;
 		if (mod->module_cancel.funcint) {
 			mod->module_active = 0;
 			cancel_func = mod->module_cancel.funcint;
 			(void)cancel_func (-20);	/* Clear just decimals */
 		}
+		cob_cache_free (ptr);
 	}
+	cob_module_list = NULL;
 
 	if (exit_hdlrs != NULL) {
 		h = exit_hdlrs;
@@ -2117,7 +2125,7 @@ cob_module_global_enter (
 {
 	cob_module	*mod;
 	int		k;
-	struct cob_alloc_cache	*cache_ptr;
+	struct cob_alloc_module	*mod_ptr;
 
 	/* Check initialized */
 	if (unlikely(!cob_initialized)) {
@@ -2150,10 +2158,10 @@ cob_module_global_enter (
 	if (!*module) {
 		*module = cob_cache_malloc (sizeof(cob_module));
 		/* Add to list of all modules activated */
-		cache_ptr = cob_malloc (sizeof (struct cob_alloc_cache));
-		cache_ptr->cob_pointer = *module;
-		cache_ptr->next = cob_module_list;
-		cob_module_list = cache_ptr;
+		mod_ptr = cob_malloc (sizeof (struct cob_alloc_module));
+		mod_ptr->cob_pointer = *module;
+		mod_ptr->next = cob_module_list;
+		cob_module_list = mod_ptr;
 	} else if (entry == 0
 		&& !cobglobptr->cob_call_from_c) {
 		for(k = 0, mod = COB_MODULE_PTR; mod && k < 10240; mod = mod->next, k++) {
@@ -2199,7 +2207,7 @@ cob_module_leave (cob_module *module)
 void
 cob_module_free (cob_module **module)
 {
-	struct cob_alloc_cache	*ptr, *prv;
+	struct cob_alloc_module	*ptr, *prv;
 	if (*module != NULL) {
 		prv = NULL;
 		/* Remove from list of all modules activated */

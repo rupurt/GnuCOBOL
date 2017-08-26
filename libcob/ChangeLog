@@ -1,4 +1,7 @@
 
+2017-08-26 Ron Norman <rjn@inglenet.com>
+	* common.c: Free the structs used to track modules on STOP RUN
+
 2017-08-18 Ron Norman <rjn@inglenet.com>
 	* common.c: Keep list of all active modules for later free of
 	            memory allocated for decimal constants
