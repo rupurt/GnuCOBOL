@@ -1824,7 +1824,7 @@ cob_stop_run (const int status)
 			cancel_func = mod->module_cancel.funcint;
 			(void)cancel_func (-20);	/* Clear just decimals */
 		}
-		cob_cache_free (ptr);
+		cob_free (ptr);
 	}
 	cob_module_list = NULL;
 
@@ -2218,7 +2218,7 @@ cob_module_free (cob_module **module)
 				} else {
 					prv->next = ptr->next;
 				}
-				cob_cache_free (ptr);
+				cob_free (ptr);
 				break;
 			}
 			prv = ptr;
