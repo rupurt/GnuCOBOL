@@ -368,6 +368,22 @@ cob_exit_common (void)
 	void 	*data;
 	char	*str;
 	unsigned int	i;
+	cob_module	*mod;
+	struct cob_alloc_module	*ptr, *nxt;
+	int		(*cancel_func)(const int);
+
+	/* Call each module to release 'decimal' memory */
+	for (ptr = cob_module_list; ptr; ptr = nxt) {
+		mod = ptr->cob_pointer;
+		nxt = ptr->next;
+		if (mod->module_cancel.funcint) {
+			mod->module_active = 0;
+			cancel_func = mod->module_cancel.funcint;
+			(void)cancel_func (-20);	/* Clear just decimals */
+		}
+		cob_free (ptr);
+	}
+	cob_module_list = NULL;
 
 #ifdef	HAVE_SETLOCALE
 	if (cobglobptr->cob_locale_orig) {
