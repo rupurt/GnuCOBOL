@@ -368,22 +368,6 @@ cob_exit_common (void)
 	void 	*data;
 	char	*str;
 	unsigned int	i;
-	cob_module	*mod;
-	struct cob_alloc_module	*ptr, *nxt;
-	int		(*cancel_func)(const int);
-
-	/* Call each module to release 'decimal' memory */
-	for (ptr = cob_module_list; ptr; ptr = nxt) {
-		mod = ptr->cob_pointer;
-		nxt = ptr->next;
-		if (mod->module_cancel.funcint) {
-			mod->module_active = 0;
-			cancel_func = mod->module_cancel.funcint;
-			(void)cancel_func (-20);	/* Clear just decimals */
-		}
-		cob_free (ptr);
-	}
-	cob_module_list = NULL;
 
 #ifdef	HAVE_SETLOCALE
 	if (cobglobptr->cob_locale_orig) {
@@ -494,6 +478,29 @@ cob_exit_common (void)
 }
 
 static void
+cob_exit_common_modules (void)
+{
+	cob_module	*mod;
+	struct cob_alloc_module	*ptr, *nxt;
+	int		(*cancel_func)(const int);
+
+	/* Call each module to release local memory
+	   - currently used for: decimals -
+	   and remove it from the internal module list */
+	for (ptr = cob_module_list; ptr; ptr = nxt) {
+		mod = ptr->cob_pointer;
+		nxt = ptr->next;
+		if (mod && mod->module_cancel.funcint) {
+			mod->module_active = 0;
+			cancel_func = mod->module_cancel.funcint;
+			(void)cancel_func (-20);	/* Clear just decimals */
+		}
+		cob_free (ptr);
+	}
+	cob_module_list = NULL;
+}
+
+static void
 cob_terminate_routines (void)
 {
 	if (!cob_initialized) {
@@ -519,6 +526,7 @@ cob_terminate_routines (void)
 	cob_exit_intrinsic ();
 	cob_exit_strings ();
 	cob_exit_numeric ();
+	cob_exit_common_modules ();
 	cob_exit_call ();
 	cob_exit_reportio ();
 
@@ -1823,26 +1831,10 @@ void
 cob_stop_run (const int status)
 {
 	struct exit_handlerlist	*h;
-	cob_module	*mod;
-	struct cob_alloc_module	*ptr, *nxt;
-	int		(*cancel_func)(const int);
 
 	if (!cob_initialized) {
 		exit (1);
 	}
-
-	/* Call each module to release 'decimal' memory */
-	for (ptr = cob_module_list; ptr; ptr = nxt) {
-		mod = ptr->cob_pointer;
-		nxt = ptr->next;
-		if (mod->module_cancel.funcint) {
-			mod->module_active = 0;
-			cancel_func = mod->module_cancel.funcint;
-			(void)cancel_func (-20);	/* Clear just decimals */
-		}
-		cob_free (ptr);
-	}
-	cob_module_list = NULL;
 
 	if (exit_hdlrs != NULL) {
 		h = exit_hdlrs;
