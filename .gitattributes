@@ -158,11 +158,13 @@ po/Makevars -text
 po/POTFILES.in -text
 po/Rules-quot -text
 po/boldquot.sed -text
+po/de.po -text
 po/en@boldquot.header -text
 po/en@quot.header -text
 po/es.po -text
 po/gnucobol.pot -text
 po/insert-header.sin -text
+po/it.po -text
 po/ja.po -text
 po/nl.po -text
 po/pt.po -text
