@@ -3786,7 +3786,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -fintrinsics=all prog.cob], [0], [], [])
+AT_CHECK([$COMPILE -w -fintrinsics=all prog.cob], [0], [], [])
 AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
@@ -3807,7 +3807,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE -fintrinsics=pi,e prog.cob], [0], [], [])
+AT_CHECK([$COMPILE -w -fintrinsics=pi,e prog.cob], [0], [], [])
 AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP

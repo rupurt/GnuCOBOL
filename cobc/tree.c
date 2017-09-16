@@ -26,6 +26,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "cobc.h"
 #include "tree.h"
@@ -1745,6 +1746,7 @@ cb_build_numeric_literal (int sign, const void *data, const int scale)
 {
 	struct cb_literal *p;
 	char	*sdata = (char*)data;
+	int	k, dec;
 
 	if (*sdata == '-') {
 		sign = -1;
@@ -1753,9 +1755,18 @@ cb_build_numeric_literal (int sign, const void *data, const int scale)
 		sign = 1;
 		sdata++;
 	}
+	/* Check for '.' in numeric string and adjust scale */
+	dec = 0;
+	for (k=0; sdata[k] != 0; k++) {
+		if (sdata[k] == '.') {
+			memmove(&sdata[k], &sdata[k+1], strlen(&sdata[k]));
+			dec = strlen(&sdata[k]);
+			break;
+		}
+	}
 	p = build_literal (CB_CATEGORY_NUMERIC, (void*)sdata, strlen (sdata));
 	p->sign = (short)sign;
-	p->scale = scale;
+	p->scale = scale + dec;
 	return CB_TREE (p);
 }
 
@@ -4347,8 +4358,15 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 {
 	struct cb_intrinsic_table	*cbp;
 	cb_tree				x;
-	int				numargs;
+	cb_tree				l;
+	struct cb_literal 		*lp;
+	struct cb_field			*f;
+	int				numargs, num_integer, num_string, use_rslt, use_drslt;
+	int				xscale, rscale, k;
 	enum cb_category		catg;
+	cob_s64_t			xval,rslt;
+	double				drslt, dval;
+	char				result[64];
 
 	numargs = cb_list_length (args);
 
@@ -4422,15 +4440,181 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 #endif
 	}
 
+	/*
+	 * Check if intrinsic can be computed at compile time
+	 *  (Partly implemented as much more can be added for other functions)
+	 *  RJN Sep 2017
+	 */
+	if (cb_flag_inline_intrinsic) {
+		if (cbp->intr_enum == CB_INTR_E) {
+			return cb_build_numeric_literal (0, "271828182845904523536028747135266249", 35);
+		}
+		if (cbp->intr_enum == CB_INTR_PI) {
+			return cb_build_numeric_literal (0, "314159265358979323846264338327950288", 35);
+		}
+
+		num_integer = num_string = 0;
+		for (l = args; l; l = CB_CHAIN(l)) {
+			if (CB_LITERAL_P (CB_VALUE(l))) {
+				lp = CB_LITERAL(CB_VALUE(l));
+				if (CB_NUMERIC_LITERAL_P (CB_VALUE(l))) {
+					if ((lp->size - lp->scale) >= 0	/* Simple Numerics */
+					 && lp->scale < 5
+					 && lp->size  < 12)
+						num_integer++;	
+				} else {
+					num_string++;
+				}
+			}
+		}
+
+		if (num_integer == numargs
+		 && numargs > 0
+		 && !refmod) {
+			xval = rslt = use_rslt = use_drslt = rscale = 0;
+			drslt = dval = 0;
+			for (l = args; l; l = CB_CHAIN(l)) {
+				lp = CB_LITERAL(CB_VALUE(l));
+				xval = atoll((const char*)lp->data);
+				if(lp->sign == -1) xval = -xval;
+				xscale = lp->scale;
+				while (xscale < rscale) {
+					xval = xval * 10;
+					xscale++;
+				}
+				while (xscale > rscale) {
+					rslt = rslt * 10;
+					rscale++;
+				}
+				switch (cbp->intr_enum) {
+				case CB_INTR_MAX:
+					if (l == args)
+						rslt = xval;
+					else if (xval > rslt)
+						rslt = xval;
+					use_rslt = 1;
+					break;
+				case CB_INTR_MIN:
+					if (l == args)
+						rslt = xval;
+					else if (xval < rslt)
+						rslt = xval;
+					use_rslt = 1;
+					break;
+				case CB_INTR_SUM:
+					rslt += xval;
+					use_rslt = 1;
+					break;
+				case CB_INTR_REM:
+					if (l == args) {
+						rslt = xval;
+					} else {
+						rslt = rslt % xval;
+					}
+					use_rslt = 1;
+					break;
+				case CB_INTR_INTEGER:
+				case CB_INTR_INTEGER_PART:
+					rslt = xval;
+					while (rscale > 0) {
+						rslt = rslt / 10;
+						rscale--;
+					}
+					use_rslt = 1;
+					break;
+#if 0
+		/* SIN results differs after 15 decimal places from runtime value */
+				case CB_INTR_SIN:
+					dval = xval;
+					while (xscale > 0) {
+						dval = dval / 10.0;
+						xscale--;
+					}
+					drslt = sin (dval);
+					use_drslt = 1;
+					break;
+		/* SQRT results differs after 15 decimal places from runtime value */
+				case CB_INTR_SQRT:
+					dval = xval;
+					while (xscale > 0) {
+						dval = dval / 10.0;
+						xscale--;
+					}
+					drslt = sqrt (dval);
+					use_drslt = 1;
+					break;
+#endif
+				default:
+					break;
+				}
+			}
+			if (use_rslt) {
+				while (rscale > 0
+				    && rslt != 0
+				    && (rslt % 10) == 0) {	/* Adjust out trailing ZEROs */
+					rslt = rslt / 10;
+					rscale--;
+				}
+				sprintf(result, CB_FMT_LLD, rslt);
+				return cb_build_numeric_literal (0, result, rscale);
+			}
+			if (use_drslt) {
+				for (k=35; k > 2; k--) {
+					if (sprintf(result, "%.*f", k, drslt) < 40)
+						break;
+				}
+				for (k=strlen(result); k > 0 && result[k-1] == '0'; k--)
+					result[k-1] = 0;
+				if (result[k-1] == '.')
+					result[k-1] = 0;
+				return cb_build_numeric_literal (0, result, 0);
+			}
+		} else 
+		if (num_string == numargs
+		 && numargs > 0
+		 && !refmod) {
+			for (l = args; l; l = CB_CHAIN(l)) {
+				lp = CB_LITERAL(CB_VALUE(l));
+				switch (cbp->intr_enum) {
+				case CB_INTR_UPPER_CASE:
+					for (k=0; k < lp->size; k++) {
+						if (islower(lp->data[k]))
+							lp->data[k] = toupper(lp->data[k]);
+					}
+					return cb_build_alphanumeric_literal (lp->data, lp->size);
+					break;
+				case CB_INTR_LOWER_CASE:
+					for (k=0; k < lp->size; k++) {
+						if (isupper(lp->data[k]))
+							lp->data[k] = tolower(lp->data[k]);
+					}
+					return cb_build_alphanumeric_literal (lp->data, lp->size);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
 	switch (cbp->intr_enum) {
 	case CB_INTR_LENGTH:
 	case CB_INTR_BYTE_LENGTH:
 		x = CB_VALUE (args);
+		if (CB_REF_OR_FIELD_P (x)) {
+			f = CB_FIELD (x);
+			if (!cb_field_variable_size (f)
+			 && !f->flag_any_length) {
+				if (!(f->pic 
+				 && (f->pic->category == CB_CATEGORY_NATIONAL
+				  || f->pic->category == CB_CATEGORY_NATIONAL_EDITED))) 
+					return cb_build_length (x);
+			}
+		} else
 		if (CB_LITERAL_P (x)) {
 			return cb_build_length (x);
-		} else {
-			return make_intrinsic (name, cbp, args, NULL, NULL, 0);
 		}
+		return make_intrinsic (name, cbp, args, NULL, NULL, 0);
 
 	case CB_INTR_WHEN_COMPILED:
 		if (refmod) {
