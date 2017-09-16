@@ -1,4 +1,14 @@
 
+2017-09-15  Ron Norman <rjn@inglenet.com>
+
+	* flag.def,tree.c: 
+	  Added -finline-intrinsic, defaults to ON
+	  In tree.c . cb_build_intrinsic . if arguments as constants
+	  then for some functions the value is computed at compile
+	  time. Some functions are not done due to difference in
+	  precision expected by some test cases.
+	  More could be done with this later...
+
 2017-08-20  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* tree.c: work on expression warning messages and added more
