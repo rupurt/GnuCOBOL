@@ -2893,10 +2893,23 @@ cb_validate_program_body (struct cb_program *prog)
 				cb_error_x (fl->key,
 					_("File %s: RELATIVE KEY %s cannot have OCCURS"), fl->name, f->name);
 			}
-			if (f->storage != CB_STORAGE_WORKING
+			if (cb_select_working
+			 && f->storage != CB_STORAGE_WORKING
+			 && f->storage != CB_STORAGE_FILE
 			 && f->storage != CB_STORAGE_LOCAL) {
 				cb_error_x (fl->key,
-					_("File %s: RELATIVE KEY %s declared outside WORKING STORAGE"), 
+					_("File %s: RELATIVE KEY %s declared outside WORKING-STORAGE"), 
+						fl->name, f->name);
+			}
+		}
+		if (fl->assign != NULL) {
+			f = CB_FIELD_PTR (fl->assign);
+			if (cb_select_working
+			 && f->storage != CB_STORAGE_WORKING
+			 && f->storage != CB_STORAGE_FILE
+			 && f->storage != CB_STORAGE_LOCAL) {
+				cb_error_x (fl->key,
+					_("File %s: ASSIGN %s declared outside WORKING-STORAGE"), 
 						fl->name, f->name);
 			}
 		}
