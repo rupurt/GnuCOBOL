@@ -1,6 +1,11 @@
 
 2017-09-18  Ron Norman <rjn@inglenet.com>
 
+	* codegen.c: 
+	  Clear cob_glob_ptr->cob_exception_code at start of CALL
+
+2017-09-18  Ron Norman <rjn@inglenet.com>
+
 	* config.def: 
 	  Added select-working: yes/no
 	  SELECT RELATIVE KEY and ASSIGN fields must be in WORKING-STORAGE

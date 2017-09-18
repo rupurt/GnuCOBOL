@@ -4705,6 +4705,7 @@ output_call (struct cb_call *p)
 			output_prefix ();
 			output ("cob_glob_ptr->cob_call_name_hash = 0x%X;\n",
 					cob_get_name_hash(callname));
+			output_line ("cob_glob_ptr->cob_exception_code = 0;");
 		}
 		output_prefix ();
 		if (p->call_returning == cb_null) {
