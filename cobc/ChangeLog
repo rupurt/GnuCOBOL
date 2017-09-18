@@ -2,6 +2,11 @@
 2017-09-18  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: 
+	  Emit Decimal Constants for all module types
+
+2017-09-18  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: 
 	  Clear cob_glob_ptr->cob_exception_code at start of CALL
 
 2017-09-18  Ron Norman <rjn@inglenet.com>

@@ -9179,22 +9179,23 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			}
 			output_newline ();
 		}
-		i = 1;
-		for (m = literal_cache; m; m = m->next) {
-			if (CB_TREE_CLASS (m->x) == CB_CLASS_NUMERIC
-			 && m->make_decimal) {
-				if (i) {
-					output_line ("/* Set Decimal Constant values */");
-					i = 0;
-				}
-				output_line ("%s%d = &%s%d;", 	CB_PREFIX_DEC_CONST,m->id,
-								CB_PREFIX_DEC_FIELD,m->id);
-				output_line ("cob_decimal_init(%s%d);",CB_PREFIX_DEC_CONST,m->id);
-				output_line ("cob_decimal_set_field (%s%d, (cob_field *)&%s%d);",
-									CB_PREFIX_DEC_CONST,m->id,
-									CB_PREFIX_CONST,m->id);
-				output_newline ();
+	}
+
+	i = 1;
+	for (m = literal_cache; m; m = m->next) {
+		if (CB_TREE_CLASS (m->x) == CB_CLASS_NUMERIC
+		 && m->make_decimal) {
+			if (i) {
+				output_line ("/* Set Decimal Constant values */");
+				i = 0;
 			}
+			output_line ("%s%d = &%s%d;", 	CB_PREFIX_DEC_CONST,m->id,
+							CB_PREFIX_DEC_FIELD,m->id);
+			output_line ("cob_decimal_init(%s%d);",CB_PREFIX_DEC_CONST,m->id);
+			output_line ("cob_decimal_set_field (%s%d, (cob_field *)&%s%d);",
+								CB_PREFIX_DEC_CONST,m->id,
+								CB_PREFIX_CONST,m->id);
+			output_newline ();
 		}
 	}
 
