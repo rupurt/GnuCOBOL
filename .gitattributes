@@ -183,6 +183,7 @@ tests/cobol85/IC.txt -text
 tests/cobol85/IF.txt -text
 tests/cobol85/IX.txt -text
 tests/cobol85/Makefile.am -text
+tests/cobol85/Makefile.module.in -text
 tests/cobol85/NC.txt -text
 tests/cobol85/OB.txt -text
 tests/cobol85/RL.txt -text
