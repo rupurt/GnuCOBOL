@@ -585,7 +585,7 @@ cob_sig_handler_ex (int sig)
 #ifdef	HAVE_RAISE
 	raise (sig);
 #else
-	kill (cob_sys_getpid(), sig);
+	kill (cob_sys_getpid (), sig);
 #endif
 	exit (sig);
 }
@@ -595,19 +595,19 @@ DECLNORET static void COB_A_NORETURN
 cob_sig_handler (int sig)
 {
 	const char *signal_name;
-	char	reason[50];
 
-#if	defined(HAVE_SIGACTION) && !defined(SA_RESETHAND)
+#if	defined (HAVE_SIGACTION) && !defined (SA_RESETHAND)
 	struct sigaction	sa;
 #endif
 
 #ifdef	HAVE_SIG_ATOMIC_T
 	if (sig_is_handled) {
-		cob_sig_handler_ex(sig);
+		cob_sig_handler_ex (sig);
 	}
 	sig_is_handled = 1;
 #endif
 
+	/* LCOV_EXCL_START */
 	switch (sig) {
 #ifdef	SIGINT
 	case SIGINT:
@@ -639,15 +639,28 @@ cob_sig_handler (int sig)
 		signal_name = "SIGSEGV";
 		break;
 #endif
+#ifdef	SIGBUS
+	case SIGBUS:
+		signal_name = "SIGBUS";
+		break;
+#endif
+#ifdef	SIGFPE
+	case SIGFPE:
+		signal_name = "SIGFPE";
+		break;
+#endif
 	default:
-		signal_name = "unkown";
-		fprintf(stderr, "Caught wrong signal: %d\n", sig);
+		signal_name = _("unknown");
+		/* not translated as it is a very unlikely errorcase */
+		fprintf (stderr, "cob_sig_handler caught not handled signal: %d", sig);
+		putc ('\n', stderr);
 		break;
 	}
+	/* LCOV_EXCL_STOP */
 
 #ifdef	HAVE_SIGACTION
 #ifndef	SA_RESETHAND
-	memset (&sa, 0, sizeof(sa));
+	memset (&sa, 0, sizeof (sa));
 	sa.sa_handler = SIG_DFL;
 	(void)sigemptyset (&sa.sa_mask);
 	(void)sigaction (sig, &sa, NULL);
@@ -664,27 +677,40 @@ cob_sig_handler (int sig)
 		}
 	}
 
+	/* LCOV_EXCL_START */
+	switch (sig) {
 #ifdef	SIGSEGV
-	if (sig == SIGSEGV) {
-		fprintf (stderr, _("Attempt to reference unallocated memory"));
-	} else {
-		fprintf (stderr, _("Caught Signal"));
-	}
-#else
-	fprintf (stderr, _("Caught Signal"));
+	case SIGSEGV:
+		fprintf (stderr, _("attempt to reference unallocated memory"));
+		break;
 #endif
-	sprintf (reason, _("Signal %s"), signal_name);
-	fprintf (stderr, " (%s)\n",reason);
+#ifdef	SIGBUS
+	case SIGBUS:
+		fprintf (stderr, _("bus error"));
+		break;
+#endif
+#ifdef	SIGFPE
+	case SIGFPE:
+		fprintf (stderr, _("fatal arithmetic error"));
+		break;
+#endif
+	default:
+		fprintf (stderr, _("caught signal"));
+		break;
+	}
+	/* LCOV_EXCL_STOP */
+	fprintf (stderr, " (");
+	fprintf (stderr, _("signal %s"), signal_name);
+	fprintf (stderr, ")\n");
 
 	if (cob_initialized) {
-		cob_dump_module (reason);
 		cob_terminate_routines ();
-		fprintf (stderr, _("Abnormal termination - File contents may be incorrect"));
+		fprintf (stderr, _("abnormal termination - file contents may be incorrect"));
 	}
 	putc ('\n', stderr);
 	fflush (stderr);
 
-	cob_sig_handler_ex(sig);
+	cob_sig_handler_ex (sig);
 }
 #endif
 
@@ -748,6 +774,19 @@ cob_set_signal (void)
 	(void)sigemptyset (&sa.sa_mask);
 	(void)sigaction (SIGSEGV, &sa, NULL);
 #endif
+#ifdef	SIGBUS
+	/* Take direct control of bus error */
+	(void)sigemptyset (&sa.sa_mask);
+	(void)sigaction (SIGBUS, &sa, NULL);
+#endif
+#ifdef	SIGFPE
+	/* fatal arithmetic errors including non-floating-point division by zero */
+	(void)sigaction (SIGFPE, NULL, &osa);
+	if (osa.sa_handler != SIG_IGN) {
+		(void)sigemptyset (&sa.sa_mask);
+		(void)sigaction (SIGFPE, &sa, NULL);
+	}
+#endif
 
 #else
 
@@ -779,6 +818,15 @@ cob_set_signal (void)
 #ifdef	SIGSEGV
 	/* Take direct control of segmentation violation */
 	(void)signal (SIGSEGV, cob_sig_handler);
+#endif
+#ifdef	SIGBUS
+	/* Take direct control of bus error */
+	(void)signal (SIGBUS, cob_sig_handler);
+#endif
+#ifdef	SIGFPE
+	if (signal (SIGFPE, SIG_IGN) != SIG_IGN) {
+		(void)signal (SIGFPE, cob_sig_handler);
+	}
 #endif
 
 #endif
