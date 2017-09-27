@@ -5803,13 +5803,14 @@ output_stmt (cb_tree x)
 			last_line = x->source_line;
 		}
 
-#if	0	/* RXWRXW - Exception */
-		if (p->handler1 || p->handler2 ||
-		    (p->file && CB_EXCEPTION_ENABLE (COB_EC_I_O))) {
-#else
 		if (!p->file && (p->handler1 || p->handler2)) {
-#endif
 			output_line ("cob_glob_ptr->cob_exception_code = 0;");
+		} else
+		if (!p->file 
+		 && p->handler_id == -1 
+		 && cobc_wants_debug) {
+			output_line ("cob_glob_ptr->cob_exception_code = -1;");
+			p->handler_id = 0;
 		}
 
 		if(p->file) {

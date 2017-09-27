@@ -726,6 +726,7 @@ GLib is licensed under the GNU Lesser General Public License.
 #define COB_FERROR_FILE		11
 #define COB_FERROR_FUNCTION	12
 #define COB_FERROR_FREE		13
+#define COB_FERROR_DIV_ZERO	14
 
 /* Exception identifier enumeration */
 
