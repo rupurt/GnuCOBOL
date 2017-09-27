@@ -3422,7 +3422,7 @@ build_store_option (cb_tree x, cb_tree round_opt)
 		if (current_statement->handler1) {
 			opt |= COB_STORE_KEEP_ON_OVERFLOW;
 		}
-	} else if (current_statement->handler_id) {
+	} else if (current_statement->handler_id > 0) {
 		/* There is a [NOT] ERROR/OVERFLOW/EXCEPTION - Set in parser */
 		opt |= COB_STORE_KEEP_ON_OVERFLOW;
 	} else if (usage == CB_USAGE_BINARY && cb_binary_truncate) {

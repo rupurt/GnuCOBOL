@@ -10003,6 +10003,9 @@ opt_not_on_disp_exception:
 /* ON SIZE ERROR */
 
 on_size_error:
+  {
+	current_statement->handler_id = -1;
+  }
   opt_on_size_error opt_not_on_size_error
 ;
 

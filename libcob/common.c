@@ -595,6 +595,7 @@ DECLNORET static void COB_A_NORETURN
 cob_sig_handler (int sig)
 {
 	const char *signal_name;
+	char	reason[64];
 
 #if	defined (HAVE_SIGACTION) && !defined (SA_RESETHAND)
 	struct sigaction	sa;
@@ -700,10 +701,12 @@ cob_sig_handler (int sig)
 	}
 	/* LCOV_EXCL_STOP */
 	fprintf (stderr, " (");
-	fprintf (stderr, _("signal %s"), signal_name);
+	sprintf (reason, _("signal %s"), signal_name);
+	fprintf (stderr, "%s", reason);
 	fprintf (stderr, ")\n");
 
 	if (cob_initialized) {
+		cob_dump_module (reason);
 		cob_terminate_routines ();
 		fprintf (stderr, _("abnormal termination - file contents may be incorrect"));
 	}
@@ -2098,6 +2101,9 @@ cob_fatal_error (const int fatal_error)
 		break;
 	case COB_FERROR_FUNCTION:
 		cob_runtime_error (_("Attempt to use non-implemented function"));
+		break;
+	case COB_FERROR_DIV_ZERO:
+		cob_runtime_error (_("Divide by ZERO"));
 		break;
 	default:
 		cob_runtime_error (_("Unknown failure : %d"), fatal_error);
