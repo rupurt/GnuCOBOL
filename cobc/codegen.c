@@ -797,6 +797,8 @@ out_odoslide_grp_offset (struct cb_field *p, struct cb_field *fld)
 			}
 			need_plus_sign = 0;
 			output (")");
+			if (found_it)
+				return 1;
 		}
 		if (odo_stop_now)
 			return 1;
@@ -1017,6 +1019,24 @@ output_base (struct cb_field *f, const cob_u32_t no_output)
 	}
 }
 
+static int
+is_index_1 (cb_tree x)
+{
+	switch (CB_TREE_TAG (x)) {
+	case CB_TAG_INTEGER:
+		if (CB_INTEGER (x)->val == 1)
+			return 1;
+		break;
+	case CB_TAG_LITERAL:
+		if (cb_get_int (x) == 1)
+			return 1;
+		break;
+	default:
+		return 0;
+	}
+	return 0;
+}
+
 static void
 output_data (cb_tree x)
 {
@@ -1054,6 +1074,11 @@ output_data (cb_tree x)
 			for (; f && lsub; f = f->parent) {
 				/* add current field size for OCCURS */
 				if (f->flag_occurs) {
+					if (is_index_1 (CB_VALUE (lsub)) ) {	/* 1 - 1 is 0 so skip it */
+						lsub = CB_CHAIN (lsub);
+						continue;
+					}
+
 					if (cb_flag_odoslide 
 					 && !gen_init_working
 					 && f != o 
@@ -2232,6 +2257,7 @@ output_long_integer (cb_tree x)
 		COBC_ABORT ();
 	}
 }
+
 
 static void
 output_index (cb_tree x)
