@@ -2210,7 +2210,6 @@ process_command_line (const int argc, char **argv)
 		case 'd':
 			/* -debug : Turn on OC debugging */
 			cb_flag_source_location = 1;
-			cb_flag_trace = 1;
 			cb_flag_stack_check = 1;
 			cobc_wants_debug = 1;
 			break;

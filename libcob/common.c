@@ -1715,7 +1715,8 @@ cob_trace_sect (const char *name)
 {
 	char	val[60];
 	cob_current_section = name;
-	if (cobsetptr->cob_line_trace) {
+	if (cobsetptr->cob_line_trace
+         && (COB_MODULE_PTR->flag_debug_trace & COB_MODULE_TRACE)) {
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
@@ -1736,7 +1737,8 @@ cob_trace_para (const char *name)
 {
 	char	val[60];
 	cob_current_paragraph = name;
-	if (cobsetptr->cob_line_trace) {
+	if (cobsetptr->cob_line_trace
+         && (COB_MODULE_PTR->flag_debug_trace & COB_MODULE_TRACE)) {
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
@@ -1756,7 +1758,8 @@ void
 cob_trace_entry (const char *name)
 {
 	char	val[60];
-	if (cobsetptr->cob_line_trace) {
+	if (cobsetptr->cob_line_trace
+         && (COB_MODULE_PTR->flag_debug_trace & COB_MODULE_TRACE)) {
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
@@ -1776,7 +1779,8 @@ void
 cob_trace_exit (const char *name)
 {
 	char	val[60];
-	if (cobsetptr->cob_line_trace) {
+	if (cobsetptr->cob_line_trace
+         && (COB_MODULE_PTR->flag_debug_trace & COB_MODULE_TRACE)) {
 		if (cob_trace_prep()
 		 || name == NULL)
 			return;
@@ -1798,7 +1802,8 @@ cob_trace_stmt (const char *stmt)
 	char	val[60];
 	if (stmt)
 		cob_source_statement = stmt;
-	if (cobsetptr->cob_line_trace) {
+	if (cobsetptr->cob_line_trace
+         && (COB_MODULE_PTR->flag_debug_trace & COB_MODULE_TRACEALL)) {
 		if (cob_trace_prep())
 			return;
 		sprintf(val,"            %-30.30s", stmt ? (char *)stmt : "Unknown");

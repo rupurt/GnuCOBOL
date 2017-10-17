@@ -1164,7 +1164,11 @@ typedef struct __cob_module {
 
 	unsigned char		flag_dump_ready;	/* Module was compiled with -fdump */
 	unsigned char		flag_did_cancel;	/* Module has been canceled */
-	unsigned char		unused[2];		/* Use these flags up later */
+	unsigned char		flag_debug_trace;	/* Module debug/trace compile option */
+#define COB_MODULE_DEBUG	1
+#define COB_MODULE_TRACE	2
+#define COB_MODULE_TRACEALL	4
+	unsigned char		unused[1];		/* Use these flags up later */
 
 	unsigned int		module_stmt;		/* Last statement executed */
 	const char		**module_sources;	/* Source module names compiled */

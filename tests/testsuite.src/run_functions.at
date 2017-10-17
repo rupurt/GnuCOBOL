@@ -642,7 +642,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COMPILE -debug prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
 [prog; A00 OF A00-MAIN; 18], [])
 
