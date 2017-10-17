@@ -1,4 +1,11 @@
 
+2017-10-17  Ron Norman <rjn@inglenet.com>
+
+	* common.h: Add flag_debug_trace to the cob_module 
+	* common.c: Check flag_debug_trace to verify module
+	  was compile with -debug and/or -ftrace[all] and only
+	  record trace information if compiled with the option
+
 2017-09-26  Ron Norman <rjn@inglenet.com>
 
 	* common.c,common.h: Add code for COB_FERROR_DIV_ZERO

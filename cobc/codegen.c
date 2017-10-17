@@ -5956,7 +5956,8 @@ output_stmt (cb_tree x)
 				CB_PREFIX_LABEL, CB_LABEL (lp->exit_label)->id);
 		}
 
-		if (cb_flag_trace) {
+		if (cb_flag_trace
+		 || cobc_wants_debug) {
 			output_section_info (lp);
 		}
 
@@ -8022,6 +8023,7 @@ output_error_handler (struct cb_program *prog)
 static void
 output_module_init (struct cb_program *prog)
 {
+	int	opt;
 #if	0	/* Module comments */
 	output ("/* Next pointer, Parameter list pointer, Module name, */\n");
 	output ("/* Module formatted date, Module source, */\n");
@@ -8105,7 +8107,19 @@ output_module_init (struct cb_program *prog)
 	output_line ("module->flag_main = %d;", cobc_flag_main);
 	output_line ("module->flag_fold_call = %d;", cb_fold_call);
 	output_line ("module->flag_exit_program = 0;");
-	output_line ("module->flag_exit_program = 0;");
+	opt = 0;
+	if (cb_flag_traceall) {
+		opt |= COB_MODULE_TRACE;
+		opt |= COB_MODULE_TRACEALL;
+	} else
+	if (cb_flag_trace) {
+		opt |= COB_MODULE_TRACE;
+	}
+	if (cb_flag_source_location 
+	 || cb_flag_dump) {
+		opt |= COB_MODULE_DEBUG;
+	}
+	output_line ("module->flag_debug_trace = %d;",opt);
 	if (cb_flag_dump) {
 		output_line ("module->flag_dump_ready = 1;");
 	} else {

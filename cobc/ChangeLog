@@ -1,4 +1,12 @@
 
+2017-10-17  Ron Norman <rjn@inglenet.com>
+
+	* cobc.c: Change so -debug does NOT set -ftrace
+	* codegen.c: Set module flags on entry to indicate if module
+	  was compiled with -debug or -ftrace[all] so that the module
+	  is not traced at runtime unless it had been compiled with that 
+	  option
+
 2017-10-07  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: correction for -fodoslide
