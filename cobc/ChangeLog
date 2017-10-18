@@ -1,4 +1,8 @@
 
+2017-10-18  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Fixed problem with braces in variable dump code
+
 2017-10-17  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c: Change so -debug does NOT set -ftrace
