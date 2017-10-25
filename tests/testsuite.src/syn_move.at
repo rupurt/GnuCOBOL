@@ -397,3 +397,32 @@ prog.cob: 30: Warning: Overlapping MOVE may produce unpredictable results
 AT_CHECK([./prog], [0], [], [])
 
 AT_CLEANUP
+
+AT_SETUP([SET error])
+AT_KEYWORDS([SET-MOVE])
+
+AT_DATA([prog.cob], [
+       program-id. thing.
+       data division.
+       working-storage section.
+       01 default-float usage float-long.
+
+       linkage section.
+       01 float-var usage float-long.
+
+       procedure division .
+           set address of float-var to default-float
+      *> will generate this error message:
+      *> thing.cob: 10: Error: Invalid MOVE statement
+
+           set address of float-var to address of default-float
+           goback.
+       end program thing .
+])
+
+AT_CHECK([cobc -x -std=mf -w prog.cob ], [1], [],
+[prog.cob: 11: Error: Invalid SET statement
+])
+
+AT_CLEANUP
+
