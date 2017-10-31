@@ -40,8 +40,8 @@
 CB_FLAG_RQ (cb_stack_size, 0, "stack-size", 255, 1,
 	 _("define PERFORM stack size\n\t\t\t- default: 255"))
 
-CB_FLAG_RQ (cb_if_cutoff, 0, "if-cutoff", 3, 2,
-	 _("define cutoff depth for IF statements\n\t\t\t- default: 3"))
+CB_FLAG_RQ (cb_if_cutoff, 0, "if-cutoff", 200, 2,
+	 _("define cutoff depth for IF statements\n\t\t\t- default: 200"))
 
 CB_FLAG_RQ (cb_ebcdic_sign, 1, "sign", 0, 3,
 	 _("define display sign representation\n\t\t\t- ASCII or EBCDIC (default: machine native)"))

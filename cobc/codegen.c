@@ -4731,7 +4731,7 @@ output_call (struct cb_call *p)
 			output_prefix ();
 			output ("cob_glob_ptr->cob_call_name_hash = 0x%X;\n",
 					cob_get_name_hash(callname));
-			output_line ("cob_glob_ptr->cob_exception_code = 0;");
+			output_line ("COB_RESET_EXCEPTION (0);");
 		}
 		output_prefix ();
 		if (p->call_returning == cb_null) {
@@ -4808,7 +4808,7 @@ output_call (struct cb_call *p)
 	output (");\n");
 
 	if (except_id > 0) {
-		output_line ("if (unlikely(cob_glob_ptr->cob_exception_code != 0))");
+		output_line ("if (unlikely(cob_global_exception != 0))");
 		output_line ("\tgoto %s%d;", CB_PREFIX_LABEL, except_id);
 	}
 
@@ -5494,23 +5494,33 @@ output_alter (struct cb_alter *p)
 	}
 }
 
+/* Output check for EXCEPTION */
+static void
+output_check_exception (struct cb_statement *p, const int code)
+{
+	if (p->handler1) {
+		if ((code & 0x00ff) == 0) {
+			output_line ("if ((cob_global_exception & 0xff00) == 0x%04x)",
+			     code);
+		} else {
+			output_line ("if (cob_global_exception == 0x%04x)", code);
+		}
+		output_indent ("{");
+		output_stmt (p->handler1);
+		output_indent ("}");
+	}
+}
+
+
 /* Output statement */
 
 static void
 output_ferror_stmt (struct cb_statement *p, const int code)
 {
-	output_line ("if (unlikely(cob_glob_ptr->cob_exception_code != 0))");
+	output_line ("if (unlikely(cob_global_exception != 0))");
 	output_indent ("{");
 	if (p->handler1) {
-		if ((code & 0x00ff) == 0) {
-			output_line ("if ((cob_glob_ptr->cob_exception_code & 0xff00) == 0x%04x)",
-			     code);
-		} else {
-			output_line ("if (cob_glob_ptr->cob_exception_code == 0x%04x)", code);
-		}
-		output_indent ("{");
-		output_stmt (p->handler1);
-		output_indent ("}");
+		output_check_exception (p, code);
 		output_line ("else");
 		output_indent ("{");
 	}
@@ -5830,12 +5840,12 @@ output_stmt (cb_tree x)
 		}
 
 		if (!p->file && (p->handler1 || p->handler2)) {
-			output_line ("cob_glob_ptr->cob_exception_code = 0;");
+			output_line ("COB_RESET_EXCEPTION (0);");
 		} else
 		if (!p->file 
 		 && p->handler_id == -1 
 		 && cobc_wants_debug) {
-			output_line ("cob_glob_ptr->cob_exception_code = -1;");
+			output_line ("cob_global_exception = -1;");
 			p->handler_id = 0;
 		}
 
@@ -5887,39 +5897,32 @@ output_stmt (cb_tree x)
 		/* Must be done immediately after I/O and before */
 		/* status check */
 		if (current_prog->flag_gen_debug && p->file && p->flag_callback) {
-			output_line ("save_exception_code = cob_glob_ptr->cob_exception_code;");
+			output_line ("save_exception_code = cob_global_exception;");
 			output_stmt (cb_build_debug (cb_debug_name,
 				     CB_FILE(p->file)->name, NULL));
 			output_move (cb_space, cb_debug_contents);
 			output_perform_call (CB_FILE(p->file)->debug_section,
 					     CB_FILE(p->file)->debug_section);
-			output_line ("cob_glob_ptr->cob_exception_code = save_exception_code;");
+			output_line ("cob_global_exception = save_exception_code;");
 			need_save_exception = 1;
 		}
 
-		if (p->handler1 || p->handler2 ||
-		    (p->file && CB_EXCEPTION_ENABLE (COB_EC_I_O))) {
+		if (p->handler1 
+		 || p->handler2 
+		 || (p->file && CB_EXCEPTION_ENABLE (COB_EC_I_O)) ) {
 			code = CB_EXCEPTION_CODE (p->handler_id);
 			if (p->file) {
 				output_ferror_stmt (p, code);
 			} else {
 				if (p->handler1) {
-					if ((code & 0x00ff) == 0) {
-						output_line ("if (unlikely((cob_glob_ptr->cob_exception_code & 0xff00) == 0x%04x))",
-						     code);
-					} else {
-						output_line ("if (unlikely(cob_glob_ptr->cob_exception_code == 0x%04x))", code);
-					}
-					output_indent ("{");
-					output_stmt (p->handler1);
-					output_indent ("}");
+					output_check_exception (p, code);
 					if (p->handler2) {
 						output_line ("else");
 					}
 				}
 				if (p->handler2) {
 					if (p->handler1 == NULL) {
-						output_line ("if (!cob_glob_ptr->cob_exception_code)");
+						output_line ("if (cob_global_exception == 0)");
 					}
 					output_indent ("{");
 					output_stmt (p->handler2);
