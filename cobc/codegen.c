@@ -208,6 +208,25 @@ static const struct system_table	system_tab[] = {
 
 #undef	COB_SYSTEM_GEN
 
+/* Clear local variables */
+void 
+cb_init_codegen ()
+{
+	attr_cache = NULL;
+	base_cache = NULL;
+	call_cache = NULL;
+	field_cache = NULL;
+	func_call_cache = NULL;
+	globext_cache = NULL;
+	label_cache = NULL;
+	literal_cache = NULL;
+	local_base_cache = NULL;
+	local_field_cache = NULL;
+	static_call_cache = NULL;
+	string_buffer = NULL;
+	string_cache = NULL;
+}
+
 /* Declarations */
 static void output (const char *, ...)		COB_A_FORMAT12;
 static void output_line (const char *, ...)	COB_A_FORMAT12;

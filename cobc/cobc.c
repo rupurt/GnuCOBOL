@@ -504,6 +504,7 @@ cobc_free_mem (void)
 		cobc_free (repsl);
 	}
 	cobc_mainmem_base = NULL;
+	cb_init_codegen ();
 	ppp_clear_lists ();
 }
 
@@ -4657,6 +4658,7 @@ main (int argc, char **argv)
 				cobc_free (mptrt);
 			}
 			cobc_parsemem_base = NULL;
+			cb_init_codegen ();
 		}
 		if (cb_compile_level < CB_LEVEL_COMPILE ||
 		    cb_flag_syntax_only || fn->has_error) {

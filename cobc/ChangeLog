@@ -1,4 +1,8 @@
 
+2017-11-13  Ron Norman <rjn@inglenet.com>
+	* codegen.c: Add cb_init_codegen to clear local variables
+	* cobc.c: Call cb_init_codegen after releasing cob_parsemem_base
+
 2017-10-31  Ron Norman <rjn@inglenet.com>
 	* flag.def: effectively remove use of -fif-cutoff by setting large
 	  default. This code should be removed in the near future
