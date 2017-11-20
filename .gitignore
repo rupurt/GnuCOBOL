@@ -1,12 +1,8 @@
-/*-coverage
 /*.7z
 /*.bz2
 /*.edited
-/*.gcda
-/*.gcno
 /*.gz
 /*.lz
-/*.patch
 /*.sig
 /*.tmp
 /*.xz
@@ -14,6 +10,7 @@
 /.deps
 /Makefile
 /Makefile.in
+/_build*
 /aclocal.m4
 /atlocal
 /autom4te.cache
@@ -127,10 +124,7 @@ cobc/scanner.c
 /conf*.dir
 /conf*.file
 /confdefs.h
-/config.h
-/config.h.in
-/config.log
-/config.status
+/config.*
 config/.deps
 config/Makefile
 config/Makefile.in
@@ -166,7 +160,6 @@ doc/version.texi
 extras/*.dll
 extras/Makefile
 extras/Makefile.in
-/gnu-cobol-*
 lib/.deps
 lib/Makefile
 lib/Makefile.in
