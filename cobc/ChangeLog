@@ -1,4 +1,11 @@
 
+2017-11-23  Ron Norman <rjn@inglenet.com>
+	* codegen.c: For FUNCTION-ID and RECURSIVE, generate all LINKAGE
+	  and LOCAL-STORAGE fields with the 'cob_field' on the function
+	  stack instead of making them 'static'. If static then the fields
+	  end up as a side effect with the same memory address which is 
+	  not correct.
+
 2017-11-13  Ron Norman <rjn@inglenet.com>
 	* codegen.c: Add cb_init_codegen to clear local variables
 	* cobc.c: Call cb_init_codegen after releasing cob_parsemem_base

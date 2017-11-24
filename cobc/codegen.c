@@ -9076,17 +9076,18 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 		output_newline ();
 	}
 
-	output_line ("/* Program return */");
-#if	1	/* RXWRXW - PROCRET */
-	if (prog->returning) {
-		output_move (prog->returning, prog->cb_return_code);
-	}
-#endif
-	output_prefix ();
-	output ("return ");
 	if (prog->prog_type == CB_FUNCTION_TYPE) {
+		output_line ("/* Function return */");
+		output_prefix ();
+		output ("return ");
 		output_param (prog->returning, -1);
 	} else {
+		output_line ("/* Program return */");
+		if (prog->returning) {
+			output_move (prog->returning, prog->cb_return_code);
+		}
+		output_prefix ();
+		output ("return ");
 		output_integer (prog->cb_return_code);
 	}
 	output (";\n");
@@ -9636,6 +9637,7 @@ output_entry_function (struct cb_program *prog, cb_tree entry,
 			}
 		}
 		output (");\n");
+
 		output ("  **cob_fret = *floc->ret_fld;\n");
 		output ("  /* Restore environment */\n");
 		output ("  cob_restore_func (floc);\n");
@@ -10573,15 +10575,27 @@ codegen (struct cb_program *prog, const int nested)
 	if (local_field_cache) {
 		/* Switch to local storage file */
 		output_target = current_prog->local_include->local_fp;
-		output_local ("\n/* Local Fields */\n");
+		if (prog->flag_recursive) {
+			output_local ("\n/* Local Fields for recursive routine */\n");
+		} else {
+			output_local ("\n/* Local Fields */\n");
+		}
 		local_field_cache = list_cache_sort (local_field_cache,
 						     &field_cache_cmp);
 		for (k = local_field_cache; k; k = k->next) {
-			output ("static cob_field %s%d\t= ", CB_PREFIX_FIELD,
-				k->f->id);
 			if (!k->f->flag_local) {
+				if (prog->flag_recursive
+				&& !k->f->flag_filler) {
+					output ("/* %s is not local */\n", k->f->name);
+				}
+				output ("static cob_field %s%d\t= ", CB_PREFIX_FIELD, k->f->id);
 				output_field (k->x);
 			} else {
+				if (prog->flag_recursive) {
+					output ("\tcob_field %s%d\t= ", CB_PREFIX_FIELD, k->f->id);
+				} else {
+					output ("static cob_field %s%d\t= ", CB_PREFIX_FIELD, k->f->id);
+				}
 				output ("{");
 				output_size (k->x);
 				output (", NULL, ");
