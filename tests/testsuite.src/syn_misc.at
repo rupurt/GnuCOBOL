@@ -2291,3 +2291,34 @@ prog.cob: 12: Warning: Expression is always FALSE
 
 AT_CLEANUP
 
+
+AT_SETUP([CONSTANT LENGTH])
+AT_KEYWORDS([LENGTH])
+
+AT_DATA([prog.cob], [
+       identification division.  
+       program-id. r_test recursive.
+       environment division.  
+       
+       data division.  
+       working-storage section. 
+       
+       01  item-01.
+           05  item-05-a       pointer.
+           05  item-05-b       pic x(01).
+       
+       01 myk-01 constant global as length of item-01.
+       01 myk-02 constant global as length of item-05-a.
+       01 myk-03 constant global as length of pointer.
+       
+       procedure division. 
+       main-00. 
+           goback.
+       end program r_test.
+])
+
+AT_CHECK([cobc -x -std=default -w prog.cob ], [0], [],
+[])
+
+AT_CLEANUP
+

@@ -1,4 +1,10 @@
 
+2017-11-25  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c: make sure field has been verified for constant LENGTH
+	* field.c: If pic.category is POINTER ignore PIC as this was added
+	  as a psuedo PICTURE. Also set PIC 9(17) for 64 bit mode.
+
 2017-11-23  Ron Norman <rjn@inglenet.com>
 	* codegen.c: For FUNCTION-ID and RECURSIVE, generate all LINKAGE
 	  and LOCAL-STORAGE fields with the 'cob_field' on the function

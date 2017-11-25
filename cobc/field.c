@@ -1008,8 +1008,12 @@ validate_field_1 (struct cb_field *f)
 			}
 		}
 		if (f->pic != NULL && need_picture == 0) {
-			cb_error_x (x, _("'%s' cannot have PICTURE clause"),
+			if (f->pic->category != CB_CATEGORY_OBJECT_REFERENCE
+			 && f->pic->category != CB_CATEGORY_DATA_POINTER
+			 && f->pic->category != CB_CATEGORY_PROGRAM_POINTER) {
+				cb_error_x (x, _("'%s' cannot have PICTURE clause"),
 				    cb_name (x));
+			} 
 		}
 
 		/* Validate USAGE */
@@ -1254,6 +1258,15 @@ setup_parameters (struct cb_field *f)
 
 		case CB_USAGE_INDEX:
 			f->pic = CB_PICTURE (cb_build_picture ("S9(9)"));
+#if 0
+			/* REMIND: The category should be set, but doing so causes
+			 * other problems as mroe checks need to be added to
+			 * accept a category of CB_CATEGORY_INDEX so this change
+			 * is deferred until a later time
+			 * RJN: Nov 2017
+			 */
+			f->pic->category = CB_CATEGORY_INDEX;
+#endif
 			break;
 
 		case CB_USAGE_LENGTH:
@@ -1262,7 +1275,12 @@ setup_parameters (struct cb_field *f)
 
 		case CB_USAGE_POINTER:
 		case CB_USAGE_PROGRAM_POINTER:
-			f->pic = CB_PICTURE (cb_build_picture ("9(10)"));
+			if (sizeof (void *) == 8) {
+				f->pic = CB_PICTURE (cb_build_picture ("9(17)"));
+			} else {
+				f->pic = CB_PICTURE (cb_build_picture ("9(10)"));
+			}
+			f->pic->category = CB_CATEGORY_PROGRAM_POINTER;
 			break;
 		case CB_USAGE_FLOAT:
 			f->pic = CB_PICTURE (cb_build_picture ("S9(7)V9(8)"));
