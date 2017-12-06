@@ -114,6 +114,7 @@ extras/Makefile.am eol=lf
 lib/Makefile.am eol=lf
 /libcob.h eol=lf
 libcob/Makefile.am eol=lf
+libcob/reportio.c -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
