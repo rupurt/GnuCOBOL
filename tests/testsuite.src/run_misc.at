@@ -7773,6 +7773,7 @@ Program-Id: prog
             CLOSE FLATFILE Status: 00
  Line:    331             STOP RUN                       
 ])
+# " <-- comment for fixing syntax highlighting
 
 # hack for not checking Status 02 as this isn't returned by all
 # ISAM implementations
@@ -8342,13 +8343,13 @@ AT_DATA([prog.cob], [
                          UPON CONSOLE.
            ADD 5 TO CM-NO-TERMINALS
            REWRITE TSPFL-RECORD
-           IF  CUST-STAT NOT = "02"
-           AND CUST-STAT NOT = "00"
-               DISPLAY "Error " CUST-STAT " instead of 02"
+           IF  CUST-STAT NOT = "00"
+               DISPLAY "Error " CUST-STAT
+                       " instead of 00"
                                 UPON CONSOLE
            ELSE
                DISPLAY "ReWrite: " CM-CUST-NUM " got "
-                         CUST-STAT " as expected "
+                       CUST-STAT " as expected "
                          CM-NO-TERMINALS " terminals"
                          UPON CONSOLE
            END-IF.
@@ -8364,11 +8365,11 @@ AT_DATA([prog.cob], [
            REWRITE TSPFL-RECORD
            IF  CUST-STAT NOT = "02"
            AND CUST-STAT NOT = "00"
-               DISPLAY "Error " CUST-STAT " instead of 02"
+               DISPLAY "Error " CUST-STAT " instead of 00/02"
                                 UPON CONSOLE
            ELSE
                DISPLAY "ReWrite: " CM-CUST-NUM " got "
-                         CUST-STAT " as expected"
+                        "00/02 as expected"
                          UPON CONSOLE
            END-IF.
            MOVE DATA-CUST-NUM      (6)       TO CM-CUST-NUM.
@@ -8379,11 +8380,11 @@ AT_DATA([prog.cob], [
            REWRITE TSPFL-RECORD
            IF  CUST-STAT NOT = "02"
            AND CUST-STAT NOT = "00"
-               DISPLAY "Error " CUST-STAT " instead of 02"
+               DISPLAY "Error " CUST-STAT " instead of 00/02"
                                 UPON CONSOLE
            ELSE
                DISPLAY "ReWrite: " CM-CUST-NUM " got "
-                         CUST-STAT " as expected"
+                       "00/02 as expected"
                          UPON CONSOLE
            END-IF.
            DELETE TSPFILE.
@@ -8420,13 +8421,14 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE -std=cobol2002 -ftraceall prog.cob ], [0], [], [])
 
-AT_CHECK([export COB_TRACE_FILE=trace.txt
-export COB_TRACE_IO=Y
-export COB_SET_TRACE=Y
-export COB_TRACE_FORMAT=%L%S
-export IO_TSPFILE=trace
-export IO_TSTFILE=no-trace
-./prog], [0], [OK: Operations on empty file
+AT_CHECK([COB_TRACE_FILE=trace.txt \
+COB_TRACE_IO=Y                     \
+COB_SET_TRACE=Y                    \
+COB_TRACE_FORMAT=%L%S              \
+IO_TSPFILE=trace                   \
+IO_TSTFILE=no-trace                \
+./prog], [0],
+[OK: Operations on empty file
 Loading sample data file.
 Sample data file load complete.
 LIST SAMPLE FILE
@@ -8461,8 +8463,8 @@ Ky2: GIB00000 is GIBRALTER LIFE INSURANCE  Mach=UNI-80/6.
    Read: GAM00000 got 00 as expected 00075 terminals
 ReWrite: GAM00000 got 00 as expected 00080 terminals
    Read: BET00000 got 00 as expected 00034 terminals
-ReWrite: GAM00000 got 02 as expected
-ReWrite: FOR00000 got 02 as expected
+ReWrite: GAM00000 got 00/02 as expected
+ReWrite: FOR00000 got 00/02 as expected
 Expected ERROR 39 opening TSTFILE, Record size different
 ], [])
 
@@ -9287,8 +9289,18 @@ Program-Id: prog
             CLOSE FLATFILE Status: 00
  Line:    333             STOP RUN                       
 ])
+# " <-- comment for fixing syntax highlighting
 
-AT_CHECK([gcdiff reference trace.txt], [0], [], [])
+# hack for not checking Status 02 as this isn't returned by all
+# ISAM implementations
+
+AT_CHECK([sed -e 's/WRITE TSPFILE Status: 02/WRITE TSPFILE Status: 00/g' \
+reference > references], [0], [], [])
+AT_CHECK([sed -e 's/WRITE TSPFILE Status: 02/WRITE TSPFILE Status: 00/g'  \
+-e 's/'"OPEN OUTPUT TSPFILE -> 'testisam' Status: 05"'/'"OPEN OUTPUT TSPFILE -> 'testisam' Status: 00"'/g' \
+trace.txt > traces.txt], [0], [], [])
+
+AT_CHECK([gcdiff references traces.txt], [0], [], [])
 
 AT_CLEANUP
 
