@@ -1,4 +1,12 @@
 
+2017-12-11  Ron Norman <rjn@inglenet.com>
+	* codegen.c: For FUNCTION-ID and RECURSIVE, generate all LINKAGE
+	  and LOCAL-STORAGE fields with the 'cob_field' on the function
+	  stack instead of making them 'static'. If static then the fields
+	  end up as a side effect with the same memory address which is 
+	  not correct. Additional change for C compiler issue of returning
+	  a local variable.
+
 2017-11-25  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c: make sure field has been verified for constant LENGTH

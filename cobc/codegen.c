@@ -9587,6 +9587,7 @@ output_entry_function (struct cb_program *prog, cb_tree entry,
 		}
 		output ("{\n");
 		output ("  struct cob_func_loc\t*floc;\n\n");
+		output ("  cob_field *ret;\n\n");
 		output ("  /* Save environment */\n");
 		output ("  floc = cob_save_func (cob_fret, cob_pam, %u",
 			parmnum);
@@ -9639,9 +9640,10 @@ output_entry_function (struct cb_program *prog, cb_tree entry,
 		output (");\n");
 
 		output ("  **cob_fret = *floc->ret_fld;\n");
+		output ("  ret = *cob_fret;\n");
 		output ("  /* Restore environment */\n");
 		output ("  cob_restore_func (floc);\n");
-		output ("  return *cob_fret;\n}\n\n");
+		output ("  return ret;\n}\n\n");
 		return;
 	}
 	if (prog->nested_level) {
