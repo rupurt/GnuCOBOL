@@ -428,64 +428,6 @@ align_decimal (cob_decimal *d1, cob_decimal *d2)
 
 /* IEEE 754 floats */
 
-#if	0	/* Clamp */
-static unsigned int
-cob_clamp_decimal (cob_decimal *d, const unsigned int expomin,
-		   const unsigned int expomax, const unsigned int sigfbits)
-{
-	int		size;
-	unsigned int	count;
-
-	if (!mpz_sgn (d->value)) {
-		/* Value is zero */
-		d->scale = 0;
-		return 0;
-	}
-	/* Remove trailing 0 from decimal places (if any) */
-	for ( ; d->scale > 0; d->scale--) {
-		if (!mpz_divisible_ui_p (d->value, 10UL)) {
-			break;
-		}
-		mpz_tdiv_q_ui (d->value, d->value, 10UL);
-	}
-	if (d->scale) {
-		/* Have decimal places */
-		size = (int)mpz_sizeinbase (d->value, 2);
-		for (; size > sigfbits && d->scale; d->scale--) {
-			mpz_tdiv_q_ui (d->value, d->value, 10UL);
-			size = (int)mpz_sizeinbase (d->value, 2);
-		}
-		return expomin - (unsigned int)d->scale;
-	}
-	for (count = 0; count < expomax; ++count) {
-		if (!mpz_divisible_ui_p (d->value, 10UL)) {
-			break;
-		}
-		mpz_tdiv_q_ui (d->value, d->value, 10UL);
-	}
-	return expomin + count;
-}
-#endif
-
-#if	0	/* Binary */
-static void
-cob_decimal_set_ieee_binary (cob_decimal *d, const cob_field *f)
-{
-	unsigned char	*data;
-	unsigned int	n;
-	unsigned int	expo;
-	unsigned char	bd[16];
-
-	data = f->data;
-	expo = ((data[0] & 0x7FU) << 8U) | data[1];
-	if (expo == 0x7FFFU) {
-		mpz_set_ui (d->value, 1UL);
-		d->scale = COB_DECIMAL_NAN;
-		return;
-	}
-}
-#endif
-
 static int
 cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 {
@@ -501,21 +443,16 @@ cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 	if (sign < 0) {
 		mpz_neg (d->value, d->value);
 	}
-	for ( ; ; d->scale--) {
-		if (!mpz_divisible_ui_p (d->value, 10UL)) {
-			break;
-		}
+	while (mpz_divisible_ui_p (d->value, 10UL)
+	    || mpz_cmpabs (d->value, cob_mpz_ten16m1) > 0) {
 		mpz_tdiv_q_ui (d->value, d->value, 10UL);
+		d->scale--;
 	}
-	if (mpz_cmpabs (d->value, cob_mpz_ten16m1) >= 0) {
+	if (mpz_cmpabs (d->value, cob_mpz_ten16m1) > 0) {
 		if (opt & COB_STORE_KEEP_ON_OVERFLOW) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
-#if	0	/* RXWRXW - FP Trunc */
-		if (d->scale > 0 ) {
-			for ( ; d->scale; ) {
-#endif
 		for ( ; ; ) {
 			mpz_tdiv_q_ui (d->value, d->value, 10UL);
 			d->scale--;
@@ -523,20 +460,12 @@ cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 				break;
 			}
 		}
-#if	0	/* RXWRXW - FP Trunc */
-		} else {
-			mpz_tdiv_r (d->value, d->value, cob_mpze10[16]);
-		}
-#endif
 	}
 	if (d->scale < -398 || d->scale > 369) {
 		cob_set_exception (COB_EC_SIZE_OVERFLOW);
 		return cobglobptr->cob_exception_code;
 	}
 	expo = 398 - d->scale;
-#if	0	/* Clamp */
-	expo = cob_clamp_decimal (d, 398U, 369U, 53U);
-#endif
 
 	data = 0;
 	mpz_export (&data, NULL, -1, (size_t)8, COB_MPZ_ENDIAN,
@@ -544,7 +473,7 @@ cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 	/* Move in exponent */
 	if (mpz_sizeinbase (d->value, 2) > 53U) {
 		data &= COB_64_SIGF_2;
-		data |= (expo << 51U) | COB_DEC_EXTEND | COB_64_OR_EXTEND;
+		data |= (expo << 51U) | COB_DEC_EXTEND;
 	} else {
 		data &= COB_64_SIGF_1;
 		data |= (expo << 53U);
@@ -632,21 +561,16 @@ cob_decimal_get_ieee128dec (cob_decimal *d, cob_field *f, const int opt)
 	if (sign < 0) {
 		mpz_neg (d->value, d->value);
 	}
-	for ( ; ; d->scale--) {
-		if (!mpz_divisible_ui_p (d->value, 10UL)) {
-			break;
-		}
+	while (mpz_divisible_ui_p (d->value, 10UL)
+	    || mpz_cmpabs (d->value, cob_mpz_ten34m1) > 0) {
 		mpz_tdiv_q_ui (d->value, d->value, 10UL);
+		d->scale--;
 	}
 	if (mpz_cmpabs (d->value, cob_mpz_ten34m1) >= 0) {
 		if (opt & COB_STORE_KEEP_ON_OVERFLOW) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
-#if	0	/* RXWRXW - FP Trunc */
-		if (d->scale > 0 ) {
-			for ( ; d->scale; ) {
-#endif
 		for ( ; ; ) {
 			mpz_tdiv_q_ui (d->value, d->value, 10UL);
 			d->scale--;
@@ -654,38 +578,20 @@ cob_decimal_get_ieee128dec (cob_decimal *d, cob_field *f, const int opt)
 				break;
 			}
 		}
-#if	0	/* RXWRXW - FP Trunc */
-		} else {
-			mpz_tdiv_r (d->value, d->value, cob_mpze10[34]);
-		}
-#endif
 	}
 	if (d->scale < -6176 || d->scale > 6111) {
 		cob_set_exception (COB_EC_SIZE_OVERFLOW);
 		return cobglobptr->cob_exception_code;
 	}
 	expo = 6176 - d->scale;
-#if	0	/* Clamp */
-	expo = cob_clamp_decimal (d, 6176U, 6111U, 113U);
-#endif
 
 	data[0] = 0;
 	data[1] = 0;
 	mpz_export (data, NULL, -1, (size_t)16, COB_MPZ_ENDIAN,
 		    (size_t)0, d->value);
 	/* Move in exponent */
-#if	0	/* IEEE canonical */
-	if (mpz_sizeinbase (d->value, 2) > 113U) {
-		COB_128_MSW(data) &= COB_128_SIGF_2;
-		COB_128_MSW(data) |= (expo << 47U) |
-				     COB_DEC_EXTEND | COB_128_OR_EXTEND;
-	} else {
-#endif
-		COB_128_MSW(data) &= COB_128_SIGF_1;
-		COB_128_MSW(data) |= (expo << 49U);
-#if	0	/* IEEE canonical */
-	}
-#endif
+	COB_128_MSW(data) &= COB_128_SIGF_1;
+	COB_128_MSW(data) |= (expo << 49U);
 	if (sign < 0) {
 		COB_128_MSW(data) |= COB_DEC_SIGN;
 	}
@@ -767,62 +673,6 @@ cob_decimal_set_ieee128dec (cob_decimal *d, const cob_field *f)
 		mpz_neg (d->value, d->value);
 	}
 }
-
-#if	0	/* RXWRXW - Endian */
-static void
-cob_decimal_set_ieee128dec (cob_decimal *d, const cob_field *f)
-{
-	unsigned int	sign;
-	unsigned int	expo;
-	unsigned int	comb;
-	unsigned char	data[16];
-
-	/* bit 0 : sign bit */
-	/* bits 1 - 4 : combination field */
-	/* combination = 15 (all bits set) is inf/nan */
-	/* combination > 11 (bits 1100) is extended exponent */
-	/* Exponent length - 14 bits */
-	memcpy (data, f->data, 16);
-	sign = data[0] >> 7U;
-	comb = (data[0] & 0x78U) >> 3U;
-	if (comb == 15U) {
-		mpz_set_ui (d->value, 1UL);
-		d->scale = COB_DECIMAL_NAN;
-		return;
-	}
-	if (comb > 11U) {
-		/* 5 bits from byte 0 - 8 bits from byte 1 - 1 bit from byte 2 */
-		expo = ((data[0] & 0x1FU) << 9U) | (data[1] << 1U) |
-			(data[2] >> 7U);
-		/* Mask out expo bit in byte 2 */
-		data[2] &= 0x7FU;
-		/* Set 100 bits left of significand in byte 1*/
-		data[1] = 0x02U;
-	} else {
-		/* 7 bits from byte 0 - 7 bits from byte 1 */
-		expo = ((data[0] & 0x7FU) << 7U) | (data[1] >> 1U);
-		/* Mask out expo bits */
-		data[1] &= 0x01U;
-	}
-	mpz_import (d->value, 15, 1, 1, 1, 0, &data[1]);
-	if (!mpz_sgn (d->value)) {
-		/* Significand 0 */
-		d->scale = 0;
-		return;
-	}
-	if (sign) {
-		mpz_neg (d->value, d->value);
-	}
-	d->scale = (int)expo - 6176;
-	if (d->scale > 0) {
-		mpz_ui_pow_ui (cob_mexp, 10, (cob_uli_t)d->scale);
-		mpz_mul (d->value, d->value, cob_mexp);
-		d->scale = 0;
-	} else if (d->scale < 0) {
-		d->scale = -(d->scale);
-	}
-}
-#endif
 
 /* Double */
 
