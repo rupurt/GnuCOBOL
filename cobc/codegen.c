@@ -2901,6 +2901,8 @@ output_funcall (cb_tree x)
 			}
 			output ("cob_report_initiate (");
 			output_param (p->argv[0], 0);
+			output (",");
+			output_param (r->code_clause, 0);
 			output (")");
 			break;
 		case 'S':		/* Suppress flag on */

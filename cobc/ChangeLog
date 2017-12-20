@@ -1,4 +1,8 @@
 
+2017-12-20  Ron Norman <rjn@inglenet.com>
+	* codegen.c: For REPORT pass CODE value to cob_report_initiate
+	* parser.y: pass back CODE value
+
 2017-12-11  Ron Norman <rjn@inglenet.com>
 	* codegen.c: For FUNCTION-ID and RECURSIVE, generate all LINKAGE
 	  and LOCAL-STORAGE fields with the 'cob_field' on the function

@@ -1438,12 +1438,17 @@ typedef struct cob_report_ {
 	unsigned int		first_generate:1;	/* Ready for first GENERATE */
 	unsigned int		initiate_done:1;	/* INITIATE has been done */
 	unsigned int		next_line:1;		/* Advance to line on next DETAIL */
+
 	unsigned int		next_line_plus:1;	/* Advance to plus line on next DETAIL */
 	unsigned int		next_page:1;		/* Advance to next page on next DETAIL */
 	unsigned int		next_just_set:1;	/* NEXT xxx was just set so ignore */
 	unsigned int		in_report_footing:1;	/* doing report footing now */
 	unsigned int		incr_line:1;		/* 'curr_lines' should be incremented */
 	unsigned int		foot_next_page:1;	/* Advance to next page after all CONTROL footings */
+	unsigned int		unused:18;		/* Use these bits up next */
+
+	int			code_len;		/* Length to use for holding 'CODE IS' value */
+	char			*code_is;		/* Value of CODE IS for this report */
 } cob_report;
 /***************************/
 /* End of Report structure */
@@ -2318,7 +2323,7 @@ COB_EXPIMP void	cob_file_return(cob_file *);
 /***************************/
 /* Functions in reportio.c */
 /***************************/
-COB_EXPIMP void cob_report_initiate	(cob_report *);
+COB_EXPIMP void cob_report_initiate	(cob_report *, cob_field *);
 COB_EXPIMP int  cob_report_terminate	(cob_report *, int);
 COB_EXPIMP int  cob_report_generate	(cob_report *, cob_report_line *, int);
 COB_EXPIMP void cob_report_suppress	(cob_report *r, cob_report_line *l);
