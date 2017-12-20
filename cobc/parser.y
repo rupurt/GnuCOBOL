@@ -4735,6 +4735,7 @@ report_description_option:
 | CODE _is id_or_lit
   {
 	check_repeated ("CODE", SYN_CLAUSE_2, &check_duplicate);
+	current_report->code_clause = $3;
   }
 | control_clause
 | page_limit_clause
