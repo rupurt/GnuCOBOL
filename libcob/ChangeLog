@@ -1,4 +1,10 @@
 
+2017-12-21 Ron Norman <rjn@inglenet.com>
+
+	* common.h: Add code_is_present flag to cob_report structure
+	* reportio.c: Output CODE value as fixed length field
+	              (Do not trim trailing spaces)
+
 2017-12-20  Ron Norman <rjn@inglenet.com>
 
 	* numeric.c: Fix coding error in cob_decimal_get_ieee64dec

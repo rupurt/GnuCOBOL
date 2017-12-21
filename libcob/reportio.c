@@ -774,7 +774,7 @@ write_rec(cob_report *r, int opt)
 	if (f->record->size > r->def_cols)	/* Truncate line if needed */
 		f->record->size = r->def_cols;
 
-	if (r->code_is
+	if (r->code_is_present
 	 && r->code_len > 0) {			/* Insert CODE IS value */
 		 if (f->file) {
 			 if (num > 1
@@ -1293,7 +1293,7 @@ cob_exit_reportio()
  * INITIATE report
  */
 void
-cob_report_initiate(cob_report *r, cob_field *code_is)
+cob_report_initiate(cob_report *r)
 {
 	cob_report_control	*rc;
 	cob_report_control_ref	*rr;
@@ -1329,13 +1329,6 @@ cob_report_initiate(cob_report *r, cob_field *code_is)
 	r->curr_page = 1;
 	r->curr_line = 0;
 	r->incr_line = TRUE;
-	r->code_len = 0;
-	r->code_is = NULL;
-	if (code_is) {
-		cob_field_to_string(code_is, wrk, sizeof(wrk)-1);
-		r->code_len = strlen (wrk);
-		r->code_is = cob_strdup (wrk);
-	}
 	saveLineCounter(r);
 #if defined(COB_DEBUG_LOG) 
 	reportDump(r,"INITIATE");
