@@ -1298,7 +1298,6 @@ cob_report_initiate(cob_report *r)
 	cob_report_control	*rc;
 	cob_report_control_ref	*rr;
 	cob_report_sum_ctr	*sc;
-	char			wrk[256];
 
 	reportInitialize();
 	if(r->initiate_done) {
