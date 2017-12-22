@@ -68,43 +68,6 @@ static const unsigned char packed_bytes[] = {
 	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99
 };
 
-#if	0	/* RXWRXW - IEEE 754 */
-static const unsigned char	bits8[] = {
-	8, 7, 6, 6, 5, 5, 5, 5,
-	4, 4, 4, 4, 4, 4, 4, 4,
-	3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3,
-	2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-#endif
-
 static cob_decimal	cob_d1;
 static cob_decimal	cob_d2;
 static cob_decimal	cob_d3;
@@ -372,7 +335,8 @@ cob_decimal_set (cob_decimal *dst, const cob_decimal *src)
 static void
 cob_decimal_print (cob_decimal *d, FILE *fp)
 {
-	int	scale;
+	int	scale, len;
+	char	wrk[256];
 
 	if (unlikely(d->scale == COB_DECIMAL_NAN)) {
 		fprintf (fp, "(Nan)");
@@ -395,7 +359,16 @@ cob_decimal_print (cob_decimal *d, FILE *fp)
 		mpz_tdiv_q_ui (cob_mpzt2, cob_mpzt2, 10UL);
 		scale--;
 	}
-	gmp_fprintf (fp, "%ZdE%d", cob_mpzt2, -scale);
+	len = gmp_sprintf (wrk, "%Zd", cob_mpzt2);
+	if (len > 0
+	 && scale > 0
+	 && scale < len) {
+		fprintf (fp, "%.*s%c%.*s",len-scale,wrk,'.',scale,wrk+len-scale);
+	} else if (scale == 0) {
+		fprintf (fp, "%s", wrk);
+	} else {
+		fprintf (fp, "%sE%d", wrk, -scale);
+	}
 }
 
 /* d->value *= 10^n, d->scale += n */
@@ -428,6 +401,43 @@ align_decimal (cob_decimal *d1, cob_decimal *d2)
 
 /* IEEE 754 floats */
 
+static void
+cob_decimal_adjust (cob_decimal *d, mpz_t max_value, int min_exp, int max_exp)
+{
+	if (mpz_cmpabs (d->value, max_value) > 0) {
+		/* Adjust by 100000000 to get close */
+		while (mpz_cmpabs (d->value, max_value) > 0
+		    && mpz_divisible_ui_p (d->value, 100000000UL)) {	
+			if (d->scale-8 < min_exp)
+				break;
+			mpz_tdiv_q_ui (d->value, d->value, 100000000UL);
+			d->scale -= 8;
+		}
+		/* Adjust by 1000 to get close */
+		while (mpz_cmpabs (d->value, max_value) > 0
+		    && mpz_divisible_ui_p (d->value, 1000UL)) {
+			if (d->scale-3 < min_exp)
+				break;
+			mpz_tdiv_q_ui (d->value, d->value, 1000UL);
+			d->scale -= 3;
+		}
+	}
+	/* Remove trailing ZEROS */
+	while (mpz_divisible_ui_p (d->value, 10UL)
+	    || mpz_cmpabs (d->value, max_value) > 0) {
+		if (d->scale < min_exp)
+			break;
+		mpz_tdiv_q_ui (d->value, d->value, 10UL);
+		d->scale--;
+	}
+	if (mpz_cmpabs (d->value, max_value) > 0
+	 || d->scale < min_exp
+	 || d->scale > max_exp) {
+		cob_set_exception (COB_EC_SIZE_OVERFLOW);
+		return;
+	}
+}
+
 static int
 cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 {
@@ -443,17 +453,15 @@ cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 	if (sign < 0) {
 		mpz_neg (d->value, d->value);
 	}
-	while (mpz_divisible_ui_p (d->value, 10UL)
-	    || mpz_cmpabs (d->value, cob_mpz_ten16m1) > 0) {
-		mpz_tdiv_q_ui (d->value, d->value, 10UL);
-		d->scale--;
-	}
+	cob_decimal_adjust (d, cob_mpz_ten16m1, -369, 398);
 	if (mpz_cmpabs (d->value, cob_mpz_ten16m1) > 0) {
 		if (opt & COB_STORE_KEEP_ON_OVERFLOW) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
 		for ( ; ; ) {
+			if (d->scale < -369)
+				break;
 			mpz_tdiv_q_ui (d->value, d->value, 10UL);
 			d->scale--;
 			if (mpz_cmpabs (d->value, cob_mpz_ten16m1) < 0) {
@@ -461,15 +469,14 @@ cob_decimal_get_ieee64dec (cob_decimal *d, cob_field *f, const int opt)
 			}
 		}
 	}
-	if (d->scale < -398 || d->scale > 369) {
+	if (d->scale < -369 || d->scale > 398) {
 		cob_set_exception (COB_EC_SIZE_OVERFLOW);
 		return cobglobptr->cob_exception_code;
 	}
 	expo = 398 - d->scale;
 
 	data = 0;
-	mpz_export (&data, NULL, -1, (size_t)8, COB_MPZ_ENDIAN,
-		    (size_t)0, d->value);
+	mpz_export (&data, NULL, -1, (size_t)8, COB_MPZ_ENDIAN, (size_t)0, d->value);
 	/* Move in exponent */
 	if (mpz_sizeinbase (d->value, 2) > 53U) {
 		data &= COB_64_SIGF_2;
@@ -544,6 +551,10 @@ cob_decimal_set_ieee64dec (cob_decimal *d, const cob_field *f)
 	if (sign) {
 		mpz_neg (d->value, d->value);
 	}
+	if (d->scale < -369 || d->scale > 398) {
+		cob_set_exception (COB_EC_SIZE_OVERFLOW);
+		return;
+	}
 }
 
 static int
@@ -561,17 +572,15 @@ cob_decimal_get_ieee128dec (cob_decimal *d, cob_field *f, const int opt)
 	if (sign < 0) {
 		mpz_neg (d->value, d->value);
 	}
-	while (mpz_divisible_ui_p (d->value, 10UL)
-	    || mpz_cmpabs (d->value, cob_mpz_ten34m1) > 0) {
-		mpz_tdiv_q_ui (d->value, d->value, 10UL);
-		d->scale--;
-	}
-	if (mpz_cmpabs (d->value, cob_mpz_ten34m1) >= 0) {
+	cob_decimal_adjust (d, cob_mpz_ten34m1, -6111, 6176);
+	if (mpz_cmpabs (d->value, cob_mpz_ten34m1) > 0) {
 		if (opt & COB_STORE_KEEP_ON_OVERFLOW) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
 		for ( ; ; ) {
+			if (d->scale < -6111)
+				break;
 			mpz_tdiv_q_ui (d->value, d->value, 10UL);
 			d->scale--;
 			if (mpz_cmpabs (d->value, cob_mpz_ten34m1) < 0) {
@@ -579,7 +588,7 @@ cob_decimal_get_ieee128dec (cob_decimal *d, cob_field *f, const int opt)
 			}
 		}
 	}
-	if (d->scale < -6176 || d->scale > 6111) {
+	if (d->scale < -6111 || d->scale > 6176) {
 		cob_set_exception (COB_EC_SIZE_OVERFLOW);
 		return cobglobptr->cob_exception_code;
 	}
@@ -587,8 +596,7 @@ cob_decimal_get_ieee128dec (cob_decimal *d, cob_field *f, const int opt)
 
 	data[0] = 0;
 	data[1] = 0;
-	mpz_export (data, NULL, -1, (size_t)16, COB_MPZ_ENDIAN,
-		    (size_t)0, d->value);
+	mpz_export (data, NULL, -1, (size_t)16, COB_MPZ_ENDIAN, (size_t)0, d->value);
 	/* Move in exponent */
 	COB_128_MSW(data) &= COB_128_SIGF_1;
 	COB_128_MSW(data) |= (expo << 49U);
@@ -624,12 +632,6 @@ cob_decimal_set_ieee128dec (cob_decimal *d, const cob_field *f)
 		expo = (COB_128_MSW(data) & COB_128_EXPO_2) >> 47U;
 		COB_128_MSW(data) &= COB_128_SIGF_2;
 		COB_128_MSW(data) |= COB_128_OR_EXTEND;
-#if	0	/* RXWRXW - IEEE cap at 34 digits */
-		/* Non-canonical */
-		mpz_set_ui (d->value, 0);
-		d->scale = 0;
-		return;
-#endif
 	} else {
 		expo = (COB_128_MSW(data) & COB_128_EXPO_1) >> 49U;
 		COB_128_MSW(data) &= COB_128_SIGF_1;
@@ -655,12 +657,6 @@ cob_decimal_set_ieee128dec (cob_decimal *d, const cob_field *f)
 	mpz_add_ui (d->value, d->value, (cob_uli_t)(COB_128_LSW(data) & 0xFFFFFFFFU));
 #endif
 
-	if (mpz_cmpabs (d->value, cob_mpz_ten34m1) >= 0) {
-		/* Non-canonical */
-		mpz_set_ui (d->value, 0UL);
-		d->scale = 0;
-		return;
-	}
 	d->scale = (int)expo - 6176;
 	if (d->scale > 0) {
 		mpz_ui_pow_ui (cob_mexp, 10UL, (cob_uli_t)d->scale);
@@ -671,6 +667,14 @@ cob_decimal_set_ieee128dec (cob_decimal *d, const cob_field *f)
 	}
 	if (sign) {
 		mpz_neg (d->value, d->value);
+	}
+	cob_decimal_adjust (d, cob_mpz_ten34m1, -6111, 6176);
+	if (mpz_cmpabs (d->value, cob_mpz_ten34m1) > 0) {
+		/* Non-canonical */
+		cob_set_exception (COB_EC_SIZE_OVERFLOW);
+		mpz_set_ui (d->value, 0UL);
+		d->scale = 0;
+		return;
 	}
 }
 
@@ -1678,18 +1682,14 @@ cob_decimal_get_field (cob_decimal *d, cob_field *f, const int opt)
 		d = &cob_d1;
 	}
 
-#if	0	/* RXWRXW - Round FP */
+	/* Rounding */
+	if ((opt & COB_STORE_ROUND)) {
+		cob_decimal_do_round (d, f, opt);
+	}
 	if (!COB_FIELD_IS_FP(f)) {
-#endif
-		/* Rounding */
-		if ((opt & COB_STORE_ROUND)) {
-			cob_decimal_do_round (d, f, opt);
-		}
 		/* Append or truncate decimal digits */
 		shift_decimal (d, COB_FIELD_SCALE(f) - d->scale);
-#if	0	/* RXWRXW - Round FP */
 	}
-#endif
 
 	/* Store number */
 	switch (COB_FIELD_TYPE (f)) {
@@ -1775,9 +1775,6 @@ cob_decimal_div (cob_decimal *d1, cob_decimal *d2)
 	}
 	d1->scale -= d2->scale;
 	shift_decimal (d1, COB_MAX_DIGITS + ((d1->scale < 0) ? -d1->scale : 0));
-#if	0	/* RXWRXW - cdiv */
-	mpz_cdiv_q (d1->value, d1->value, d2->value);
-#endif
 	mpz_tdiv_q (d1->value, d1->value, d2->value);
 }
 
