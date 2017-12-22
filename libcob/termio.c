@@ -249,7 +249,7 @@ display_common (cob_field *f, FILE *fp)
 }
 
 void
-cob_display (const int to_stderr, const int newline, const int varcnt, ...)
+cob_display (const int to_device, const int newline, const int varcnt, ...)
 {
 	FILE		*fp;
 	cob_field	*f;
@@ -260,21 +260,29 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 
 	disp_redirect = 0;
 	pclose_fp = close_fp = 0;
-	if (to_stderr == 2) {
-		if(cobsetptr->cob_display_print_file) {
+	
+	/* display to device ? */
+	if (to_device == 2) {	/* PRINTER */
+		/* display to external specified print file handle */
+		if (cobsetptr->cob_display_print_file) {
 			fp = cobsetptr->cob_display_print_file;
-		} else if(cobsetptr->cob_display_print != NULL) {
-			fp = fopen(cobsetptr->cob_display_print, "a");
-			if(fp == NULL)
+		/* display to configured print file */
+		} else if (cobsetptr->cob_display_print_filename != NULL) {
+			fp = fopen (cobsetptr->cob_display_print_filename, "a");
+			if (fp == NULL) {
 				fp = stderr;
-			else
+			} else {
 				close_fp = 1;
-		} else if(cobsetptr->cob_printer != NULL) {
-			fp = popen(cobsetptr->cob_printer, "w");
-			if(fp == NULL)
+			}
+		/* display to configured print command (piped) */
+		} else if (cobsetptr->cob_display_print_pipe != NULL) {
+			fp = popen (cobsetptr->cob_display_print_pipe, "w");
+			if (fp == NULL) {
 				fp = stderr;
-			else
+			} else {
 				pclose_fp = 1;
+			}
+		/* fallback: display to the defined SYSOUT */
 		} else {
 			fp = stdout;
 			if (cobglobptr->cob_screen_initialized) {
@@ -285,9 +293,9 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 				}
 			}
 		}
-	} else if (to_stderr) {
+	} else if (to_device == 1) {	/* SYSERR */
 		fp = stderr;
-	} else {
+	} else {		/* general (SYSOUT) */
 		fp = stdout;
 		if (cobglobptr->cob_screen_initialized) {
 			if (!COB_DISP_TO_STDERR) {
@@ -302,7 +310,7 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 	va_start (args, varcnt);
 	for (i = 0; i < varcnt; ++i) {
 		f = va_arg (args, cob_field *);
-		if (unlikely(disp_redirect)) {
+		if (unlikely (disp_redirect)) {
 			cob_field_display (f, NULL, NULL, NULL, NULL,
 					   NULL, nlattr);
 		} else {
@@ -315,10 +323,12 @@ cob_display (const int to_stderr, const int newline, const int varcnt, ...)
 		putc ('\n', fp);
 		fflush (fp);
 	}
-	if(pclose_fp)
-		pclose(fp);
-	if(close_fp)
-		fclose(fp);
+	if (pclose_fp) {
+		pclose (fp);
+	}
+	if (close_fp) {
+		fclose (fp);
+	}
 }
 
 static int

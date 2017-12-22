@@ -340,8 +340,9 @@ static struct config_tbl gc_conf[] = {
 	{"DB_HOME","db_home",			NULL,	NULL,GRP_FILE,ENV_FILE,SETPOS(bdb_home)},
 #endif
 	{"COB_LEGACY","legacy",			NULL,	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_legacy)},
-	{"COBPRINTER","printer",		NULL,	NULL,GRP_SCREEN,ENV_STR,SETPOS(cob_printer)},
-	{"COB_DISPLAY_PRINTER","display_printer",NULL,	NULL,GRP_SCREEN,ENV_FILE,SETPOS(cob_display_print)},
+	{"COB_DISPLAY_PRINT_PIPE", "display_print_pipe",		NULL,	NULL, GRP_SCREEN, ENV_STR, SETPOS (cob_display_print_pipe)},
+	{"COBPRINTER", "printer",		NULL,	NULL, GRP_HIDE, ENV_STR, SETPOS (cob_display_print_pipe)},
+	{"COB_DISPLAY_PRINT_FILE", "display_print_file",		NULL,	NULL, GRP_SCREEN, ENV_STR,SETPOS (cob_display_print_filename)},
 	{"COB_CURRENT_DATE","current_date",	NULL,	NULL,GRP_MISC,ENV_STR,SETPOS(cob_date)},
 	{"COB_DATE","date",			NULL,	NULL,GRP_HIDE,ENV_STR,SETPOS(cob_date)},
 	{"COB_EXIT_WAIT","exit_wait",		"1",	NULL,GRP_SCREEN,ENV_BOOL,SETPOS(cob_exit_wait)},
@@ -503,12 +504,25 @@ cob_exit_common_modules (void)
 static void
 cob_terminate_routines (void)
 {
-	if (!cob_initialized) {
+	if (!cob_initialized || !cobglobptr) {
 		return;
 	}
-	if (!cobglobptr) {
-		return;
+
+#ifdef COB_DEBUG_LOG
+	if (cob_debug_file
+	&& !cobsetptr->external_trace_file
+	&& cob_debug_file != cobsetptr->cob_trace_file) {
+		if(cob_debug_file_name != NULL
+		&& ftell(cob_debug_file) == 0) {
+			fclose (cob_debug_file);
+			unlink(cob_debug_file_name);
+			cob_debug_file_name = NULL;
+		} else {
+			fclose (cob_debug_file);
+		}
 	}
+	cob_debug_file = NULL;
+#endif
 
 	if (cobsetptr->cob_dump_file == cobsetptr->cob_trace_file
 	 || cobsetptr->cob_dump_file == stderr)
@@ -529,20 +543,6 @@ cob_terminate_routines (void)
 	cob_exit_common_modules ();
 	cob_exit_call ();
 	cob_exit_reportio ();
-
-	if (cob_debug_file 
-	&& !cobsetptr->external_trace_file
-	&& cob_debug_file != cobsetptr->cob_trace_file) {
-		if(cob_debug_file_name != NULL
-		&& ftell(cob_debug_file) == 0) {
-			fclose (cob_debug_file);
-			unlink(cob_debug_file_name);
-			cob_debug_file_name = NULL;
-		} else {
-			fclose (cob_debug_file);
-		}
-	}
-	cob_debug_file = NULL;
 
 	if (cobsetptr->cob_dump_file 
 	 && cobsetptr->cob_dump_file != stderr) {
@@ -1262,9 +1262,6 @@ cob_check_trace_file (void)
 	if (!cobsetptr->cob_unix_lf) {
 		cobsetptr->cob_trace_file = fopen (cobsetptr->cob_trace_filename, "w");
 	} else {
-		cobsetptr->cob_trace_file = fopen (cobsetptr->cob_trace_filename, "wb");
-	}
-	if (!cobsetptr->cob_trace_file) {
 		cobsetptr->cob_trace_file = stderr;
 	}
 }
@@ -5496,7 +5493,7 @@ get_config_val (char *value, int pos, char *orgvalue)
 
 	} else if((data_type & ENV_FILE)) {	/* File/path stored as a string */
 		memcpy(&str,data,sizeof(char *));
-		if(data_loc == offsetof(cob_settings,cob_display_print)
+		if(data_loc == offsetof(cob_settings,cob_display_print_file)
 		&& cobsetptr->external_display_print_file) 
 			strcpy(value,"set by cob_set_runtime_option");
 		else
@@ -6532,23 +6529,24 @@ cob_get_name_hash (const char *name)
 }
 
 /*
- * Set certain runtime options: 
+ * Set special runtime options:
  * Currently this is only FILE * for trace and printer output
+ * or to reload the runtime configuration after changing environment
  */
-void 
-cob_set_runtime_option( int opt, void *p )
+void
+cob_set_runtime_option (enum cob_runtime_option_switch opt, void *p)
 {
-	switch(opt) {
+	switch (opt) {
 	case COB_SET_RUNTIME_TRACE_FILE:
 		cobsetptr->cob_trace_file = (FILE *)p;
-		if(p)
+		if (p)
 			cobsetptr->external_trace_file = 1;
 		else
 			cobsetptr->external_trace_file = 0;
 		break;
 	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
 		cobsetptr->cob_display_print_file = (FILE *)p;
-		if(p)
+		if (p)
 			cobsetptr->external_display_print_file = 1;
 		else
 			cobsetptr->external_display_print_file = 0;
@@ -6557,7 +6555,8 @@ cob_set_runtime_option( int opt, void *p )
 		cob_rescan_env_vals ();
 		break;
 	default:
-		cob_runtime_error (_("cob_set_runtime_option called with unknown option: %d"),opt);
+		cob_runtime_error (_("%s called with unknown option: %d"),
+			"cob_set_runtime_option", opt);
 	}
 	return;
 }
@@ -6638,21 +6637,19 @@ cob_dump_module(char *reason)
 }
 
 /*
- * Return current value of runtime option
+ * Return current value of special runtime options
  */
 void *
-cob_get_runtime_option( int opt )
+cob_get_runtime_option (enum cob_runtime_option_switch opt)
 {
 	switch(opt) {
 	case COB_SET_RUNTIME_TRACE_FILE:
 		return (void*)cobsetptr->cob_trace_file;
 	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
 		return (void*)cobsetptr->cob_display_print_file;
-	case COB_SET_RUNTIME_RESCAN_ENV:
-		cob_rescan_env_vals ();
-		break;
 	default:
-		cob_runtime_error (_("cob_get_runtime_option called with unknown option: %d"),opt);
+		cob_runtime_error (_("%s called with unknown option: %d"),
+			"cob_get_runtime_option", opt);
 	}
 	return NULL;
 }
