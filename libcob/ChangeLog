@@ -1,4 +1,9 @@
 
+2017-12-22  Ron Norman <rjn@inglenet.com>
+
+	* numeric.c: More fixes for FLOAT-DECIMAL-16/34 data types
+	             It should now be setting SIZE ERROR condition
+
 2017-12-21 Ron Norman <rjn@inglenet.com>
 
 	* common.h: Add code_is_present flag to cob_report structure
