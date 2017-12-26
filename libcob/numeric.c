@@ -1674,6 +1674,12 @@ cob_decimal_get_field (cob_decimal *d, cob_field *f, const int opt)
 		cob_set_exception (COB_EC_SIZE_OVERFLOW);
 		return cobglobptr->cob_exception_code;
 	}
+	if (opt & COB_STORE_KEEP_ON_OVERFLOW) {
+		if (unlikely(d->scale == COB_DECIMAL_INF)) {
+			cob_set_exception (COB_EC_SIZE_OVERFLOW);
+			return cobglobptr->cob_exception_code;
+		}
+	}
 
 	/* work copy */
 	if (d != &cob_d1) {
@@ -1702,10 +1708,20 @@ cob_decimal_get_field (cob_decimal *d, cob_field *f, const int opt)
 	case COB_TYPE_NUMERIC_FLOAT:
 		uval.fval = (float) cob_decimal_get_double (d);
 		memcpy (f->data, &uval.fval, sizeof (float));
+		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
+		 && (isinf (uval.fval) || isnan(uval.fval))) {
+			cob_set_exception (COB_EC_SIZE_OVERFLOW);
+			return cobglobptr->cob_exception_code;
+		}
 		return 0;
 	case COB_TYPE_NUMERIC_DOUBLE:
 		uval.val = cob_decimal_get_double (d);
 		memcpy (f->data, &uval.val, sizeof (double));
+		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
+		 && (isinf (uval.val) || isnan(uval.val))) {
+			cob_set_exception (COB_EC_SIZE_OVERFLOW);
+			return cobglobptr->cob_exception_code;
+		}
 		return 0;
 	case COB_TYPE_NUMERIC_FP_DEC64:
 		return cob_decimal_get_ieee64dec (d, f, opt);
