@@ -11798,12 +11798,13 @@ AT_DATA([prog.cob], [
            MOVE ALL "x"    TO TESTRECORD.
        CHECK-EXIT.
            EXIT.
-           
 ])
 
-AT_CHECK([cobc -x -std=mf -w -fibmcomp prog.cob ], [0], [], [])
+# compile without many warnings
+AT_CHECK([$COBC -x -debug -fibmcomp prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [23 tests & 00 failed
+AT_CHECK([./prog], [0],
+[23 tests & 00 failed
 ], [])
 
 AT_CLEANUP
@@ -11937,7 +11938,7 @@ AT_DATA([prog.cob], [
 
        CND-300-OK.
            DISPLAY "    ..."
-           DISPLAY "--- Test underlow ---"
+           DISPLAY "--- Test underflow ---"
            MOVE 0.000000099 TO FD16, FD34.
            PERFORM 400 TIMES
              MOVE FD16 TO SV16
@@ -11992,9 +11993,10 @@ AT_DATA([prog.cob], [
            END PROGRAM prog.
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [--- FLOAT-DECIMAL-34 ---
+AT_CHECK([./prog], [0],
+[--- FLOAT-DECIMAL-34 ---
 A: 9216586.861751152073732718894009216
 B: 5305036.78779840848806366047745358
 Z: 476.1904761904761904761904761904761 IS OK
@@ -12023,10 +12025,110 @@ CMP2: 99 IS OK
 FD16: after 99E369 SIZE ERROR
 FD34: after 99E6111 SIZE ERROR
     ...
---- Test underlow ---
+--- Test underflow ---
 FD16: after 99E-398 SIZE ERROR
 FD34: after 99E-6176 SIZE ERROR
 CMP2: after 9.881312916824931E-324 SIZE ERROR
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([FLOAT-SHORT with SIZE ERROR])
+AT_KEYWORDS([COMP-1])
+
+AT_DATA([prog.cob], [
+       identification division.
+       program-id. prog.
+
+       data division.
+       working-storage section.
+      *------------------------
+       77 counter             pic s9(4) binary value zero.
+      * FLOAT-SHORT (if binary-comp-1 is not active)
+       77 floatValue          COMP-1  value 2.
+       77 lastFloatValue      COMP-1.
+
+      ******************************************************************
+       procedure division.
+       main section.
+           perform varying counter from 1 by 1 until
+                           counter > 130
+      *>      display 'counter: ' counter ', value: ' floatValue
+              compute floatValue = floatValue * 2
+                   ON SIZE ERROR
+                      display 'SIZE ERROR, last value = ' floatValue
+                      exit perform
+               not ON SIZE ERROR
+                      if floatValue > lastFloatValue
+                         move floatValue to lastFloatValue
+                      else
+                         display 'math ERROR, last value > current: '
+                                 lastFloatValue ' > ' floatValue
+                         exit perform
+                      end-if
+              end-compute
+           end-perform
+           display 'counter is ' counter
+
+           goback.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([./prog], [0],
+[SIZE ERROR, last value = 1.7014118E+38
+counter is +0127
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([FLOAT-LONG with SIZE ERROR])
+AT_KEYWORDS([COMP-2])
+
+AT_DATA([prog.cob], [
+       identification division.
+       program-id. prog.
+
+       data division.
+       working-storage section.
+      *------------------------
+       77 counter             pic s9(4) binary value zero.
+      * FLOAT-LONG
+       77 doubleValue         COMP-2 value 2.
+       77 lastDoubleValue     COMP-2.
+
+      ******************************************************************
+       procedure division.
+       main section.
+           perform varying counter from 1 by 1 until
+                           counter > 1060
+      *>      display 'counter: ' counter ', value: ' doubleValue
+              compute doubleValue = doubleValue * 2
+                   ON SIZE ERROR
+                      display 'SIZE ERROR, last value = ' doubleValue
+                      exit perform
+               not ON SIZE ERROR
+                      if doubleValue > lastdoubleValue
+                         move doubleValue to lastdoubleValue
+                      else
+                         display 'math ERROR, last value > current: '
+                                 lastdoubleValue ' > ' doubleValue
+                         exit perform
+                      end-if
+              end-compute
+           end-perform
+           display 'counter is ' counter
+
+           goback.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([./prog], [0],
+[SIZE ERROR, last value = 1.79769313486225E+308
+counter is +1024
 ], [])
 
 AT_CLEANUP
