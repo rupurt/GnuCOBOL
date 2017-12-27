@@ -1707,21 +1707,21 @@ cob_decimal_get_field (cob_decimal *d, cob_field *f, const int opt)
 		return cob_decimal_get_packed (d, f, opt);
 	case COB_TYPE_NUMERIC_FLOAT:
 		uval.fval = (float) cob_decimal_get_double (d);
-		memcpy (f->data, &uval.fval, sizeof (float));
 		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
 		 && (isinf (uval.fval) || isnan(uval.fval))) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
+		memcpy (f->data, &uval.fval, sizeof (float));
 		return 0;
 	case COB_TYPE_NUMERIC_DOUBLE:
 		uval.val = cob_decimal_get_double (d);
-		memcpy (f->data, &uval.val, sizeof (double));
 		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
 		 && (isinf (uval.val) || isnan(uval.val))) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
+		memcpy (f->data, &uval.val, sizeof (double));
 		return 0;
 	case COB_TYPE_NUMERIC_FP_DEC64:
 		return cob_decimal_get_ieee64dec (d, f, opt);
