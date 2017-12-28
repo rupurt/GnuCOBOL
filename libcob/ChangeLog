@@ -1,6 +1,11 @@
 
 2017-12-26  Ron Norman <rjn@inglenet.com>
 
+	* numeric.c: Additional fix for COMP-2 to check of overflow and
+	             set SIZE ERROR condition when requested
+
+2017-12-26  Ron Norman <rjn@inglenet.com>
+
 	* numeric.c: Fix for COMP-1 to check of overflow and
 	             set SIZE ERROR condition when requested
 

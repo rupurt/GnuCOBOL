@@ -87,6 +87,7 @@ static mpf_t		cob_mpft_get;
 
 static unsigned char	packed_value[20];
 static cob_u64_t	last_packed_val;
+static int		cob_not_finite = 0;
 
 
 #ifdef	COB_EXPERIMENTAL
@@ -742,6 +743,7 @@ cob_decimal_get_double (cob_decimal *d)
 	double		v;
 	cob_sli_t	n;
 
+	cob_not_finite = 0;
 	v = 0.0;
 	if (unlikely(mpz_size (d->value) == 0)) {
 		return v;
@@ -762,6 +764,7 @@ cob_decimal_get_double (cob_decimal *d)
 
 	v = mpf_get_d (cob_mpft);
 	if (!ISFINITE (v)) {
+		cob_not_finite = 1;
 		v = 0.0;
 	}
 	return v;
@@ -1712,12 +1715,22 @@ cob_decimal_get_field (cob_decimal *d, cob_field *f, const int opt)
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}
+		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
+		 && cob_not_finite) {
+			cob_set_exception (COB_EC_SIZE_OVERFLOW);
+			return cobglobptr->cob_exception_code;
+		}
 		memcpy (f->data, &uval.fval, sizeof (float));
 		return 0;
 	case COB_TYPE_NUMERIC_DOUBLE:
 		uval.val = cob_decimal_get_double (d);
 		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
 		 && (isinf (uval.val) || isnan(uval.val))) {
+			cob_set_exception (COB_EC_SIZE_OVERFLOW);
+			return cobglobptr->cob_exception_code;
+		}
+		if ((opt & COB_STORE_KEEP_ON_OVERFLOW)
+		 && cob_not_finite) {
 			cob_set_exception (COB_EC_SIZE_OVERFLOW);
 			return cobglobptr->cob_exception_code;
 		}

@@ -11810,8 +11810,8 @@ AT_CHECK([./prog], [0],
 AT_CLEANUP
 
 
-AT_SETUP([FLOAT-DECIMAL with SIZE ERROR])
-AT_KEYWORDS([FLOAT-DECIMAL-16 FLOAT-DECIMAL-34 COMP-2])
+AT_SETUP([FLOAT-DECIMAL-16 with SIZE ERROR])
+AT_KEYWORDS([FLOAT-DECIMAL])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
@@ -11823,11 +11823,13 @@ AT_DATA([prog.cob], [
       ******************************************************************
        DATA DIVISION.
        WORKING-STORAGE SECTION.
+       01  CMP1                        COMP-1.
+       01  SV1                         COMP-1.
        01  CMP2                        COMP-2.
        01  SV2                         COMP-2.
        01  FD16                        USAGE FLOAT-DECIMAL-16.
-       01  FD34                        USAGE FLOAT-DECIMAL-34.
        01  SV16                        USAGE FLOAT-DECIMAL-16.
+       01  FD34                        USAGE FLOAT-DECIMAL-34.
        01  SV34                        USAGE FLOAT-DECIMAL-34.
 
        PROCEDURE DIVISION.
@@ -11858,6 +11860,18 @@ AT_DATA([prog.cob], [
            END-COMPUTE.
 
            DISPLAY "    ..."
+           DISPLAY "--- COMP-1 ---"
+           COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
+           DISPLAY "A: " CMP1 
+           COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
+           DISPLAY "B: " CMP1 
+           MOVE ZERO TO CMP1.
+           COMPUTE CMP1 = 1.0E3 / 2.1E0
+                   ON SIZE ERROR DISPLAY "Z: " CMP1 " SIZE ERROR"
+               NOT ON SIZE ERROR DISPLAY "Z: " CMP1 " IS OK"
+           END-COMPUTE.
+
+           DISPLAY "    ..."
            DISPLAY "--- COMP-2 ---"
            COMPUTE CMP2 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
            DISPLAY "A: " CMP2 
@@ -11880,6 +11894,10 @@ AT_DATA([prog.cob], [
                    ON SIZE ERROR DISPLAY "FD16: " FD16 " SIZE ERROR"
                NOT ON SIZE ERROR DISPLAY "FD16: " FD16 " IS OK"
            END-COMPUTE.
+           COMPUTE CMP1 = 99 + 1 / 3
+                   ON SIZE ERROR DISPLAY "CMP1: " CMP1 " SIZE ERROR"
+               NOT ON SIZE ERROR DISPLAY "CMP1: " CMP1 " IS OK"
+           END-COMPUTE.
            COMPUTE CMP2 = 99 + 1 / 3
                    ON SIZE ERROR DISPLAY "CMP2: " CMP2 " SIZE ERROR"
                NOT ON SIZE ERROR DISPLAY "CMP2: " CMP2 " IS OK"
@@ -11895,6 +11913,10 @@ AT_DATA([prog.cob], [
            COMPUTE FD16 = 99
                    ON SIZE ERROR DISPLAY "FD16: " FD16 " SIZE ERROR"
                NOT ON SIZE ERROR DISPLAY "FD16: " FD16 " IS OK"
+           END-COMPUTE.
+           COMPUTE CMP1 = 99
+                   ON SIZE ERROR DISPLAY "CMP1: " CMP1 " SIZE ERROR"
+               NOT ON SIZE ERROR DISPLAY "CMP1: " CMP1 " IS OK"
            END-COMPUTE.
            COMPUTE CMP2 = 99
                    ON SIZE ERROR DISPLAY "CMP2: " CMP2 " SIZE ERROR"
@@ -11937,8 +11959,40 @@ AT_DATA([prog.cob], [
            DISPLAY "FD34: after " SV34 " SIZE ERROR".
 
        CND-300-OK.
+           MOVE 990000 TO CMP1.
+           PERFORM 6500 TIMES
+             MOVE CMP1 TO SV1
+             COMPUTE CMP1 = CMP1 * 10
+                    ON SIZE ERROR GO TO CND-350-ERR
+             END-COMPUTE
+             IF CMP1 < 9.0
+               GO TO CND-350-ERR
+             END-IF
+           END-PERFORM.
+           DISPLAY "CMP1: " CMP1 " IS OK".
+           GO TO CND-350-OK.
+       CND-350-ERR.
+           DISPLAY "CMP1: after " SV1 " SIZE ERROR".
+
+       CND-350-OK.
+           MOVE 9900000000 TO CMP2.
+           PERFORM 6500 TIMES
+             MOVE CMP2 TO SV2
+             COMPUTE CMP2 = CMP2 * 10
+                    ON SIZE ERROR GO TO CND-380-ERR
+             END-COMPUTE
+             IF CMP2 < 9.0
+               GO TO CND-380-ERR
+             END-IF
+           END-PERFORM.
+           DISPLAY "CMP2: " CMP2 " IS OK".
+           GO TO CND-380-OK.
+       CND-380-ERR.
+           DISPLAY "CMP2: after " SV2 " SIZE ERROR".
+
+       CND-380-OK.
            DISPLAY "    ..."
-           DISPLAY "--- Test underflow ---"
+           DISPLAY "--- Test underlow ---"
            MOVE 0.000000099 TO FD16, FD34.
            PERFORM 400 TIMES
              MOVE FD16 TO SV16
@@ -11971,32 +12025,46 @@ AT_DATA([prog.cob], [
            DISPLAY "FD34: after " SV34 " SIZE ERROR".
 
        CND-500-OK.
+           MOVE 0.000000099 TO CMP1.
+           PERFORM 350 TIMES
+             MOVE CMP1 TO SV1
+             COMPUTE CMP1 = CMP1 / 10.0
+                    ON SIZE ERROR GO TO CND-500-ERR
+             END-COMPUTE
+             IF CMP1 = 0.0
+               GO TO CND-500-ERR
+             END-IF
+           END-PERFORM.
+           DISPLAY "CMP1: " CMP1 " IS OK".
+           GO TO CND-600-OK.
+       CND-500-ERR.
+           DISPLAY "CMP1: after " SV1 " SIZE ERROR".
+
+       CND-600-OK.
            MOVE 0.000000099 TO CMP2.
            PERFORM 350 TIMES
              MOVE CMP2 TO SV2
              COMPUTE CMP2 = CMP2 / 10.0
-                    ON SIZE ERROR GO TO CND-500-ERR
+                    ON SIZE ERROR GO TO CND-600-ERR
              END-COMPUTE
              IF CMP2 = 0.0
-               GO TO CND-500-ERR
+               GO TO CND-600-ERR
              END-IF
            END-PERFORM.
            DISPLAY "CMP2: " CMP2 " IS OK".
-           GO TO CND-600-OK.
-       CND-500-ERR.
+           GO TO CND-600-XIT.
+       CND-600-ERR.
            DISPLAY "CMP2: after " SV2 " SIZE ERROR".
-
-       CND-600-OK.
+       CND-600-XIT.
 
        CND-999.
            STOP RUN.
            END PROGRAM prog.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([cobc -x -std=cobol2002 -w prog.cob ], [0], [], [])
 
-AT_CHECK([./prog], [0],
-[--- FLOAT-DECIMAL-34 ---
+AT_CHECK([./prog], [0], [--- FLOAT-DECIMAL-34 ---
 A: 9216586.861751152073732718894009216
 B: 5305036.78779840848806366047745358
 Z: 476.1904761904761904761904761904761 IS OK
@@ -12006,6 +12074,11 @@ A: 9216586.861751152
 B: 5305036.787798408
 Z: 476.1904761904761 IS OK
     ...
+--- COMP-1 ---
+A: 9216587
+B: 5305037
+Z: 476.19049 IS OK
+    ...
 --- COMP-2 ---
 A: 9216586.86175115
 B: 5305036.787798408
@@ -12014,25 +12087,29 @@ Z: 476.1904761904761 IS OK
 --- 99 + 1 / 3 ---
 FD34: 99.33333333333333333333333333333333 IS OK
 FD16: 99.33333333333333 IS OK
+CMP1: 99.333336 IS OK
 CMP2: 99.33333333333333 IS OK
     ...
 --- 99 ---
 FD34: 99 IS OK
 FD16: 99 IS OK
+CMP1: 99 IS OK
 CMP2: 99 IS OK
     ...
 --- Test overflow ---
 FD16: after 99E369 SIZE ERROR
 FD34: after 99E6111 SIZE ERROR
+CMP1: after 9.8999983E+37 SIZE ERROR
+CMP2: after 9.899999999999781E+307 SIZE ERROR
     ...
---- Test underflow ---
+--- Test underlow ---
 FD16: after 99E-398 SIZE ERROR
 FD34: after 99E-6176 SIZE ERROR
+CMP1: after 1.4012985E-45 SIZE ERROR
 CMP2: after 9.881312916824931E-324 SIZE ERROR
 ], [])
 
 AT_CLEANUP
-
 
 AT_SETUP([FLOAT-SHORT with SIZE ERROR])
 AT_KEYWORDS([COMP-1])
@@ -12055,7 +12132,7 @@ AT_DATA([prog.cob], [
            perform varying counter from 1 by 1 until
                            counter > 130
       *>      display 'counter: ' counter ', value: ' floatValue
-              compute floatValue = floatValue * 2
+              compute floatValue = floatValue * 4
                    ON SIZE ERROR
                       display 'SIZE ERROR, last value = ' floatValue
                       exit perform
@@ -12078,7 +12155,7 @@ AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
 AT_CHECK([./prog], [0],
 [SIZE ERROR, last value = 1.7014118E+38
-counter is +0127
+counter is +0064
 ], [])
 
 AT_CLEANUP
