@@ -2720,6 +2720,13 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 				f->count++;
 			}
 		}
+		if(p->report_control
+		&& CB_REF_OR_FIELD_P (p->report_control)) {
+			struct cb_field *f = CB_FIELD (cb_ref(p->report_control));
+			if (f && f->count == 0) {
+				f->count++;
+			}
+		}
 		if (p->children) {
 			finalize_report (r,p->children);
 		}
