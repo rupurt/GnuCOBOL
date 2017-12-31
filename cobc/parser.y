@@ -2172,6 +2172,8 @@ alphabet_lits:
 space_or_zero:
   SPACE				{ $$ = cb_space; }
 | ZERO				{ $$ = cb_zero; }
+| HIGH_VALUE			{ $$ = cb_high; }
+| LOW_VALUE			{ $$ = cb_low; }
 ;
 
 

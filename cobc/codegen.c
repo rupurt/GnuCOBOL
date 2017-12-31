@@ -7711,6 +7711,10 @@ literal_value (cb_tree x)
 		return 0;
 	} else if (x == cb_norm_high) {
 		return 255;
+	} else if (x == cb_low) {
+		return 0;
+	} else if (x == cb_high) {
+		return 255;
 	} else if (x == cb_null) {
 		return 0;
 	} else if (CB_TREE_CLASS (x) == CB_CLASS_NUMERIC) {

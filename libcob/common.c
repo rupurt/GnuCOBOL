@@ -671,6 +671,8 @@ cob_sig_handler (int sig)
 #endif
 	cob_exit_screen ();
 	putc ('\n', stderr);
+	fflush (stdout);
+	fflush (stderr);
 	if (cob_source_file) {
 		fprintf (stderr, "%s: ", cob_source_file);
 		if (cob_source_line) {
@@ -6601,6 +6603,8 @@ cob_dump_module(char *reason)
 	FILE		*fp;
 	int		(*cancel_func)(const int);
 	int		num_stmts = 0, k;
+	fflush (stdout);
+	fflush (stderr);
 	if (COB_MODULE_PTR
 	 && COB_MODULE_PTR->flag_dump_ready) {		/* Was it compiled with -fdump= */
 		fp = cob_get_dump_file(COB_DUMP_TO_FILE);

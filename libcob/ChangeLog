@@ -1,4 +1,9 @@
 
+2017-12-31  Ron Norman <rjn@inglenet.com>
+	* fileio.c: If file ASSIGN is empty use SELECT name
+	            BDB fix to allocation record area for max record size
+	* common.c: flush stderr/stdout to get display output before dump
+
 2017-12-26  Ron Norman <rjn@inglenet.com>
 
 	* numeric.c: Additional fix for COMP-2 to check of overflow and
