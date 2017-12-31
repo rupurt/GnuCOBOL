@@ -1,5 +1,9 @@
 
 2017-12-31  Ron Norman <rjn@inglenet.com>
+	* codegen.c,tree.c: Mark report fields as being referenced
+	  so that the cob_field is always emited
+
+2017-12-31  Ron Norman <rjn@inglenet.com>
 	* parser.y,codegen.c: Accept  SUPPRESS WHEN LOW-VALUES
 	                      Accept  SUPPRESS WHEN HIGH-VALUES
 
