@@ -1181,6 +1181,7 @@ typedef struct __cob_module {
 	unsigned int		param_num;		/* Number of entries in 'param_field' */
 	unsigned int		param_max;		/* Max number of entries in 'param_field' */
 	cob_field		**param_field;		/* Array of pointers to parameter 'cob_field' */
+	cob_field		function_return;	/* Copy of RETURNING field */
 } cob_module;
 
 /* For 'module_type'
@@ -1561,6 +1562,7 @@ COB_EXPIMP void	cob_check_version(const char *, const char *,
 COB_EXPIMP void	*cob_save_func(cob_field **, const int,
 	const int, ...);
 COB_EXPIMP void	cob_restore_func(struct cob_func_loc *);
+COB_EXPIMP cob_field	*cob_function_return (cob_field *);
 
 COB_EXPIMP void	cob_accept_arg_number(cob_field *);
 COB_EXPIMP void	cob_accept_arg_value(cob_field *);
