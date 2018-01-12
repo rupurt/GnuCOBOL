@@ -1195,8 +1195,8 @@ num_zero:
 static int
 scan_floating_numeric (const char *text)
 {
-	size_t		size1;
-	size_t		size2;
+	size_t		sig_int_len;
+	size_t		sig_dec_len;
 	int		sign;
 	int		scale;
 	int		exponent;
@@ -1226,73 +1226,58 @@ scan_floating_numeric (const char *text)
 		    significand_dec, junk, &exponent);
 	if (n != 5) {
 		/* No decimals in significand */
+		significand_dec[0] = '0';
+		significand_dec[1] = 0;
 		n = sscanf (text, "%[^.,]%[,.]%[Ee]%d", significand_int,
 			    decpoint, junk, &exponent);
 	}
 
 	/* Validation */
-	size1 = strlen (significand_int);
-	if (size1 > 17U) {
-		size1 = 17;
-		significand_int[17] = 0;
+	sig_int_len = strlen (significand_int);
+	if (sig_int_len > COB_MAX_DIGITS-1) {
+		sig_int_len = COB_MAX_DIGITS-1;
+		significand_int[COB_MAX_DIGITS-1] = 0;
 		cb_error (_("Invalid floating-point literal"));
 	}
-	size2 = strlen (significand_dec);
-	if (size2 > 17U) {
-		size2 = 17;
-		significand_dec[17] = 0;
+	sig_dec_len = strlen (significand_dec);
+	if (sig_dec_len > COB_MAX_DIGITS-1) {
+		sig_dec_len = COB_MAX_DIGITS-1;
+		significand_dec[COB_MAX_DIGITS-1] = 0;
 		cb_error (_("Invalid floating-point literal"));
 	}
-	if ((size1 + size2) > 18U) {
+	if ((sig_int_len + sig_dec_len) > COB_MAX_DIGITS) {
 		cb_error (_("Invalid floating-point literal"));
 	}
-	if (exponent > 76) {
-		exponent = 76;
+	/* Exponent range -383  thru +384  for FLOAT-DECIMAL-16 */
+	/* Exponent range -6143 thru +6144 for FLOAT-DECIMAL-34 */
+	if (exponent > 6144) {
+		exponent = 6144;
 		cb_error (_("Invalid floating-point literal"));
 	}
-	if (exponent < -78) {
-		exponent = -78;
+	if (exponent < -6143) {
+		exponent = -6143;
 		cb_error (_("Invalid floating-point literal"));
 	}
 
 	/* Determine scale */
 	/* Base scale is decimal part of the significant */
-	scale = (int)size2;
+	scale = (int)sig_dec_len;
 	/* Adjust according to exponent */
+	strcpy (result, significand_int);
+	strcat (result, significand_dec);
 	if (exponent < 0) {
 		/* Decimals; power down by scale difference */
-		exponent = -exponent;
-		scale += exponent;
-		result[0] = 0;
-		if (exponent > (int)size1) {
-			n = exponent - (int)size1;
-			for (; n; --n) {
-				strcat (result, "0");
-			}
-		}
-		strcat (result, significand_int);
-		strcat (result, significand_dec);
+		scale = - (exponent - scale);
 	} else if (exponent > 0) {
 		/* No decimals; power up by scale difference */
-		strcpy (result, significand_int);
-		strcat (result, significand_dec);
 		if (exponent >= scale) {
-			n = exponent - scale;
-			for (; n; --n) {
-				strcat (result, "0");
-			}
-			scale = 0;
+			scale = - (exponent - scale);
 		} else {
 			scale -= exponent;
 		}
-	} else {
-		/* Exponent is 0; take as is */
-		strcpy (result, significand_int);
-		strcat (result, significand_dec);
 	}
 
-	yylval = cb_build_numeric_literal (sign, result,
-					   scale);
+	yylval = cb_build_numeric_literal (sign, result, scale);
 	SET_LOCATION (yylval);
 	return LITERAL;
 }
