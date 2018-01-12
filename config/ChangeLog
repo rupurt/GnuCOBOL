@@ -1,4 +1,9 @@
 
+2018-01-12  Ron Norman <rjn@inglenet.com>
+	* mf.conf ibm.conf mvs.conf now have 
+	    move-figurative-constant-to-numeric: ok
+	  This retains MOVE HIGH-VALUES TO PIC 9 DISPLAY field
+
 2017-09-18  Ron Norman <rjn@inglenet.com>
 	* Added option for disallowing SELECT ASSIGN and RELATIVE KEY
 	  fields to be in other than WORKING-STORAGE locations

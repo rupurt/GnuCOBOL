@@ -1,5 +1,11 @@
 
 2018-01-12  Ron Norman <rjn@inglenet.com>
+	* typeck.c,config.def: Check for config option
+	   move-figurative-constant-to-numeric and
+	 allow MOVE LOW-VALUES or HIGH-VALUES to PIC 9 DISPLAY field
+	 Micro Focus allows this and some old COBOL code expects this behaviour
+
+2018-01-12  Ron Norman <rjn@inglenet.com>
 	* scanner.l: Updated to accept larger float constants
 
 2018-01-03  Ron Norman <rjn@inglenet.com>

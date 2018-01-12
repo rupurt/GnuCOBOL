@@ -5068,7 +5068,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
+AT_CHECK([cobc -x -std=mf -cb_conf=move-figurative-constant-to-numeric:skip -debug -Wall prog.cob], [0], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 14: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 17: Warning: Source is non-numeric - substituting zero
 prog.cob: 19: Warning: Source is non-numeric - substituting zero

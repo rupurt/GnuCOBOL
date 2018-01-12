@@ -6555,6 +6555,13 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 			if (CB_TREE_CATEGORY (dst) == CB_CATEGORY_ALPHABETIC) {
 				goto invalid;
 			}
+		} else
+		if ((src == cb_space || src == cb_low || src == cb_high) 
+		 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
+		     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)
+		 && cb_verify (cb_move_figurative_constant_to_numeric,
+				_("MOVE of figurative constant to numeric item"))) {
+			/* Ignore this */
 		} else if (src == cb_low || src == cb_high || src == cb_quote) {
 			if (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
 			    CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED) {
@@ -7706,6 +7713,13 @@ cb_build_move (cb_tree src, cb_tree dst)
 		dst = CB_TREE (x);
 	}
 
+	if ((src == cb_space || src == cb_low || src == cb_high) 
+	 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
+	     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)
+	 && cb_verify (cb_move_figurative_constant_to_numeric,
+	 		_("MOVE of figurative constant to numeric item"))) {
+		/* Retain this MOVE as is for TIP/ix */
+	} else
 	if ((src == cb_space || src == cb_low ||
 	     src == cb_high || src == cb_quote) &&
 	    (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
