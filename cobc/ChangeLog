@@ -1,9 +1,17 @@
 
+2018-01-14  Ron Norman <rjn@inglenet.com>
+	* error.c: add  cb_verify_x  
+	* field.c: update call to  validate_move for
+	           changes made in typeck.c
+	* typeck.c,config.def: Check for config option
+	   move-non-numeric-lit-to-numeric-is-zero
+	 and change MOVE LOW-VALUES or HIGH-VALUES to PIC 9 DISPLAY field
+	 into MOVE ZERO Micro Focus does this
+
 2018-01-12  Ron Norman <rjn@inglenet.com>
 	* typeck.c,config.def: Check for config option
 	   move-figurative-constant-to-numeric and
-	 allow MOVE LOW-VALUES or HIGH-VALUES to PIC 9 DISPLAY field
-	 Micro Focus allows this and some old COBOL code expects this behaviour
+	 report as directed
 
 2018-01-12  Ron Norman <rjn@inglenet.com>
 	* scanner.l: Updated to accept larger float constants

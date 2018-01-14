@@ -1627,6 +1627,7 @@ extern void			cb_list_map (cb_tree (*) (cb_tree), cb_tree);
 /* error.c */
 extern void	cb_warning_x (cb_tree, const char *, ...) COB_A_FORMAT23;
 extern void	cb_error_x (cb_tree, const char *, ...) COB_A_FORMAT23;
+extern unsigned int	cb_verify_x (cb_tree, const enum cb_support, const char *);
 
 extern void		redefinition_error (cb_tree);
 extern void		redefinition_warning (cb_tree, cb_tree);
@@ -1784,7 +1785,7 @@ extern cb_tree		cb_build_replacing_trailing (cb_tree, cb_tree, cb_tree);
 extern cb_tree		cb_build_converting (cb_tree, cb_tree, cb_tree);
 extern cb_tree		cb_build_inspect_region_start (void);
 
-extern int		validate_move (cb_tree, cb_tree, const unsigned int);
+extern int		validate_move (cb_tree, cb_tree, const unsigned int, int *);
 extern cb_tree		cb_build_move (cb_tree, cb_tree);
 extern void		cb_emit_move (cb_tree, cb_tree);
 

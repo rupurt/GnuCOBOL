@@ -271,6 +271,44 @@ cb_verify (const enum cb_support tag, const char *feature)
 	return 0;
 }
 
+unsigned int
+cb_verify_x (cb_tree x, const enum cb_support tag, const char *feature)
+{
+	switch (tag) {
+	case CB_OK:
+		return 1;
+	case CB_WARNING:
+		cb_warning_x (x,_("%s used"), feature);
+		return 1;
+	case CB_ARCHAIC:
+		if (cb_warn_archaic) {
+			cb_warning_x (x,_("%s is archaic in %s"), feature, cb_config_name);
+		}
+		return 1;
+	case CB_OBSOLETE:
+		if (cb_warn_obsolete) {
+			cb_warning_x (x,_("%s is obsolete in %s"), feature, cb_config_name);
+		}
+		return 1;
+	case CB_SKIP:
+		return 0;
+	case CB_IGNORE:
+		if (warningopt) {
+			cb_warning_x (x,_("%s ignored"), feature);
+		}
+		return 0;
+	case CB_ERROR:
+		cb_error_x (x,_("%s used"), feature);
+		return 0;
+	case CB_UNCONFORMABLE:
+		cb_error_x (x,_("%s does not conform to %s"), feature, cb_config_name);
+		return 0;
+	default:
+		break;
+	}
+	return 0;
+}
+
 void
 redefinition_error (cb_tree x)
 {

@@ -1,8 +1,17 @@
 
+2018-01-14  Ron Norman <rjn@inglenet.com>
+	* mf.conf now has 
+	    move-figurative-constant-to-numeric: warn
+	    move-non-numeric-lit-to-numeric-is-zero: yes
+	  This changes MOVE HIGH-VALUES TO PIC 9 field
+	  into MOVE ZERO 
+	* ibm.conf mvs.conf now have 
+	    move-figurative-constant-to-numeric: error
+
 2018-01-12  Ron Norman <rjn@inglenet.com>
 	* mf.conf ibm.conf mvs.conf now have 
 	    move-figurative-constant-to-numeric: ok
-	  This retains MOVE HIGH-VALUES TO PIC 9 DISPLAY field
+	  This retains MOVE HIGH-VALUES TO PIC 9 field
 
 2017-09-18  Ron Norman <rjn@inglenet.com>
 	* Added option for disallowing SELECT ASSIGN and RELATIVE KEY

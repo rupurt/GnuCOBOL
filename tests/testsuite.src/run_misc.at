@@ -5068,7 +5068,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=mf -cb_conf=move-figurative-constant-to-numeric:skip -debug -Wall prog.cob], [0], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob], [0], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 14: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 17: Warning: Source is non-numeric - substituting zero
 prog.cob: 19: Warning: Source is non-numeric - substituting zero
@@ -5085,6 +5085,264 @@ NUM9 value HIGH-VALUES is 000000
 9(6)(1:6) Does NOT test OK for LOW-VALUES
 9(6) tests OK for ZERO
 The date is 2015 08 21
+], [])
+
+AT_CLEANUP
+
+AT_SETUP([MF FIGURATIVE to NUMERIC])
+AT_KEYWORDS([MOVE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID. prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  MYFLD        PIC 9(4) VALUE 96.
+       01  BIGFLT       COMP-1 VALUE 543.12345E10.
+       PROCEDURE        DIVISION.
+       MAIN-1.
+           DISPLAY "Initial value"
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE BIGFLT"
+           MOVE BIGFLT TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE SPACES"
+           MOVE SPACES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE LOW-VALUES"
+           MOVE LOW-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES"
+           MOVE HIGH-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE QUOTE"
+           MOVE QUOTE TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL *"
+           MOVE ALL '*' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 0"
+           MOVE ALL '0' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 'A1'"
+           MOVE ALL 'A1' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL '21'"
+           MOVE ALL '21' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES TO (1:)"
+           MOVE HIGH-VALUES TO MYFLD (1:).
+           PERFORM SHOW-IT.
+
+           DISPLAY "MOVE HIGH-VALUES TO BIGFLT"
+           MOVE HIGH-VALUES TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE QUOTE TO BIGFLT"
+           MOVE QUOTE TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL * TO BIGFLT"
+           MOVE ALL '*' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL '21' TO BIGFLT"
+           MOVE ALL '21' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           STOP RUN.
+       SHOW-IT.
+           CALL "dump" USING MYFLD.
+       SHOW-BIG.
+           DISPLAY "BIGFLT is " BIGFLT.
+           CALL "dump" USING BIGFLT.
+])
+
+AT_DATA([cmod.c], [[
+#include <stdio.h>
+int dump (unsigned char *data)
+{
+  int i;
+  for (i = 0; i < 4; i++)
+    printf ("%02X", data[i]);
+  puts (" .");
+  return 0;
+}
+]])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall prog.cob cmod.c], [0], [], [prog.cob: In paragraph 'MAIN-1':
+prog.cob: 16: Warning: Source is non-numeric - substituting zero
+prog.cob: 19: Warning: Source is non-numeric - substituting zero
+prog.cob: 22: Warning: Source is non-numeric - substituting zero
+prog.cob: 25: Warning: Source is non-numeric - substituting zero
+prog.cob: 28: Warning: Source is non-numeric - substituting zero
+prog.cob: 34: Warning: Source is non-numeric - substituting zero
+prog.cob: 44: Warning: Source is non-numeric - substituting zero
+prog.cob: 47: Warning: Source is non-numeric - substituting zero
+prog.cob: 50: Warning: Source is non-numeric - substituting zero
+])
+
+AT_CHECK([./prog], [0], [Initial value
+30303936 .
+MOVE BIGFLT
+38333034 .
+MOVE SPACES
+30303030 .
+MOVE LOW-VALUES
+30303030 .
+MOVE HIGH-VALUES
+30303030 .
+MOVE QUOTE
+30303030 .
+MOVE ALL *
+30303030 .
+MOVE ALL 0
+30303030 .
+MOVE ALL 'A1'
+30303030 .
+MOVE ALL '21'
+32313231 .
+MOVE HIGH-VALUES TO (1:)
+FFFFFFFF .
+MOVE HIGH-VALUES TO BIGFLT
+BIGFLT is 0
+00000000 .
+MOVE QUOTE TO BIGFLT
+BIGFLT is 0
+00000000 .
+MOVE ALL * TO BIGFLT
+BIGFLT is 0
+00000000 .
+MOVE ALL '21' TO BIGFLT
+BIGFLT is 2.1212121E+37
+E5547F7D .
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([MF FIGURATIVE to NUMERIC])
+AT_KEYWORDS([MOVE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID. prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  MYFLD        PIC 9(4) VALUE 96.
+       01  BIGFLT       COMP-1 VALUE 543.12345E10.
+       PROCEDURE        DIVISION.
+       MAIN-1.
+           DISPLAY "Initial value"
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE BIGFLT"
+           MOVE BIGFLT TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE SPACES"
+           MOVE SPACES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE LOW-VALUES"
+           MOVE LOW-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES"
+           MOVE HIGH-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE QUOTE"
+           MOVE QUOTE TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL *"
+           MOVE ALL '*' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 0"
+           MOVE ALL '0' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 'A1'"
+           MOVE ALL 'A1' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL '21'"
+           MOVE ALL '21' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES TO (1:)"
+           MOVE HIGH-VALUES TO MYFLD (1:).
+           PERFORM SHOW-IT.
+
+           DISPLAY "MOVE HIGH-VALUES TO BIGFLT"
+           MOVE HIGH-VALUES TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE QUOTE TO BIGFLT"
+           MOVE QUOTE TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL * TO BIGFLT"
+           MOVE ALL '*' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL '21' TO BIGFLT"
+           MOVE ALL '21' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           STOP RUN.
+       SHOW-IT.
+           CALL "dump" USING MYFLD.
+       SHOW-BIG.
+           DISPLAY "BIGFLT is " BIGFLT.
+           CALL "dump" USING BIGFLT.
+])
+
+AT_DATA([cmod.c], [[
+#include <stdio.h>
+int dump (unsigned char *data)
+{
+  int i;
+  for (i = 0; i < 4; i++)
+    printf ("%02X", data[i]);
+  puts (" .");
+  return 0;
+}
+]])
+
+AT_CHECK([cobc -x -std=mf -debug -Wall -cb_conf=move-non-numeric-lit-to-numeric-is-zero:no prog.cob cmod.c], [0], [], [prog.cob: In paragraph 'MAIN-1':
+prog.cob: 16: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 19: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 22: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 25: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 28: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 34: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 44: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 47: Warning: MOVE of figurative constant to numeric item used
+prog.cob: 50: Warning: Numeric value is expected
+prog.cob: 7: Warning: 'BIGFLT' defined here as USAGE FLOAT
+])
+
+AT_CHECK([./prog], [0], [Initial value
+30303936 .
+MOVE BIGFLT
+38333034 .
+MOVE SPACES
+20202020 .
+MOVE LOW-VALUES
+00000000 .
+MOVE HIGH-VALUES
+FFFFFFFF .
+MOVE QUOTE
+22222222 .
+MOVE ALL *
+2A2A2A2A .
+MOVE ALL 0
+30303030 .
+MOVE ALL 'A1'
+41314131 .
+MOVE ALL '21'
+32313231 .
+MOVE HIGH-VALUES TO (1:)
+FFFFFFFF .
+MOVE HIGH-VALUES TO BIGFLT
+BIGFLT is -NAN
+FFFFFFFF .
+MOVE QUOTE TO BIGFLT
+BIGFLT is 2.1973164E-18
+22222222 .
+MOVE ALL * TO BIGFLT
+BIGFLT is 5.4312347E+12
+DA119E54 .
+MOVE ALL '21' TO BIGFLT
+BIGFLT is 2.1212121E+37
+E5547F7D .
 ], [])
 
 AT_CLEANUP

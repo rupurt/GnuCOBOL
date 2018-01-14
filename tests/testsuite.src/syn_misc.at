@@ -1944,9 +1944,9 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [1], [], [prog.cob: 12: Warning: Initial VALUE clause ignored for REDEFINES item
 prog.cob: 14: Warning: Initial VALUE clause ignored for REDEFINES item
-prog.cob: 17: Error: Invalid MOVE statement
-prog.cob: 19: Error: Invalid MOVE statement
-prog.cob: 29: Error: Invalid MOVE statement
+prog.cob: 17: Error: MOVE of figurative constant to numeric item used
+prog.cob: 19: Error: MOVE of figurative constant to numeric item used
+prog.cob: 29: Error: MOVE of figurative constant to numeric item used
 ])
 
 AT_CLEANUP
