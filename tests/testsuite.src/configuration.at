@@ -400,6 +400,7 @@ test.conf: Missing definitions
 	No definition of 'accept-update'
 	No definition of 'accept-auto'
 	No definition of 'select-working'
+	No definition of 'move-non-numeric-lit-to-numeric-is-zero'
 	No definition of 'move-figurative-constant-to-numeric'
 	No definition of 'comment-paragraphs'
 	No definition of 'memory-size-clause'

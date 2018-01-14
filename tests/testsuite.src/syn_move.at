@@ -51,8 +51,8 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
-[prog.cob: 9: Error: Invalid MOVE statement
-prog.cob: 10: Error: Invalid MOVE statement
+[prog.cob: 9: Error: MOVE of figurative constant to numeric item used
+prog.cob: 10: Error: MOVE of figurative constant to numeric item used
 ])
 
 AT_CLEANUP
@@ -422,6 +422,189 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([cobc -x -std=mf -w prog.cob ], [1], [],
 [prog.cob: 11: Error: Invalid SET statement
+])
+
+AT_CLEANUP
+
+AT_SETUP([2002 FIGURATIVE to NUMERIC])
+AT_KEYWORDS([MOVE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID. prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  MYFLD        PIC 9(4) VALUE 96.
+       01  BIGFLT       COMP-1 VALUE 543.12345E10.
+       PROCEDURE        DIVISION.
+       MAIN-1.
+           DISPLAY "Initial value"
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE BIGFLT"
+           MOVE BIGFLT TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE SPACES"
+           MOVE SPACES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE LOW-VALUES"
+           MOVE LOW-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES"
+           MOVE HIGH-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE QUOTE "
+           MOVE QUOTE TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL *"
+           MOVE ALL '*' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 0"
+           MOVE ALL '0' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 'A1'"
+           MOVE ALL 'A1' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL '21'"
+           MOVE ALL '21' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "SET HIGH-VALUES"
+           SET MYFLD TO HIGH-VALUES.
+           PERFORM SHOW-IT.
+           DISPLAY "SET SPACES"
+           SET MYFLD TO SPACES.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES TO (1:)"
+           MOVE HIGH-VALUES TO MYFLD (1:).
+           PERFORM SHOW-IT.
+
+           DISPLAY "MOVE HIGH-VALUES TO BIGFLT"
+           MOVE HIGH-VALUES TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE QUOTE TO BIGFLT"
+           MOVE QUOTE TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL * TO BIGFLT"
+           MOVE ALL '*' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL '21' TO BIGFLT"
+           MOVE ALL '21' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           STOP RUN.
+       SHOW-IT.
+           CALL "dump" USING MYFLD.
+       SHOW-BIG.
+           DISPLAY "BIGFLT is " BIGFLT.
+           CALL "dump" USING BIGFLT.
+])
+
+AT_CHECK([$COMPILE_ONLY -std=cobol2002 prog.cob ], [1], [],
+[prog.cob: In paragraph 'MAIN-1':
+prog.cob: 16: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 19: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 22: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 25: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 28: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 34: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 40: Error: SET operand should be numeric
+prog.cob: 43: Error: SET operand should be numeric
+prog.cob: 50: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 53: Warning: MOVE of figurative constant to numeric item is archaic in COBOL 2002
+prog.cob: 56: Warning: Numeric value is expected
+prog.cob: 7: Warning: 'BIGFLT' defined here as USAGE FLOAT
+])
+
+AT_CLEANUP
+
+
+AT_SETUP([IBM FIGURATIVE to NUMERIC])
+AT_KEYWORDS([MOVE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID. prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  MYFLD        PIC 9(4) VALUE 96.
+       01  BIGFLT       COMP-1 VALUE 543.12345E10.
+       PROCEDURE        DIVISION.
+       MAIN-1.
+           DISPLAY "Initial value"
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE BIGFLT"
+           MOVE BIGFLT TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE SPACES"
+           MOVE SPACES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE LOW-VALUES"
+           MOVE LOW-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES"
+           MOVE HIGH-VALUES TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE QUOTE "
+           MOVE QUOTE TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL *"
+           MOVE ALL '*' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 0"
+           MOVE ALL '0' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL 'A1'"
+           MOVE ALL 'A1' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE ALL '21'"
+           MOVE ALL '21' TO MYFLD.
+           PERFORM SHOW-IT.
+           DISPLAY "SET HIGH-VALUES"
+           SET MYFLD TO HIGH-VALUES.
+           PERFORM SHOW-IT.
+           DISPLAY "SET SPACES"
+           SET MYFLD TO SPACES.
+           PERFORM SHOW-IT.
+           DISPLAY "MOVE HIGH-VALUES TO (1:)"
+           MOVE HIGH-VALUES TO MYFLD (1:).
+           PERFORM SHOW-IT.
+
+           DISPLAY "MOVE HIGH-VALUES TO BIGFLT"
+           MOVE HIGH-VALUES TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE QUOTE TO BIGFLT"
+           MOVE QUOTE TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL * TO BIGFLT"
+           MOVE ALL '*' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           DISPLAY "MOVE ALL '21' TO BIGFLT"
+           MOVE ALL '21' TO BIGFLT.
+           PERFORM SHOW-BIG.
+           STOP RUN.
+       SHOW-IT.
+           CALL "dump" USING MYFLD.
+       SHOW-BIG.
+           DISPLAY "BIGFLT is " BIGFLT.
+           CALL "dump" USING BIGFLT.
+])
+
+AT_CHECK([$COMPILE_ONLY -std=ibm prog.cob ], [1], [],
+[prog.cob: In paragraph 'MAIN-1':
+prog.cob: 16: Error: MOVE of figurative constant to numeric item used
+prog.cob: 19: Error: MOVE of figurative constant to numeric item used
+prog.cob: 22: Error: MOVE of figurative constant to numeric item used
+prog.cob: 25: Error: MOVE of figurative constant to numeric item used
+prog.cob: 28: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 34: Warning: Numeric value is expected
+prog.cob: 6: Warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob: 40: Error: SET operand should be numeric
+prog.cob: 43: Error: SET operand should be numeric
+prog.cob: 50: Error: MOVE of figurative constant to numeric item used
+prog.cob: 53: Error: MOVE of figurative constant to numeric item used
+prog.cob: 56: Warning: Numeric value is expected
+prog.cob: 7: Warning: 'BIGFLT' defined here as USAGE FLOAT
 ])
 
 AT_CLEANUP

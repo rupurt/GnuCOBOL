@@ -6499,7 +6499,7 @@ overlapret:
 }
 
 int
-validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
+validate_move (cb_tree src, cb_tree dst, const unsigned int is_value, int *move_zero)
 {
 	struct cb_field		*fdst;
 	struct cb_field		*fsrc;
@@ -6512,13 +6512,16 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 	int			src_scale_mod;
 	int			dst_scale_mod;
 	int			dst_size_mod;
-	int			size;
+	int			size, m_zero;
 	int			most_significant;
 	int			least_significant;
 
 	loc = src->source_line ? src : dst;
 	is_numeric_edited = 0;
 	overlapping = 0;
+	if (move_zero == NULL)
+		move_zero = &m_zero;
+	*move_zero = 0;
 	if (CB_REFERENCE_P (dst)) {
 		if (CB_ALPHABET_NAME_P(CB_REFERENCE(dst)->value)) {
 			goto invalid;
@@ -6543,32 +6546,52 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 	fdst = CB_FIELD_PTR (dst);
 	switch (CB_TREE_TAG (src)) {
 	case CB_TAG_CONST:
+		if (cobc_cs_check == CB_CS_SET
+		 && (src == cb_space || src == cb_low || src == cb_high || src == cb_quote) 
+		 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
+		     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)) {
+			goto not_numeric;
+		}
+
+		if (!is_value
+	 	 && cb_move_non_numeric_lit_to_numeric_is_zero
+		 && cobc_cs_check != CB_CS_SET) {
+			if ((src == cb_space || src == cb_low || src == cb_high || src == cb_quote) 
+			 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
+			     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)) {
+				goto movezero;
+			} 
+		}
+
+		if (!is_value
+		 && (src == cb_space || src == cb_low || src == cb_high || src == cb_quote) 
+		 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC 
+		  || CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)) {
+		 	if (cb_verify_x (loc, cb_move_figurative_constant_to_numeric,
+				_("MOVE of figurative constant to numeric item"))) {
+				break;
+			} else {
+				return 1;
+			}
+		}
+
 		if (src == cb_space) {
 			if (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
 			    (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED && !is_value)) {
 				if (!cb_relaxed_syntax_check || is_value) {
 					goto invalid;
 				}
-				cb_warning_x (loc, _("Source is non-numeric - substituting zero"));
 			}
 		} else if (src == cb_zero) {
 			if (CB_TREE_CATEGORY (dst) == CB_CATEGORY_ALPHABETIC) {
 				goto invalid;
 			}
-		} else
-		if ((src == cb_space || src == cb_low || src == cb_high) 
-		 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
-		     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)
-		 && cb_verify (cb_move_figurative_constant_to_numeric,
-				_("MOVE of figurative constant to numeric item"))) {
-			/* Ignore this */
 		} else if (src == cb_low || src == cb_high || src == cb_quote) {
 			if (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
 			    CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED) {
 				if (!cb_relaxed_syntax_check || is_value) {
 					goto invalid;
 				}
-				cb_warning_x (loc, _("Source is non-numeric - substituting zero"));
 			}
 		}
 		break;
@@ -6857,13 +6880,31 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 				}
 				break;
 			case CB_CATEGORY_NUMERIC:
-				goto expect_numeric;
+				for (i = 0; i < l->size; i++) {
+					if (!isdigit (l->data[i])) {
+						if (cb_move_non_numeric_lit_to_numeric_is_zero
+						 && !is_value)
+							goto movezero;
+						goto expect_numeric;
+					}
+				}
+				break;
 			case CB_CATEGORY_NUMERIC_EDITED:
 				if (!is_value) {
-					goto expect_numeric;
+					for (i = 0; i < l->size; i++) {
+						if (!isdigit (l->data[i])
+						 && l->data[i] != '.'
+						 && l->data[i] != ','
+						 && l->data[i] != '+'
+						 && l->data[i] != '-'
+						 && l->data[i] != ' ') {
+							if (cb_move_non_numeric_lit_to_numeric_is_zero
+							 && !is_value) 
+								goto movezero;
+							goto expect_numeric;
+						}
+					}
 				}
-
-				/* TODO: validate the value */
 				break;
 			default:
 				break;
@@ -7009,6 +7050,19 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value)
 		COBC_ABORT ();
 	}
 	return 0;
+
+movezero:
+	cb_warning_x (loc, _("Source is non-numeric - substituting zero"));
+	*move_zero = 1;
+	return 0;
+
+not_numeric:
+	if (cobc_cs_check == CB_CS_SET) {
+		cb_error_x (loc, _("SET operand should be numeric"));
+	} else {
+		cb_error_x (loc, _("operand should be numeric"));
+	}
+	return -1;
 
 invalid:
 	if (is_value) {
@@ -7688,12 +7742,13 @@ cb_tree
 cb_build_move (cb_tree src, cb_tree dst)
 {
 	struct cb_reference	*x;
+	int	move_zero;
 
 	if (src == cb_error_node || dst == cb_error_node) {
 		return cb_error_node;
 	}
 
-	if (validate_move (src, dst, 0) < 0) {
+	if (validate_move (src, dst, 0, &move_zero) < 0) {
 		return cb_error_node;
 	}
 
@@ -7713,17 +7768,7 @@ cb_build_move (cb_tree src, cb_tree dst)
 		dst = CB_TREE (x);
 	}
 
-	if ((src == cb_space || src == cb_low || src == cb_high) 
-	 && (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
-	     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)
-	 && cb_verify (cb_move_figurative_constant_to_numeric,
-	 		_("MOVE of figurative constant to numeric item"))) {
-		/* Retain this MOVE as is for TIP/ix */
-	} else
-	if ((src == cb_space || src == cb_low ||
-	     src == cb_high || src == cb_quote) &&
-	    (CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC ||
-	     CB_TREE_CATEGORY (dst) == CB_CATEGORY_NUMERIC_EDITED)) {
+	if ( move_zero ) {
 		src = cb_zero;
 	}
 
