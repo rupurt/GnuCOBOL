@@ -1955,7 +1955,7 @@ cb_build_length (cb_tree x)
 		if (CB_REFERENCE_P (x) && CB_REFERENCE (x)->offset) {
 			return cb_build_any_intrinsic (CB_LIST_INIT (x));
 		}
-		f = CB_FIELD (cb_ref (x));
+		f = CB_FIELD_PTR (x);
 		if (f->flag_any_length) {
 			return cb_build_any_intrinsic (CB_LIST_INIT (x));
 		}
@@ -4778,8 +4778,8 @@ cb_emit_accept (cb_tree var, cb_tree pos, struct cb_attr_struct *attr_ptr)
 			CB_FIELD_PTR (current_program->crt_status)->count++;
 		}
 		if ((CB_REF_OR_FIELD_P (var)) &&
-		     CB_FIELD (cb_ref (var))->storage == CB_STORAGE_SCREEN) {
-			output_screen_from (CB_FIELD (cb_ref (var)), 0);
+		     CB_FIELD_PTR (var)->storage == CB_STORAGE_SCREEN) {
+			output_screen_from (CB_FIELD_PTR (var), 0);
 			gen_screen_ptr = 1;
 			if (pos) {
 				if (CB_LIST_P (pos)) {
@@ -5584,7 +5584,7 @@ cb_emit_display (cb_tree values, cb_tree upon, cb_tree no_adv, cb_tree pos,
 
 	x = CB_VALUE (values);
 	if ((CB_REF_OR_FIELD_P (x)) &&
-	     CB_FIELD (cb_ref (x))->storage == CB_STORAGE_SCREEN) {
+	     CB_FIELD_PTR (x)->storage == CB_STORAGE_SCREEN) {
 		output_screen_from (CB_FIELD (cb_ref (x)), 0);
 		gen_screen_ptr = 1;
 		if (pos) {
