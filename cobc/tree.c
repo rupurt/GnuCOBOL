@@ -2700,7 +2700,7 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 		} 
 		if(p->report_source
 		&& CB_REF_OR_FIELD_P (p->report_source)) {
-			struct cb_field *f = CB_FIELD (cb_ref(p->report_source));
+			struct cb_field *f = CB_FIELD_PTR (p->report_source);
 			if (f && f->count == 0) {
 				f->count++;
 			}
@@ -2715,14 +2715,14 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 		}
 		if (p->report_sum_counter
 		&& CB_REF_OR_FIELD_P (p->report_sum_counter)) {
-			struct cb_field *f = CB_FIELD (cb_ref(p->report_sum_counter));
+			struct cb_field *f = CB_FIELD_PTR (p->report_sum_counter);
 			if (f && f->count == 0) {
 				f->count++;
 			}
 		}
 		if(p->report_control
 		&& CB_REF_OR_FIELD_P (p->report_control)) {
-			struct cb_field *f = CB_FIELD (cb_ref(p->report_control));
+			struct cb_field *f = CB_FIELD_PTR (p->report_control);
 			if (f && f->count == 0) {
 				f->count++;
 			}
@@ -3667,12 +3667,12 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	case ']':
 		/* Relational operators */
 		if ((CB_REF_OR_FIELD_P (x)) &&
-		    CB_FIELD (cb_ref (x))->level == 88) {
+		    CB_FIELD_PTR (x)->level == 88) {
 			cb_error_x (e, _("Invalid expression"));
 			return cb_error_node;
 		}
 		if ((CB_REF_OR_FIELD_P (y)) &&
-		    CB_FIELD (cb_ref (y))->level == 88) {
+		    CB_FIELD_PTR (y)->level == 88) {
 			cb_error_x (e, _("Invalid expression"));
 			return cb_error_node;
 		}
@@ -3695,13 +3695,13 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 		}
 
 		if (CB_REF_OR_FIELD_P (y)
-		 && CB_FIELD (cb_ref (y))->usage == CB_USAGE_DISPLAY
+		 && CB_FIELD_PTR (y)->usage == CB_USAGE_DISPLAY
 		 && (CB_LITERAL_P(x) || x == cb_zero)
 		 && xl->all == 0) {
 			relop = compare_field_literal (e, 1, y, op, xl);
 		} else
 		if (CB_REF_OR_FIELD_P (x)
-		 && CB_FIELD (cb_ref (x))->usage == CB_USAGE_DISPLAY
+		 && CB_FIELD_PTR (x)->usage == CB_USAGE_DISPLAY
 		 && (CB_LITERAL_P(y) || y == cb_zero)
 		 && yl->all == 0) {
 			relop = compare_field_literal (e, 0, x, op, yl);
@@ -4625,7 +4625,7 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 	case CB_INTR_BYTE_LENGTH:
 		x = CB_VALUE (args);
 		if (CB_REF_OR_FIELD_P (x)) {
-			f = CB_FIELD (x);
+			f = CB_FIELD_PTR (x);
 			if (!cb_field_variable_size (f)
 			 && !f->flag_any_length) {
 				if (!(f->pic 

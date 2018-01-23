@@ -1,4 +1,8 @@
 
+2018-01-23  Ron Norman <rjn@inglenet.com>
+	* tree.c: Fixed coding error to use CB_FIELD_PTR
+	* codegen.c,typeck.c: Changed to use CB_FIELD_PTR as needed
+
 2018-01-14  Ron Norman <rjn@inglenet.com>
 	* error.c: add  cb_verify_x  
 	* field.c: update call to  validate_move for
