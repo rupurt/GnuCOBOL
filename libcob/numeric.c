@@ -37,6 +37,9 @@
 #ifdef HAVE_FINITE_IEEEFP_H
 #include <ieeefp.h>
 #endif
+#if   defined(__SUNPRO_C) && !defined(isinf)
+int isinf(double x) { return !finite(x) && x==x; }
+#endif
 
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP
