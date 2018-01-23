@@ -201,7 +201,11 @@ display_common (cob_field *f, FILE *fp)
 		sprintf (wrk, "%-.16G", un.f1doub);
 		if(strcmp(wrk,"-NAN") == 0)
 			strcpy(wrk,"-NaN");
+		else if(strcmp(wrk,"-NaNQ") == 0)
+			strcpy(wrk,"-NaN");
 		else if(strcmp(wrk,"NAN") == 0)
+			strcpy(wrk,"NaN");
+		else if(strcmp(wrk,"NaNQ") == 0)
 			strcpy(wrk,"NaN");
 		fprintf (fp, "%s", wrk);
 		return;
@@ -210,7 +214,11 @@ display_common (cob_field *f, FILE *fp)
 		sprintf (wrk, "%-.8G", (double)un.f1float);
 		if(strcmp(wrk,"-NAN") == 0)
 			strcpy(wrk,"-NaN");
+		else if(strcmp(wrk,"-NaNQ") == 0)
+			strcpy(wrk,"-NaN");
 		else if(strcmp(wrk,"NAN") == 0)
+			strcpy(wrk,"NaN");
+		else if(strcmp(wrk,"NaNQ") == 0)
 			strcpy(wrk,"NaN");
 		fprintf (fp, "%s", wrk);
 		return;
