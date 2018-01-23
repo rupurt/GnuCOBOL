@@ -186,6 +186,7 @@ display_common (cob_field *f, FILE *fp)
 		float		f1float;
 	} un;
 	int		n;
+	char	wrk[48];
 #if	0	/* RXWRXW - Print bin */
 	cob_field	temp;
 	cob_field_attr	attr;
@@ -197,11 +198,21 @@ display_common (cob_field *f, FILE *fp)
 	switch (COB_FIELD_TYPE (f)) {
 	case COB_TYPE_NUMERIC_DOUBLE:
 		memcpy (&un.f1doub, f->data, sizeof (double));
-		fprintf (fp, "%-.16G", un.f1doub);
+		sprintf (wrk, "%-.16G", un.f1doub);
+		if(strcmp(wrk,"-NAN") == 0)
+			strcpy(wrk,"-NaN");
+		else if(strcmp(wrk,"NAN") == 0)
+			strcpy(wrk,"NaN");
+		fprintf (fp, "%s", wrk);
 		return;
 	case COB_TYPE_NUMERIC_FLOAT:
 		memcpy (&un.f1float, f->data, sizeof (float));
-		fprintf (fp, "%-.8G", (double)un.f1float);
+		sprintf (wrk, "%-.8G", (double)un.f1float);
+		if(strcmp(wrk,"-NAN") == 0)
+			strcpy(wrk,"-NaN");
+		else if(strcmp(wrk,"NAN") == 0)
+			strcpy(wrk,"NaN");
+		fprintf (fp, "%s", wrk);
 		return;
 	case COB_TYPE_NUMERIC_FP_DEC64:
 	case COB_TYPE_NUMERIC_FP_DEC128:

@@ -37,15 +37,20 @@
 #ifdef HAVE_FINITE_IEEEFP_H
 #include <ieeefp.h>
 #endif
-#if   defined(__SUNPRO_C) && !defined(isinf)
-int isinf(double x) { return !finite(x) && x==x; }
-#endif
 
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP
 
 #include "libcob.h"
 #include "coblocal.h"
+
+#if !defined(isinf)
+#if defined(WIN32)
+#define isinf(x) ((_fpclass(x) == _FPCLASS_PINF) || (_fpclass(x) == _FPCLASS_NINF))
+#else
+#define isinf(x) (!ISFINITE(x))
+#endif
+#endif
 
 #define DECIMAL_CHECK(d1,d2) \
 	if (unlikely(d1->scale == COB_DECIMAL_NAN || \
