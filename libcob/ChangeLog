@@ -1,5 +1,9 @@
 
 2018-01-23  Ron Norman <rjn@inglenet.com>
+	* numeric.c: Improved check for 'isinf' with replacement
+	* termio.c: Standardize display of -NaN and NaN for float/double
+
+2018-01-23  Ron Norman <rjn@inglenet.com>
 	* numeric.c: SUN Solaris may not have 'isinf'
 
 2018-01-03 Ron Norman <rjn@inglenet.com>
