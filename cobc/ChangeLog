@@ -1,4 +1,7 @@
 
+2018-01-29  Ron Norman <rjn@inglenet.com>
+	* tree.c,tree.h,typeck.c: Fine tuning of arithmetic_osvs
+	
 2018-01-23  Ron Norman <rjn@inglenet.com>
 	* tree.c: Fixed coding error to use CB_FIELD_PTR
 	* codegen.c,typeck.c: Changed to use CB_FIELD_PTR as needed
