@@ -10619,7 +10619,8 @@ codegen (struct cb_program *prog, const int nested)
 		local_field_cache = list_cache_sort (local_field_cache,
 						     &field_cache_cmp);
 		for (k = local_field_cache; k; k = k->next) {
-			if (!k->f->flag_local) {
+			if (!k->f->flag_local
+			 && !k->f->flag_external) {
 				if (prog->flag_recursive
 				&& !k->f->flag_filler) {
 					output ("/* %s is not local */\n", k->f->name);

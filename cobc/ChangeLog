@@ -1,4 +1,7 @@
 
+2018-01-30  Ron Norman <rjn@inglenet.com>
+	* codegen.c: Add check for field IS EXTERNAL
+
 2018-01-29  Ron Norman <rjn@inglenet.com>
 	* tree.c,tree.h,typeck.c: Fine tuning of arithmetic_osvs
 	
