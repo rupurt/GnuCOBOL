@@ -524,6 +524,7 @@ same_level:
 		f->indexes = f->parent->indexes;
 		f->flag_is_global = f->parent->flag_is_global;
 	}
+
 	return CB_TREE (f);
 }
 
@@ -730,6 +731,7 @@ validate_field_1 (struct cb_field *f)
 	cb_tree		l;
 	struct cb_field *p;
 	unsigned char	*pstr;
+	char		*varname, *section;
 	int		vorint;
 	int		n;
 	int		need_picture;
@@ -1017,6 +1019,24 @@ validate_field_1 (struct cb_field *f)
 		}
 
 		/* Validate USAGE */
+
+		if ((f->storage == CB_STORAGE_SCREEN
+		  || f->storage == CB_STORAGE_REPORT) 
+		 &&  f->usage   != CB_USAGE_DISPLAY
+		 &&  f->usage   != CB_USAGE_NATIONAL) {
+			if (f->flag_filler
+			 || memcmp(f->name,"FILLER ",7) == 0)
+				varname = (char*)"FILLER";
+			else
+				varname = (char*)f->name;
+			if (f->storage == CB_STORAGE_SCREEN)
+				section = (char*)"SCREEN";
+			else
+				section = (char*)"REPORT";
+			cb_error_x (CB_TREE(f), 
+				_("'%s' should be USAGE DISPLAY for %s"), varname, section);
+		}
+
 		switch (f->usage) {
 		case CB_USAGE_DISPLAY:
 			if (current_program->flag_trailing_separate &&
