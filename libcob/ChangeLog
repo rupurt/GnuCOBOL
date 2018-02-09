@@ -1,19 +1,29 @@
 
+2017-12-21  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c [!COB_DEBUG_LOG]: adjusted handling of COB_DEBUG_LOG to
+	  minimize active code while still raise a warning (instead of an error)
+
 2018-01-23  Ron Norman <rjn@inglenet.com>
+
 	* termio.c: Standardize display of -NaN and NaN for float/double
 
 2018-01-23  Ron Norman <rjn@inglenet.com>
+
 	* numeric.c: Improved check for 'isinf' with replacement
 
 2018-01-23  Ron Norman <rjn@inglenet.com>
+
 	* numeric.c: SUN Solaris may not have 'isinf'
 
 2018-01-03 Ron Norman <rjn@inglenet.com>
+
 	* common.c,common.h: Add cob_function_return routine to
 	  copy a FUNCTION's RETURNING cob_field to 'cob_module' 
 	  save area and return address of that
 
 2017-12-31  Ron Norman <rjn@inglenet.com>
+
 	* fileio.c: If file ASSIGN is empty use SELECT name
 	            BDB fix to allocation record area for max record size
 	* common.c: flush stderr/stdout to get display output before dump

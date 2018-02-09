@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2017 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2018 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -147,7 +147,7 @@ static const cob_field_attr	const_alpha_attr =
 				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
 static char			*cob_local_env = NULL;
-#if defined(COB_DEBUG_LOG)
+#ifdef COB_DEBUG_LOG
 static int			cob_debug_log_time = 0;
 #endif
 static int			current_arg = 0;
@@ -167,14 +167,14 @@ static const char		*cob_current_paragraph = NULL;
 static const char		*cob_source_file = NULL;
 static const char		*cob_source_statement = NULL;
 static unsigned int		cob_source_line = 0;
+#ifdef COB_DEBUG_LOG
 static const char		*cob_debug_env = NULL;
 static FILE			*cob_debug_file = NULL;
-#if defined(COB_DEBUG_LOG)
 static int			cob_debug_level = 9;
 static char			*cob_debug_mod = NULL;
 static char			cob_debug_modules[12][4] = {"", "", "", "", "", "", "", "", "", "", "", ""};
-#endif
 static char			*cob_debug_file_name = NULL;
+#endif
 
 static char			*strbuff = NULL;
 
@@ -283,6 +283,7 @@ static struct config_tbl gc_conf[] = {
 	{"default_cancel_mode","cancel_mode",	NULL,	NULL,GRP_HIDE,ENV_BOOL|ENV_NOT,SETPOS(physical_cancel)},
 	{"COB_PRE_LOAD","pre_load",		NULL,	NULL,GRP_CALL,ENV_STR,SETPOS(cob_preload_str)},
 	{"COB_BELL","bell",			"0",	beepopts,GRP_SCREEN,ENV_INT|ENV_ENUMVAL,SETPOS(cob_beep_value)},
+	/* note: included for being part of the list in --runtime-config */
 	{"COB_DEBUG_LOG","debug_log",		NULL,	NULL,GRP_HIDE,ENV_FILE,SETPOS(cob_debug_log)},
 	{"COB_COL_JUST_LRC","col_just_lrc",	"true",	NULL,GRP_MISC,ENV_BOOL,SETPOS(cob_col_just_lrc)},
 	{"COB_DISABLE_WARNINGS","disable_warnings","0",	NULL,GRP_MISC,ENV_BOOL|ENV_NOT,SETPOS(cob_display_warn)},
@@ -6002,7 +6003,7 @@ print_version (void)
 
 	printf ("libcob (%s) %s.%d\n",
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	puts ("Copyright (C) 2017 Free Software Foundation, Inc.");
+	puts ("Copyright (C) 2018 Free Software Foundation, Inc.");
 	puts (_("License LGPLv3+: GNU LGPL version 3 or later <http://gnu.org/licenses/lgpl.html>"));
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
 	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
@@ -6417,8 +6418,12 @@ cob_init (const int argc, char **argv)
 	/* DebugLog file */
 	s = getenv ("COB_DEBUG_LOG");
 	if (s) {
+#ifdef COB_DEBUG_LOG
 		cob_debug_env = (const char*) cob_save_env_value((char*) cob_debug_env, s);
 		cob_debug_open(cob_debug_env);
+#else
+		cob_runtime_warning (_("compiler was not built with --enable-debug-log; COB_DEBUG_LOG ignored"));
+#endif
 	}
 	/* Get user name */
 	if (cobsetptr->cob_user_name == NULL || !strcmp(cobsetptr->cob_user_name, "Unknown")) {
@@ -6695,6 +6700,7 @@ cob_alloc_attr(int type, int digits, int scale, int flags)
 	return &da->attr;
 }
 
+#if defined(COB_DEBUG_LOG)
 /******************************/
 /* Routines for COB_DEBUG_LOG */
 /******************************/
@@ -6712,7 +6718,6 @@ cob_alloc_attr(int type, int digits, int scale, int flags)
 int
 cob_debug_open(const char *debug_env)
 {
-#if defined(COB_DEBUG_LOG)
 	int		i,j;
 	char	val[256],logfile[256];
 	if(debug_env == NULL)
@@ -6773,13 +6778,10 @@ cob_debug_open(const char *debug_env)
 		return 0;
 	}
 	cob_debug_file_name = cob_strdup(logfile);
-#else
-	cob_runtime_error (_("Compiler was not built with --enable-debug-log so ignore COB_DEBUG_LOG"));
-#endif
 	return 1;
 }
 
-#if defined(COB_DEBUG_LOG)
+
 /* Determine if DEBUGLOG is to be allowed */
 int
 cob_debug_logit(int level, char *module)
