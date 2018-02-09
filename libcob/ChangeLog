@@ -1,8 +1,9 @@
 
-2017-12-21  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+2018-02-09  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* common.c [!COB_DEBUG_LOG]: adjusted handling of COB_DEBUG_LOG to
-	  minimize active code while still raise a warning (instead of an error)
+	  minimize active code while still raise a warning (instead of an
+	  error) for fixing compiler warnings
 
 2018-01-23  Ron Norman <rjn@inglenet.com>
 
