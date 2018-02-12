@@ -304,10 +304,11 @@ typedef struct __cob_settings {
 	char		*cob_display_print_filename;	/* File name for DISPLAY UPON PRINTER */
 
 	/* common.c */
-	char		external_trace_file;	/* value set externally */
-	char		external_display_print_file;
-	FILE		*cob_trace_file;	/* FILE* to write TRACE[ALL] information to */
-	FILE		*cob_display_print_file;/* FILE* to write DISPLAY UPON PRINTER information to */
+	char		external_trace_file;	/* use external FILE * for TRACE[ALL] */
+	FILE		*cob_trace_file;		/* FILE* to write TRACE[ALL] information to */
+	FILE		*cob_display_print_file;	/* external FILE* to write DISPLAY UPON PRINTER information to 
+											   if not external cob_display_print_filename is always opened
+											   before each DISPLAY UPON PRINTER and closed afterwards */
 	FILE		*cob_dump_file;		/* FILE* to write DUMP information to */
 
 	char		*cob_dump_filename;	/* Place to write dump of variables */
@@ -333,7 +334,7 @@ struct config_tbl {
 	int		data_len;		/* Length of referenced field */
 	int		config_num;		/* Set by which runtime.cfg file */
 	int		set_by;			/* value set by a different keyword */
-	unsigned long	min_value;		/* Minium accepted value */
+	unsigned long	min_value;		/* Minimum accepted value */
 	unsigned long	max_value;		/* Maximum accepted value */
 };
 
@@ -426,7 +427,6 @@ COB_HIDDEN void		cob_parameter_check	(const char *, const int);
 COB_HIDDEN void		cob_runtime_error	(const char *, ...) COB_A_FORMAT12;
 COB_HIDDEN void		cob_runtime_warning	(const char *, ...) COB_A_FORMAT12;
 
-COB_HIDDEN char*	cob_save_env_value	(char*, char*);
 COB_HIDDEN cob_settings *cob_get_settings_ptr	(void);
 
 COB_HIDDEN int		cob_ctoi		(const char);

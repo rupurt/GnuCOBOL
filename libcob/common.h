@@ -1676,7 +1676,6 @@ COB_EXPIMP FILE			*cob_get_dump_file(int where);
 #define COB_SET_LINE_FILE(l,f) ( (unsigned int)((unsigned int)f<<20) | l)
 
 /* COB_DEBUG_LOG Macros and routines found in common.c */
-COB_EXPIMP int cob_debug_open( const char *cob_debug_env );
 #if defined(COB_DEBUG_LOG)
 COB_EXPIMP int cob_debug_logit( int level, char *module);
 COB_EXPIMP int cob_debug_logger( const char *fmt, ... );
