@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2018 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -43,6 +43,12 @@
 
 #include "libcob.h"
 #include "coblocal.h"
+
+#if !defined(isnan)
+#ifdef WIN32
+#define isnan(x)	_isnan(x)
+#endif
+#endif
 
 #if !defined(isinf)
 #if defined(WIN32)
