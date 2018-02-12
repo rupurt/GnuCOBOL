@@ -43,6 +43,11 @@
 	* numeric.c: Fix for COMP-1 to check of overflow and
 	             set SIZE ERROR condition when requested
 
+2017-12-25  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c (cob_check_trace_file): FR #242 allow trace file to be
+	  appended by starting COB_TRACE_FILE with "+"
+
 2017-12-22  Ron Norman <rjn@inglenet.com>
 
 	* numeric.c: More fixes for FLOAT-DECIMAL-16/34 data types
