@@ -1252,18 +1252,32 @@ cob_memcpy (cob_field *dst, const void *src, const size_t size)
 static void
 cob_check_trace_file (void)
 {
-	if(cobsetptr->cob_trace_file)
-		return;
+	const char *filename = cobsetptr->cob_trace_filename;
+	const char *mode;
 
-	if (!cobsetptr->cob_trace_filename
-	&&  !cobsetptr->cob_trace_file) {
-		cobsetptr->cob_trace_file = stderr;
+	if (cobsetptr->cob_trace_file) {
 		return;
 	}
-	if(cobsetptr->cob_trace_file)
-		return;
-	if (!cobsetptr->cob_unix_lf) {
-		cobsetptr->cob_trace_file = fopen (cobsetptr->cob_trace_filename, "w");
+	if (cobsetptr->cob_trace_filename) {
+		if (!cobsetptr->cob_unix_lf) {
+			if (*filename == '+') {
+				filename++;
+				mode = "a";
+			} else {
+				mode = "w";
+			}
+		} else {
+			if (*filename == '+') {
+				filename++;
+				mode = "ab";
+			} else {
+				mode = "wb";
+			}
+		}
+		cobsetptr->cob_trace_file = fopen (filename, mode);
+		if (!cobsetptr->cob_trace_file) {
+			cobsetptr->cob_trace_file = stderr;
+		}
 	} else {
 		cobsetptr->cob_trace_file = stderr;
 	}
