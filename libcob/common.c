@@ -5112,18 +5112,6 @@ cob_strjoin (char** strarray, int size, char* separator)
 	return result;
 }
 
-char *
-cob_save_env_value (char* env_var, char* env_val)
-{
-	if (!env_val) return NULL;
-
-	if (env_var) cob_free(env_var);
-	env_var = (char*) cob_fast_malloc(strlen(env_val) + 1);
-	strcpy(env_var, env_val);
-
-	return env_var;
-}
-
 static void
 var_print (const char *msg, const char *val, const char *default_val,
 		const unsigned int format)
