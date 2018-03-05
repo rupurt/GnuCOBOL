@@ -1,4 +1,13 @@
 
+2018-03-05  Ron Norman <rjn@inglenet.com>
+	* Changes to solve REPORT problems related to COB_TREE_DEBUG
+
+	* tree.h: Added CB_REF_OR_REPORT_P and CB_REPORT_PTR
+	* tree.c: cb_ref verifies it was passed a CB_REFERENCE
+	* parser.y: Remove report_name_list and changes for COB_TREE_DEBUG
+	* codegen.c: Fixed problems found by COB_TREE_DEBUG
+	* typeck.c: Fixed problems found by COB_TREE_DEBUG
+
 2018-01-30  Ron Norman <rjn@inglenet.com>
 	* parser.y: Have REPORT fields parse all USAGE so if it
 	           is not DISPLAY and meaningful error happens

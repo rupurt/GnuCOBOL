@@ -2910,14 +2910,18 @@ cb_validate_program_body (struct cb_program *prog)
 			}
 		}
 		if (fl->assign != NULL) {
-			f = CB_FIELD_PTR (fl->assign);
-			if (cb_select_working
-			 && f->storage != CB_STORAGE_WORKING
-			 && f->storage != CB_STORAGE_FILE
-			 && f->storage != CB_STORAGE_LOCAL) {
-				cb_error_x (fl->key,
-					_("File %s: ASSIGN %s declared outside WORKING-STORAGE"), 
-						fl->name, f->name);
+			if (CB_LITERAL_P (fl->assign)) {
+				/* ASSIGN TO 'literal' */
+			} else if (CB_REF_OR_FIELD_P (fl->assign)) {
+				f = CB_FIELD_PTR (fl->assign);
+				if (cb_select_working
+				 && f->storage != CB_STORAGE_WORKING
+				 && f->storage != CB_STORAGE_FILE
+				 && f->storage != CB_STORAGE_LOCAL) {
+					cb_error_x (fl->key,
+						_("File %s: ASSIGN %s declared outside WORKING-STORAGE"), 
+							fl->name, f->name);
+				}
 			}
 		}
 	}
@@ -6582,21 +6586,25 @@ cb_check_overlapping (cb_tree src, cb_tree dst,
 
 	/* Adjusting offsets by occurs and reference modification */
 	src_off += src_f->mem_offset ;
-	r = CB_REFERENCE (src);
-	if (r->offset) {
-		if (CB_LITERAL_P (r->offset)) {
-			src_off += cb_get_int (r->offset) - 1;
-		} else {
-			goto overlapret;
-	}
+	if (CB_REFERENCE_P (src)) {
+		r = CB_REFERENCE (src);
+		if (r->offset) {
+			if (CB_LITERAL_P (r->offset)) {
+				src_off += cb_get_int (r->offset) - 1;
+			} else {
+				goto overlapret;
+			}
+		}
 	}
 	dst_off += dst_f->mem_offset;
-	r = CB_REFERENCE (dst);
-	if (r->offset) {
-		if (CB_LITERAL_P (r->offset)) {
-			dst_off += cb_get_int (r->offset) - 1;
-		} else {
-			goto overlapret;
+	if (CB_REFERENCE_P (dst)) {
+		r = CB_REFERENCE (dst);
+		if (r->offset) {
+			if (CB_LITERAL_P (r->offset)) {
+				dst_off += cb_get_int (r->offset) - 1;
+			} else {
+				goto overlapret;
+			}
 		}
 	}
 
@@ -9250,8 +9258,7 @@ cb_emit_write (cb_tree record, cb_tree from, cb_tree opt, cb_tree lockopt)
 		}
 	}
 
-	if (from) {
-		if(CB_FIELD_PTR (from) != CB_FIELD_PTR (record))
+	if (from && (!CB_FIELD_P(from) || (CB_FIELD_PTR (from) != CB_FIELD_PTR (record)))) {
 			cb_emit (cb_build_move (from, record));
 	}
 
@@ -9412,11 +9419,11 @@ cb_emit_report_moves (struct cb_report *r, struct cb_field *f, int forterminate)
 		if(p->report_from) {
 			if(forterminate
 			&& report_in_footing) {
-				cb_emit_move( p->report_from, p->report_source);
+				cb_emit_move (p->report_from, CB_LIST_INIT (p->report_source));
 			} else
 			if(!forterminate
 			&& !report_in_footing) {
-				cb_emit_move( p->report_from, p->report_source);
+				cb_emit_move (p->report_from, CB_LIST_INIT (p->report_source));
 			}
 		}
 		if(p->report_when) {
@@ -9444,7 +9451,7 @@ cb_emit_report_moves (struct cb_report *r, struct cb_field *f, int forterminate)
 static void
 cb_emit_report_move_id (cb_tree rep)
 {
-	struct cb_report *r = CB_REPORT (cb_ref(rep));
+	struct cb_report *r = CB_REPORT_PTR (rep);
 	if(r
 	&& r->id == 0) {
 		r->id = report_id++;
@@ -9464,7 +9471,6 @@ cb_emit_initiate (cb_tree rep)
 	if (rep == cb_error_node) {
 		return;
 	}
-	rep->tag = CB_TAG_REPORT;
 	cb_emit_report_move_id(rep);
 	cb_emit (CB_BUILD_FUNCALL_1 ("$I", rep));
 
@@ -9478,7 +9484,6 @@ cb_emit_terminate (cb_tree rep)
 	if (rep == cb_error_node) {
 		return;
 	}
-	rep->tag = CB_TAG_REPORT;
 	cb_emit_report_move_id(rep);
 	cb_emit (CB_BUILD_FUNCALL_1 ("$T", rep));
 
@@ -9493,21 +9498,20 @@ cb_emit_generate (cb_tree x)
 	struct cb_report *r;
 	cb_tree		y;
 	cb_tree		z;
-	struct cb_word	*word;
 	if (x == cb_error_node) {
 		return;
 	}
-	y = cb_ref (x);
-	if (y == cb_error_node) {
-		return;
+	if (CB_REFERENCE_P (x)) {
+		y = cb_ref (x);
+		if (y == cb_error_node) {
+			return;
+		}
+	} else {
+		y = x;
 	}
-	if(CB_TREE_TAG (y) == CB_TAG_REPORT) {
+	if(CB_REPORT_P (y)) {
 		r = CB_REPORT (y);
 		z = cb_build_reference (r->name);
-		word = CB_REFERENCE (z)->word;
-		z->category = CB_CATEGORY_UNKNOWN;
-		z->tag = CB_TAG_REPORT;
-		CB_REFERENCE (z)->word = word;
 		CB_REFERENCE (z)->value = CB_TREE (y);
 		cb_emit_report_move_id(z);
 		cb_emit (CB_BUILD_FUNCALL_2 ("$R", z, NULL));
@@ -9518,14 +9522,7 @@ cb_emit_generate (cb_tree x)
 	|| f->report == NULL) {
 		cb_error_x (x, _("Data item is not part of a report"));
 	} else {
-#if 0	/* r is unused afterwards and parameter types doesn't match */
-		r = CB_REPORT (f->report);
-#endif
 		z = cb_build_reference (f->name);
-		word = CB_REFERENCE (z)->word;
-		z->category = CB_CATEGORY_UNKNOWN;
-		z->tag = CB_TAG_REPORT;
-		CB_REFERENCE (z)->word = word;
 		CB_REFERENCE (z)->value = CB_TREE (f->report);
 		x->tag = CB_TAG_REPORT_LINE;
 		cb_emit_report_move_id(z);
@@ -9539,7 +9536,6 @@ void
 cb_emit_suppress (struct cb_field *f)
 {
 	cb_tree		z;
-	struct cb_word	*word;
 	/* MORE TO DO HERE */
 	/* Find cob_report_control and set on suppress flag */
 	if(f == NULL
@@ -9548,10 +9544,6 @@ cb_emit_suppress (struct cb_field *f)
 		return;
 	}
 	z = cb_build_reference (f->name);
-	word = CB_REFERENCE (z)->word;
-	z->category = CB_CATEGORY_UNKNOWN;
-	z->tag = CB_TAG_REPORT;
-	CB_REFERENCE (z)->word = word;
 	CB_REFERENCE (z)->value = CB_TREE (f->report);
 	cb_emit (CB_BUILD_FUNCALL_2 ("$S", z, cb_int (f->id)));
 }
