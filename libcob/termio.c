@@ -177,6 +177,18 @@ display_alnum (cob_field *f, FILE *fp)
 	}
 }
 
+/* Check for alternate styles of Not A Number and convert to just NaN */
+static void
+clean_nan( char *wrk)
+{
+	if(strcmp(wrk,"-NAN") == 0
+	|| strcmp(wrk,"-NaNQ") == 0
+	|| strcmp(wrk,"-NaN") == 0
+	|| strcmp(wrk,"NAN") == 0
+	|| strcmp(wrk,"NaNQ") == 0)
+		strcpy(wrk,"NaN");
+}
+
 static void
 display_common (cob_field *f, FILE *fp)
 {
@@ -199,27 +211,13 @@ display_common (cob_field *f, FILE *fp)
 	case COB_TYPE_NUMERIC_DOUBLE:
 		memcpy (&un.f1doub, f->data, sizeof (double));
 		sprintf (wrk, "%-.16G", un.f1doub);
-		if(strcmp(wrk,"-NAN") == 0)
-			strcpy(wrk,"-NaN");
-		else if(strcmp(wrk,"-NaNQ") == 0)
-			strcpy(wrk,"-NaN");
-		else if(strcmp(wrk,"NAN") == 0)
-			strcpy(wrk,"NaN");
-		else if(strcmp(wrk,"NaNQ") == 0)
-			strcpy(wrk,"NaN");
+		clean_nan (wrk);
 		fprintf (fp, "%s", wrk);
 		return;
 	case COB_TYPE_NUMERIC_FLOAT:
 		memcpy (&un.f1float, f->data, sizeof (float));
 		sprintf (wrk, "%-.8G", (double)un.f1float);
-		if(strcmp(wrk,"-NAN") == 0)
-			strcpy(wrk,"-NaN");
-		else if(strcmp(wrk,"-NaNQ") == 0)
-			strcpy(wrk,"-NaN");
-		else if(strcmp(wrk,"NAN") == 0)
-			strcpy(wrk,"NaN");
-		else if(strcmp(wrk,"NaNQ") == 0)
-			strcpy(wrk,"NaN");
+		clean_nan (wrk);
 		fprintf (fp, "%s", wrk);
 		return;
 	case COB_TYPE_NUMERIC_FP_DEC64:
