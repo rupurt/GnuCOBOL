@@ -1,4 +1,7 @@
 
+2018-03-08  Ron Norman <rjn@inglenet.com>
+	* codegen.c: For INITIALIZE of signed numeric use 'cob_move'
+
 2018-03-05  Ron Norman <rjn@inglenet.com>
 	* Changes to solve REPORT problems related to COB_TREE_DEBUG
 

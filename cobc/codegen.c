@@ -3133,6 +3133,10 @@ initialize_type (struct cb_initialize *p, struct cb_field *f, const int topfield
 		return INITIALIZE_ONE;
 	}
 
+	if (f->flag_sign_separate) {	/* Need to use cob_move for this one */
+		return INITIALIZE_ONE;
+	}
+
 	if (f->flag_external && !p->flag_init_statement) {
 		return INITIALIZE_NONE;
 	}
