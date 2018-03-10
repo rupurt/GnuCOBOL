@@ -659,7 +659,7 @@ real_field_founder (const struct cb_field *f)
 	return (struct cb_field *)ff;
 }
 
-static struct cb_field *
+struct cb_field *
 chk_field_variable_size (struct cb_field *f)
 {
 	struct cb_field		*p;
@@ -3623,6 +3623,7 @@ output_initialize_one (struct cb_initialize *p, cb_tree x)
 			output_move (cb_space, x);
 			break;
 		default:
+			printf("DBG field %s\n",f->name);
 			cobc_abort_pr (_("Unexpected tree category %d"),
 				 (int)CB_TREE_CATEGORY (x));
 			COBC_ABORT ();
