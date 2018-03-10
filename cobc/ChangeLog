@@ -1,4 +1,7 @@
 
+2018-03-10  Ron Norman <rjn@inglenet.com>
+	* codegen.c: Fix for INITIALIZE of signed numeric use 'cob_move'
+
 2018-03-08  Ron Norman <rjn@inglenet.com>
 	* codegen.c: For INITIALIZE of signed numeric use 'cob_move'
 
