@@ -82,7 +82,6 @@ AH_TEMPLATE([COB_EXEEXT], [Executable extension])
 AH_TEMPLATE([COB_OBJEXT], [Object extension])
 AH_TEMPLATE([COB_KEYWORD_INLINE], [Keyword for inline])
 AH_TEMPLATE([COB_NO_SELFOPEN], [Can not dlopen self])
-AH_TEMPLATE([COB_STRFTIME], [Can use strftime for timezone])
 AH_TEMPLATE([COB_LI_IS_LL], [long int is long long])
 AH_TEMPLATE([WITH_CURSES], [curses library for extended SCREEN I/O])
 AH_TEMPLATE([HAVE_COLOR_SET], [curses has color_set function])
@@ -180,7 +179,7 @@ AC_CHECK_FUNCS([memmove memset setlocale fcntl strerror strcasecmp \
 # Check for timezone
 AC_MSG_CHECKING([for timezone variable access])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]],
-	[[timezone = 3600;]])],
+	[[timezone = 3600; daylight = 0;]])],
 	[AC_DEFINE([HAVE_TIMEZONE], [1]) AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])])
 
@@ -823,26 +822,6 @@ if test "$DEFINE_DL" = "no"; then
 	AC_MSG_ERROR([libltdl is required]), [])
 fi
 
-# Checks for workable strftime
-AC_MSG_CHECKING([for working strftime])
-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
-	#include <time.h>]], [[
-	time_t	ticks;
-	int	ret;
-	char	buff[16];
-	ticks = time(NULL);
-	ret = strftime(buff, 15, "%z", localtime(&ticks));
-	if (ret != 5) {
-		return 1;
-	}
-	if (buff[0] != '+' && buff[0] != '-') {
-		return 1;
-	}
-	return 0;]])],
-	[AC_DEFINE([COB_STRFTIME], [1]) AC_MSG_RESULT([yes])],
-	[AC_MSG_RESULT([no])],
-	[])
-
 # Checks for size of long
 AC_MSG_CHECKING([if size of long int = size of long long])
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
@@ -1202,13 +1181,6 @@ AC_SUBST([COB_FIX_LIBTOOL])
 AC_SUBST([COB_KEYWORD_INLINE])
 AC_SUBST([COB_HAS_ISAM])
 AC_SUBST([COB_HAS_CURSES])
-if test "$COB_STRFTIME" = "no" -a "$COB_TIMEZONE" = "no"
-then
-	COB_HAS_UTC_OFFSET="no"
-else
-	COB_HAS_UTC_OFFSET="yes"
-fi
-AC_SUBST([COB_HAS_UTC_OFFSET])
 AC_SUBST([COB_HAS_64_BIT_POINTER])
 AC_SUBST([COB_PATCH_LEVEL], [$with_patch_level]) # needed for bin/cob-config
 
@@ -1283,7 +1255,3 @@ else
   AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
 fi
 unset DEFINE_DL
-if test "$COB_HAS_UTC_OFFSET" = "no"; then
-  AC_MSG_WARN([ Could not find strftime or timezone. FORMATTED-CURRENT-DATE, FORMATTED-DATE])
-  AC_MSG_WARN([and FORMATTED-DATETIME may not work.])
-fi

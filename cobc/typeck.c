@@ -1108,6 +1108,8 @@ cb_build_registers (void)
 		contz = timezone;
 		buff[16] = '-';
 	}
+	if (daylight)
+		contz -= 3600;
 	sprintf (&buff[17], "%2.2ld%2.2ld", contz / 3600, contz % 60);
 #else
 	strftime (buff, (size_t)22, "%Y%m%d%H%M%S0000000", tlt);

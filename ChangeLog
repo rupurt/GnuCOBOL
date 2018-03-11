@@ -1,4 +1,7 @@
 
+2017-03-11  Ron Norman <rjn@inglenet.com> 
+	* configure.ac: Removed check for strftime having %z as no longer used
+
 2017-03-08  Ron Norman <rjn@inglenet.com> 
 	* termio.c standardize DISPLAY of NaN (Not A Number)
 
