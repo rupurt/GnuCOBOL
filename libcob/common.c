@@ -1379,13 +1379,6 @@ one_indexed_day_of_week_from_monday(int zero_indexed_from_sunday)
 	return ((zero_indexed_from_sunday + 6) % 7) + 1;
 }
 
-static void
-set_unknown_offset(struct cob_time *time)
-{
-	time->offset_known = 0;
-	time->utc_offset = 0;
-}
-
 #if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
 static void
 set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time)
@@ -3196,12 +3189,9 @@ cob_get_current_date_and_time (void)
 #elif defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
 	struct timeval	tmv;
 #endif
-	time_t		curtime;
+	time_t		curtime, utctime, lcltime, difftime;
 	struct tm	*tmptr;
 	struct cob_time	cb_time;
-#if defined(COB_STRFTIME)
-	char		iso_timezone[6] = { '\0' };
-#endif
 
 	/* Get the current time */
 #if defined (HAVE_CLOCK_GETTIME)
@@ -3213,11 +3203,24 @@ cob_get_current_date_and_time (void)
 #else
 	curtime = time (NULL);
 #endif
+	tmptr = gmtime (&curtime);
+	/* Leap seconds ? */
+	if (tmptr->tm_sec >= 60) {
+		tmptr->tm_sec = 59;
+	}
+	utctime = mktime( tmptr );
+
 	tmptr = localtime (&curtime);
 	/* Leap seconds ? */
 	if (tmptr->tm_sec >= 60) {
 		tmptr->tm_sec = 59;
 	}
+	lcltime = mktime( tmptr );
+	difftime = utctime - lcltime;
+	if (tmptr->tm_isdst)
+		difftime -= 3600;
+	cb_time.offset_known = 1;
+	cb_time.utc_offset = difftime / 60;
 
 	cb_time.year = tmptr->tm_year + 1900;
 	cb_time.month = tmptr->tm_mon + 1;
@@ -3227,8 +3230,6 @@ cob_get_current_date_and_time (void)
 	cb_time.minute = tmptr->tm_min;
 	cb_time.second = tmptr->tm_sec;
 	cb_time.nanosecond = 0;
-	cb_time.offset_known = 0;
-	cb_time.utc_offset = 0;
 
 	/* Get nanoseconds or microseconds, if possible */
 #if defined (HAVE_CLOCK_GETTIME)
@@ -3237,31 +3238,6 @@ cob_get_current_date_and_time (void)
 	cb_time.nanosecond = tmv.tv_usec * 1000;
 #else
 	cb_time.nanosecond = 0;
-#endif
-
-	/* Get the offset from UTC */
-#if defined (COB_STRFTIME)
-	strftime (iso_timezone, (size_t) 6, "%z", tmptr);
-
-	if (iso_timezone[0] == '0') {
-		set_unknown_offset (&cb_time);
-	} else {
-		/* Convert the timezone string into minutes from UTC */
-		cb_time.offset_known = 1;
-		cb_time.utc_offset =
-			cob_ctoi (iso_timezone[1]) * 60 * 10
-			+ cob_ctoi (iso_timezone[2]) * 60
-			+ cob_ctoi (iso_timezone[3]) * 10
-			+ cob_ctoi (iso_timezone[4]);
-		if (iso_timezone[0] == '-') {
-			cb_time.utc_offset *= -1;
-		}
-	}
-#elif defined (HAVE_TIMEZONE)
-	cb_time.offset_known = 1;
-	cb_time.utc_offset = timezone / 60;
-#else
-	set_unknown_offset(&cb_time);
 #endif
 
 	return cb_time;

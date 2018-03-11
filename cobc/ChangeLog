@@ -1,4 +1,7 @@
 
+2018-03-11  Ron Norman <rjn@inglenet.com>
+	* typeck.c: Adjust UTC Offset for Daylight Savings Time
+
 2018-03-10  Ron Norman <rjn@inglenet.com>
 	* codegen.c,tree.h: Make chk_field_variable_size available
 	* typeck.c: If destination of a MOVE is variable_size then

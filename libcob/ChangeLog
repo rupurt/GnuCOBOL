@@ -1,4 +1,8 @@
 
+2018-03-11  Ron Norman <rjn@inglenet.com>
+	* common.c: Compute UTC without strftime and adjust for
+	            daylight savings time
+
 2018-02-20  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* common.c (cob_save_env_value): removed
