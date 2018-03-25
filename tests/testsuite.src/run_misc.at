@@ -5909,12 +5909,12 @@ AT_DATA([cmod.c], [[
 #include <libcob.h>
 
 static char *
-getType(int type)
+getType(int type, int byvalue)
 {
    static char wrk[24];
    switch (type) {
    case COB_TYPE_GROUP:    return "Group";
-   case COB_TYPE_NUMERIC_COMP5:  return "COMP-5";
+   case COB_TYPE_NUMERIC_COMP5:  return byvalue?"COMP-4":"COMP-5";
    case COB_TYPE_NUMERIC_BINARY: return "COMP-4";
    case COB_TYPE_NUMERIC_PACKED: return "COMP-3";
    case COB_TYPE_NUMERIC_FLOAT:  return "COMP-1";
@@ -5930,7 +5930,7 @@ getType(int type)
 int
 CAPI(void *p1, ...)
 {
-   int      k,nargs,type,digits,scale,size,sign;
+   int      k,nargs,type,digits,scale,size,sign,byvalue;
    cob_s64_t   val;
    char     *str, wrk[80],pic[24];
 
@@ -5942,8 +5942,12 @@ CAPI(void *p1, ...)
       scale  = cob_get_param_scale (k);
       size   = cob_get_param_size (k);
       sign   = cob_get_param_sign (k);
-      printf(" %d: %-8s ",k,getType(type));
       if (cob_get_param_constant(k))
+         byvalue = 1;
+      else
+         byvalue = 0;
+      printf(" %d: %-8s ",k,getType(type,byvalue));
+      if (byvalue)
          printf("BY VALUE     ");
       else
          printf("BY REFERENCE ");
@@ -6061,7 +6065,7 @@ CAPI called with 1 parameters
  1: COMP-4   BY VALUE     S9(9)       4;
 Now BY VALUE LENGTH OF MYTAB;
 CAPI called with 1 parameters
- 1: COMP-5   BY VALUE     9(9)        10;
+ 1: COMP-4   BY VALUE     9(9)        10;
 Now BY VALUE LENGTH OF MYOCC;
 CAPI called with 1 parameters
  1: DISPLAY  BY VALUE     9(1)        4;
@@ -6085,7 +6089,6 @@ libcob: warning: cob_put_s64_param: attempt to over-write constant param 1 with 
 ])
 
 AT_CLEANUP
-
 
 AT_SETUP([SIZE OF])
 AT_KEYWORDS([LENGTH])
