@@ -1,4 +1,7 @@
 
+2018-03-25  Ron Norman <rjn@inglenet.com>
+	* tree.c: Removed warn_cannot_get_utc
+
 2018-03-11  Ron Norman <rjn@inglenet.com>
 	* typeck.c: Adjust UTC Offset for Daylight Savings Time
 
