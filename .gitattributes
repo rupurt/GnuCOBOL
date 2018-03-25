@@ -200,6 +200,7 @@ tests/cobol85/summary.pl -text
 tests/cobol85/summary.txt -text
 tests/cobol85/summarynoix.txt -text
 tests/listings-sed.sh eol=lf
+tests/run_prog_manual.sh.in eol=lf
 tests/testsuite.at eol=lf
 tests/testsuite.src/configuration.at eol=lf
 tests/testsuite.src/data_binary.at eol=lf
@@ -213,6 +214,7 @@ tests/testsuite.src/run_file.at eol=lf
 tests/testsuite.src/run_functions.at eol=lf
 tests/testsuite.src/run_fundamental.at eol=lf
 tests/testsuite.src/run_initialize.at eol=lf
+tests/testsuite.src/run_manual_screen.at -text
 tests/testsuite.src/run_misc.at eol=lf
 tests/testsuite.src/run_refmod.at eol=lf
 tests/testsuite.src/run_reportwriter.at eol=lf
@@ -234,3 +236,4 @@ tests/testsuite.src/syn_set.at eol=lf
 tests/testsuite.src/syn_subscripts.at eol=lf
 tests/testsuite.src/syn_value.at eol=lf
 tests/testsuite.src/used_binaries.at eol=lf
+tests/testsuite_manual.at eol=lf

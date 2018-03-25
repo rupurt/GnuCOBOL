@@ -181,6 +181,7 @@ po/*.po~
 po/.deps
 po/Makefile
 po/Makefile.in
+po/Makevars.template
 po/POTFILES
 po/atlocal
 po/en@boldquot.po
@@ -227,3 +228,4 @@ tests/testsuite.dir
 tests/testsuite.log
 tests/testsuite.src/Makefile
 tests/testsuite.src/atlocal
+tests/testsuite_manual
