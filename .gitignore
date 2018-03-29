@@ -224,6 +224,7 @@ tests/cobol85/copy
 tests/cobol85/copyalt
 tests/cobol85/newcob.val*
 tests/package.m4
+tests/run_prog_manual.sh
 tests/testsuite
 tests/testsuite*.dir
 tests/testsuite.src/Makefile
