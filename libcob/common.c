@@ -3122,6 +3122,39 @@ cob_ctoi (const char digit)
 	return (int) (digit - '0');
 }
 
+void
+static set_cob_time_offset (time_t curtime, struct cob_time *cb_time) {
+
+	time_t		utctime, lcltime, difftime;
+	struct tm	*tmptr;
+
+	tmptr = gmtime (&curtime);
+	utctime = mktime (tmptr);
+
+	tmptr = localtime (&curtime);
+	lcltime = mktime (tmptr);
+
+#if 0	/* not included in rw-branch: */
+	cb_time->is_daylight_saving_time = tmptr->tm_isdst;
+#endif
+
+	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
+		difftime = utctime - lcltime;
+		/* LCOV_EXCL_START */
+		if (tmptr->tm_isdst) {
+			difftime -= 3600;
+		}
+		/* LCOV_EXCL_STOP */
+		cb_time->utc_offset = difftime / 60;
+		cb_time->offset_known = 1;
+	/* LCOV_EXCL_START */
+	} else {
+		cb_time->offset_known = 0;
+		cb_time->utc_offset = 0;
+	}
+	/* LCOV_EXCL_STOP */
+}
+
 #if defined (_WIN32) /* cygwin does not define _WIN32 */
 struct cob_time
 cob_get_current_date_and_time (void)
@@ -3132,10 +3165,9 @@ cob_get_current_date_and_time (void)
 	SYSTEMTIME	utc_time;
 #endif
 
-	time_t		curtime, utctime, lcltime, difftime;
-	struct tm	*tmptr;
+	time_t		curtime;
 	
-	struct cob_time	cb_time;	
+	struct cob_time	cb_time;
 
 #if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
 	(time_as_filetime_func) (&filetime);
@@ -3162,22 +3194,7 @@ cob_get_current_date_and_time (void)
 #endif
 
 	curtime = time (NULL);
-	tmptr = gmtime (&curtime);
-	utctime = mktime( tmptr );
-	tmptr = localtime (&curtime);
-	/* not included in rw-branch: cb_time->is_daylight_saving_time = tmptr->tm_isdst; */
-	lcltime = mktime( tmptr );
-
-	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
-		difftime = utctime - lcltime;
-		cb_time.utc_offset = difftime / 60;
-		cb_time.offset_known = 1;
-	/* LCOV_EXCL_START */
-	} else {
-		cb_time.offset_known = 0;
-		cb_time.utc_offset = 0;
-	}
-	/* LCOV_EXCL_STOP */
+	set_cob_time_offset (curtime, &cb_time);
 
 	return cb_time;
 }
@@ -3190,7 +3207,7 @@ cob_get_current_date_and_time (void)
 #elif defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
 	struct timeval	tmv;
 #endif
-	time_t		curtime, utctime, lcltime, difftime;
+	time_t		curtime;
 	struct tm	*tmptr;
 	struct cob_time	cb_time;
 
@@ -3204,30 +3221,10 @@ cob_get_current_date_and_time (void)
 #else
 	curtime = time (NULL);
 #endif
-	tmptr = gmtime (&curtime);
-	/* Leap seconds ? */
-	if (tmptr->tm_sec >= 60) {
-		tmptr->tm_sec = 59;
-	}
-	utctime = mktime( tmptr );
+
+	set_cob_time_offset (curtime, &cb_time);
 
 	tmptr = localtime (&curtime);
-	/* Leap seconds ? */
-	if (tmptr->tm_sec >= 60) {
-		tmptr->tm_sec = 59;
-	}
-	lcltime = mktime( tmptr );
-
-	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
-		difftime = utctime - lcltime;
-		cb_time.utc_offset = difftime / 60;
-		cb_time.offset_known = 1;
-	/* LCOV_EXCL_START */
-	} else {
-		cb_time.offset_known = 0;
-		cb_time.utc_offset = 0;
-	}
-	/* LCOV_EXCL_STOP */
 
 	cb_time.year = tmptr->tm_year + 1900;
 	cb_time.month = tmptr->tm_mon + 1;
@@ -3235,6 +3232,12 @@ cob_get_current_date_and_time (void)
 	cb_time.day_of_week = one_indexed_day_of_week_from_monday (tmptr->tm_wday);
 	cb_time.hour = tmptr->tm_hour;
 	cb_time.minute = tmptr->tm_min;
+	/* LCOV_EXCL_START */
+	/* Leap seconds ? */
+	if (tmptr->tm_sec >= 60) {
+		tmptr->tm_sec = 59;
+	}
+	/* LCOV_EXCL_STOP */
 	cb_time.second = tmptr->tm_sec;
 	cb_time.nanosecond = 0;
 
