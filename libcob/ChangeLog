@@ -1,7 +1,17 @@
 
+2018-03-29  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c (set_cob_time_offset) [_WIN32]: removed
+	* common.c (cob_get_current_date_and_time) [_WIN32]: Compute UTC
+	* common.c (cob_get_current_date_and_time) [!_WIN32]: don't adjust UTC
+	  offset depending on daylight saving time as this changes the offset
+	* common.c (cob_get_current_date_and_time): set unknown offset in the
+	  unlikely case that computation of UTC does not work
+
 2018-03-11  Ron Norman <rjn@inglenet.com>
+
 	* common.c: Compute UTC without strftime and adjust for
-	            daylight savings time
+	  daylight savings time, removed (set_unknown_offset)
 
 2018-02-20  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
