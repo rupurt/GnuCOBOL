@@ -1393,23 +1393,6 @@ set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time
 }
 #endif
 
-#if defined (_WIN32) /* cygwin does not define _WIN32 */
-static void
-set_cob_time_offset (struct cob_time *cb_time)
-{
-	DWORD	time_zone_result;
-	TIME_ZONE_INFORMATION	time_zone_info;
-
-	time_zone_result = GetTimeZoneInformation (&time_zone_info);
-	if (time_zone_result != TIME_ZONE_ID_INVALID) {
-		cb_time->offset_known = 1;
-		cb_time->utc_offset = time_zone_info.Bias;
-	} else {
-		set_unknown_offset (cb_time);
-	}
-}
-#endif
-
 /* Global functions */
 
 int
@@ -3148,7 +3131,11 @@ cob_get_current_date_and_time (void)
 	FILETIME	filetime;
 	SYSTEMTIME	utc_time;
 #endif
-	struct cob_time	cb_time;
+
+	time_t		curtime, utctime, lcltime, difftime;
+	struct tm	*tmptr;
+	
+	struct cob_time	cb_time;	
 
 #if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
 	(time_as_filetime_func) (&filetime);
@@ -3168,15 +3155,29 @@ cob_get_current_date_and_time (void)
 	cb_time.hour = local_time.wHour;
 	cb_time.minute = local_time.wMinute;
 	cb_time.second = local_time.wSecond;
-	cb_time.nanosecond = local_time.wMilliseconds;
-	cb_time.offset_known = 0;
-	cb_time.utc_offset = 0;
+	cb_time.nanosecond = local_time.wMilliseconds * 1000000;
 
 #if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
 	set_cob_time_ns_from_filetime (filetime, &cb_time);
 #endif
 
-	set_cob_time_offset (&cb_time);
+	curtime = time (NULL);
+	tmptr = gmtime (&curtime);
+	utctime = mktime( tmptr );
+	tmptr = localtime (&curtime);
+	/* not included in rw-branch: cb_time->is_daylight_saving_time = tmptr->tm_isdst; */
+	lcltime = mktime( tmptr );
+
+	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
+		difftime = utctime - lcltime;
+		cb_time.utc_offset = difftime / 60;
+		cb_time.offset_known = 1;
+	/* LCOV_EXCL_START */
+	} else {
+		cb_time.offset_known = 0;
+		cb_time.utc_offset = 0;
+	}
+	/* LCOV_EXCL_STOP */
 
 	return cb_time;
 }
@@ -3216,11 +3217,17 @@ cob_get_current_date_and_time (void)
 		tmptr->tm_sec = 59;
 	}
 	lcltime = mktime( tmptr );
-	difftime = utctime - lcltime;
-	if (tmptr->tm_isdst)
-		difftime -= 3600;
-	cb_time.offset_known = 1;
-	cb_time.utc_offset = difftime / 60;
+
+	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
+		difftime = utctime - lcltime;
+		cb_time.utc_offset = difftime / 60;
+		cb_time.offset_known = 1;
+	/* LCOV_EXCL_START */
+	} else {
+		cb_time.offset_known = 0;
+		cb_time.utc_offset = 0;
+	}
+	/* LCOV_EXCL_STOP */
 
 	cb_time.year = tmptr->tm_year + 1900;
 	cb_time.month = tmptr->tm_mon + 1;
