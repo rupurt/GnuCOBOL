@@ -189,6 +189,7 @@ po/en@quot.po
 po/remove-potcdate.sed
 /stamp-h1
 /tarstamp.h
+tests/*.log
 tests/.deps
 tests/Makefile
 tests/Makefile.in
@@ -224,8 +225,7 @@ tests/cobol85/copyalt
 tests/cobol85/newcob.val*
 tests/package.m4
 tests/testsuite
-tests/testsuite.dir
-tests/testsuite.log
+tests/testsuite*.dir
 tests/testsuite.src/Makefile
 tests/testsuite.src/atlocal
 tests/testsuite_manual
