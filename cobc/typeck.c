@@ -1108,6 +1108,10 @@ cb_build_registers (void)
 		contz = timezone;
 		buff[16] = '-';
 	}
+	/* note: the following is not correct as most systems specify only
+	   if the current time zone has DST, not if it is currently active
+	   fixed in trunk by using cob_get_current_date_and_time instead.
+	   */
 	if (daylight)
 		contz -= 3600;
 	sprintf (&buff[17], "%2.2ld%2.2ld", contz / 3600, contz % 60);

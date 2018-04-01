@@ -365,22 +365,6 @@ struct config_tbl {
 
 #define SETPOS(member)	offsetof(cob_settings,member),sizeof(cobsetptr->member),0,0
 
-
-/* Datetime structure */
-struct cob_time
-{
-	int	year;
-	int	month; /* 1 = Jan ... 12 = Dec */
-	int	day_of_month; /* 1 ... 31 */
-	int	day_of_week; /* 1 = Monday ... 7 = Sunday */
-	int	hour;
-	int	minute;
-	int	second;
-	int	nanosecond;
-	int	offset_known;
-	int	utc_offset; /* in minutes */
-};
-
 /* Local function prototypes */
 COB_HIDDEN void		cob_init_numeric	(cob_global *);
 COB_HIDDEN void		cob_init_termio		(cob_global *, cob_settings *);
