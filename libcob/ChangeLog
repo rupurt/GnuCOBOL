@@ -1,4 +1,10 @@
 
+2018-04-01  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
+
+	* common.c, coblocal.h, common.h: merged changes to time calculation
+	  from trunk to reportwriter to fix all known runtime issues on this
+	  topic
+
 2018-03-29  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* common.c (set_cob_time_offset): recreated for use on all systems,

@@ -3122,21 +3122,72 @@ cob_ctoi (const char digit)
 	return (int) (digit - '0');
 }
 
-void
-static set_cob_time_offset (time_t curtime, struct cob_time *cb_time) {
+#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
 
-	time_t		utctime, lcltime, difftime;
+/* Get function pointer for most precise time function
+GetSystemTimePreciseAsFileTime is available since OS-version Windows 2000
+GetSystemTimeAsFileTime        is available since OS-version Windows 8 / Server 2012
+*/
+static void
+get_function_ptr_for_precise_time (void)
+{
+	HMODULE		kernel32_handle;
+
+	kernel32_handle = GetModuleHandle (TEXT ("kernel32.dll"));
+	if (kernel32_handle != NULL) {
+		time_as_filetime_func = (VOID (WINAPI *) (LPFILETIME))
+			GetProcAddress (kernel32_handle, "GetSystemTimePreciseAsFileTime");
+}
+	if (time_as_filetime_func == NULL) {
+		time_as_filetime_func = GetSystemTimeAsFileTime;
+	}
+}
+#endif
+
+/* Set the offset from UTC */
+void
+static set_cob_time_from_localtime (time_t curtime, struct cob_time *cb_time) {
+
 	struct tm	*tmptr;
+#if !defined (_BSD_SOURCE) && !defined (HAVE_TIMEZONE)
+	time_t		utctime, lcltime, difftime;
+#endif
+
+	tmptr = localtime (&curtime);
+
+	cb_time->year = tmptr->tm_year + 1900;
+	cb_time->month = tmptr->tm_mon + 1;
+	cb_time->day_of_month = tmptr->tm_mday;
+	cb_time->day_of_week = one_indexed_day_of_week_from_monday (tmptr->tm_wday);
+	cb_time->day_of_year = tmptr->tm_yday + 1;
+	cb_time->hour = tmptr->tm_hour;
+	cb_time->minute = tmptr->tm_min;
+	/* LCOV_EXCL_START */
+	/* Leap seconds ? */
+	if (tmptr->tm_sec >= 60) {
+		tmptr->tm_sec = 59;
+	}
+	/* LCOV_EXCL_STOP */
+	cb_time->second = tmptr->tm_sec;
+	cb_time->nanosecond = 0;
+	cb_time->is_daylight_saving_time = tmptr->tm_isdst;
+
+#if defined (_BSD_SOURCE)
+	cb_time->offset_known = 1;
+	cb_time->utc_offset = tmptr->tm_gmtoff / 60;
+#elif defined (HAVE_TIMEZONE)
+	cb_time->offset_known = 1;
+	cb_time->utc_offset = timezone / -60;
+	/* LCOV_EXCL_START */
+	if (tmptr->tm_isdst) {
+		cb_time->utc_offset += 60;
+	}
+	/* LCOV_EXCL_STOP */
+#else
+	lcltime = mktime (tmptr);
 
 	tmptr = gmtime (&curtime);
 	utctime = mktime (tmptr);
-
-	tmptr = localtime (&curtime);
-	lcltime = mktime (tmptr);
-
-#if 0	/* not included in rw-branch: */
-	cb_time->is_daylight_saving_time = tmptr->tm_isdst;
-#endif
 
 	if (utctime != -1 && lcltime != -1) { /* LCOV_EXCL_BR_LINE */
 		difftime = utctime - lcltime;
@@ -3147,12 +3198,13 @@ static set_cob_time_offset (time_t curtime, struct cob_time *cb_time) {
 		/* LCOV_EXCL_STOP */
 		cb_time->utc_offset = difftime / 60;
 		cb_time->offset_known = 1;
-	/* LCOV_EXCL_START */
+		/* LCOV_EXCL_START */
 	} else {
 		cb_time->offset_known = 0;
 		cb_time->utc_offset = 0;
 	}
 	/* LCOV_EXCL_STOP */
+#endif
 }
 
 #if defined (_WIN32) /* cygwin does not define _WIN32 */
@@ -3160,42 +3212,33 @@ struct cob_time
 cob_get_current_date_and_time (void)
 {
 	SYSTEMTIME	local_time;
-#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
 	FILETIME	filetime;
 	SYSTEMTIME	utc_time;
 #endif
 
 	time_t		curtime;
-	
 	struct cob_time	cb_time;
 
-#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
-	(time_as_filetime_func) (&filetime);
-	/* use fallback to GetLocalTime if one of the following does not work */
-	if (!(FileTimeToSystemTime (&filetime, &utc_time) &&
-		SystemTimeToTzSpecificLocalTime (NULL, &utc_time, &local_time))) {
-		GetLocalTime (&local_time);
-	}
-#else
-	GetLocalTime (&local_time);
-#endif
-
-	cb_time.year = local_time.wYear;
-	cb_time.month = local_time.wMonth;
-	cb_time.day_of_month = local_time.wDay;
-	cb_time.day_of_week = one_indexed_day_of_week_from_monday (local_time.wDayOfWeek);
-	cb_time.hour = local_time.wHour;
-	cb_time.minute = local_time.wMinute;
-	cb_time.second = local_time.wSecond;
-	cb_time.nanosecond = local_time.wMilliseconds * 1000000;
-
-#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
-	set_cob_time_ns_from_filetime (filetime, &cb_time);
-#endif
-
 	curtime = time (NULL);
-	set_cob_time_offset (curtime, &cb_time);
+	set_cob_time_from_localtime (curtime, &cb_time);
 
+	/* Get nanoseconds with highest precision possible */
+#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+	if (!time_as_filetime_func) {
+		get_function_ptr_for_precise_time ();
+	}
+#pragma warning(suppress: 6011) // the function pointer is always set by get_function_ptr_for_precise_time
+	(time_as_filetime_func) (&filetime);
+	/* fallback to GetLocalTime if one of the following does not work */
+	if (FileTimeToSystemTime (&filetime, &utc_time) &&
+		SystemTimeToTzSpecificLocalTime (NULL, &utc_time, &local_time)) {
+		set_cob_time_ns_from_filetime (filetime, &cb_time);
+		return cb_time;
+	}
+#endif
+	GetLocalTime (&local_time);
+	cb_time.nanosecond = local_time.wMilliseconds * 1000000;
 	return cb_time;
 }
 #else
@@ -3204,11 +3247,10 @@ cob_get_current_date_and_time (void)
 {
 #if defined (HAVE_CLOCK_GETTIME)
 	struct timespec	time_spec;
-#elif defined(HAVE_SYS_TIME_H) && defined(HAVE_GETTIMEOFDAY)
+#elif defined (HAVE_SYS_TIME_H) && defined (HAVE_GETTIMEOFDAY)
 	struct timeval	tmv;
 #endif
 	time_t		curtime;
-	struct tm	*tmptr;
 	struct cob_time	cb_time;
 
 	/* Get the current time */
@@ -3216,34 +3258,17 @@ cob_get_current_date_and_time (void)
 	clock_gettime (CLOCK_REALTIME, &time_spec);
 	curtime = time_spec.tv_sec;
 #elif defined (HAVE_SYS_TIME_H) && defined (HAVE_GETTIMEOFDAY)
-	gettimeofday(&tmv, NULL);
+	gettimeofday (&tmv, NULL);
 	curtime = tmv.tv_sec;
 #else
 	curtime = time (NULL);
 #endif
 
-	set_cob_time_offset (curtime, &cb_time);
-
-	tmptr = localtime (&curtime);
-
-	cb_time.year = tmptr->tm_year + 1900;
-	cb_time.month = tmptr->tm_mon + 1;
-	cb_time.day_of_month = tmptr->tm_mday;
-	cb_time.day_of_week = one_indexed_day_of_week_from_monday (tmptr->tm_wday);
-	cb_time.hour = tmptr->tm_hour;
-	cb_time.minute = tmptr->tm_min;
-	/* LCOV_EXCL_START */
-	/* Leap seconds ? */
-	if (tmptr->tm_sec >= 60) {
-		tmptr->tm_sec = 59;
-	}
-	/* LCOV_EXCL_STOP */
-	cb_time.second = tmptr->tm_sec;
-	cb_time.nanosecond = 0;
+	set_cob_time_from_localtime (curtime, &cb_time);
 
 	/* Get nanoseconds or microseconds, if possible */
 #if defined (HAVE_CLOCK_GETTIME)
-	cb_time.nanosecond = time_spec.tv_nsec;
+	cb_time.nanosecond = (int) time_spec.tv_nsec;
 #elif defined (HAVE_SYS_TIME_H) && defined (HAVE_GETTIMEOFDAY)
 	cb_time.nanosecond = tmv.tv_usec * 1000;
 #else

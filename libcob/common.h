@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2002-2017 Free Software Foundation, Inc.
+   Copyright (C) 2002-2018 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -305,6 +305,7 @@ GLib is licensed under the GNU Lesser General Public License.
 #define unsetenv(name)					_putenv_s(name,"")
 #if defined COB_USE_VC2013_OR_GREATER
 #define timezone			_timezone
+#define daylight			_daylight
 #endif
 
 #if !COB_USE_VC2013_OR_GREATER
@@ -1674,6 +1675,26 @@ COB_EXPIMP FILE			*cob_get_dump_file(int where);
 #define COB_GET_LINE_NUM(n) ( n & 0xFFFFF )
 #define COB_GET_FILE_NUM(n) ( (n >> 20) & 0xFFF)
 #define COB_SET_LINE_FILE(l,f) ( (unsigned int)((unsigned int)f<<20) | l)
+
+
+/* Datetime structure */
+struct cob_time
+{
+	int	year;			/* Year         [1900-9999] */
+	int	month;			/* Month        [1-12] 1 = Jan ... 12 = Dec */
+	int	day_of_month;	/* Day          [1-31] */
+	int	day_of_week;	/* Day of week  [1-7] 1 = Monday ... 7 = Sunday */
+	int day_of_year;	/* Days in year [1-366] -1 on _WIN32! */
+	int	hour;			/* Hours        [0-23] */
+	int	minute;			/* Minutes      [0-59] */
+	int	second;			/* Seconds      [0-60] (1 leap second) */
+	int	nanosecond;		/* Nanoseconds */
+	int	offset_known;
+	int	utc_offset;		/* Minutes east of UTC */
+	int is_daylight_saving_time;	/* DST [-1/0/1] */
+};
+
+COB_EXPIMP struct cob_time cob_get_current_date_and_time	(void);
 
 /* COB_DEBUG_LOG Macros and routines found in common.c */
 #if defined(COB_DEBUG_LOG)

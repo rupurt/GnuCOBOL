@@ -1,8 +1,10 @@
 
-2017-03-11  Ron Norman <rjn@inglenet.com> 
+2017-03-11  Ron Norman <rjn@inglenet.com>
+
 	* configure.ac: Removed check for strftime having %z as no longer used
 
-2017-03-08  Ron Norman <rjn@inglenet.com> 
+2017-03-08  Ron Norman <rjn@inglenet.com>
+
 	* termio.c standardize DISPLAY of NaN (Not A Number)
 
 2017-08-13  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
@@ -13,14 +15,14 @@
 	* configure.ac: adjusted GMP version checks,
 	  substitute COB_HAS_64_BIT_POINTER for use in testsuite
 
-2017-06-07  Ron Norman <rjn@inglenet.com> 
+2017-06-07  Ron Norman <rjn@inglenet.com>
 
 	* configure.ac,configure,config.h.in: Add check for atoll, strtoll
 	* coblocal.h: if 'atoll' is not available, then use strtoll in #define
-	  
-2017-05-31  Ron Norman <rjn@inglenet.com> 
 
-	* configure.ac,configure: Set COB_HAS_ISAM to type of ISAM handler 
+2017-05-31  Ron Norman <rjn@inglenet.com>
+
+	* configure.ac,configure: Set COB_HAS_ISAM to type of ISAM handler
 	  instead of 'yes'. 'cisam', 'disam', 'vbisam', 'db', 'index_extfh'
 	  If no ISAM then it is set to 'no'
 
@@ -109,8 +111,8 @@
 2015-04-14  Ron Norman
 
 	* cobc.c, fileio.c, common.h updated to include support to a
-	  Micro Focus style EXTFH interface. The allows for users to 
-	  insert an external file handler while retaining all of the 
+	  Micro Focus style EXTFH interface. The allows for users to
+	  insert an external file handler while retaining all of the
 	  normal COBOL I/O functions.
 	  To have the compiled program call 'yurfh' for I/O use:
 	     cobc -fcallfh=yurfh
@@ -137,7 +139,7 @@
 
 	* fileio.c was updated to handle sparse and split keys for BDB
 	  This was tested with BDB, D-ISAM, VB-ISAM 2.0 and VB-ISAM 2.1.1
-	  configure was updated with new option -enable-bdbdupno which 
+	  configure was updated with new option -enable-bdbdupno which
 	  will cause fileio.c (-with-db) to retian the old and incorrect
 	  method of computing the next duplicate sequence value
 
@@ -151,7 +153,7 @@
 2015-02-16  Ron Norman <rjn@inglenet.com>
 
 	* Implemented DEBUG logging for Compiler developers
-	  Added --enable-debug-log to configure.ac; 
+	  Added --enable-debug-log to configure.ac;
 	  Added DEBUG_xxx macros to common.h
 	  Added cob_debug_xxx subroutines to common.c
 	  Updated reportio.c to use this new COB_DEBUG_LOG feature
@@ -176,7 +178,7 @@
 
 2014-09-09  Philipp Böhme <phi.boehme@googlemail.com>
 
-	* configure.ac : new check for mp_get_memory_functions in 
+	* configure.ac : new check for mp_get_memory_functions in
 	  libgmp and new preprocessor define HAVE_MP_GET_MEMORY_FUNCTIONS
 
 2014-08-07  Simon 'sf-mensch/human' Sobisch <sf-mensch@users.sf.net>
@@ -228,7 +230,7 @@
 
 20??-??-??  Roger While <simrw@sim-basis.de>
 
-	* General : Affecting directories bin and cobc - use a 
+	* General : Affecting directories bin and cobc - use a
 	  modified version of getopt_long_long (placed in lib)
 
 2010-06-28  Roger While <simrw@sim-basis.de>
@@ -374,7 +376,7 @@
 	* All : Update Coypright info on all files
 	* README : Update - SORT does not require BDB; Fix typo
 	* cpucheck.c : Uck, Intel, in their infinite wisdom, decided
-		to assign the same family to Core 2 Duo as 
+		to assign the same family to Core 2 Duo as
 		Pentium (pro/2/3). Check the model number.
 
 2006-10-25  Roger While <simrw@sim-basis.de>
@@ -713,7 +715,7 @@
 
 	* configure.ac: Generate libcob/cobconfig.h using AM_CONFIG_HEADER.
 	Check db.h as well as db1/db.h.
-	
+
 2002-09-12  Keisuke Nishida  <knishida@netlab.jp>
 
 	* configure.ac: Add check for regex.
