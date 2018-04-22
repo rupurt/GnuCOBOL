@@ -1499,3 +1499,7 @@ else
   AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
 fi
 unset DEFINE_DL
+if test "$enable_code_coverage" = "yes"; then
+	AC_MSG_WARN([Code coverage checks are currently disabled because of compatibility issues!])
+	AC_MSG_NOTICE([Use trunk (or enable it in */Makefile.am) to use coverage checks.])
+fi

@@ -36,8 +36,9 @@ EXTRA_DIST = coblocal.h system.def
 pkgincludedir = $(includedir)/libcob
 pkginclude_HEADERS = common.h cobgetopt.h exception.def
 
-# Add rules for code-coverage testing, as provided by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+# Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
+# FIXME: needs GNU make, even if not enabled
+#@ CODE_COVERAGE_RULE S@
 CODE_COVERAGE_BRANCH_COVERAGE=1
 CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 

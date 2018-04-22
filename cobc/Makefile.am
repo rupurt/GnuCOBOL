@@ -43,7 +43,8 @@ MAINTAINERCLEANFILES = pplex.c scanner.c ppparse.h parser.h cobc.1
 CLEANFILES = parser.output ppparse.output
 
 # Add rules for code-coverage testing, as provided by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+# FIXME: needs GNU make, even if not enabled
+#@ CODE_COVERAGE_RULES @
 CODE_COVERAGE_BRANCH_COVERAGE=1
 CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 

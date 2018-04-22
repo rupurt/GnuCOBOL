@@ -31,9 +31,10 @@ AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
 cobcrun_LDADD = $(top_builddir)/lib/libsupport.a $(top_builddir)/libcob/libcob.la \
 	$(CODE_COVERAGE_LIBS)
 
-# Add rules for code-coverage testing, as provided AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+# Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
+# FIXME: needs GNU make, even if not enabled
 CODE_COVERAGE_BRANCH_COVERAGE=1
+#@ CODE_COVERAGE_RULES @
 CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 
 MAINTAINERCLEANFILES = cobcrun.1

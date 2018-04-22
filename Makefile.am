@@ -42,7 +42,8 @@ EXTRA_DIST = gnucobol.spec po/update_linguas.sh
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
 CODE_COVERAGE_BRANCH_COVERAGE=1
-@CODE_COVERAGE_RULES@
+# FIXME: needs GNU make, even if not enabled
+#@ CODE_COVERAGE_RULES @
 
 dist-hook:
 	echo "#define COB_TAR_DATE \"`LC_ALL=C date -u +'%b %d %Y %T'` UTC\"" > $(distdir)/tarstamp.h
