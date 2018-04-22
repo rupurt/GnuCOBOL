@@ -1,6 +1,10 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.0rc-1 to be released (20180422)
+ GnuCOBOL 3.0rc-1 (20180422)
+
+ Note: This is a non-feature-complete preview for GnuCOBOL 3.0
+       There are some known issues in this version but it is
+       considered to be better and more stable than GnuCOBOL 2.2.
 
 * New GnuCOBOL features
 
