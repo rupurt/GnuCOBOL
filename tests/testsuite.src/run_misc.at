@@ -12158,6 +12158,69 @@ AT_CHECK([./prog], [0],
 
 AT_CLEANUP
 
+AT_SETUP([MF COMP-5])
+AT_KEYWORDS([NOIBMCOMP])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       77  CMP4     PIC 99   COMP-4.
+       77  CMP5     PIC 99   COMP-5.
+       77  CMP4-4   PIC 9(4) COMP-4.
+       77  CMP5-4   PIC 9(4) COMP-5.
+       PROCEDURE DIVISION.
+           DISPLAY 'LEN PIC 99 COMP-5 is ' LENGTH OF CMP5 " :".
+           DISPLAY 'LEN PIC 99 COMP-4 is ' LENGTH OF CMP4 " :".
+           DISPLAY 'LEN PIC 9(4) COMP-5 is ' LENGTH OF CMP5-4 " :".
+           DISPLAY 'LEN PIC 9(4) COMP-4 is ' LENGTH OF CMP4-4 " :".
+           STOP RUN RETURNING 0.
+])
+
+AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [LEN PIC 99 COMP-5 is 1 :
+LEN PIC 99 COMP-4 is 1 :
+LEN PIC 9(4) COMP-5 is 2 :
+LEN PIC 9(4) COMP-4 is 2 :
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([MF COMP-5])
+AT_KEYWORDS([IBMCOMP])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       77  CMP4     PIC 99   COMP-4.
+       77  CMP5     PIC 99   COMP-5.
+       77  CMP4-4   PIC 9(4) COMP-4.
+       77  CMP5-4   PIC 9(4) COMP-5.
+       PROCEDURE DIVISION.
+           DISPLAY 'LEN PIC 99 COMP-5 is ' LENGTH OF CMP5 " :".
+           DISPLAY 'LEN PIC 99 COMP-4 is ' LENGTH OF CMP4 " :".
+           DISPLAY 'LEN PIC 9(4) COMP-5 is ' LENGTH OF CMP5-4 " :".
+           DISPLAY 'LEN PIC 9(4) COMP-4 is ' LENGTH OF CMP4-4 " :".
+           STOP RUN RETURNING 0.
+])
+
+AT_CHECK([cobc -x -std=mf -w -fibmcomp prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [LEN PIC 99 COMP-5 is 2 :
+LEN PIC 99 COMP-4 is 2 :
+LEN PIC 9(4) COMP-5 is 2 :
+LEN PIC 9(4) COMP-4 is 2 :
+], [])
+
+AT_CLEANUP
+
 
 AT_SETUP([FLOAT-DECIMAL-16 with SIZE ERROR])
 AT_KEYWORDS([FLOAT-DECIMAL])

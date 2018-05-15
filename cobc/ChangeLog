@@ -1,4 +1,8 @@
 
+2018-05-15  Ron Norman <rjn@inglenet.com>
+	* field.c: When -fibmcomp is used, COMP-5 as well as COMP-4/BINARY
+	         should have the size computed as binary-size = 2-4-8
+
 2018-03-25  Ron Norman <rjn@inglenet.com>
 	* tree.c: Removed warn_cannot_get_utc
 

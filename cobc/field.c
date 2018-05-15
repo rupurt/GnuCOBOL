@@ -1354,7 +1354,9 @@ compute_binary_size (struct cb_field *f, const int size)
 		return;
 	}
 	if (cb_binary_size == CB_BINARY_SIZE_2_4_8) {
-		if (f->flag_real_binary && size <= 2) {
+		if (f->flag_real_binary 
+		 && cb_mf_ibm_comp != 1 
+		 && size <= 2) {
 			f->size = 1;
 		} else {
 			f->size = ((size <= 4) ? 2 :
