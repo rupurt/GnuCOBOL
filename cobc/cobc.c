@@ -4332,6 +4332,12 @@ main (int argc, char **argv)
 	}
 
 #ifdef	HAVE_SETLOCALE
+#if HAVE_SETENV
+	if (getenv ("LANG") == NULL
+	 && getenv ("LC_MESSAGES") == NULL) {
+		setenv("LANG","C",0);
+	}
+#endif
 	setlocale (LC_ALL, "");
 	setlocale (LC_NUMERIC, "C");
 #endif
