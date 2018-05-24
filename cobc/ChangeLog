@@ -1,5 +1,8 @@
 
 2018-05-24  Ron Norman <rjn@inglenet.com>
+	* cobc.c: Remove change to set LANG env var
+
+2018-05-24  Ron Norman <rjn@inglenet.com>
 	* tree.c: Limit compile time constant expression resolution
 	    to values small than 9 digits. (To avoid a problem on macOS)
 
