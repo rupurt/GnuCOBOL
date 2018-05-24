@@ -3536,9 +3536,11 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			yl = CB_LITERAL(y);
 
 			if(xl->llit == 0
-			&& xl->size - xl->scale >= 0
+			&& ((int)xl->size - xl->scale) >= 0
 			&& yl->llit == 0
-			&& yl->size - yl->scale >= 0
+			&& ((int)yl->size - yl->scale) >= 0
+			&& xl->size < 9
+			&& yl->size < 9
 			&& xl->all == 0
 			&& yl->all == 0) {
 				xval = atoll((const char*)xl->data);
@@ -3696,6 +3698,8 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 			 && yl->scale == 0
 			 && xl->sign == 0
 			 && yl->sign == 0
+			 && xl->size < 9
+			 && yl->size < 9
 			 && xl->all == 0
 			 && yl->all == 0) {
 				copy_file_line (e, y, x);
@@ -4436,7 +4440,7 @@ cb_build_intrinsic (cb_tree name, cb_tree args, cb_tree refmod,
 			if (CB_LITERAL_P (CB_VALUE(l))) {
 				lp = CB_LITERAL(CB_VALUE(l));
 				if (CB_NUMERIC_LITERAL_P (CB_VALUE(l))) {
-					if ((lp->size - lp->scale) >= 0	/* Simple Numerics */
+					if (((int)lp->size - lp->scale) >= 0	/* Simple Numerics */
 					 && lp->scale < 5
 					 && lp->size  < 12)
 						num_integer++;	
