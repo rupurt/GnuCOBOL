@@ -5300,6 +5300,7 @@ indexed_open (cob_file *f, char *filename, const int mode, const int sharing)
 				isfullclose (isfd);
 			}
 			iserase ((void *)filename);
+			ISERRNO = 0;
 		}
 		dobld = 1;
 		break;
@@ -5327,6 +5328,14 @@ dobuild:
 		isfd = isbuild ((void *)filename, (int)f->record_max, &fh->key[0],
 				vmode | ISINOUT | ISEXCLLOCK);
 		f->flag_file_lock = 1;
+		if (ISERRNO == EEXIST
+		 && isfd < 0) {
+			/* Erase file and redo the 'isbuild' */
+			iserase ((void *)filename);
+			isfd = isbuild ((void *)filename, (int)f->record_max, &fh->key[0],
+					vmode | ISINOUT | ISEXCLLOCK);
+			f->flag_file_lock = 1;
+		}
 	} else {
 		if (lmode == ISAUTOLOCK
 		&& (f->lock_mode & COB_LOCK_MULTIPLE)) {
@@ -7079,6 +7088,12 @@ cob_open (cob_file *f, const int mode, const int sharing, cob_field *fnstatus)
 		return;
 	}
 
+	if (f->assign == NULL) {
+		cob_runtime_error (_("ERROR FILE %s has ASSIGN field is NULL"),
+							f->select_name);
+		save_status (f, fnstatus, COB_STATUS_31_INCONSISTENT_FILENAME);
+		return;
+	} 
 	if (f->assign->data == NULL) {
 		cob_runtime_error (_("ERROR FILE %s has ASSIGN field with NULL address"),
 							f->select_name);
@@ -7198,8 +7213,8 @@ cob_start (cob_file *f, const int cond, cob_field *key,
 	f->flag_read_done = 0;
 	f->flag_first_read = 0;
 
-	if (unlikely(f->open_mode != COB_OPEN_I_O &&
-		     f->open_mode != COB_OPEN_INPUT)) {
+	if (unlikely(f->open_mode != COB_OPEN_I_O 
+	 && f->open_mode != COB_OPEN_INPUT)) {
 		save_status (f, fnstatus, COB_STATUS_47_INPUT_DENIED);
 		return;
 	}
@@ -7230,6 +7245,10 @@ cob_start (cob_file *f, const int cond, cob_field *key,
 	}
 	if (ret == COB_STATUS_00_SUCCESS) {
 		f->flag_end_of_file = 0;
+		f->flag_begin_of_file = 0;
+		f->flag_first_read = 1;
+	} else {
+		f->flag_end_of_file = 1;
 		f->flag_begin_of_file = 0;
 		f->flag_first_read = 1;
 	}
@@ -9032,6 +9051,7 @@ static struct fcd_file {
 	int		sts;
 	int		free_fcd;
 } *fcd_file_list = NULL;
+static const cob_field_attr alnum_attr = {COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
 /*
  * Update FCD from cob_file
@@ -9229,6 +9249,9 @@ update_fcd_to_file(FCD3* fcd, cob_file *f, cob_field *fnstatus, int wasOpen)
 static void
 copy_fcd_to_file(FCD3* fcd, cob_file *f)
 {
+	int		k, p, parts, off;
+	char	fdname[48];
+	EXTKEY	*key;
 
 	if(fcd->accessFlags == ACCESS_SEQ)
 		f->access_mode = COB_ACCESS_SEQUENTIAL;
@@ -9261,10 +9284,6 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 
 	if(fcd->fileOrg == ORG_INDEXED) {
 		f->organization = COB_ORG_INDEXED;
-		/* Copy Key information from cob_file to FCD */
-		/* Complicated as cob_field(s) need to be created if not present */
-		/* For now, assume there is one fcd for each cob_file */
-
 	} else if(fcd->fileOrg == ORG_SEQ) {
 		f->organization = COB_ORG_SEQUENTIAL;
 	} else if(fcd->fileOrg == ORG_LINE_SEQ) {
@@ -9272,6 +9291,7 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 	} else if(fcd->fileOrg == ORG_RELATIVE) {
 		f->organization = COB_ORG_RELATIVE;
 	}
+
 	if (fcd->gcFlags & MF_CALLFH_TRACE)
 		f->trace_io = 1;
 	else
@@ -9280,6 +9300,76 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 		f->io_stats = 1;
 	else
 		f->io_stats = 0;
+
+	/* Allocate cob_file fields as needed and copy from FCD */
+	if (f->record == NULL) {
+		f->record = cob_malloc(sizeof(cob_field));
+		f->record->data = fcd->recPtr;
+		f->record->size = LDCOMPX4(fcd->curRecLen);
+		f->record->attr = &alnum_attr;
+		f->record_min = LDCOMPX4(fcd->minRecLen);
+		f->record_max = LDCOMPX4(fcd->maxRecLen);
+	}
+	if (f->file_status == NULL) {
+		f->file_status = cob_malloc( 6 );
+	}
+	if (f->assign == NULL) {
+		f->assign = cob_malloc(sizeof(cob_field));
+		f->assign->data = (unsigned char*)fcd->fnamePtr;
+		f->assign->size = LDCOMPX2(fcd->fnameLen);
+		f->assign->attr = &alnum_attr;
+	}
+	if (f->select_name == NULL) {
+		f->select_name = (char*)f->assign->data;
+		for (k=0; k < f->assign->size; k++) {
+			if (f->assign->data[k] == '/') {
+				f->select_name = (char*)&f->assign->data[k+1];
+			}
+		}
+		for (k=0; f->select_name[k] > ' ' && k < 48; k++) {
+			fdname[k] = toupper(f->select_name[k]);
+		}
+		fdname[k] = 0;
+		f->select_name = cob_strdup (fdname);
+	}
+	if (f->keys == NULL) {
+		f->nkeys = LDCOMPX2(fcd->kdbPtr->nkeys);
+		if (fcd->kdbPtr != NULL
+		 && f->nkeys > 0) { 	/* Copy Key information from FCD to cob_file */
+			f->keys = cob_malloc (sizeof(cob_file_key) * f->nkeys);
+			for (k=0; k < f->nkeys; k++) {
+				parts = LDCOMPX2(fcd->kdbPtr->key[k].count);
+				off   = LDCOMPX2(fcd->kdbPtr->key[k].offset);
+				key   = (EXTKEY*) ((char*)(fcd->kdbPtr) + off);
+				if (fcd->kdbPtr->key[k].keyFlags &  KEY_SPARSE) {
+					f->keys[k].char_suppress = fcd->kdbPtr->key[k].sparse;
+					f->keys[k].tf_suppress = 1;
+				} else {
+					f->keys[k].tf_suppress = 0;
+				}
+				if (fcd->kdbPtr->key[k].keyFlags &  KEY_DUPS) {
+					f->keys[k].tf_duplicates = 1;
+				} else {
+					f->keys[k].tf_duplicates = 0;
+				}
+				f->keys[k].count_components = parts;
+				f->keys[k].field = cob_malloc(sizeof(cob_field));
+				f->keys[k].field->data = f->record->data + LDCOMPX4(key->pos);
+				f->keys[k].field->attr = &alnum_attr;
+				f->keys[k].field->size = LDCOMPX4(key->len);
+				f->keys[k].offset = LDCOMPX4(key->pos);
+				for (p=0; p < parts; p++) {
+					f->keys[k].component[p] = cob_malloc(sizeof(cob_field));
+					f->keys[k].component[p]->data = f->record->data + LDCOMPX4(key->pos);
+					f->keys[k].component[p]->attr = &alnum_attr;
+					f->keys[k].component[p]->size = LDCOMPX4(key->len);
+					key   = (EXTKEY*) ((char*)(key) + sizeof(EXTKEY));
+				}
+			}
+		} else {
+			f->keys = cob_malloc(sizeof(cob_file_key));
+		}
+	}
 	update_fcd_to_file(fcd,f,NULL,0);
 }
 
@@ -9674,7 +9764,6 @@ cob_extfh_delete (
 }
 
 
-static const cob_field_attr alnum_attr = {COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 /*
  * EXTFH: maybe called by user own 'callfh' routine
  *        so call correct routine in fileio.c
@@ -9690,11 +9779,26 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 	cob_file *f;
 
 	sts = opts = 0;
+	if (fcd->fcdVer != FCD_VER_64Bit) {
+		cob_runtime_error (_("ERROR EXTFH called with FCD version %d"), fcd->fcdVer);
+		exit(-1);
+	}
 	fs->data = fnstatus;
 	fs->size = sizeof(fnstatus);
 	fs->attr = &alnum_attr;
 	memset(fnstatus,'0',2);
 	memcpy(fcd->fileStatus, "00", 2);
+
+	if (cobglobptr == NULL 
+	 && cobsetptr  == NULL) {	/* Auto Init GnuCOBOL runtime */
+		cob_init (0, NULL); 
+		if (COB_MODULE_PTR == NULL) {
+			COB_MODULE_PTR = cob_malloc( sizeof(cob_module) );
+			COB_MODULE_PTR->module_name = "GnuCOBOL-fileio";
+			COB_MODULE_PTR->module_source = "GnuCOBOL-fileio";
+			COB_MODULE_PTR->module_formatted_date = "2018/07/01 12:00:00";
+		}
+	}
 
 	/* Look for fcd in table and if found use associated 'cob_file' after copying values over */
 	/* If fcd is not found, then 'callfh' created it, so create a new 'cob_file' adn table that */
@@ -9743,6 +9847,10 @@ EXTFH(unsigned char *opcode, FCD3 *fcd)
 			f->open_mode = COB_OPEN_INPUT;
 		}
 		update_file_to_fcd(f,fcd,fnstatus);
+		if(f->organization == COB_ORG_INDEXED
+		&& memcmp(f->file_status,"61",1) == 0) {/* 61 --> 9A for MF */
+			memcpy(fcd->fileStatus,"9A",2);
+		}
 		break;
 
 	case OP_OPEN_OUTPUT:
