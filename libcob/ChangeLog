@@ -1,4 +1,11 @@
 
+2018-06-18  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c: Updates to the EXTFH logic 
+	   You can now actually compile using MF Visual COBOL and include the
+	   GnuCOBOL libcob as follows:
+	     cob -L/usr/local/lib -lcob -C "CALLFH=EXTFH" 
+
 2018-04-01  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* common.c, coblocal.h, common.h: merged changes to time calculation
