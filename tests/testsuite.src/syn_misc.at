@@ -50,6 +50,69 @@ prog.cob: 15: Warning: Suggest parentheses around OR within AND
 
 AT_CLEANUP
 
+AT_SETUP([Incorrect Conditional])
+AT_KEYWORDS([EXPRESSION])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+      ******************************************************************
+       WORKING-STORAGE SECTION.
+      *
+       01 FLD9 PIC 9 VALUE 1.
+       01 FLD8 PIC 9 VALUE 2.
+       01 FLDX PIC 9 VALUE 5.
+       01 FLDY PIC 9 VALUE 6.
+
+       PROCEDURE DIVISION.
+           IF 1 AND 2 > 1 THEN
+                DISPLAY 'Test 1 is WRONG'
+           ELSE
+                DISPLAY 'Test 1 is OK'.
+
+           IF FLD8 AND FLDX > FLD9 THEN
+                DISPLAY 'Test 2 is OK' 
+           ELSE
+                DISPLAY 'Test 2 is Wrong'.
+
+           IF FLD8 OR FLDX > FLD9 THEN
+                DISPLAY 'Test 2 is OK' 
+           ELSE
+                DISPLAY 'Test 2 is Wrong'.
+
+           IF FLD8 > 2 AND FLDX > FLD9 THEN
+                DISPLAY 'Test 2 is OK' 
+           ELSE
+                DISPLAY 'Test 2 is Wrong'.
+
+           IF FLD9 IS NUMERIC AND FLD8 THEN
+                DISPLAY 'Test 2 is OK' 
+           ELSE
+                DISPLAY 'Test 2 is Wrong'.
+
+           IF FLDX > FLD9 AND FLD8 AND 9 THEN
+                DISPLAY 'Test 3 is OK ' FLDX ' > ' FLD9 ' & ' FLD8
+           ELSE
+                DISPLAY 'Test 3 is Wrong'.
+
+           IF FLDX > FLD9 OR FLD8 OR 9 THEN
+                DISPLAY 'Test 3 is OK'
+           ELSE
+                DISPLAY 'Test 3 is Wrong'.
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE_ONLY -std=cobol2002 prog.cob ], [1], [],
+[prog.cob: 15: Error: Invalid conditional expression
+prog.cob: 20: Error: Invalid conditional expression
+prog.cob: 25: Error: Invalid conditional expression
+prog.cob: 35: Error: Invalid expression
+])
+
+AT_CLEANUP
+
 AT_SETUP([Warn Literal size])
 AT_KEYWORDS([Numeric])
 

@@ -3349,37 +3349,45 @@ cb_expr_finish (void)
 cb_tree
 cb_build_expr (cb_tree list)
 {
-	cb_tree	l;
-	int	op;
+	cb_tree	l, v;
+	struct cb_field	*f;
+	int	op, has_rel, has_con, has_var, bad_cond;
 
 	cb_expr_init ();
 
+	bad_cond = has_rel = has_con = has_var = 0;
 	for (l = list; l; l = CB_CHAIN (l)) {
 		op = CB_PURPOSE_INT (l);
 		switch (op) {
 		case '9':
 			/* NUMERIC */
 			cb_expr_shift_class ("cob_is_numeric");
+			has_rel = 1;
 			break;
 		case 'A':
 			/* ALPHABETIC */
 			cb_expr_shift_class ("cob_is_alpha");
+			has_rel = 1;
 			break;
 		case 'L':
 			/* ALPHABETIC_LOWER */
 			cb_expr_shift_class ("cob_is_lower");
+			has_rel = 1;
 			break;
 		case 'U':
 			/* ALPHABETIC_UPPER */
 			cb_expr_shift_class ("cob_is_upper");
+			has_rel = 1;
 			break;
 		case 'P':
 			/* POSITIVE */
 			cb_expr_shift_sign ('>');
+			has_rel = 1;
 			break;
 		case 'N':
 			/* NEGATIVE */
 			cb_expr_shift_sign ('<');
+			has_rel = 1;
 			break;
 		case 'O':
 			/* OMITTED */
@@ -3387,16 +3395,56 @@ cb_build_expr (cb_tree list)
 				current_statement->null_check = NULL;
 			}
 			cb_expr_shift_class ("cob_is_omitted");
+			has_rel = 1;
 			break;
 		case 'C':
 			/* CLASS */
 			cb_expr_shift_class (CB_CLASS_NAME (cb_ref (CB_VALUE (l)))->cname);
+			has_rel = 1;
 			break;
 		default:
+			 if (op == 'x') {
+				has_var = 1;
+				v = CB_VALUE (l);
+				if (CB_TREE_TAG (v) == CB_TAG_BINARY_OP) {
+					has_rel = 1;
+				} else
+				if (CB_TREE_TAG (v) == CB_TAG_FUNCALL) {
+					has_rel = 1;
+				} else
+				if (CB_REF_OR_FIELD_P (v)) {
+					f = CB_FIELD_PTR (v);
+					if (f->level == 88) {
+						has_rel = 1;
+					} else
+					if (f->storage == CB_STORAGE_CONSTANT) {
+						has_rel = 1;
+					}
+				}
+			 } else
+			 if (op == '|' 
+			  || op == '&') {
+				has_con = 1;
+				if (has_var && !has_rel) {
+					bad_cond = 1;
+				}
+			 } else 
+			 if (op == '>' 
+			  || op == '<'
+			  || op == '='
+			  || op == '~'
+			  || op == '['
+			  || op == ']') {
+				has_rel = 1;
+			 } else 
+			 if (op == '!') {
+				has_rel = 1;
+			 }
 			/* Warning for complex expressions without explicit parentheses
 			   (i.e., "a OR b AND c" or "a AND b OR c") */
 			if (cb_warn_parentheses 
-			 && expr_index > 3) {
+			 && expr_index > 3
+			 && (op == '|' || op == '&')) {
 				if (op == '|' && expr_stack[expr_index-2].token == '&') {
 					cb_warning (_("Suggest parentheses around AND within OR"));
 				} else
@@ -3407,6 +3455,10 @@ cb_build_expr (cb_tree list)
 			cb_expr_shift (op, CB_VALUE (l));
 			break;
 		}
+	}
+	if (bad_cond) {
+		cb_error_x (list, _("Invalid conditional expression"));
+		return cb_any;
 	}
 
 	return cb_expr_finish ();
@@ -4195,8 +4247,8 @@ cb_build_cond (cb_tree x)
 	struct cb_binary_op	*p;
 	cb_tree			d1;
 	cb_tree			d2;
-	int			size1;
-	int			size2;
+	int				size1;
+	int				size2;
 
 	if (x == cb_error_node) {
 		return cb_error_node;
@@ -4205,7 +4257,6 @@ cb_build_cond (cb_tree x)
 	if (cb_arithmetic_osvs) {
 		/* ARITHMETIC-OSVS: Determine largest scale used in condition */
 		if (expr_dmax == -1) {
-			/* FIXME: this is a hack, x should always be a list !*/
 			if (CB_LIST_P(x)) {
 				expr_rslt = CB_VALUE(x);
 			} else {
