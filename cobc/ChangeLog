@@ -1,4 +1,7 @@
 
+2018-06-28  Ron Norman <rjn@inglenet.com>
+	* typeck.c: Check properly formed 'Abbreviated conditional expressions'
+
 2018-06-24  Ron Norman <rjn@inglenet.com>
 	* typeck.c: If destination of a MOVE is variable_size handle
 	   starting position that is more than 1 and less than fixed
