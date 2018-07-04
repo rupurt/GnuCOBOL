@@ -1,5 +1,8 @@
 
 2018-07-04  Ron Norman <rjn@inglenet.com>
+	* parser.y: Accept both LENGTH and LENGTH OF in all places
+
+2018-07-04  Ron Norman <rjn@inglenet.com>
 	* codegen.c: Fixed 'output_size' to compute size of OCCURS DEPENDING
 	          for -fodoslide as well as when the field is BASED or 
 			  is in LINKAGE SECTION

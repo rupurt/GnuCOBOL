@@ -1049,7 +1049,7 @@ AT_DATA([prog.cob], [
        TEST2.
            MOVE "A01BCD" TO WITH-ODO 
            DISPLAY "TEST WITH ODO: '" WITH-ODO 
-                   "' Len:" LENGTH OF WITH-ODO
+                   "' Len:" LENGTH WITH-ODO
            DISPLAY "ODO-DATA1=" ODO-DATA1 "."
            DISPLAY "ODO-DEP1="  ODO-DEP1 "."
            DISPLAY "ODO-DEP2="  ODO-DEP2 "."
@@ -1058,7 +1058,7 @@ AT_DATA([prog.cob], [
 
            MOVE "12BCDEF" TO WITH-ODO (2:)
            DISPLAY "TEST WITH ODO: '" WITH-ODO 
-                   "' Len:" LENGTH OF WITH-ODO
+                   "' Len:" LENGTH WITH-ODO
            DISPLAY "ODO-DATA1=" ODO-DATA1 "."
            DISPLAY "ODO-DEP1="  ODO-DEP1 "."
            DISPLAY "ODO-DEP2="  ODO-DEP2 "."
@@ -1090,9 +1090,7 @@ AT_DATA([prog.cob], [
            DISPLAY "ODO-DEP1="  ODO-DEP1 "."
            DISPLAY "ODO-DEP2="  ODO-DEP2 "."
            DISPLAY "ODO-DATA21(1)="  ODO-DATA21 (1) "."
-           DISPLAY "ODO-DATA3="  ODO-DATA3 "."
-           .
-  
+           DISPLAY "ODO-DATA3="  ODO-DATA3 ".".
 
            DISPLAY "********"
            MOVE 2 TO ODO-1
@@ -1103,8 +1101,7 @@ AT_DATA([prog.cob], [
            MOVE 6 TO ODO-2
            MOVE "End" TO ODO-3
            PERFORM SHOW-ODO
-           STOP RUN
-           .
+           STOP RUN.
 
        SHOW-ODO.
            PERFORM VARYING IX FROM 1 BY 1
