@@ -1,4 +1,17 @@
 
+2018-07-04  Ron Norman <rjn@inglenet.com>
+	* codegen.c: Fixed 'output_size' to compute size of OCCURS DEPENDING
+	          for -fodoslide as well as when the field is BASED or 
+			  is in LINKAGE SECTION
+	* typeck.c: If destination of a MOVE is variable_size 
+	   and there is no reference mod (or start position is 1) 
+	   and the field is BASED or in LINKAGE SECTION
+	   then emit code to MOVE fixed size header of field first as it
+	   may be holding the DEPENDING ON fields/values 
+	   and then do a complete MOVE.
+	   If the field is NOT BASED and NOT LINKAGE 
+	   then MOVE for the maximum size of the destination field
+
 2018-06-28  Ron Norman <rjn@inglenet.com>
 	* typeck.c: Check properly formed 'Abbreviated conditional expressions'
 
