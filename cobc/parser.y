@@ -3772,8 +3772,7 @@ const_global:
 
 lit_or_length:
   literal				{ $$ = $1; }
-| LENGTH_OF con_identifier		{ $$ = cb_build_const_length ($2); }
-| LENGTH con_identifier			{ $$ = cb_build_const_length ($2); }
+| _length_of con_identifier			{ $$ = cb_build_const_length ($2); }
 | BYTE_LENGTH _of con_identifier	{ $$ = cb_build_const_length ($3); }
 ;
 
@@ -10654,15 +10653,15 @@ x:
 | literal
 | function
 | line_linage_page_counter
-| LENGTH_OF identifier_1
+| _length_of identifier_1
   {
 	$$ = cb_build_length ($2);
   }
-| LENGTH_OF basic_literal
+| _length_of basic_literal
   {
 	$$ = cb_build_length ($2);
   }
-| LENGTH_OF function
+| _length_of function
   {
 	$$ = cb_build_length ($2);
   }
@@ -10716,15 +10715,15 @@ arith_x:
 | basic_literal
 | function
 | line_linage_page_counter
-| LENGTH_OF identifier_1
+| _length_of identifier_1
   {
 	$$ = cb_build_length ($2);
   }
-| LENGTH_OF basic_literal
+| _length_of basic_literal
   {
 	$$ = cb_build_length ($2);
   }
-| LENGTH_OF function
+| _length_of function
   {
 	$$ = cb_build_length ($2);
   }
@@ -11495,6 +11494,7 @@ _into:		| INTO ;
 _is:		| IS ;
 _is_are:	| IS | ARE ;
 _key:		| KEY ;
+_length_of:	LENGTH_OF | LENGTH OF | LENGTH ;
 _line_or_lines:	| LINE | LINES ;
 _limits:	| LIMIT _is_are | LIMITS _is_are ;
 _lines:		| LINES ;
