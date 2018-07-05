@@ -422,6 +422,7 @@ test.conf: Missing definitions
 	No definition of 'section-segments'
 	No definition of 'alter-statement'
 	No definition of 'word-continuation'
+	No definition of 'depending-on-not-fixed'
 	No definition of 'constant-78'
 	No definition of 'constant-01'
 ])
