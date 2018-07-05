@@ -1,4 +1,7 @@
 
+2018-07-05  Ron Norman <rjn@inglenet.com>
+	* Added 'depending-on-not-fixed' option & error for MF
+
 2018-01-14  Ron Norman <rjn@inglenet.com>
 	* mf.conf now has 
 	    move-figurative-constant-to-numeric: warn
