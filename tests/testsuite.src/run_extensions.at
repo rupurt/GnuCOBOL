@@ -1,4 +1,4 @@
-## Copyright (C) 2003-2012, 2014-2017 Free Software Foundation, Inc.
+## Copyright (C) 2003-2012, 2014-2018 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch
 ##
 ## This file is part of GnuCOBOL.
@@ -260,14 +260,29 @@ AT_DATA([prog.cob], [
               DISPLAY "Length 1 " L
               END-DISPLAY
            END-IF.
+           MOVE LENGTH X TO L.
+           IF L NOT = 2
+              DISPLAY "Length 1a " L LENGTH X
+              END-DISPLAY
+           END-IF.
            MOVE LENGTH OF Y TO L.
            IF L NOT = 2
               DISPLAY "Length 2 " L
               END-DISPLAY
            END-IF.
+           MOVE LENGTH Y TO L.
+           IF L NOT = 2
+              DISPLAY "Length 2a " L LENGTH OF Y
+              END-DISPLAY
+           END-IF.
            MOVE LENGTH OF Y(1) TO L.
            IF L NOT = 2
               DISPLAY "Length 3 " L
+              END-DISPLAY
+           END-IF.
+           MOVE LENGTH Y(1) TO L.
+           IF L NOT = 2
+              DISPLAY "Length 3a " L LENGTH OF Y(1)
               END-DISPLAY
            END-IF.
            STOP RUN.
