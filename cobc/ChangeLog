@@ -1,4 +1,7 @@
 
+2018-07-05  Ron Norman <rjn@inglenet.com>
+	* parser.y,scanner.l: Removed LENGTH_OF as it is no longer used
+
 2018-07-04  Ron Norman <rjn@inglenet.com>
 	* parser.y: Accept both LENGTH and LENGTH OF in all places
 

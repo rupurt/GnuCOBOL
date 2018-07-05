@@ -978,7 +978,6 @@ check_headers_present (const unsigned int lev1, const unsigned int lev2,
 %token LEFT
 %token LEFTLINE
 %token LENGTH
-%token LENGTH_OF		"LENGTH OF"
 %token LESS
 %token LESS_OR_EQUAL		"LESS OR EQUAL"
 %token LIMIT
@@ -11494,7 +11493,7 @@ _into:		| INTO ;
 _is:		| IS ;
 _is_are:	| IS | ARE ;
 _key:		| KEY ;
-_length_of:	LENGTH_OF | LENGTH OF | LENGTH ;
+_length_of:	LENGTH OF | LENGTH ;
 _line_or_lines:	| LINE | LINES ;
 _limits:	| LIMIT _is_are | LIMITS _is_are ;
 _lines:		| LINES ;

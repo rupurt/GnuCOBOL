@@ -653,11 +653,6 @@ H\"[^\"\n]*\" {
 	return EC;
 }
 
-"LENGTH"[ ,;\n]+"OF"[ ,;\n] {
-	count_lines (yytext);
-	return LENGTH_OF;
-}
-
 "ID"[ ,;]+"DIVISION"[ ,;]*"." |
 "IDENTIFICATION"[ ,;]+"DIVISION"[ ,;]*"." {
 	/* Ignore */
