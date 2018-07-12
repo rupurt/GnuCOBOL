@@ -1600,7 +1600,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob: 8: Warning: BY CONTENT assumed for alphanumeric item
+[prog.cob: 8: Warning: BY CONTENT assumed for alphanumeric item 'X'
 ])
 AT_CHECK([./prog], [0], [])
 
