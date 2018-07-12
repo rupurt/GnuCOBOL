@@ -619,7 +619,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[prog.cob: 8: Warning: BY CONTENT assumed for alphanumeric item
+[prog.cob: 8: Warning: BY CONTENT assumed for alphanumeric item 'X'
 ])
 
 AT_CLEANUP

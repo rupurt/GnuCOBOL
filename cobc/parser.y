@@ -6819,20 +6819,30 @@ call_param:
 	int	save_mode;
 
 	save_mode = call_mode;
+	if (CB_LITERAL_P($3)) {
+		/* literals become BY CONTENT */
+		if (CB_NUMERIC_LITERAL_P ($3)) {
+			/* If not BY VALUE numeric-literals become BY CONTENT */
+			if (call_mode != CB_CALL_BY_VALUE) {
+				call_mode = CB_CALL_BY_CONTENT;
+			}
+		} else {
+			call_mode = CB_CALL_BY_CONTENT;
+		}
+	}
 	if (call_mode != CB_CALL_BY_REFERENCE) {
-		if (CB_FILE_P ($3) || (CB_REFERENCE_P ($3) &&
-		    CB_FILE_P (CB_REFERENCE ($3)->value))) {
-			cb_error_x (CB_TREE (current_statement),
-				    _("Invalid file name reference"));
+		if (CB_FILE_P ($3) 
+		 || (CB_REFERENCE_P ($3) && CB_FILE_P (CB_REFERENCE ($3)->value))) {
+			cb_error_x (CB_TREE (current_statement), _("Invalid file name reference"));
 		} else if (call_mode == CB_CALL_BY_VALUE) {
 			if (cb_category_is_alpha ($3)) {
-				cb_warning_x ($3,
-					      _("BY CONTENT assumed for alphanumeric item"));
-				save_mode = CB_CALL_BY_CONTENT;
+				cb_warning_x ($3, _("BY CONTENT assumed for alphanumeric item '%s'"),
+						cb_name($3));
+				call_mode = CB_CALL_BY_CONTENT;
 			}
 		}
 	}
-	$$ = CB_BUILD_PAIR (cb_int (save_mode), $3);
+	$$ = CB_BUILD_PAIR (cb_int (call_mode), $3);
 	CB_SIZES ($$) = size_mode;
 	call_mode = save_mode;
   }
