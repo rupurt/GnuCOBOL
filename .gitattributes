@@ -1,6 +1,7 @@
 * text=auto !eol
 /Makefile.am eol=lf
 bin/Makefile.am eol=lf
+bin/cob-config.1 -text
 bin/cob-config.in eol=lf
 bin/cobcrun.c eol=lf
 build_aux/bootstrap eol=lf
