@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2017 Free Software Foundation, Inc.
+   Copyright (C) 2001-2018 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch
 
    This file is part of GnuCOBOL.
@@ -1468,7 +1468,7 @@ extern cb_tree			cb_build_class_name (cb_tree, cb_tree);
 
 extern cb_tree			cb_build_locale_name (cb_tree, cb_tree);
 
-extern cb_tree			cb_build_numeric_literal (const int,
+extern cb_tree			cb_build_numeric_literal (int,
 							  const void *,
 							  const int);
 extern cb_tree			cb_build_alphanumeric_literal (const void *,
