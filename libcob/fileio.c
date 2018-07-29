@@ -3633,6 +3633,8 @@ relative_read (cob_file *f, cob_field *k, const int read_opts)
 				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
 				return COB_STATUS_52_DEAD_LOCK;
+			case ENOLCK:
+				return COB_STATUS_53_MAX_LOCKS;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
@@ -3719,6 +3721,8 @@ relative_read_next (cob_file *f, const int read_opts)
 					 || (read_opts & COB_READ_ADVANCING_LOCK))
 						goto next_record;
 					return COB_STATUS_52_DEAD_LOCK;
+				case ENOLCK:
+					return COB_STATUS_53_MAX_LOCKS;
 				default:
 					return COB_STATUS_30_PERMANENT_ERROR;
 				}
@@ -3952,6 +3956,8 @@ relative_rewrite (cob_file *f, const int opt)
 				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
 				return COB_STATUS_52_DEAD_LOCK;
+			case ENOLCK:
+				return COB_STATUS_53_MAX_LOCKS;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
@@ -4029,6 +4035,8 @@ relative_delete (cob_file *f)
 				return COB_STATUS_51_RECORD_LOCKED;
 			case EDEADLK:
 				return COB_STATUS_52_DEAD_LOCK;
+			case ENOLCK:
+				return COB_STATUS_53_MAX_LOCKS;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
 			}
@@ -4120,6 +4128,8 @@ fisretsts (const int dfltsts)
 		return COB_STATUS_51_RECORD_LOCKED;
 	case EDEADLK:
 		return COB_STATUS_52_DEAD_LOCK;
+	case ENOLCK:
+		return COB_STATUS_53_MAX_LOCKS;
 	case EFLOCKED:
 		return COB_STATUS_61_FILE_SHARING;
 	case ENOCURR:
