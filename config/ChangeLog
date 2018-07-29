@@ -1,4 +1,7 @@
 
+2018-07-25  Ron Norman <rjn@inglenet.com>
+	* Added 'occurs-max-length-without-subscript' option 
+
 2018-07-05  Ron Norman <rjn@inglenet.com>
 	* Added 'depending-on-not-fixed' option & error for MF
 
