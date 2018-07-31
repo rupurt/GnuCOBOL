@@ -2211,7 +2211,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
-[000000108
+[0000000108
 ])
 
 AT_CLEANUP
@@ -2233,7 +2233,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
-[000000004
+[0000000004
 ])
 
 AT_CLEANUP
@@ -2255,7 +2255,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
-[000000002
+[0000000002
 ])
 
 AT_CLEANUP
@@ -2833,7 +2833,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
-[000000003
+[0000000003
 ])
 
 AT_CLEANUP
@@ -2855,7 +2855,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([./prog], [0],
-[000000002
+[0000000002
 ])
 
 AT_CLEANUP

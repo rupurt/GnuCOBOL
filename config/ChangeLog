@@ -1,4 +1,7 @@
 
+2018-07-31  Ron Norman <rjn@inglenet.com>
+	* Added 'length-in-data-division' option 
+
 2018-07-25  Ron Norman <rjn@inglenet.com>
 	* Added 'occurs-max-length-without-subscript' option 
 

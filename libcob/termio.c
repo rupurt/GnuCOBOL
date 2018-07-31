@@ -163,7 +163,8 @@ pretty_display_numeric (cob_field *f, FILE *fp)
 
 	cob_move (f, &temp);
 	for (i = 0; i < size; ++i) {
-		putc (q[i], fp);
+		if(q[i] != 0)
+			putc (q[i], fp);
 	}
 }
 
@@ -676,6 +677,17 @@ cob_accept (cob_field *f)
 		}
 	}
 	cob_move (&temp, f);
+}
+
+/*
+ * Move numeric value into working field with tailing NULs
+ * Then 'pretty_display_numeric' will skip outputing the NULs
+ */
+void
+cob_field_int_display (cob_field *i, cob_field *f)
+{
+	memset(f->data,0,f->size);
+	sprintf((char *)(f->data),"%d",*(int *)i->data);
 }
 
 void
