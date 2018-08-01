@@ -5848,7 +5848,7 @@ cob_load_config_file (const char *config_file, int isoptional)
 	conf_fd = fopen (config_file, "r");
 	if (conf_fd == NULL && !isoptional) {
 		cob_source_line = 0;
-		conf_runtime_error (1,_("No such file or directory"));
+		conf_runtime_error (1, cob_get_strerror ());
 		if (cobsetptr->cob_config_file) {
 			cob_source_file = cobsetptr->cob_config_file[cobsetptr->cob_config_num-1];
 		}
