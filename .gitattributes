@@ -143,6 +143,7 @@ m4/lt~obsolete.m4 eol=lf
 m4/m4_ax_check_define.m4 -text
 m4/m4_ax_code_coverage.m4 -text
 m4/nls.m4 eol=lf
+m4/pkg.m4 -text
 m4/po.m4 eol=lf
 m4/printf-posix.m4 -text
 m4/progtest.m4 eol=lf
