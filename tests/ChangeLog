@@ -1,4 +1,9 @@
 
+2018-08-11  Ron Norman <rjn@inglenet.com>
+
+	* testsuite.src/run_misc.at: Added code to test temp decimals
+	                to the 'Multiple calls of INITIAL program' test case
+
 2017-08-13  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* atlocal.in, atlocal_win: export COB_HAS_64_BIT_POINTER
