@@ -1,4 +1,7 @@
 
+2018-09-10  Ron Norman <rjn@inglenet.com>
+	* tree.c: removed redundant warnings about xyz 'is always' TRUE/FALSE
+
 2018-07-31  Ron Norman <rjn@inglenet.com>
 	* config.def: Added 'cb_length_in_data_division' and if 'no' then
 	            LENGTH OF is not allowed for 78 VALUEs

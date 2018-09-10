@@ -12842,3 +12842,95 @@ counter is +1024
 
 AT_CLEANUP
 
+AT_SETUP([Constant Expressions 3])
+AT_KEYWORDS([Conditions])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       01  VAR       PIC X(200).
+       01  OTHERVAR  PIC X(115).
+       78  VAR-LEN   VALUE 115.
+
+       PROCEDURE DIVISION.
+       MAIN-10.
+           MOVE "Peek a boo" TO VAR.
+           EVALUATE TRUE 
+               ALSO FALSE
+               ALSO TRUE
+            WHEN    TRUE 
+               ALSO VAR-LEN > 16 AND VAR-LEN < 200
+               ALSO TRUE
+                  MOVE OTHERVAR (1 : VAR-LEN - 9)
+                    TO VAR (16 - VAR-LEN : VAR-LEN - 9)
+                  DISPLAY "A: Should NOT be executed"
+            WHEN  TRUE 
+               ALSO VAR-LEN < 16 
+               ALSO TRUE
+                  MOVE OTHERVAR TO VAR
+                  DISPLAY "A: OK VAR-LEN > 16 AND VAR-LEN < 200"
+            WHEN  TRUE 
+               ALSO VAR = SPACES 
+               ALSO TRUE
+                  MOVE OTHERVAR TO VAR
+                  DISPLAY "A: OK VAR IS SPACES"
+           END-EVALUATE.
+
+           MOVE "Peek a boo" TO VAR.
+           EVALUATE 3 EQUALS 7
+           WHEN  VAR = SPACES 
+               DISPLAY "B: OK VAR IS NOT SPACES"
+           WHEN  VAR NOT = SPACES 
+               DISPLAY "B: FALSE VAR IS SPACES"
+           END-EVALUATE.
+
+           MOVE SPACES       TO VAR.
+           EVALUATE FALSE
+           WHEN  VAR = SPACES 
+               DISPLAY "C: FALSE VAR IS SPACES"
+           WHEN  VAR NOT = SPACES 
+               DISPLAY "C: OK VAR IS SPACES"
+           END-EVALUATE.
+
+           MOVE "Peek a boo" TO VAR.
+           EVALUATE TRUE
+           WHEN  VAR = SPACES 
+               DISPLAY "D: BAD VAR IS SPACES"
+           WHEN  VAR NOT = SPACES 
+               DISPLAY "D: OK VAR IS NOT SPACES"
+           END-EVALUATE.
+
+           MOVE SPACES       TO VAR.
+           EVALUATE VAR-LEN ALSO VAR
+           WHEN  < 32 ALSO SPACES
+               DISPLAY "E: OK VAR IS SPACES"
+           WHEN  > 16 ALSO NOT SPACES 
+               DISPLAY "E: BAD VAR IS NOT SPACES"
+           WHEN OTHER
+               DISPLAY "E: OK OTHER option taken"
+           END-EVALUATE.
+
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE -std=mf prog.cob ], [0], [], [prog.cob: In paragraph 'MAIN-10':
+prog.cob: 17: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 17: Warning: Expression '115' LESS THAN '200' is always TRUE
+prog.cob: 20: Error (ignored): Offset of 'VAR' out of bounds: -99
+prog.cob: 23: Warning: Expression '115' LESS THAN '16' is always FALSE
+prog.cob: 35: Warning: Expression '3' EQUALS '7' is always FALSE
+prog.cob: 60: Warning: Expression '115' LESS THAN '32' is always FALSE
+prog.cob: 62: Warning: Expression '115' GREATER THAN '16' is always TRUE
+])
+
+AT_CHECK([./prog], [0], [A: OK VAR-LEN > 16 AND VAR-LEN < 200
+B: OK VAR IS NOT SPACES
+C: OK VAR IS SPACES
+D: OK VAR IS NOT SPACES
+E: OK OTHER option taken
+], [])
+
+AT_CLEANUP
+
