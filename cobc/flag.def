@@ -91,6 +91,9 @@ CB_FLAG (cb_flag_stack_on_heap, 0, "stack-on-heap",
 CB_FLAG_ON (cb_flag_inline_intrinsic, 1, "inline-intrinsic",
 	_("when possible resolve intrinsic FUNCTIONs at compile time"))
 
+CB_FLAG_ON (cb_flag_remove_unreachable, 1, "remove-unreachable",
+	_("when possible remove code which is unreachable"))
+
 CB_FLAG (cb_flag_trace, 1, "trace",
 	 _("generate trace code\n\t\t\t- executed SECTION/PARAGRAPH"))
 

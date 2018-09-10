@@ -1,5 +1,11 @@
 
 2018-09-10  Ron Norman <rjn@inglenet.com>
+	* flag.def: new compile option: 'remove-unreachable' defaults to on
+	      So then -fno-remove-unreachable does not remove unreachable code
+	* typeck.c: Checks cb_flag_remove_unreachable
+	* cobc.c: If -g then clear cb_flag_remove_unreachable
+
+2018-09-10  Ron Norman <rjn@inglenet.com>
 	* tree.c: removed redundant warnings about xyz 'is always' TRUE/FALSE
 
 2018-07-31  Ron Norman <rjn@inglenet.com>
