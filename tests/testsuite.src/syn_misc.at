@@ -2312,16 +2312,12 @@ prog.cob: 62: Warning: Expression '115' GREATER THAN '16' is always TRUE
 prog.cob: 71: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 73: Error: Offset of 'var' out of bounds: -99
 prog.cob: 74: Warning: Expression '115' GREATER THAN '16' is always TRUE
-prog.cob: 74: Warning: Expression is always TRUE
-prog.cob: 74: Warning: Expression is always FALSE
 prog.cob: 87: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 89: Error (ignored): Offset of 'var' out of bounds: -98
 prog.cob: 90: Warning: Expression '115' GREATER THAN '16' is always TRUE
 prog.cob: 89: Warning: Expression '115' EQUALS '15' is always FALSE
 prog.cob: 89: Warning: Expression '115' EQUALS '115' is always TRUE
-prog.cob: 89: Warning: Expression is always TRUE
 prog.cob: 98: Warning: Expression '15' EQUALS '115' is always FALSE
-prog.cob: 98: Warning: Expression is always FALSE
 ])
 
 AT_CLEANUP
@@ -2349,7 +2345,6 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
 [prog.cob: 12: Warning: Expression '115' EQUALS '112' is always FALSE
-prog.cob: 12: Warning: Expression is always FALSE
 ])
 
 AT_CLEANUP

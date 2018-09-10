@@ -3977,28 +3977,19 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE -std=default prog.cob ], [0], [], [prog.cob: In paragraph 'MAIN-LINE':
 prog.cob: 49: Warning: Suggest parentheses around AND within OR
 prog.cob: 53: Warning: Expression '9' GREATER THAN '2' is always TRUE
-prog.cob: 53: Warning: Expression is always TRUE
+prog.cob: 53: Warning: Expression '9' GREATER THAN '7' is always TRUE
 prog.cob: 53: Warning: Expression '9' GREATER THAN '5' is always TRUE
-prog.cob: 53: Warning: Expression is always TRUE
 prog.cob: 53: Warning: Expression '9' GREATER THAN '1' is always TRUE
-prog.cob: 53: Warning: Expression is always TRUE
 prog.cob: 55: Warning: Expression '1' LESS THAN '2' is always TRUE
-prog.cob: 55: Warning: Expression is always TRUE
+prog.cob: 55: Warning: Expression '1' LESS THAN '5' is always TRUE
 prog.cob: 55: Warning: Expression '1' LESS THAN '7' is always TRUE
-prog.cob: 55: Warning: Expression is always TRUE
 prog.cob: 55: Warning: Expression '1' LESS THAN '9' is always TRUE
-prog.cob: 55: Warning: Expression is always TRUE
 prog.cob: 57: Warning: Expression '5' LESS THAN '2' is always FALSE
-prog.cob: 57: Warning: Expression is always FALSE
 prog.cob: 57: Warning: Expression '5' LESS THAN '9' is always TRUE
-prog.cob: 57: Warning: Expression is always TRUE
 prog.cob: 57: Warning: Expression '5' LESS THAN '7' is always TRUE
-prog.cob: 57: Warning: Expression is always TRUE
 prog.cob: 59: Warning: Expression '5' GREATER THAN '1' is always TRUE
 prog.cob: 59: Warning: Expression '5' LESS THAN '3' is always FALSE
-prog.cob: 59: Warning: Expression is always FALSE
 prog.cob: 59: Warning: Expression '5' LESS THAN '6' is always TRUE
-prog.cob: 59: Warning: Expression is always TRUE
 ])
 
 AT_CHECK([./prog], [0], [Test 01 passed
