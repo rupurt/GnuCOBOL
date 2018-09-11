@@ -167,7 +167,7 @@ was_prev_warn (int linen, int tf)
 		prev_expr_line = cb_exp_line;
 		for (i=0; i < EXPR_WARN_PER_LINE; i++) {
 			prev_expr_warn[i] = 0;
-			prev_expr_tf[i] = -99;
+			prev_expr_tf[i] = -9999;
 		}
 	}
 	for (i=0; i < EXPR_WARN_PER_LINE; i++) {
@@ -183,7 +183,7 @@ was_prev_warn (int linen, int tf)
 			return 0;
 		}
 	}
-	prev_expr_pos = (prev_expr_pos + 1) % 6;
+	prev_expr_pos = (prev_expr_pos + 1) % EXPR_WARN_PER_LINE;
 	prev_expr_warn [prev_expr_pos] = linen;
 	prev_expr_tf [prev_expr_pos] = tf;
 	return 0;
@@ -3714,7 +3714,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 				switch(op) {
 				case '=':
 					bop = "EQUALS";
-					warn_type = 51 + (xval+yval)%50;
+					warn_type = 51 + (xval * 2 + yval) % 5000;
 					if (xval == yval) {
 						relop = cb_true;
 					} else {
@@ -3723,7 +3723,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					break;
 				case '~':
 					bop = "NOT EQUAL";
-					warn_type = 52 + (xval+yval)%50;
+					warn_type = 52 + (xval * 2 + yval) % 5000;
 					if (xval != yval) {
 						relop = cb_true;
 					} else {
@@ -3732,7 +3732,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					break;
 				case '>':
 					bop = "GREATER THAN";
-					warn_type = 53 + (xval+yval)%50;
+					warn_type = 53 + (xval * 2 + yval) % 5000;
 					if (xval > yval) {
 						relop = cb_true;
 					} else {
@@ -3741,7 +3741,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					break;
 				case '<':
 					bop = "LESS THAN";
-					warn_type = 54 + (xval+yval)%50;
+					warn_type = 54 + (xval * 2 + yval) % 5000;
 					if (xval < yval) {
 						relop = cb_true;
 					} else {
@@ -3750,7 +3750,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					break;
 				case ']':
 					bop = "GREATER OR EQUAL";
-					warn_type = 55 + (xval+yval)%50;
+					warn_type = 55 + (xval * 2 + yval) % 5000;
 					if (xval >= yval) {
 						relop = cb_true;
 					} else {
@@ -3759,7 +3759,7 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 					break;
 				case '[':
 					bop = "LESS OR EQUAL";
-					warn_type = 56 + (xval+yval)%50;
+					warn_type = 56 + (xval * 2 + yval) % 5000;
 					if (xval <= yval) {
 						relop = cb_true;
 					} else {
@@ -3943,11 +3943,11 @@ cb_build_binary_op (cb_tree x, const int op, cb_tree y)
 	if (relop == cb_false) {
 		if (cb_warn_constant_expr && warn_ok) {
 			if (rlit && llit && bop) {
-				if (!was_prev_warn (e->source_line, 9)) {
+				if (!was_prev_warn (e->source_line, 9 + warn_type)) {
 					cb_warning_x (e, _("Expression '%.38s' %s '%.38s' is always FALSE"),llit,bop, rlit);
 				}
 			} else {
-				if (!was_prev_warn (e->source_line, -9)) {
+				if (!was_prev_warn (e->source_line, -(9 + warn_type))) {
 					cb_warning_x (e, _("Expression is always FALSE"));
 				}
 			}

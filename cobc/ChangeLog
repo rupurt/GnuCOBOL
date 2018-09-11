@@ -1,5 +1,9 @@
 
 2018-09-11  Ron Norman <rjn@inglenet.com>
+	* scanner.l: Duplicate 78/CONSTANT and then assign line number
+	* tree.c: improved warnings to be more inclusive
+
+2018-09-11  Ron Norman <rjn@inglenet.com>
 	* tree.c,codegen.c: Added checks for cb_flag_remove_unreachable
 
 2018-09-10  Ron Norman <rjn@inglenet.com>
