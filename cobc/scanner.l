@@ -221,6 +221,7 @@ static void	scan_picture (char *);
 static void	count_lines (const char *);
 static void	scan_define_options (const char *);
 static void	scan_options (const char *, const unsigned int);
+static void *	make_literal (cb_tree l);
 
 %}
 
@@ -818,7 +819,7 @@ H\"[^\"\n]*\" {
 			if (p78->chk_const && p78->not_const) {
 				break;
 			}
-			yylval = CB_VALUE (p78->fld78->values);
+			yylval = make_literal (CB_VALUE (p78->fld78->values));
 			SET_LOCATION (yylval);
 			return LITERAL;
 		}
@@ -1440,6 +1441,16 @@ cb_add_const_var (const char *name, cb_tree value)
 	} else {
 		top78ptr = const78ptr;
 	}
+}
+
+static void *
+make_literal (cb_tree l)
+{
+	cb_tree x;
+
+	x = cobc_parse_malloc (sizeof (struct cb_literal));
+	memcpy(x,l,sizeof (struct cb_literal));
+	return x;
 }
 
 static void

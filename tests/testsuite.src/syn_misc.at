@@ -2315,9 +2315,10 @@ prog.cob: 74: Warning: Expression '115' GREATER THAN '16' is always TRUE
 prog.cob: 87: Warning: Expression '115' LESS THAN '16' is always FALSE
 prog.cob: 89: Error (ignored): Offset of 'var' out of bounds: -98
 prog.cob: 90: Warning: Expression '115' GREATER THAN '16' is always TRUE
-prog.cob: 89: Warning: Expression '115' EQUALS '15' is always FALSE
-prog.cob: 89: Warning: Expression '115' EQUALS '115' is always TRUE
-prog.cob: 98: Warning: Expression '15' EQUALS '115' is always FALSE
+prog.cob: 83: Warning: Expression '115' EQUALS '15' is always FALSE
+prog.cob: 84: Warning: Expression '115' EQUALS '115' is always TRUE
+prog.cob: 97: Warning: Expression '15' EQUALS '115' is always FALSE
+prog.cob: 98: Warning: Expression '115' EQUALS '15' is always FALSE
 ])
 
 AT_CLEANUP
@@ -2344,7 +2345,8 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[prog.cob: 12: Warning: Expression '115' EQUALS '112' is always FALSE
+[prog.cob: 11: Warning: Expression '115' EQUALS '112' is always FALSE
+prog.cob: 12: Warning: Expression '112' EQUALS '115' is always FALSE
 ])
 
 AT_CLEANUP
@@ -2528,6 +2530,55 @@ prog.cob: 14: Error: 78 VALUE used
 prog.cob: 21: Error: LENGTH OF 'ODO-DATA' not allowed outside of Procedure Division
 prog.cob: 21: Error: 78 VALUE used
 prog.cob: 30: Error: 'MY-ELEMENT-1' requires 1 subscript
+])
+
+AT_CLEANUP
+
+AT_SETUP([Constant Expressions 4])
+AT_KEYWORDS([Conditions])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       78  const1    value 115.
+       01  const2    CONSTANT 200.
+       77  othervar  PIC X(const1).
+       01  var       PIC X(const2).
+
+       PROCEDURE DIVISION.
+
+           IF const1 = const2
+           OR const2 = const1
+              DISPLAY 'no way' END-DISPLAY
+           END-IF
+
+           EVALUATE const1
+           WHEN  15
+           WHEN 115
+               display '1'
+           WHEN  < 16
+               move othervar (1:8)
+                 to var (17:8)
+           WHEN  > 16
+               display othervar
+      *> actually WHEN OTHER is also FALSE in this case (115 = 16),
+      *> but this is too complex to check
+           WHEN OTHER
+               display othervar
+           END-EVALUATE
+
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE_ONLY -std=default prog.cob ], [0], [],
+[prog.cob: 13: Warning: Expression '115' EQUALS '200' is always FALSE
+prog.cob: 14: Warning: Expression '200' EQUALS '115' is always FALSE
+prog.cob: 22: Warning: Expression '115' LESS THAN '16' is always FALSE
+prog.cob: 25: Warning: Expression '115' GREATER THAN '16' is always TRUE
+prog.cob: 19: Warning: Expression '115' EQUALS '15' is always FALSE
+prog.cob: 20: Warning: Expression '115' EQUALS '115' is always TRUE
 ])
 
 AT_CLEANUP
