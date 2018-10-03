@@ -25,6 +25,7 @@ bin/Makefile.in
 bin/atlocal
 bin/cob-config
 bin/cobcrun
+/build
 build_windows/*.7z
 build_windows/*.bak
 build_windows/*.h
