@@ -99,6 +99,11 @@ build_windows/vs2017/libcob.vcxproj.filters eol=crlf
 build_windows/vs2017/libsupport.vcxproj eol=crlf
 build_windows/vs2017/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
+cobc/Makefile.options -text
+cobc/opt_parse.y -text
+cobc/opt_scan.l -text
+cobc/options.c -text
+cobc/options.h -text
 config/Makefile.am eol=lf
 config/rm-strict.conf -text
 config/rm.conf -text
