@@ -118,6 +118,8 @@ cobc/atlocal
 cobc/cobc
 cobc/opt_parse.tab.c
 cobc/opt_parse.tab.h
+cobc/opt_scan.c
+cobc/opt_test
 cobc/parser.c
 cobc/parser.h
 cobc/pplex.c

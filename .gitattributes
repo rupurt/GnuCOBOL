@@ -102,6 +102,7 @@ cobc/Makefile.am eol=lf
 cobc/Makefile.options -text
 cobc/opt_parse.y -text
 cobc/opt_scan.l -text
+cobc/opt_test.c -text
 cobc/options.c -text
 cobc/options.h -text
 config/Makefile.am eol=lf
