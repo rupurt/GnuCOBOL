@@ -1,4 +1,8 @@
 
+2018-11-20  Ron Norman <rjn@inglenet.com>
+	* numeric.c: fixed cob_print_realbin to call cob_binary_get_uint64 
+	             for unsigned field
+
 2018-08-01  Simon 'sf-mensch/human' Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c [!COB_GEN_SCREENIO]: fixed missing cob_sys_get_char
