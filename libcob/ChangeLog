@@ -1,4 +1,7 @@
 
+2018-11-22  Ron Norman <rjn@inglenet.com>
+	* move.c: cob_move_binary_to_binary fixed to do truncation as required
+
 2018-11-20  Ron Norman <rjn@inglenet.com>
 	* numeric.c: fixed cob_print_realbin to call cob_binary_get_uint64 
 	             for unsigned field
