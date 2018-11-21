@@ -1178,3 +1178,124 @@ AT_CHECK([./prog], [0],
 ])
 
 AT_CLEANUP
+
+AT_SETUP([COMP-4 Truncate])
+AT_KEYWORDS([Numeric])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  RANDOM-ORIGIN-B                     PIC 9V99 COMP-4.
+       01  RANDOM-TARGET-B                     PIC V99  COMP-4.
+       01  RANDOM-ORIGIN-D                     PIC 9V99 DISPLAY.
+       01  RANDOM-TARGET-D                     PIC V99  DISPLAY.
+
+       PROCEDURE DIVISION.
+           MOVE 0.12            TO RANDOM-ORIGIN-D
+           MOVE RANDOM-ORIGIN-D TO RANDOM-TARGET-D
+           MOVE 0.12            TO RANDOM-ORIGIN-B
+           MOVE RANDOM-ORIGIN-B TO RANDOM-TARGET-B
+           IF RANDOM-ORIGIN-D <> RANDOM-ORIGIN-B
+             DISPLAY "ORIGIN 0.12 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-ORIGIN-D
+                " !=  BINARY : " RANDOM-ORIGIN-B
+           END-IF.
+           IF RANDOM-TARGET-D <> RANDOM-TARGET-B
+             DISPLAY "TARGET  .12 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-TARGET-D
+                " !=  BINARY : " RANDOM-TARGET-B
+           ELSE
+             DISPLAY "Ok with " RANDOM-TARGET-D " == " RANDOM-TARGET-B
+           END-IF.
+
+           MOVE 9.85            TO RANDOM-ORIGIN-D
+           MOVE RANDOM-ORIGIN-D TO RANDOM-TARGET-D
+           MOVE 9.85            TO RANDOM-ORIGIN-B
+           MOVE RANDOM-ORIGIN-B TO RANDOM-TARGET-B
+           IF RANDOM-ORIGIN-D <> RANDOM-ORIGIN-B
+             DISPLAY "ORIGIN 9.85 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-ORIGIN-D
+                " !=  BINARY : " RANDOM-ORIGIN-B
+           END-IF.
+           IF RANDOM-TARGET-D <> RANDOM-TARGET-B
+             DISPLAY "TARGET  .85 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-TARGET-D
+                " !=  BINARY : " RANDOM-TARGET-B
+           ELSE
+             DISPLAY "Ok with " RANDOM-TARGET-D " == " RANDOM-TARGET-B
+           END-IF.
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=default -w prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [Ok with .12 == .12
+Ok with .85 == .85
+], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([COMP-4 No Truncate])
+AT_KEYWORDS([Numeric])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  RANDOM-ORIGIN-B                     PIC 9V99 COMP-4.
+       01  RANDOM-TARGET-B                     PIC V99  COMP-4.
+       01  RANDOM-ORIGIN-D                     PIC 9V99 DISPLAY.
+       01  RANDOM-TARGET-D                     PIC V99  DISPLAY.
+
+       PROCEDURE DIVISION.
+           MOVE 0.12            TO RANDOM-ORIGIN-D
+           MOVE RANDOM-ORIGIN-D TO RANDOM-TARGET-D
+           MOVE 0.12            TO RANDOM-ORIGIN-B
+           MOVE RANDOM-ORIGIN-B TO RANDOM-TARGET-B
+           IF RANDOM-ORIGIN-D <> RANDOM-ORIGIN-B
+             DISPLAY "ORIGIN 0.12 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-ORIGIN-D
+                " !=  BINARY : " RANDOM-ORIGIN-B
+           END-IF.
+           IF RANDOM-TARGET-D <> RANDOM-TARGET-B
+             DISPLAY "TARGET  .12 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-TARGET-D
+                " !=  BINARY : " RANDOM-TARGET-B
+           ELSE
+             DISPLAY "Ok with " RANDOM-TARGET-D " == " RANDOM-TARGET-B
+           END-IF.
+
+           MOVE 9.85            TO RANDOM-ORIGIN-D
+           MOVE RANDOM-ORIGIN-D TO RANDOM-TARGET-D
+           MOVE 9.85            TO RANDOM-ORIGIN-B
+           MOVE RANDOM-ORIGIN-B TO RANDOM-TARGET-B
+           IF RANDOM-ORIGIN-D <> RANDOM-ORIGIN-B
+             DISPLAY "ORIGIN 9.85 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-ORIGIN-D
+                " !=  BINARY : " RANDOM-ORIGIN-B
+           END-IF.
+           IF RANDOM-TARGET-D <> RANDOM-TARGET-B
+             DISPLAY "TARGET  .85 WRONG"
+             DISPLAY "DISPLAY: " RANDOM-TARGET-D
+                " !=  BINARY : " RANDOM-TARGET-B
+           ELSE
+             DISPLAY "Ok with " RANDOM-TARGET-D " == " RANDOM-TARGET-B
+           END-IF.
+           STOP RUN.
+])
+
+AT_CHECK([cobc -x -std=default -w -fnotrunc prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [Ok with 12 == 012
+TARGET  .85 WRONG
+DISPLAY: 85 !=  BINARY : 217
+], [])
+
+AT_CLEANUP
+
