@@ -110,8 +110,6 @@ doc/Makefile.am eol=lf
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
 doc/gnucobol.texi eol=lf
-doc/man/Makefile -text
-doc/man/cobc.conf.5 -text
 extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
