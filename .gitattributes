@@ -176,7 +176,6 @@ po/remove-potcdate.sin -text
 po/stamp-po -text
 po/sv.po -text
 po/update_linguas.sh eol=lf
-/tarstamp.gen -text
 tests/Makefile.am eol=lf
 tests/atlocal.in eol=lf
 tests/atlocal_valgrind eol=lf
