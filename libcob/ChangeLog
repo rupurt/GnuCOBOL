@@ -1,4 +1,7 @@
 
+2018-12-13  Ron Norman <rjn@inglenet.com>
+	* fileio.c: Fixed coding error related to EXTFH if file has no keys
+
 2018-11-22  Ron Norman <rjn@inglenet.com>
 	* move.c: cob_move_binary_to_binary fixed to do truncation as required
 
