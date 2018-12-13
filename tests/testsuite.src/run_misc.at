@@ -8220,6 +8220,412 @@ AT_CHECK([gcdiff references traces.txt], [0], [], [])
 
 AT_CLEANUP
 
+AT_SETUP([SEQUENTIAL with EXTFH])
+AT_KEYWORDS([runfile])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+      
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+      
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT FLATFILE ASSIGN EXTERNAL SEQFIX
+           ORGANIZATION SEQUENTIAL
+           FILE STATUS IS CUST-STAT .
+
+       DATA  DIVISION.
+       FILE SECTION.
+       FD  FLATFILE
+           BLOCK CONTAINS 5 RECORDS.
+      
+       01  TSPFL-RECORD.
+           10  CM-CUST-NUM                     PICTURE X(8). 
+           10  CM-COMPANY                      PICTURE X(25). 
+           10  CM-DISK                         PICTURE X(8). 
+           10  CM-NO-TERMINALS                 PICTURE 9(4) COMP-4. 
+           10  CM-PK-DATE                      PICTURE S9(14) COMP-3.
+           10  CM-TRAILER                      PICTURE X(8). 
+       
+       WORKING-STORAGE SECTION.
+      
+       77  MAX-SUB           VALUE  6          PICTURE 9(4) COMP SYNC.
+       77  CUST-STAT                           PICTURE X(2).
+      
+       01  TEST-DATA.
+      
+         02  DATA-CUST-NUM-TBL.
+      
+           05  FILLER PIC X(8) VALUE "ALP00000".
+           05  FILLER PIC X(8) VALUE "BET00000".
+           05  FILLER PIC X(8) VALUE "GAM00000".
+           05  FILLER PIC X(8) VALUE "DEL00000".
+           05  FILLER PIC X(8) VALUE "EPS00000".
+           05  FILLER PIC X(8) VALUE "FOR00000".
+      
+         02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
+                                       PIC X(8) OCCURS 6.
+         02  DATA-COMPANY-TBL.
+      
+           05  FILLER PIC X(25) VALUE "ALPHA ELECTRICAL CO. LTD.".
+           05  FILLER PIC X(25) VALUE "BETA SHOE MFG. INC.      ".
+           05  FILLER PIC X(25) VALUE "GAMMA X-RAY TECHNOLOGY   ".
+           05  FILLER PIC X(25) VALUE "DELTA LUGGAGE REPAIRS    ".
+           05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
+           05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
+         02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
+                                       PIC X(25) OCCURS 6.
+         02  DATA-ADDRESS-2-TBL.
+      
+           05  FILLER PIC X(10) VALUE "NEW YORK  ".
+           05  FILLER PIC X(10) VALUE "ATLANTA   ".
+           05  FILLER PIC X(10) VALUE "WASHINGTON".
+           05  FILLER PIC X(10) VALUE "TORONTO   ".
+           05  FILLER PIC X(10) VALUE "CALGARY   ".
+           05  FILLER PIC X(10) VALUE "WHITEPLAIN".
+      
+         02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
+                                       PIC X(10) OCCURS 6.
+
+         02  DATA-NO-TERMINALS-TBL.
+      
+           05  FILLER PIC 9(3) COMP-3 VALUE 10.
+           05  FILLER PIC 9(3) COMP-3 VALUE 13.
+           05  FILLER PIC 9(3) COMP-3 VALUE 75.
+           05  FILLER PIC 9(3) COMP-3 VALUE 10.
+           05  FILLER PIC 9(3) COMP-3 VALUE 90.
+           05  FILLER PIC 9(3) COMP-3 VALUE 254.
+      
+         02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
+                                       PIC 9(3) COMP-3 OCCURS 6.
+       01  WORK-AREA.
+           05  SUB                             PICTURE 9(4) COMP SYNC.
+               88  ODD-RECORD                  VALUE 1 3 5.
+      
+      
+       PROCEDURE DIVISION.
+
+           OPEN INPUT FLATFILE.
+           DISPLAY "Open Input when no file Sts:" CUST-STAT 
+           CLOSE FLATFILE.
+           OPEN EXTEND FLATFILE.
+           DISPLAY "Open Extend when no file Sts:" CUST-STAT 
+           CLOSE FLATFILE.
+           OPEN OUTPUT FLATFILE.
+           CLOSE FLATFILE.
+           OPEN EXTEND FLATFILE.
+           DISPLAY "Open Extend when empty file Sts:" CUST-STAT 
+           CLOSE FLATFILE.
+
+           PERFORM LOADFILE.
+           OPEN INPUT FLATFILE.
+           DISPLAY "Open Sts:" CUST-STAT 
+           READ FLATFILE
+           DISPLAY "Read " CM-CUST-NUM " Sts:" CUST-STAT.
+           READ FLATFILE
+           DISPLAY "Read " CM-CUST-NUM " Sts:" CUST-STAT.
+           CLOSE FLATFILE.
+
+           OPEN I-O FLATFILE.
+           READ FLATFILE
+           DISPLAY "Read " CM-CUST-NUM " Sts:" CUST-STAT.
+           ADD 1 TO CM-NO-TERMINALS
+           REWRITE TSPFL-RECORD
+           DISPLAY "REWRITE " CM-CUST-NUM " Sts " CUST-STAT 
+                   " Trms:" CM-NO-TERMINALS.
+           CLOSE FLATFILE.
+
+           OPEN I-O FLATFILE.
+           READ FLATFILE
+           DISPLAY "Read " CM-CUST-NUM " Sts:" CUST-STAT.
+           ADD 1 TO CM-NO-TERMINALS
+           REWRITE TSPFL-RECORD
+           DISPLAY "REWRITE " CM-CUST-NUM " Sts " CUST-STAT 
+                   " Trms:" CM-NO-TERMINALS.
+           READ FLATFILE WITH LOCK
+           DISPLAY "Read " CM-CUST-NUM
+      *    DELETE FLATFILE 
+      *    DISPLAY "DELETE " CM-CUST-NUM " Sts " CUST-STAT.
+           CLOSE FLATFILE.
+           OPEN INPUT FLATFILE.
+           DISPLAY "Re-list File Open Sts:" CUST-STAT 
+           PERFORM UNTIL CUST-STAT NOT = "00"
+               PERFORM READ-RECORD
+           END-PERFORM.
+           CLOSE FLATFILE.
+           OPEN EXTEND FLATFILE.
+           MOVE 2 TO SUB
+           PERFORM LOAD-RECORD
+           CLOSE FLATFILE.
+           OPEN INPUT FLATFILE.
+           DISPLAY "List File afer EXTEND Open Sts:" CUST-STAT 
+           PERFORM UNTIL CUST-STAT NOT = "00"
+               PERFORM READ-RECORD
+           END-PERFORM.
+           CLOSE FLATFILE.
+           STOP RUN RETURNING 0.
+      
+       READ-RECORD.
+           MOVE SPACES                       TO TSPFL-RECORD.
+           READ FLATFILE
+           IF CUST-STAT NOT = "00"
+             DISPLAY "Read Status: " CUST-STAT
+           ELSE
+             DISPLAY "Read  " CM-CUST-NUM
+                     " Trms:" CM-NO-TERMINALS
+           END-IF.
+
+       LOADFILE.
+           DISPLAY "Loading sample data file.".
+      
+           OPEN OUTPUT FLATFILE.
+      
+           PERFORM LOAD-RECORD
+                        VARYING SUB FROM 1 BY 1 
+                          UNTIL SUB > MAX-SUB.
+      
+           DISPLAY "Sample data file load complete.".
+           CLOSE FLATFILE.
+      
+       LOAD-RECORD.
+      
+           MOVE SPACES                       TO TSPFL-RECORD.
+           MOVE DATA-CUST-NUM      (SUB)     TO CM-CUST-NUM.
+           MOVE DATA-COMPANY       (SUB)     TO CM-COMPANY.
+           MOVE DATA-NO-TERMINALS  (SUB)     TO CM-NO-TERMINALS.
+           MOVE 20070319                     TO CM-PK-DATE.
+           IF SUB = 1 OR 4 OR 6
+               MOVE -20070319                 TO CM-PK-DATE.
+      
+           IF  ODD-RECORD
+               MOVE "8417"                   TO CM-DISK 
+           ELSE
+               MOVE "8470"                   TO CM-DISK.
+           WRITE TSPFL-RECORD.
+])
+
+AT_DATA([cmod.c], [[
+/******************************************************************************
+*     2017, Ron Norman                                                        *
+*  Source for a Micro Focus COBOL External File Handler.                      *
+*                                                                             *
+* For GnuCOBOL add  -fcallfh=TSTFH              as a compile option           *
+*                                                                             *
+* This is a sample module for GnuCOBOL, but it does not do very much          *
+******************************************************************************/
+
+#include <string.h>
+#include <stdlib.h>
+#include <libcob.h>
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+#define MIN(a,b) (a < b ? a : b)
+
+static char *txtOpCode(int opCode);
+
+/*************************************************************************
+   Replace filename with environment variable value, then open the file
+   This is required as MF Cobol seems to have pre-read the ENV Variables 
+*************************************************************************/
+static int
+doOpenFile(
+   unsigned char  *opCodep, 
+   FCD3  *fcd,
+   char  *opmsg) 
+{
+   int      sts,oldlen,j,k;
+   char  *oldFptr,*env,wrk[64];
+   unsigned char  svOther;
+   unsigned int   opCode;
+
+   oldFptr = fcd->fnamePtr;            /* Save values */
+   oldlen  = LDCOMPX2(fcd->fnameLen); 
+   fcd->otherFlags &= ~OTH_DOLSREAD;
+   svOther = fcd->otherFlags;
+
+   sts = EXTFH( opCodep, fcd );          /* No DD_, so use normal MF File Open */
+   printf("EXFTH did %s; File now %s\n",opmsg,
+                  (fcd->openMode & OPEN_NOT_OPEN)?"Closed":"Open");
+   return sts;
+}
+
+/*********************************************************
+ *  TSTFH - External File Handler entry point.
+*********************************************************/
+int   
+TSTFH( unsigned char *opCodep, FCD3 *fcd) 
+{
+   unsigned int   opCode;
+   char  *fname;
+   int      sts, ky, j, k;
+
+   if(*opCodep == 0xfa)
+      opCode = 0xfa00 + opCodep[1];
+   else
+      opCode = opCodep[1];
+
+   if(fcd->fileOrg == ORG_LINE_SEQ
+   || fcd->fileOrg == ORG_SEQ
+   || fcd->fileOrg == ORG_INDEXED
+   || fcd->fileOrg == ORG_RELATIVE) {
+      switch (opCode) {
+      case OP_OPEN_OUTPUT:
+      case OP_OPEN_IO:
+      case OP_OPEN_EXTEND:
+      case OP_OPEN_OUTPUT_NOREWIND:
+         return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+         break;
+
+      case OP_OPEN_INPUT:
+      case OP_OPEN_INPUT_NOREWIND:
+      case OP_OPEN_INPUT_REVERSED:
+         return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+         break;
+
+      case OP_CLOSE:
+         return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+         break;
+
+      default:
+         break;
+      }
+
+   }
+
+   if(opCode == OP_CLOSE
+   && (fcd->openMode & OPEN_NOT_OPEN) ) {
+      return 0;
+   }
+
+   sts = EXTFH( opCodep, fcd );
+   return sts;
+}
+
+static char *           /* Return Text name of function */
+txtOpCode(int opCode)
+{
+   static char tmp[32];
+   switch (opCode) {
+   case OP_OPEN_INPUT:     return "OPEN_IN";
+   case OP_OPEN_OUTPUT:       return "OPEN_OUT";
+   case OP_OPEN_IO:     return "OPEN_IO";
+   case OP_OPEN_EXTEND:       return "OPEN_EXT";
+   case OP_OPEN_INPUT_NOREWIND:  return "OPEN_IN_NOREW";
+   case OP_OPEN_OUTPUT_NOREWIND: return "OPEN_OUT_NOREW";
+   case OP_OPEN_INPUT_REVERSED:  return "OPEN_IN_REV";
+   case OP_CLOSE:          return "CLOSE";
+   case OP_CLOSE_LOCK:     return "CLOSE_LOCK";
+   case OP_CLOSE_NOREWIND:    return "CLOSE_NORED";
+   case OP_CLOSE_REEL:     return "CLOSE_REEL";
+   case OP_CLOSE_REMOVE:      return "CLOSE_REMOVE";
+   case OP_CLOSE_NO_REWIND:   return "CLOSE_NO_REW";
+   case OP_START_EQ:       return "START_EQ";
+   case OP_START_EQ_ANY:      return "START_EQ_ANY";
+   case OP_START_GT:       return "START_GT";
+   case OP_START_GE:       return "START_GE";
+   case OP_START_LT:       return "START_LT";
+   case OP_START_LE:       return "START_LE";
+   case OP_READ_SEQ_NO_LOCK:  return "READ_SEQ_NO_LK";
+   case OP_READ_SEQ:       return "READ_SEQ";
+   case OP_READ_SEQ_LOCK:     return "READ_SEQ_LK";
+   case OP_READ_SEQ_KEPT_LOCK:   return "READ_SEQ_KEPT_LK";
+   case OP_READ_PREV_NO_LOCK:    return "READ_PREV_NO_LK";
+   case OP_READ_PREV:      return "READ_PREV";
+   case OP_READ_PREV_LOCK:    return "READ_PREV_LK";
+   case OP_READ_PREV_KEPT_LOCK:  return "READ_PREV_KEPT_LK";
+   case OP_READ_RAN:       return "READ_RAN";
+   case OP_READ_RAN_NO_LOCK:  return "READ_RAN_NO_LK";
+   case OP_READ_RAN_KEPT_LOCK:   return "READ_RAN_KEPT_LK";
+   case OP_READ_RAN_LOCK:     return "READ_RAN_LK";
+   case OP_READ_DIR:       return "READ_DIR";
+   case OP_READ_DIR_NO_LOCK:  return "READ_DIR_NO_LK";
+   case OP_READ_DIR_KEPT_LOCK:   return "READ_DIR_KEPT_LK";
+   case OP_READ_DIR_LOCK:     return "READ_DIR_LK";
+   case OP_READ_POSITION:     return "READ_POSITION";
+   case OP_WRITE:          return "WRITE";
+   case OP_REWRITE:     return "REWRITE";
+   case OP_DELETE:      return "DELETE";
+   case OP_DELETE_FILE:       return "DELETE_FILE";
+   case OP_UNLOCK:      return "UNLOCK";
+   case OP_ROLLBACK:       return "ROLLBACK";
+   case OP_COMMIT:      return "COMMIT";
+   case OP_WRITE_BEFORE:      return "WRITE_BEFORE";
+   case OP_WRITE_BEFORE_TAB:  return "WRITE_BEFORE_TAB";
+   case OP_WRITE_BEFORE_PAGE:    return "WRITE_BEFORE_PAGE";
+   case OP_WRITE_AFTER:       return "WRITE_AFTER";
+   case OP_WRITE_AFTER_TAB:   return "WRITE_AFTER_TAB";
+   case OP_WRITE_AFTER_PAGE:  return "WRITE_AFTER_PAGE";
+   }
+   sprintf(tmp,"Func 0x%02X:",opCode);
+   return tmp;
+}
+]])
+
+AT_CHECK([cobc -x -std=mf -w -fcallfh=TSTFH prog.cob cmod.c], [0], [], [])
+
+AT_CHECK([./prog], [0], [EXFTH did OPEN_IN; File now Closed
+Open Input when no file Sts:35
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_EXT; File now Closed
+Open Extend when no file Sts:35
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_OUT; File now Open
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_EXT; File now Open
+Open Extend when empty file Sts:00
+EXFTH did CLOSE; File now Closed
+Loading sample data file.
+EXFTH did OPEN_OUT; File now Open
+Sample data file load complete.
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_IN; File now Open
+Open Sts:00
+Read ALP00000 Sts:00
+Read BET00000 Sts:00
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_IO; File now Open
+Read ALP00000 Sts:00
+REWRITE ALP00000 Sts 00 Trms:0011
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_IO; File now Open
+Read ALP00000 Sts:00
+REWRITE ALP00000 Sts 00 Trms:0012
+Read BET00000
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_IN; File now Open
+Re-list File Open Sts:00
+Read  ALP00000 Trms:0012
+Read  BET00000 Trms:0013
+Read  GAM00000 Trms:0075
+Read  DEL00000 Trms:0010
+Read  EPS00000 Trms:0090
+Read  FOR00000 Trms:0254
+Read Status: 10
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_EXT; File now Open
+EXFTH did CLOSE; File now Closed
+EXFTH did OPEN_IN; File now Open
+List File afer EXTEND Open Sts:00
+Read  ALP00000 Trms:0012
+Read  BET00000 Trms:0013
+Read  GAM00000 Trms:0075
+Read  DEL00000 Trms:0010
+Read  EPS00000 Trms:0090
+Read  FOR00000 Trms:0254
+Read  BET00000 Trms:0013
+Read Status: 10
+EXFTH did CLOSE; File now Closed
+], [])
+
+AT_CLEANUP
+
 AT_SETUP([Trace feature with subroutine])
 AT_KEYWORDS([Trace])
 
