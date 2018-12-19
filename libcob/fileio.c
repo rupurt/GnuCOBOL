@@ -3230,7 +3230,17 @@ lineseq_write (cob_file *f, const int opt)
 			putc ('\r', (FILE *)f->file);
 		} else if ((opt & COB_WRITE_BEFORE) && f->flag_needs_nl) {
 			putc ('\r', (FILE *)f->file);
+		} else if ((opt == 0) ) {
+			putc ('\r', (FILE *)f->file);
 		}
+	}
+
+	if ((opt == 0) 
+	&& !(f->flag_select_features & COB_SELECT_LINAGE)
+	&& ((f->file_features & COB_FILE_LS_LF)
+	 || (f->file_features & COB_FILE_LS_CRLF))) {	/* At least add 1 LF */
+		putc ('\n', (FILE *)f->file);
+		f->flag_needs_nl = 0;
 	}
 
 	/* WRITE BEFORE */
@@ -9243,6 +9253,12 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 	} else if(f->organization == COB_ORG_LINE_SEQUENTIAL) {
 		fcd->fileOrg = ORG_LINE_SEQ;
 		STCOMPX2(0, fcd->refKey);
+		if((f->file_features & COB_FILE_LS_CRLF))
+			fcd->fstatusType |= MF_FST_CRdelim;
+		if((f->file_features & COB_FILE_LS_NULLS))
+			fcd->fstatusType |= MF_FST_InsertNulls;
+		if((f->file_features & COB_FILE_LS_FIXED))
+			fcd->fstatusType |= MF_FST_NoStripSpaces;
 	} else if(f->organization == COB_ORG_RELATIVE) {
 		fcd->fileOrg = ORG_RELATIVE;
 		STCOMPX2(0, fcd->refKey);
@@ -9315,7 +9331,6 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 	else
 		f->flag_line_adv = 0;
 
-
 	if(fcd->recordMode == REC_MODE_FIXED) {
 	} else {
 	}
@@ -9333,6 +9348,18 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 		f->organization = COB_ORG_SEQUENTIAL;
 	} else if(fcd->fileOrg == ORG_LINE_SEQ) {
 		f->organization = COB_ORG_LINE_SEQUENTIAL;
+#ifdef	_WIN32
+		f->file_features |= COB_FILE_LS_CRLF;
+#else
+		if((fcd->fstatusType & MF_FST_CRdelim))
+			f->file_features |= COB_FILE_LS_CRLF;
+		else
+			f->file_features |= COB_FILE_LS_LF;
+#endif
+		if((fcd->fstatusType & MF_FST_InsertNulls))
+			f->file_features |= COB_FILE_LS_NULLS;
+		if((fcd->fstatusType & MF_FST_NoStripSpaces))
+			f->file_features |= COB_FILE_LS_FIXED;
 	} else if(fcd->fileOrg == ORG_RELATIVE) {
 		f->organization = COB_ORG_RELATIVE;
 	}
