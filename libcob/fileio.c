@@ -9208,19 +9208,24 @@ copy_file_to_fcd(cob_file *f, FCD3 *fcd)
 		}
 		if(fcd->kdbPtr == NULL
 		&& f->nkeys > 0) {
-			kdblen = sizeof(KDB) + (sizeof(kdb->key) * (f->nkeys - 1)) + (sizeof(EXTKEY) * keycomp);
-			fcd->kdbPtr = kdb = cob_malloc(kdblen + sizeof(EXTKEY) + 14);
-			STCOMPX2(kdblen, kdb->kdbLen);
-			STCOMPX2(f->nkeys, kdb->nkeys);
 			nkeys = f->nkeys;
+			kdblen = sizeof(KDB) - sizeof(kdb->key) + (sizeof(kdb->key[0]) * nkeys) + (sizeof(EXTKEY) * keycomp);
+			fcd->kdbPtr = kdb = cob_malloc(kdblen + sizeof(EXTKEY));
+			STCOMPX2(kdblen, kdb->kdbLen);
+			STCOMPX2(nkeys, kdb->nkeys);
+		} else if(fcd->kdbPtr == NULL) {
+			nkeys = 0;
+			kdblen = sizeof(KDB) - sizeof(kdb->key) + (sizeof(kdb->key[0]) * nkeys) + (sizeof(EXTKEY) * keycomp);
+			fcd->kdbPtr = kdb = cob_malloc(kdblen + sizeof(EXTKEY));
+			STCOMPX2(kdblen, kdb->kdbLen);
+			STCOMPX2(nkeys, kdb->nkeys);
 		} else {
 			kdb = fcd->kdbPtr;
 			nkeys = LDCOMPX2(kdb->nkeys);
 			if(nkeys > f->nkeys)
 				nkeys = f->nkeys;
 		}
-		keypos = ((sizeof(kdb->key) * nkeys) + 14);
-		keypos = (16 * nkeys) + 14;
+		keypos = (sizeof(kdb->key[0]) * nkeys) + sizeof(KDB) - sizeof(kdb->key);
 		for(idx=0; idx < nkeys; idx++) {
 			key = (EXTKEY*)((char*)((char*)kdb) + keypos);
 			STCOMPX2(keypos, kdb->key[idx].offset);
@@ -9330,10 +9335,6 @@ copy_fcd_to_file(FCD3* fcd, cob_file *f)
 		f->flag_line_adv = 1;
 	else
 		f->flag_line_adv = 0;
-
-	if(fcd->recordMode == REC_MODE_FIXED) {
-	} else {
-	}
 
 	if((fcd->lockMode & FCD_LOCK_EXCL_LOCK))
 		f->lock_mode = COB_LOCK_EXCLUSIVE;
