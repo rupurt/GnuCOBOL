@@ -105,6 +105,8 @@ config/rm.conf -text
 config/rm.words -text
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
+copy/xfhfcd.cpy -text
+copy/xfhfcd3.cpy -text
 /create_win_dist.sh eol=lf
 doc/Makefile.am eol=lf
 doc/cobcinfo.sh eol=lf
