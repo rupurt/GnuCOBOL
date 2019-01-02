@@ -1,4 +1,9 @@
 
+2019-01-02  Ron Norman <rjn@inglenet.com>
+	* field.c: Check for duplicate LINE in REPORT and ignore it
+	* codegen.c: Skip initialize to SPACES for REPORT lines as
+	            all lines are cleared to SPACES
+
 2018-09-11  Ron Norman <rjn@inglenet.com>
 	* scanner.l: Duplicate 78/CONSTANT and then assign line number
 	* tree.c: improved warnings to be more inclusive

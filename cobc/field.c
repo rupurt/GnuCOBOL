@@ -1575,10 +1575,27 @@ compute_size (struct cb_field *f)
 		}
 		return f->size;
 	}
+	if (f->storage == CB_STORAGE_REPORT
+	 && (f->report_flag & COB_REPORT_LINE)
+	 && !(f->report_flag & COB_REPORT_LINE_PLUS)
+	 && f->parent
+	 && f->parent->children != f) {
+		for(c = f->parent->children; c && c != f; c = c->sister) {
+			if ((c->report_flag & COB_REPORT_LINE)
+			 && !(c->report_flag & COB_REPORT_LINE_PLUS)
+			 && c->report_line == f->report_line) {
+				if (warningopt) {
+					cb_warning_x (CB_TREE(f), _("Duplicate LINE %d ignored"),f->report_line);
+				}
+				f->report_line = 0;
+				f->report_flag &= ~COB_REPORT_LINE;
+			}
+		}
+	}
 
 	if (f->children) {
 		if (f->storage == CB_STORAGE_REPORT
-		&& (f->report_flag && COB_REPORT_LINE) ) {
+		&& (f->report_flag & COB_REPORT_LINE) ) {
 			f->offset = 0;
 		}
 
