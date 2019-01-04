@@ -116,7 +116,7 @@ extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
-libcob/xml.c -text
+libcob/mlio.c -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
@@ -220,11 +220,11 @@ tests/testsuite.src/run_fundamental.at eol=lf
 tests/testsuite.src/run_initialize.at eol=lf
 tests/testsuite.src/run_manual_screen.at -text
 tests/testsuite.src/run_misc.at eol=lf
+tests/testsuite.src/run_ml.at -text
 tests/testsuite.src/run_refmod.at eol=lf
 tests/testsuite.src/run_reportwriter.at eol=lf
 tests/testsuite.src/run_returncode.at eol=lf
 tests/testsuite.src/run_subscripts.at eol=lf
-tests/testsuite.src/run_xml.at -text
 tests/testsuite.src/syn_copy.at eol=lf
 tests/testsuite.src/syn_definition.at eol=lf
 tests/testsuite.src/syn_file.at eol=lf
