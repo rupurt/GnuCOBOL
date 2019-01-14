@@ -240,5 +240,6 @@ tests/testsuite.src/syn_screen.at eol=lf
 tests/testsuite.src/syn_set.at eol=lf
 tests/testsuite.src/syn_subscripts.at eol=lf
 tests/testsuite.src/syn_value.at eol=lf
+tests/testsuite.src/tutorial.cob -text
 tests/testsuite.src/used_binaries.at eol=lf
 tests/testsuite_manual.at eol=lf
