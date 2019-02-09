@@ -23,6 +23,11 @@ build_windows/config.h.in eol=crlf
 build_windows/defaults.h.in eol=crlf
 build_windows/makebisonflex.bat eol=crlf
 build_windows/makedist.bat eol=crlf
+build_windows/ocide/GnuCOBOL.cwa -text
+build_windows/ocide/cobc.exe.cpj -text
+build_windows/ocide/cobcrun.exe.cpj -text
+build_windows/ocide/libcob.dll.cpj -text
+build_windows/ocide/libsupport.l.cpj -text
 build_windows/resource.h eol=crlf
 build_windows/set_env_vs.bat eol=crlf
 build_windows/set_env_vs_dist.bat eol=crlf
@@ -98,6 +103,15 @@ build_windows/vs2017/libcob.vcxproj eol=crlf
 build_windows/vs2017/libcob.vcxproj.filters eol=crlf
 build_windows/vs2017/libsupport.vcxproj eol=crlf
 build_windows/vs2017/libsupport.vcxproj.filters eol=crlf
+build_windows/vs2019/GnuCOBOL.sln eol=crlf
+build_windows/vs2019/cobc.vcxproj eol=crlf
+build_windows/vs2019/cobc.vcxproj.filters eol=crlf
+build_windows/vs2019/cobcrun.vcxproj eol=crlf
+build_windows/vs2019/cobcrun.vcxproj.filters eol=crlf
+build_windows/vs2019/libcob.vcxproj eol=crlf
+build_windows/vs2019/libcob.vcxproj.filters eol=crlf
+build_windows/vs2019/libsupport.vcxproj eol=crlf
+build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
 config/Makefile.am eol=lf
 config/rm-strict.conf -text
