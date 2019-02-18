@@ -10,7 +10,7 @@
 /.deps
 /Makefile
 /Makefile.in
-/_build*
+/_*
 /aclocal.m4
 /atlocal
 /autom4te.cache
@@ -26,6 +26,7 @@ bin/atlocal
 bin/cob-config
 bin/cobcrun
 /build
+/build-*
 build_windows/*.7z
 build_windows/*.bak
 build_windows/*.h
