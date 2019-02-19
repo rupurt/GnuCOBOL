@@ -1319,6 +1319,11 @@ setup_parameters (struct cb_field *f)
 
 		case CB_USAGE_COMP_5:
 			f->flag_real_binary = 1;
+			if(f->pic 
+			&& f->pic->orig
+			&& f->pic->orig[0] == 'X') {
+				f->usage = CB_USAGE_COMP_X;
+			}
 		case CB_USAGE_COMP_X:
 			if (f->pic->category == CB_CATEGORY_ALPHANUMERIC
 			&& f->usage == CB_USAGE_COMP_X) {

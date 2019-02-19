@@ -13815,3 +13815,137 @@ E: OK OTHER option taken
 
 AT_CLEANUP
 
+AT_SETUP([CBL_OR with PIC X COMP-5])
+AT_KEYWORDS([COMP-5])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+
+       DATA DIVISION.
+
+       WORKING-STORAGE SECTION.
+
+       01  WS-BD-BITS                     PIC S9(09) COMP VALUE ZERO.   
+       01  WS-BD-BITS-SAVE                PIC S9(09) COMP VALUE ZERO.   
+
+       01  COUNTER                        PIC S9(09) COMP VALUE ZERO.
+       01  COUNTER2                       PIC S9(09) COMP VALUE ZERO.
+
+       01  WS-BIT-CHECK                   PIC S9(09) COMP VALUE ZERO.   
+
+       01  WS-BYTE-COUNT                  PIC X(4) COMP-5 VALUE 4.
+
+       01  BD-BITS                        PIC S9(09) COMP VALUE ZERO.   
+       01  BD-BYTES                       PIC X(32)  VALUE SPACES.
+       01  BD-NUMBYTES                    PIC S9(04) COMP VALUE 32.
+       01  BD-CNVERR                      PIC S9(04) COMP VALUE ZERO.
+
+       PROCEDURE DIVISION .
+
+       main section.
+           
+           move 401399 to BD-BITS
+           display "Execute for TRANSFER A BIT MAP TO A BYTE MAP"
+           display "THE BIT VALUE IS       : " BD-BITS
+           PERFORM bit-to-byte
+              
+           display "-----".
+           
+           move "00000000000001100001111111110111" to BD-BYTES
+           display "Execute for TRANSFER A BYTE MAP TO A BIT MAP"
+           display "THE BYTE VALUE IS     : " BD-BYTES
+           perform byte-to-bit
+           
+           GOBACK.
+
+      ******************************************************************
+
+       bit-to-byte section.
+
+            MOVE BD-BITS TO WS-BD-BITS
+
+            PERFORM VARYING COUNTER FROM 1 by 1 UNTIL
+                         COUNTER >  BD-NUMBYTES
+
+                    COMPUTE WS-BD-BITS-SAVE =    WS-BD-BITS
+                    COMPUTE WS-BIT-CHECK = 2 ** (COUNTER - 1)
+
+                    CALL "CBL_OR" USING WS-BD-BITS-SAVE
+                                        WS-BIT-CHECK
+                               BY VALUE WS-BYTE-COUNT
+
+                    COMPUTE COUNTER2 = BD-NUMBYTES - COUNTER + 1
+
+                    IF WS-BD-BITS-SAVE = WS-BIT-CHECK THEN
+                       MOVE "1" TO BD-BYTES(COUNTER2:1)
+                    ELSE
+                       MOVE "0" TO BD-BYTES(COUNTER2:1)
+                    END-IF
+           END-PERFORM.
+
+              DISPLAY "BITMAP   = --------------------:"
+              DISPLAY "BITMAP   = Final Value BD-BYTES: " BD-BYTES.
+              DISPLAY "BITMAP   = --------------------:".
+
+             continue.
+
+      ******************************************************************
+
+       byte-to-bit section.
+
+           MOVE ZERO TO WS-BD-BITS-SAVE.
+
+           PERFORM VARYING COUNTER FROM 1 BY 1
+                   UNTIL   COUNTER > BD-NUMBYTES
+
+              COMPUTE COUNTER2 = BD-NUMBYTES - COUNTER + 1
+
+
+              IF BD-BYTES (COUNTER:1) NOT = "0" THEN
+
+                 COMPUTE WS-BIT-CHECK = 2 ** (COUNTER2 - 1)
+
+                 CALL "CBL_OR" USING WS-BIT-CHECK
+                                     WS-BD-BITS-SAVE
+                            BY VALUE WS-BYTE-COUNT
+
+              END-IF
+
+           END-PERFORM.
+
+           MOVE WS-BD-BITS-SAVE TO BD-BITS.
+
+
+           DISPLAY "BITMAP   = --------------------:"
+           DISPLAY "BITMAP   = Final Value of      :"
+           DISPLAY "BITMAP   = WS-BD-BITS-SAVE     : "
+                               WS-BD-BITS-SAVE
+           DISPLAY "BITMAP   = BD-BITS             : "
+                               BD-BITS      .
+           DISPLAY "BITMAP   = --------------------:".
+
+           continue.
+])
+
+AT_CHECK([cobc -x -std=cobol2002 -w prog.cob ], [0], [], [])
+
+AT_CHECK([./prog], [0], [Execute for TRANSFER A BIT MAP TO A BYTE MAP
+THE BIT VALUE IS       : +000401399
+BITMAP   = --------------------:
+BITMAP   = Final Value BD-BYTES: 00000000000001100001111111110111
+BITMAP   = --------------------:
+-----
+Execute for TRANSFER A BYTE MAP TO A BIT MAP
+THE BYTE VALUE IS     : 00000000000001100001111111110111
+BITMAP   = --------------------:
+BITMAP   = Final Value of      :
+BITMAP   = WS-BD-BITS-SAVE     : +000401399
+BITMAP   = BD-BITS             : +000401399
+BITMAP   = --------------------:
+], [])
+
+AT_CLEANUP
+
