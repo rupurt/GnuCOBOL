@@ -1,4 +1,7 @@
 
+2019-02-19  Ron Norman <rjn@inglenet.com>
+	* field.c: Change PIC X(4) COMP-5 into PIC X(4) COMP-X
+
 2019-01-02  Ron Norman <rjn@inglenet.com>
 	* field.c: Check for duplicate LINE in REPORT and ignore it
 	* codegen.c: Skip initialize to SPACES for REPORT lines as
