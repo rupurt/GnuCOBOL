@@ -1,16 +1,13 @@
 /*.7z
 /*.bz2
-/*.edited
 /*.gz
 /*.lz
 /*.sig
-/*.tmp
 /*.xz
 /*.zip
 /.deps
 /Makefile
 /Makefile.in
-/TAGS
 /_*
 /aclocal.m4
 /atlocal
@@ -153,7 +150,6 @@ copy/.deps
 copy/Makefile
 copy/Makefile.in
 copy/atlocal
-/cscope.*
 /defaults.h
 doc/*.cps
 doc/*.tex
@@ -179,7 +175,6 @@ doc/version.texi
 extras/*.dll
 extras/Makefile
 extras/Makefile.in
-/gen
 lib/.deps
 lib/Makefile
 lib/Makefile.in
@@ -191,6 +186,7 @@ libcob/*.gcno
 libcob/.deps
 libcob/Makefile
 libcob/Makefile.in
+libcob/TAGS
 libcob/atlocal
 /libtool
 m4/.deps
