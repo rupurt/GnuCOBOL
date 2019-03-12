@@ -1,5 +1,6 @@
 * text=auto !eol
 /Makefile.am eol=lf
+/NOTES -text
 /autogen.sh eol=lf
 bin/Makefile.am eol=lf
 bin/cob-config.1 -text

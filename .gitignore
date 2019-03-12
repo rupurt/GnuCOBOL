@@ -10,6 +10,7 @@
 /.deps
 /Makefile
 /Makefile.in
+/TAGS
 /_*
 /aclocal.m4
 /atlocal
@@ -27,6 +28,7 @@ bin/cob-config
 bin/cobcrun
 /build
 /build-*
+/build.*
 build_windows/*.7z
 build_windows/*.bak
 build_windows/*.h
@@ -151,6 +153,7 @@ copy/.deps
 copy/Makefile
 copy/Makefile.in
 copy/atlocal
+/cscope.*
 /defaults.h
 doc/*.cps
 doc/*.tex
@@ -176,6 +179,7 @@ doc/version.texi
 extras/*.dll
 extras/Makefile
 extras/Makefile.in
+/gen
 lib/.deps
 lib/Makefile
 lib/Makefile.in
