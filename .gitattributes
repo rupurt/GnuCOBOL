@@ -38,6 +38,7 @@ build_windows/set_env_vs_dist_x64.bat eol=crlf
 build_windows/set_env_vs_x64.bat eol=crlf
 build_windows/version_cobc.rc eol=crlf
 build_windows/version_cobcrun.rc eol=crlf
+build_windows/version_gcdiff.rc -text
 build_windows/version_libcob.rc eol=crlf
 build_windows/vs2005/GnuCOBOL.sln eol=crlf
 build_windows/vs2005/cobc.vcproj eol=crlf
