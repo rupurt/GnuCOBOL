@@ -223,7 +223,6 @@ tests/cobol85/summary.txt -text
 tests/cobol85/summarynoix.txt -text
 tests/listings-sed.sh eol=lf
 tests/run_prog_manual.sh.in eol=lf
-tests/testsuite -text
 tests/testsuite.at eol=lf
 tests/testsuite.src/configuration.at eol=lf
 tests/testsuite.src/data_binary.at eol=lf
