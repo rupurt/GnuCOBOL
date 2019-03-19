@@ -4,7 +4,6 @@
 bin/Makefile.am eol=lf
 bin/cob-config.1 -text
 bin/cob-config.in eol=lf
-bin/cobcrun.c eol=lf
 build_aux/bootstrap eol=lf
 build_aux/compile eol=lf
 build_aux/config.guess eol=lf
@@ -115,13 +114,9 @@ build_windows/vs2019/libsupport.vcxproj eol=crlf
 build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
 config/Makefile.am eol=lf
-config/rm-strict.conf -text
-config/rm.conf -text
 config/rm.words -text
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
-copy/xfhfcd.cpy -text
-copy/xfhfcd3.cpy -text
 /create_win_dist.sh eol=lf
 doc/Makefile.am eol=lf
 doc/cobcinfo.sh eol=lf
@@ -131,7 +126,6 @@ extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
-libcob/mlio.c -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
