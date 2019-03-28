@@ -116,6 +116,7 @@ build_windows/vs2019/libcob.vcxproj eol=crlf
 build_windows/vs2019/libcob.vcxproj.filters eol=crlf
 build_windows/vs2019/libsupport.vcxproj eol=crlf
 build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
+/cobc-dev.7 -text
 cobc/Makefile.am eol=lf
 config/Makefile.am eol=lf
 config/rm-strict.conf -text
