@@ -15,6 +15,7 @@ build_aux/ltmain.sh eol=lf
 build_aux/mdate-sh eol=lf
 build_aux/missing eol=lf
 build_aux/mkinstalldirs eol=lf
+build_aux/pre-inst-env.in eol=lf
 build_aux/texinfo.tex eol=lf
 build_aux/ylwrap eol=lf
 build_windows/ChangeLog.txt eol=crlf
