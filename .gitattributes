@@ -24,6 +24,7 @@ build_windows/config.h.in eol=crlf
 build_windows/defaults.h.in eol=crlf
 build_windows/makebisonflex.bat eol=crlf
 build_windows/makedist.bat eol=crlf
+build_windows/maketarstamp.ps1 eol=lf
 build_windows/ocide/GnuCOBOL.cwa -text
 build_windows/ocide/cobc.exe.cpj -text
 build_windows/ocide/cobcrun.exe.cpj -text
