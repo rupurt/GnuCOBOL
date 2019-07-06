@@ -9,6 +9,8 @@ build_aux/compile eol=lf
 build_aux/config.guess eol=lf
 build_aux/config.rpath eol=lf
 build_aux/config.sub eol=lf
+build_aux/create_mingw_bindist.sh eol=lf
+build_aux/create_win_dist.sh eol=lf
 build_aux/depcomp eol=lf
 build_aux/install-sh eol=lf
 build_aux/ltmain.sh eol=lf
@@ -119,7 +121,6 @@ config/Makefile.am eol=lf
 config/rm.words -text
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
-/create_win_dist.sh eol=lf
 doc/Makefile.am eol=lf
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
