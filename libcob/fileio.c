@@ -99,11 +99,6 @@
 
 #endif	/* _WIN32 */
 
-/* Force symbol exports */
-#define	COB_LIB_EXPIMP
-#include "libcob.h"
-#include "coblocal.h"
-
 #if !defined (EDEADLK) && defined (EDEADLOCK)
 #define EDEADLK EDEADLOCK
 #endif
@@ -158,6 +153,11 @@ static	vb_rtd_t *vbisam_rtd = NULL;
 #define ISRECLEN isreclen
 #endif
 #endif
+
+/* Force symbol exports */
+#define	COB_LIB_EXPIMP
+#include "libcob.h"
+#include "coblocal.h"
 
 /* Isam File handler packet */
 
