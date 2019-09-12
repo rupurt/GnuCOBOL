@@ -2520,6 +2520,7 @@ set_record_size (cb_tree min, cb_tree max)
 %token LEFTLINE
 %token LEFT_TEXT			"LEFT-TEXT"
 %token LENGTH
+%token LENGTH_OF		"LENGTH OF"
 %token LENGTH_FUNC		"FUNCTION LENGTH/BYTE-LENGTH"
 %token LESS
 %token LESS_OR_EQUAL		"LESS OR EQUAL"
@@ -6198,11 +6199,10 @@ _const_global:
 
 lit_or_length:
   literal				{ $$ = $1; }
-| LENGTH _of con_source			{ $$ = cb_build_const_length ($3); }
+| length_of_register con_source			{ $$ = cb_build_const_length ($2); }
 /* note: only reserved in context of CB_CS_CONSTANT: */
 | BYTE_LENGTH _of con_source	{ $$ = cb_build_const_length ($3); }
 ;
-
 
 con_source:
   identifier_1
@@ -16641,7 +16641,7 @@ x_common:
 ;
 
 length_of_register:
-  LENGTH _of
+  length_of
   {
 	/* FIXME: check with "lookup_register ("LENGTH OF") != NULL"
 	          if we actually want to do this,
@@ -16649,6 +16649,7 @@ length_of_register:
 	*/
   }
 ;
+
 report_x_list:
   arith_x
   {
@@ -17833,6 +17834,7 @@ object_char_or_word_or_modules:	CHARACTERS | WORDS | MODULES;
 records:		RECORD _is_are | RECORDS _is_are ;
 reel_or_unit:		REEL | UNIT ;
 size_or_length:		SIZE | LENGTH ;
+length_of:		LENGTH | LENGTH_OF;
 
 /* Mandatory R/W keywords */
 detail_keyword:		DETAIL | DE ;
