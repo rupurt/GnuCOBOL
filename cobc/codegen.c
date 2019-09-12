@@ -9088,14 +9088,14 @@ output_report_sum_counters (const int top, struct cb_field *f, struct cb_report 
 #endif
 	n = f->sister;
 	c = f->children;
-	if(n
-	&& n->storage != CB_STORAGE_REPORT)
+	if (n
+	 && n->storage != CB_STORAGE_REPORT)
 		n = NULL;
-	if(n
-	&& n->report != r)
+	if (n
+	 && n->report != r)
 		n = NULL;
-	if(c
-	&& c->storage != CB_STORAGE_REPORT)
+	if (c
+	 && c->storage != CB_STORAGE_REPORT)
 		c = NULL;
 	if (n) {
 		output_report_sum_counters(top, n, r);
@@ -9103,12 +9103,13 @@ output_report_sum_counters (const int top, struct cb_field *f, struct cb_report 
 	if (c) {
 		output_report_sum_counters(0, c, r);
 	}
-	if(!top)
+	if (!top) {
 		c = NULL;
+	}
 
-	if(f->report_sum_list == NULL)
+	if (f->report_sum_list == NULL)
 		return;
-	if(f->report_flag & COB_REPORT_SUM_EMITTED)	/* Was this already emited? */
+	if (f->report_flag & COB_REPORT_SUM_EMITTED)	/* Was this already emited? */
 		return;
 	f->report_flag |= COB_REPORT_SUM_EMITTED;
 
@@ -9158,7 +9159,7 @@ output_report_sum_counters (const int top, struct cb_field *f, struct cb_report 
 			output_local("NULL,");
 		}
 		z = get_sum_data_field(r, cb_code_field(x));
-		if(z) {
+		if (z) {
 			output_local("&%s%d",CB_PREFIX_FIELD, z->id);
 			sub_ttl = 1;
 		} else {
@@ -9169,27 +9170,27 @@ output_report_sum_counters (const int top, struct cb_field *f, struct cb_report 
 		rsprv = rsseq;
 	}
 	output_local ("static cob_report_sum_ctr %s%d = {", CB_PREFIX_REPORT_SUM_CTR,++sum_nxt);
-	if(sum_prv) {
+	if (sum_prv) {
 		output_local("&%s%d,",CB_PREFIX_REPORT_SUM_CTR,sum_prv);
 	} else {
 		output_local("NULL,");
 	}
 	output_local ("\"%s\",",fname);
 	output_local("&%s%d_%d,",CB_PREFIX_REPORT_SUM,rsid,rsprv);
-	if(f->report_sum_counter) {
+	if (f->report_sum_counter) {
 		output_local("&%s%d,",CB_PREFIX_FIELD, cb_code_field(f->report_sum_counter)->id);
 		z = get_sum_data_field(r, cb_code_field(f->report_sum_counter));
 	} else {
 		output_local("NULL,");
 		z = NULL;
 	}
-	if(z) {
+	if (z) {
 		output_local("&%s%d,",CB_PREFIX_FIELD, z->id);
 	} else {
 		output_local("NULL,");
 	}
-	for(p=f; p; p = p->parent) {
-		if(p->report_control) {
+	for (p = f; p; p = p->parent) {
+		if (p->report_control) {
 			output_local("&%s%d_%d,",
 				CB_PREFIX_REPORT_CONTROL, r_ctl_id, cb_code_field(p->report_control)->id);
 			break;
