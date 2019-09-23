@@ -4965,7 +4965,7 @@ cb_build_optim_cond (struct cb_binary_op *p)
 		n = ((size_t)f->size - 1)
 		  + (8 * (f->pic->have_sign ? 1 : 0))
 		  +	(16 * (f->flag_binary_swap ? 1 : 0));
-#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER)
+#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER) && defined(COB_ALLOW_UNALIGNED)
 		switch (f->size) {
 		case 2:
 #ifdef	COB_SHORT_BORK
@@ -5407,7 +5407,7 @@ cb_build_optim_add (cb_tree v, cb_tree n)
 			z = ((size_t)f->size - 1)
 			  + (8 * (f->pic->have_sign ? 1 : 0))
 			  + (16 * (f->flag_binary_swap ? 1 : 0));
-#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER)
+#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER) && defined(COB_ALLOW_UNALIGNED)
 			switch (f->size) {
 			case 2:
 #ifdef	COB_SHORT_BORK
@@ -5433,6 +5433,7 @@ cb_build_optim_add (cb_tree v, cb_tree n)
 				break;
 			}
 #else
+#ifdef COB_ALLOW_UNALIGNED
 			if (f->usage == CB_USAGE_COMP_5) {
 				switch (f->size) {
 				case 1:
@@ -5444,6 +5445,7 @@ cb_build_optim_add (cb_tree v, cb_tree n)
 					break;
 				}
 			}
+#endif
 			optimize_defs[bin_add_funcs[z].optim_val] = 1;
 			s = bin_add_funcs[z].optim_name;
 #endif
@@ -5480,7 +5482,7 @@ cb_build_optim_sub (cb_tree v, cb_tree n)
 			z = ((size_t)f->size - 1)
 			  + (8 * (f->pic->have_sign ? 1 : 0))
 			  +	(16 * (f->flag_binary_swap ? 1 : 0));
-#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER)
+#if	defined(COB_NON_ALIGNED) && !defined(_MSC_VER) && defined(COB_ALLOW_UNALIGNED)
 			switch (f->size) {
 			case 2:
 #ifdef	COB_SHORT_BORK
@@ -5505,6 +5507,7 @@ cb_build_optim_sub (cb_tree v, cb_tree n)
 				break;
 			}
 #else
+#ifdef COB_ALLOW_UNALIGNED
 			if (f->usage == CB_USAGE_COMP_5) {
 				switch (f->size) {
 				case 1:
@@ -5516,6 +5519,7 @@ cb_build_optim_sub (cb_tree v, cb_tree n)
 					break;
 				}
 			}
+#endif
 			optimize_defs[bin_sub_funcs[z].optim_val] = 1;
 			s = bin_sub_funcs[z].optim_name;
 #endif

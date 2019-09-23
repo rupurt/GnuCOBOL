@@ -137,6 +137,16 @@ struct strcache {
 #elif	defined(__TINYC__)
 #define GC_C_VERSION_PRF	"(Tiny C) "
 #define GC_C_VERSION	CB_XSTRINGIFY(__TINYC__)
+#elif  defined(__HP_cc)
+#define GC_C_VERSION_PRF       "(HP aC++/ANSI C) "
+#define GC_C_VERSION   CB_XSTRINGIFY(__HP_cc) 
+#elif  defined(__hpux) || defined(_HPUX_SOURCE)
+#if  defined(__ia64)
+#define GC_C_VERSION_PRF       "(HPUX IA64) "
+#else
+#define GC_C_VERSION_PRF       "(HPUX PA-RISC) "
+#endif
+#define GC_C_VERSION   " C"  
 #else
 #define GC_C_VERSION_PRF	""
 #define GC_C_VERSION	_("unknown")
@@ -1051,7 +1061,7 @@ cobc_main_malloc (const size_t size)
 {
 	struct cobc_mem_struct	*m;
 
-	m = calloc ((size_t)1, sizeof(struct cobc_mem_struct) + size);
+	m = calloc ((size_t)1, COBC_MEM_SIZE + size);
 	/* LCOV_EXCL_START */
 	if (unlikely (!m)) {
 		cobc_err_msg (_("cannot allocate %d bytes of memory"),
@@ -1060,7 +1070,7 @@ cobc_main_malloc (const size_t size)
 	}
 	/* LCOV_EXCL_STOP */
 	m->next = cobc_mainmem_base;
-	m->memptr = (char *)m + sizeof (struct cobc_mem_struct);
+	m->memptr = (char *)m + COBC_MEM_SIZE;
 	m->memlen = size;
 	cobc_mainmem_base = m;
 	return m->memptr;
@@ -1111,7 +1121,7 @@ cobc_main_realloc (void *prevptr, const size_t size)
 	struct cobc_mem_struct	*curr;
 	struct cobc_mem_struct	*prev;
 
-	m = calloc ((size_t)1, sizeof(struct cobc_mem_struct) + size);
+	m = calloc ((size_t)1, COBC_MEM_SIZE + size);
 	/* LCOV_EXCL_START */
 	if (unlikely (!m)) {
 		cobc_err_msg (_("cannot allocate %d bytes of memory"),
@@ -1119,7 +1129,7 @@ cobc_main_realloc (void *prevptr, const size_t size)
 		cobc_abort_terminate (0);
 	}
 	/* LCOV_EXCL_STOP */
-	m->memptr = (char *)m + sizeof (struct cobc_mem_struct);
+	m->memptr = (char *)m + COBC_MEM_SIZE;
 	m->memlen = size;
 
 	prev = NULL;
@@ -1187,7 +1197,7 @@ cobc_parse_malloc (const size_t size)
 {
 	struct cobc_mem_struct	*m;
 
-	m = calloc ((size_t)1, sizeof(struct cobc_mem_struct) + size);
+	m = calloc ((size_t)1, COBC_MEM_SIZE + size);
 	/* LCOV_EXCL_START */
 	if (unlikely (!m)) {
 		cobc_err_msg (_("cannot allocate %d bytes of memory"),
@@ -1196,7 +1206,7 @@ cobc_parse_malloc (const size_t size)
 	}
 	/* LCOV_EXCL_STOP */
 	m->next = cobc_parsemem_base;
-	m->memptr = (char *)m + sizeof(struct cobc_mem_struct);
+	m->memptr = (char *)m + COBC_MEM_SIZE;
 	m->memlen = size;
 	cobc_parsemem_base = m;
 	return m->memptr;
@@ -1227,7 +1237,7 @@ cobc_parse_realloc (void *prevptr, const size_t size)
 	struct cobc_mem_struct	*curr;
 	struct cobc_mem_struct	*prev;
 
-	m = calloc ((size_t)1, sizeof(struct cobc_mem_struct) + size);
+	m = calloc ((size_t)1, COBC_MEM_SIZE + size);
 	/* LCOV_EXCL_START */
 	if (unlikely (!m)) {
 		cobc_err_msg (_("cannot allocate %d bytes of memory"),
@@ -1235,7 +1245,7 @@ cobc_parse_realloc (void *prevptr, const size_t size)
 		cobc_abort_terminate (0);
 	}
 	/* LCOV_EXCL_STOP */
-	m->memptr = (char *)m + sizeof(struct cobc_mem_struct);
+	m->memptr = (char *)m + COBC_MEM_SIZE;
 	m->memlen = size;
 
 	prev = NULL;
@@ -1303,7 +1313,7 @@ cobc_plex_malloc (const size_t size)
 {
 	struct cobc_mem_struct	*m;
 
-	m = calloc ((size_t)1, sizeof(struct cobc_mem_struct) + size);
+	m = calloc ((size_t)1, COBC_MEM_SIZE + size);
 	/* LCOV_EXCL_START */
 	if (unlikely (!m)) {
 		cobc_err_msg (_("cannot allocate %d bytes of memory"),
@@ -1311,7 +1321,7 @@ cobc_plex_malloc (const size_t size)
 		cobc_abort_terminate (0);
 	}
 	/* LCOV_EXCL_STOP */
-	m->memptr = (char *)m + sizeof (struct cobc_mem_struct);
+	m->memptr = (char *)m + COBC_MEM_SIZE;
 	m->next = cobc_plexmem_base;
 	cobc_plexmem_base = m;
 	return m->memptr;

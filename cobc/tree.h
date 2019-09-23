@@ -524,6 +524,36 @@ struct cb_next_elem {
 	struct cb_next_elem	*next;
 };
 
+/* FIXME: HAVE_FUNC should be checked via configure and the others be a fallback (note: currently only used in trunk [debug.c]) */
+#if defined(NO_HAVE_FUNC)
+  #define CURRENT_FUNCTION "unknown"
+#elif defined(_MSC_VER)
+  #define CURRENT_FUNCTION __FUNCTION__
+#elif defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+  #define CURRENT_FUNCTION __PRETTY_FUNCTION__
+#elif defined(__DMC__) && (__DMC__ >= 0x810)
+  #define CURRENT_FUNCTION __PRETTY_FUNCTION__
+#elif defined(__FUNCSIG__)
+  #define CURRENT_FUNCTION __FUNCSIG__
+#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+  #define CURRENT_FUNCTION __FUNCTION__
+#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+  #define CURRENT_FUNCTION __FUNC__
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+  #define CURRENT_FUNCTION __func__
+#elif defined(__cplusplus) && (__cplusplus >= 201103)
+  #define CURRENT_FUNCTION __func__
+#else
+  #define CURRENT_FUNCTION __FILE__
+#endif
+
+void
+cb_tree_source_set( const char func[], int line, cb_tree tree, 
+		    const char source_file[], int source_line );
+#define SET_SOURCE(t, s, l) cb_tree_source_set(CURRENT_FUNCTION, __LINE__, (t), (s), (l))
+#define SET_SOURCE_CB(t) cb_tree_source_set(CURRENT_FUNCTION, __LINE__,	(t), \
+					    cb_source_file, cb_source_line)
+
 /* xref entries */
 struct cb_xref_elem {
 	struct cb_xref_elem	*next;
@@ -991,7 +1021,7 @@ struct cb_file {
 	int			optional;		/* OPTIONAL */
 	int			organization;		/* ORGANIZATION - FIXME: use enum */
 	int			access_mode;		/* ACCESS MODE - FIXME: use enum */
-	cob_flags_t		lock_mode;		/* LOCK MODE */
+	int			lock_mode;		/* LOCK MODE */
 	int			special;		/* Special file */
 	int			same_clause;		/* SAME clause */
 	unsigned int		flag_finalized	: 1;	/* Is finalized */
