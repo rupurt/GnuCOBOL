@@ -123,6 +123,9 @@ build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
 cobc/debug.c -text
 config/Makefile.am eol=lf
+config/realia-strict.conf -text
+config/realia.conf -text
+config/realia.words -text
 config/rm.words -text
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
