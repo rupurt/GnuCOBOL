@@ -76,11 +76,6 @@
 #endif
 #endif
 
-#ifndef off_t
-#define off_t		cob_s64_t
-#endif
-
-
 #ifndef	_O_TEMPORARY
 #define	_O_TEMPORARY	0
 #endif
@@ -160,6 +155,10 @@ static	vb_rtd_t *vbisam_rtd = NULL;
 #define	COB_LIB_EXPIMP
 #include "libcob.h"
 #include "coblocal.h"
+
+#ifndef off_t
+#define off_t		cob_s64_t
+#endif
 
 #ifdef	WITH_ANY_ISAM
 

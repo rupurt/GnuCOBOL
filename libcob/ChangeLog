@@ -1,4 +1,8 @@
 
+2019-10-01  Edward Hart <edward.dan.hart@gmail.com>
+
+	* fileio.c: fixed location of definition of off_t (bug #596)
+
 2019-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.h: moved alignment defines to cobc/cobc.h
