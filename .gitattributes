@@ -139,6 +139,9 @@ lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
 libcob/fileio.h -text
 libcob/flmdb.c -text
+libcob/libcobci.c -text
+libcob/libcobdi.c -text
+libcob/libcobvb.c -text
 libcob/sysdefines.h -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
