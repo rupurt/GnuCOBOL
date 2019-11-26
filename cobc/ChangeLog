@@ -8,6 +8,21 @@
 	  fixed to be in the header
 	* tree.h, parser.y: added flag_entry_for_goto to cb_field
 
+2019-11-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_header): use current output target instead of
+	  file pointer
+	* codegen.c (output_indent): replaced by new functions
+	  (output_block_open, output_block_close)
+	* codegen.c: count lines in generated source file in output_line_number,
+	  to do so adjust many calls to use the "correct" output function and never
+	  include a newline within the output string
+	* codegen.c (codegen), tree.h, cobc.c: adjust function to get generated
+	  sourcefile name, keep static reference to it in "output_name"
+	* flag.def, cobc.c: added flags for adjusted C source generation
+	  -fgen-c-line-directives and -fgen-c-labels
+	* codegen.c (output_cobol_info, output_c_info): added
+
 2019-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c: moved alignment defines from libcob/common.h here
