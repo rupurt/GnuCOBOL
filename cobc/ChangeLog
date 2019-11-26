@@ -1,4 +1,13 @@
 
+2019-11-18  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_key_components): extracted
+	  from (output_file_initialization)
+	* codegen.c (perform_label): minor refactoring
+	* codgenc.c: call output_storage instead of output where the result is
+	  fixed to be in the header
+	* tree.h, parser.y: added flag_entry_for_goto to cb_field
+
 2019-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c: moved alignment defines from libcob/common.h here
@@ -12,10 +21,6 @@
 	* cobc.h: For HPUX set COB_ALLOW_UNALIGNED as undefined
 	* typeck.c: Emit ADD/SUBTRACT shortcut for COMP-5 only 
 	            if COB_ALLOW_UNALIGNED defined
-
-
-
-
 	* tree.h: Revert 'lock_mode' back to an 'int'
 	* codegen.c: Changes for 'lock_mode' being an 'int'
 	* cobc.h: Add COB_MEM_SIZE as size of cob_mem_struct rounded up to
@@ -31,7 +36,6 @@
 2019-09-09  Ron Norman <rjn@inglenet.com>
 
 	* cobc.h: Add defines for COB_ALIGN_8 to set 8 byte boundary alignment
-
 
 2019-09-03  Ron Norman <rjn@inglenet.com>
 

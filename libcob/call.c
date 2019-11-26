@@ -592,20 +592,13 @@ lookup (const char *name)
 	return NULL;
 }
 
-/** encode given name
-  \param name to encode
-  \param name_buff to place the encoded name to
-  \param buff_size available
-  \param fold_case may be COB_FOLD_UPPER or COB_FOLD_LOWER
-  \return size of the encoded name, negative if the buffer size would be exceeded
- */
-int
-cob_encode_program_id (const unsigned char *const name,
-	unsigned char *const name_buff,
-	const int buff_size, const int fold_case)
+static int
+cob_encode_invalid_chars (const unsigned char* const name,
+	unsigned char* const name_buff,
+	const int buff_size, int *external_pos)
 {
 	const unsigned char *s = name;
-	int pos = 0;
+	int pos = *external_pos;
 
 #ifndef	HAVE_DESIGNATED_INITS
 	if (init_valid_char) {
@@ -617,10 +610,7 @@ cob_encode_program_id (const unsigned char *const name,
 		}
 	}
 #endif
-	/* Encode the initial digit */
-	if (unlikely (*name <= (unsigned char)'9' && *name >= (unsigned char)'0')) {
-		name_buff[pos++] = (unsigned char)'_';
-	}
+
 	/* Encode invalid letters */
 	for (; *s; ++s) {
 		if (pos >= buff_size - 3) {
@@ -639,6 +629,31 @@ cob_encode_program_id (const unsigned char *const name,
 			}
 		}
 	}
+
+	*external_pos = pos;
+	return pos;
+}
+
+/** encode given name
+  \param name to encode
+  \param name_buff to place the encoded name to
+  \param buff_size available
+  \param fold_case may be COB_FOLD_UPPER or COB_FOLD_LOWER
+  \return size of the encoded name, negative if the buffer size would be exceeded
+ */
+int
+cob_encode_program_id (const unsigned char *const name,
+	unsigned char *const name_buff,
+	const int buff_size, const int fold_case)
+{
+	int pos = 0;
+	/* Encode the initial digit */
+	if (unlikely (*name <= (unsigned char)'9' && *name >= (unsigned char)'0')) {
+		name_buff[pos++] = (unsigned char)'_';
+	}
+	/* Encode invalid letters */
+	cob_encode_invalid_chars (name, name_buff, buff_size, &pos);
+
 	name_buff[pos] = 0;
 
 	/* Check case folding */

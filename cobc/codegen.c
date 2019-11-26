@@ -1245,17 +1245,20 @@ again:
 static void
 perform_label (const char *to_prefix, int to_lbl, int call_num)
 {
-	struct label_list	*l;
 	if (!cb_flag_computed_goto) {
-		if(call_num > 0) {
-			for(l = label_cache; l && l->call_num != call_num; l = l->next);
-			if(l == NULL) {
-				printf("Internal compiler error; Could not find Label for %d\n",call_num);
-			} else {
-				output ("\tframe_ptr->return_address_num = %d; /* %s%d */\n", call_num,CB_PREFIX_LABEL,l->id);
-				output ("\tgoto %s%d;\n", to_prefix, to_lbl);
-				return;
+		struct label_list	*l;
+		if (call_num > 0) {
+			for (l = label_cache; l && l->call_num != call_num; l = l->next);
+			/* LCOV_EXCL_START */
+			if (l == NULL) {
+				cobc_err_msg ("could not find label for %d", call_num);
+				COBC_ABORT ();
 			}
+			/* LCOV_EXCL_STOP */
+			output ("\tframe_ptr->return_address_num = %d; /* %s%d */\n",
+				call_num, CB_PREFIX_LABEL, l->id);
+			output ("\tgoto %s%d;\n", to_prefix, to_lbl);
+			return;
 		}
 		l = cobc_parse_malloc (sizeof (struct label_list));
 		l->next = label_cache;
@@ -1266,25 +1269,25 @@ perform_label (const char *to_prefix, int to_lbl, int call_num)
 			l->call_num = label_cache->call_num + 1;
 		}
 		label_cache = l;
-		output ("\tframe_ptr->return_address_num = %d; /* %s%d */\n", l->call_num,CB_PREFIX_LABEL, cb_id);
-		output ("\tgoto %s%d;\n", to_prefix, to_lbl);
-		output ("%s%d:\n", CB_PREFIX_LABEL, cb_id);
+		output ("\tframe_ptr->return_address_num = %d; /* %s%d */\n",
+			l->call_num, CB_PREFIX_LABEL, cb_id);
 	} else {
-		if(call_num >= 0)
-			output ("\tframe_ptr->return_address_ptr = &&%s%d;\n", CB_PREFIX_LABEL, call_num);
-		else
-			output ("\tframe_ptr->return_address_ptr = &&%s%d;\n", CB_PREFIX_LABEL, cb_id);
-		output ("\tgoto %s%d;\n", to_prefix, to_lbl);
-		output ("%s%d:\n", CB_PREFIX_LABEL, cb_id);
+		if (call_num < 0) {
+			call_num = cb_id;
+		}
+		output ("\tframe_ptr->return_address_ptr = &&%s%d;\n",
+			CB_PREFIX_LABEL, call_num);
 	}
+	output ("\tgoto %s%d;\n", to_prefix, to_lbl);
+	output ("%s%d:\n", CB_PREFIX_LABEL, cb_id);
 	cb_id++;
 }
 
 static int
 add_new_label ()
 {
-	struct label_list	*l;
 	if (!cb_flag_computed_goto) {
+		struct label_list *l;
 		l = cobc_parse_malloc (sizeof (struct label_list));
 		l->next = label_cache;
 		l->id = cb_id;
@@ -2376,41 +2379,41 @@ output_alt_ebcdic_table (void)
 	}
 
 	output_storage ("\n/* ASCII to EBCDIC translate table (restricted) */\n");
-	output ("static const unsigned char\tcob_a2e[256] = {\n");
+	output_storage ("static const unsigned char\tcob_a2e[256] = {\n");
 	/* Restricted table */
-	output ("\t0x00, 0x01, 0x02, 0x03, 0x1D, 0x19, 0x1A, 0x1B,\n");
-	output ("\t0x0F, 0x04, 0x16, 0x06, 0x07, 0x08, 0x09, 0x0A,\n");
-	output ("\t0x0B, 0x0C, 0x0D, 0x0E, 0x1E, 0x1F, 0x1C, 0x17,\n");
-	output ("\t0x10, 0x11, 0x20, 0x18, 0x12, 0x13, 0x14, 0x15,\n");
-	output ("\t0x21, 0x27, 0x3A, 0x36, 0x28, 0x30, 0x26, 0x38,\n");
-	output ("\t0x24, 0x2A, 0x29, 0x25, 0x2F, 0x2C, 0x22, 0x2D,\n");
-	output ("\t0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A,\n");
-	output ("\t0x7B, 0x7C, 0x35, 0x2B, 0x23, 0x39, 0x32, 0x33,\n");
-	output ("\t0x37, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D,\n");
-	output ("\t0x5E, 0x5F, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66,\n");
-	output ("\t0x67, 0x68, 0x69, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F,\n");
-	output ("\t0x70, 0x71, 0x72, 0x7D, 0x6A, 0x7E, 0x7F, 0x31,\n");
-	output ("\t0x34, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41,\n");
-	output ("\t0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,\n");
-	output ("\t0x4A, 0x4B, 0x4C, 0x4E, 0x4F, 0x50, 0x51, 0x52,\n");
-	output ("\t0x53, 0x54, 0x55, 0x56, 0x2E, 0x60, 0x4D, 0x05,\n");
-	output ("\t0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,\n");
-	output ("\t0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F,\n");
-	output ("\t0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,\n");
-	output ("\t0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F,\n");
-	output ("\t0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7,\n");
-	output ("\t0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,\n");
-	output ("\t0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7,\n");
-	output ("\t0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,\n");
-	output ("\t0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,\n");
-	output ("\t0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,\n");
-	output ("\t0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7,\n");
-	output ("\t0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,\n");
-	output ("\t0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7,\n");
-	output ("\t0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,\n");
-	output ("\t0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,\n");
-	output ("\t0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF\n");
-	output ("};\n");
+	output_storage ("\t0x00, 0x01, 0x02, 0x03, 0x1D, 0x19, 0x1A, 0x1B,\n");
+	output_storage ("\t0x0F, 0x04, 0x16, 0x06, 0x07, 0x08, 0x09, 0x0A,\n");
+	output_storage ("\t0x0B, 0x0C, 0x0D, 0x0E, 0x1E, 0x1F, 0x1C, 0x17,\n");
+	output_storage ("\t0x10, 0x11, 0x20, 0x18, 0x12, 0x13, 0x14, 0x15,\n");
+	output_storage ("\t0x21, 0x27, 0x3A, 0x36, 0x28, 0x30, 0x26, 0x38,\n");
+	output_storage ("\t0x24, 0x2A, 0x29, 0x25, 0x2F, 0x2C, 0x22, 0x2D,\n");
+	output_storage ("\t0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A,\n");
+	output_storage ("\t0x7B, 0x7C, 0x35, 0x2B, 0x23, 0x39, 0x32, 0x33,\n");
+	output_storage ("\t0x37, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D,\n");
+	output_storage ("\t0x5E, 0x5F, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66,\n");
+	output_storage ("\t0x67, 0x68, 0x69, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F,\n");
+	output_storage ("\t0x70, 0x71, 0x72, 0x7D, 0x6A, 0x7E, 0x7F, 0x31,\n");
+	output_storage ("\t0x34, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40, 0x41,\n");
+	output_storage ("\t0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49,\n");
+	output_storage ("\t0x4A, 0x4B, 0x4C, 0x4E, 0x4F, 0x50, 0x51, 0x52,\n");
+	output_storage ("\t0x53, 0x54, 0x55, 0x56, 0x2E, 0x60, 0x4D, 0x05,\n");
+	output_storage ("\t0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,\n");
+	output_storage ("\t0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F,\n");
+	output_storage ("\t0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,\n");
+	output_storage ("\t0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F,\n");
+	output_storage ("\t0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7,\n");
+	output_storage ("\t0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,\n");
+	output_storage ("\t0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7,\n");
+	output_storage ("\t0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,\n");
+	output_storage ("\t0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,\n");
+	output_storage ("\t0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,\n");
+	output_storage ("\t0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7,\n");
+	output_storage ("\t0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,\n");
+	output_storage ("\t0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7,\n");
+	output_storage ("\t0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,\n");
+	output_storage ("\t0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,\n");
+	output_storage ("\t0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF\n");
+	output_storage ("};\n");
 	output_storage ("\n");
 }
 
@@ -2424,44 +2427,44 @@ output_full_ebcdic_table (void)
 	}
 
 	output_storage ("\n/* ASCII to EBCDIC table */\n");
-	output ("static const unsigned char\tcob_ascii_ebcdic[256] = {\n");
-	output ("\t0x00, 0x01, 0x02, 0x03, 0x37, 0x2D, 0x2E, 0x2F,\n");
-	output ("\t0x16, 0x05, 0x25, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,\n");
-	output ("\t0x10, 0x11, 0x12, 0x13, 0x3C, 0x3D, 0x32, 0x26,\n");
-	output ("\t0x18, 0x19, 0x3F, 0x27, 0x1C, 0x1D, 0x1E, 0x1F,\n");
-	output ("\t0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D,\n");
-	output ("\t0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61,\n");
-	output ("\t0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,\n");
-	output ("\t0xF8, 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F,\n");
-	output ("\t0x7C, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,\n");
-	output ("\t0xC8, 0xC9, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6,\n");
-	output ("\t0xD7, 0xD8, 0xD9, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,\n");
-	output ("\t0xE7, 0xE8, 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D,\n");
-	output ("\t0x79, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,\n");
-	output ("\t0x88, 0x89, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,\n");
-	output ("\t0x97, 0x98, 0x99, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6,\n");
-	output ("\t0xA7, 0xA8, 0xA9, 0xC0, 0x6A, 0xD0, 0xA1, 0x07,\n");
-	output ("\t0x68, 0xDC, 0x51, 0x42, 0x43, 0x44, 0x47, 0x48,\n");
-	output ("\t0x52, 0x53, 0x54, 0x57, 0x56, 0x58, 0x63, 0x67,\n");
-	output ("\t0x71, 0x9C, 0x9E, 0xCB, 0xCC, 0xCD, 0xDB, 0xDD,\n");
-	output ("\t0xDF, 0xEC, 0xFC, 0xB0, 0xB1, 0xB2, 0x3E, 0xB4,\n");
-	output ("\t0x45, 0x55, 0xCE, 0xDE, 0x49, 0x69, 0x9A, 0x9B,\n");
-	output ("\t0xAB, 0x9F, 0xBA, 0xB8, 0xB7, 0xAA, 0x8A, 0x8B,\n");
-	output ("\t0xB6, 0xB5, 0x62, 0x4F, 0x64, 0x65, 0x66, 0x20,\n");
-	output ("\t0x21, 0x22, 0x70, 0x23, 0x72, 0x73, 0x74, 0xBE,\n");
-	output ("\t0x76, 0x77, 0x78, 0x80, 0x24, 0x15, 0x8C, 0x8D,\n");
-	output ("\t0x8E, 0x41, 0x06, 0x17, 0x28, 0x29, 0x9D, 0x2A,\n");
-	output ("\t0x2B, 0x2C, 0x09, 0x0A, 0xAC, 0x4A, 0xAE, 0xAF,\n");
-	output ("\t0x1B, 0x30, 0x31, 0xFA, 0x1A, 0x33, 0x34, 0x35,\n");
-	output ("\t0x36, 0x59, 0x08, 0x38, 0xBC, 0x39, 0xA0, 0xBF,\n");
-	output ("\t0xCA, 0x3A, 0xFE, 0x3B, 0x04, 0xCF, 0xDA, 0x14,\n");
-	output ("\t0xE1, 0x8F, 0x46, 0x75, 0xFD, 0xEB, 0xEE, 0xED,\n");
-	output ("\t0x90, 0xEF, 0xB3, 0xFB, 0xB9, 0xEA, 0xBB, 0xFF\n");
-	output ("};\n");
+	output_storage ("static const unsigned char\tcob_ascii_ebcdic[256] = {\n");
+	output_storage ("\t0x00, 0x01, 0x02, 0x03, 0x37, 0x2D, 0x2E, 0x2F,\n");
+	output_storage ("\t0x16, 0x05, 0x25, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,\n");
+	output_storage ("\t0x10, 0x11, 0x12, 0x13, 0x3C, 0x3D, 0x32, 0x26,\n");
+	output_storage ("\t0x18, 0x19, 0x3F, 0x27, 0x1C, 0x1D, 0x1E, 0x1F,\n");
+	output_storage ("\t0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D,\n");
+	output_storage ("\t0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61,\n");
+	output_storage ("\t0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,\n");
+	output_storage ("\t0xF8, 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F,\n");
+	output_storage ("\t0x7C, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,\n");
+	output_storage ("\t0xC8, 0xC9, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6,\n");
+	output_storage ("\t0xD7, 0xD8, 0xD9, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,\n");
+	output_storage ("\t0xE7, 0xE8, 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D,\n");
+	output_storage ("\t0x79, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,\n");
+	output_storage ("\t0x88, 0x89, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,\n");
+	output_storage ("\t0x97, 0x98, 0x99, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6,\n");
+	output_storage ("\t0xA7, 0xA8, 0xA9, 0xC0, 0x6A, 0xD0, 0xA1, 0x07,\n");
+	output_storage ("\t0x68, 0xDC, 0x51, 0x42, 0x43, 0x44, 0x47, 0x48,\n");
+	output_storage ("\t0x52, 0x53, 0x54, 0x57, 0x56, 0x58, 0x63, 0x67,\n");
+	output_storage ("\t0x71, 0x9C, 0x9E, 0xCB, 0xCC, 0xCD, 0xDB, 0xDD,\n");
+	output_storage ("\t0xDF, 0xEC, 0xFC, 0xB0, 0xB1, 0xB2, 0x3E, 0xB4,\n");
+	output_storage ("\t0x45, 0x55, 0xCE, 0xDE, 0x49, 0x69, 0x9A, 0x9B,\n");
+	output_storage ("\t0xAB, 0x9F, 0xBA, 0xB8, 0xB7, 0xAA, 0x8A, 0x8B,\n");
+	output_storage ("\t0xB6, 0xB5, 0x62, 0x4F, 0x64, 0x65, 0x66, 0x20,\n");
+	output_storage ("\t0x21, 0x22, 0x70, 0x23, 0x72, 0x73, 0x74, 0xBE,\n");
+	output_storage ("\t0x76, 0x77, 0x78, 0x80, 0x24, 0x15, 0x8C, 0x8D,\n");
+	output_storage ("\t0x8E, 0x41, 0x06, 0x17, 0x28, 0x29, 0x9D, 0x2A,\n");
+	output_storage ("\t0x2B, 0x2C, 0x09, 0x0A, 0xAC, 0x4A, 0xAE, 0xAF,\n");
+	output_storage ("\t0x1B, 0x30, 0x31, 0xFA, 0x1A, 0x33, 0x34, 0x35,\n");
+	output_storage ("\t0x36, 0x59, 0x08, 0x38, 0xBC, 0x39, 0xA0, 0xBF,\n");
+	output_storage ("\t0xCA, 0x3A, 0xFE, 0x3B, 0x04, 0xCF, 0xDA, 0x14,\n");
+	output_storage ("\t0xE1, 0x8F, 0x46, 0x75, 0xFD, 0xEB, 0xEE, 0xED,\n");
+	output_storage ("\t0x90, 0xEF, 0xB3, 0xFB, 0xB9, 0xEA, 0xBB, 0xFF\n");
+	output_storage ("};\n");
 
 	if (gen_full_ebcdic > 1) {
 		i = lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL, 0);
-		output ("static cob_field f_ascii_ebcdic = { 256, (cob_u8_ptr)cob_ascii_ebcdic, &%s%d };\n",
+		output_storage ("static cob_field f_ascii_ebcdic = { 256, (cob_u8_ptr)cob_ascii_ebcdic, &%s%d };\n",
 			CB_PREFIX_ATTR, i);
 	}
 
@@ -2479,44 +2482,44 @@ output_ebcdic_to_ascii_table (void)
 	}
 
 	output_storage ("\n/* EBCDIC to ASCII table */\n");
-	output ("static const unsigned char\tcob_ebcdic_ascii[256] = {\n");
-	output ("\t0x00, 0x01, 0x02, 0x03, 0xEC, 0x09, 0xCA, 0x7F,\n");
-	output ("\t0xE2, 0xD2, 0xD3, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,\n");
-	output ("\t0x10, 0x11, 0x12, 0x13, 0xEF, 0xC5, 0x08, 0xCB,\n");
-	output ("\t0x18, 0x19, 0xDC, 0xD8, 0x1C, 0x1D, 0x1E, 0x1F,\n");
-	output ("\t0xB7, 0xB8, 0xB9, 0xBB, 0xC4, 0x0A, 0x17, 0x1B,\n");
-	output ("\t0xCC, 0xCD, 0xCF, 0xD0, 0xD1, 0x05, 0x06, 0x07,\n");
-	output ("\t0xD9, 0xDA, 0x16, 0xDD, 0xDE, 0xDF, 0xE0, 0x04,\n");
-	output ("\t0xE3, 0xE5, 0xE9, 0xEB, 0x14, 0x15, 0x9E, 0x1A,\n");
-	output ("\t0x20, 0xC9, 0x83, 0x84, 0x85, 0xA0, 0xF2, 0x86,\n");
-	output ("\t0x87, 0xA4, 0xD5, 0x2E, 0x3C, 0x28, 0x2B, 0xB3,\n");
-	output ("\t0x26, 0x82, 0x88, 0x89, 0x8A, 0xA1, 0x8C, 0x8B,\n");
-	output ("\t0x8D, 0xE1, 0x21, 0x24, 0x2A, 0x29, 0x3B, 0x5E,\n");
-	output ("\t0x2D, 0x2F, 0xB2, 0x8E, 0xB4, 0xB5, 0xB6, 0x8F,\n");
-	output ("\t0x80, 0xA5, 0x7C, 0x2C, 0x25, 0x5F, 0x3E, 0x3F,\n");
-	output ("\t0xBA, 0x90, 0xBC, 0xBD, 0xBE, 0xF3, 0xC0, 0xC1,\n");
-	output ("\t0xC2, 0x60, 0x3A, 0x23, 0x40, 0x27, 0x3D, 0x22,\n");
-	output ("\t0xC3, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,\n");
-	output ("\t0x68, 0x69, 0xAE, 0xAF, 0xC6, 0xC7, 0xC8, 0xF1,\n");
-	output ("\t0xF8, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,\n");
-	output ("\t0x71, 0x72, 0xA6, 0xA7, 0x91, 0xCE, 0x92, 0xA9,\n");
-	output ("\t0xE6, 0x7E, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,\n");
-	output ("\t0x79, 0x7A, 0xAD, 0xA8, 0xD4, 0x5B, 0xD6, 0xD7,\n");
-	output ("\t0x9B, 0x9C, 0x9D, 0xFA, 0x9F, 0xB1, 0xB0, 0xAC,\n");
-	output ("\t0xAB, 0xFC, 0xAA, 0xFE, 0xE4, 0x5D, 0xBF, 0xE7,\n");
-	output ("\t0x7B, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,\n");
-	output ("\t0x48, 0x49, 0xE8, 0x93, 0x94, 0x95, 0xA2, 0xED,\n");
-	output ("\t0x7D, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,\n");
-	output ("\t0x51, 0x52, 0xEE, 0x96, 0x81, 0x97, 0xA3, 0x98,\n");
-	output ("\t0x5C, 0xF0, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,\n");
-	output ("\t0x59, 0x5A, 0xFD, 0xF5, 0x99, 0xF7, 0xF6, 0xF9,\n");
-	output ("\t0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,\n");
-	output ("\t0x38, 0x39, 0xDB, 0xFB, 0x9A, 0xF4, 0xEA, 0xFF\n");
-	output ("};\n");
+	output_storage ("static const unsigned char\tcob_ebcdic_ascii[256] = {\n");
+	output_storage ("\t0x00, 0x01, 0x02, 0x03, 0xEC, 0x09, 0xCA, 0x7F,\n");
+	output_storage ("\t0xE2, 0xD2, 0xD3, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,\n");
+	output_storage ("\t0x10, 0x11, 0x12, 0x13, 0xEF, 0xC5, 0x08, 0xCB,\n");
+	output_storage ("\t0x18, 0x19, 0xDC, 0xD8, 0x1C, 0x1D, 0x1E, 0x1F,\n");
+	output_storage ("\t0xB7, 0xB8, 0xB9, 0xBB, 0xC4, 0x0A, 0x17, 0x1B,\n");
+	output_storage ("\t0xCC, 0xCD, 0xCF, 0xD0, 0xD1, 0x05, 0x06, 0x07,\n");
+	output_storage ("\t0xD9, 0xDA, 0x16, 0xDD, 0xDE, 0xDF, 0xE0, 0x04,\n");
+	output_storage ("\t0xE3, 0xE5, 0xE9, 0xEB, 0x14, 0x15, 0x9E, 0x1A,\n");
+	output_storage ("\t0x20, 0xC9, 0x83, 0x84, 0x85, 0xA0, 0xF2, 0x86,\n");
+	output_storage ("\t0x87, 0xA4, 0xD5, 0x2E, 0x3C, 0x28, 0x2B, 0xB3,\n");
+	output_storage ("\t0x26, 0x82, 0x88, 0x89, 0x8A, 0xA1, 0x8C, 0x8B,\n");
+	output_storage ("\t0x8D, 0xE1, 0x21, 0x24, 0x2A, 0x29, 0x3B, 0x5E,\n");
+	output_storage ("\t0x2D, 0x2F, 0xB2, 0x8E, 0xB4, 0xB5, 0xB6, 0x8F,\n");
+	output_storage ("\t0x80, 0xA5, 0x7C, 0x2C, 0x25, 0x5F, 0x3E, 0x3F,\n");
+	output_storage ("\t0xBA, 0x90, 0xBC, 0xBD, 0xBE, 0xF3, 0xC0, 0xC1,\n");
+	output_storage ("\t0xC2, 0x60, 0x3A, 0x23, 0x40, 0x27, 0x3D, 0x22,\n");
+	output_storage ("\t0xC3, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,\n");
+	output_storage ("\t0x68, 0x69, 0xAE, 0xAF, 0xC6, 0xC7, 0xC8, 0xF1,\n");
+	output_storage ("\t0xF8, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,\n");
+	output_storage ("\t0x71, 0x72, 0xA6, 0xA7, 0x91, 0xCE, 0x92, 0xA9,\n");
+	output_storage ("\t0xE6, 0x7E, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,\n");
+	output_storage ("\t0x79, 0x7A, 0xAD, 0xA8, 0xD4, 0x5B, 0xD6, 0xD7,\n");
+	output_storage ("\t0x9B, 0x9C, 0x9D, 0xFA, 0x9F, 0xB1, 0xB0, 0xAC,\n");
+	output_storage ("\t0xAB, 0xFC, 0xAA, 0xFE, 0xE4, 0x5D, 0xBF, 0xE7,\n");
+	output_storage ("\t0x7B, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,\n");
+	output_storage ("\t0x48, 0x49, 0xE8, 0x93, 0x94, 0x95, 0xA2, 0xED,\n");
+	output_storage ("\t0x7D, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,\n");
+	output_storage ("\t0x51, 0x52, 0xEE, 0x96, 0x81, 0x97, 0xA3, 0x98,\n");
+	output_storage ("\t0x5C, 0xF0, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,\n");
+	output_storage ("\t0x59, 0x5A, 0xFD, 0xF5, 0x99, 0xF7, 0xF6, 0xF9,\n");
+	output_storage ("\t0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,\n");
+	output_storage ("\t0x38, 0x39, 0xDB, 0xFB, 0x9A, 0xF4, 0xEA, 0xFF\n");
+	output_storage ("};\n");
 
 	if (gen_ebcdic_ascii > 1) {
 		i = lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL, 0);
-		output ("static cob_field f_ebcdic_ascii = { 256, (cob_u8_ptr)cob_ebcdic_ascii, &%s%d };\n",
+		output_storage ("static cob_field f_ebcdic_ascii = { 256, (cob_u8_ptr)cob_ebcdic_ascii, &%s%d };\n",
 			CB_PREFIX_ATTR, i);
 	}
 
@@ -2534,44 +2537,44 @@ output_native_table (void)
 	}
 
 	output_storage ("\n/* NATIVE table */\n");
-	output ("static const unsigned char\tcob_native[256] = {\n");
-	output ("\t0, 1, 2, 3, 4, 5, 6, 7,\n");
-	output ("\t8, 9, 10, 11, 12, 13, 14, 15,\n");
-	output ("\t16, 17, 18, 19, 20, 21, 22, 23,\n");
-	output ("\t24, 25, 26, 27, 28, 29, 30, 31,\n");
-	output ("\t32, 33, 34, 35, 36, 37, 38, 39,\n");
-	output ("\t40, 41, 42, 43, 44, 45, 46, 47,\n");
-	output ("\t48, 49, 50, 51, 52, 53, 54, 55,\n");
-	output ("\t56, 57, 58, 59, 60, 61, 62, 63,\n");
-	output ("\t64, 65, 66, 67, 68, 69, 70, 71,\n");
-	output ("\t72, 73, 74, 75, 76, 77, 78, 79,\n");
-	output ("\t80, 81, 82, 83, 84, 85, 86, 87,\n");
-	output ("\t88, 89, 90, 91, 92, 93, 94, 95,\n");
-	output ("\t96, 97, 98, 99, 100, 101, 102, 103,\n");
-	output ("\t104, 105, 106, 107, 108, 109, 110, 111,\n");
-	output ("\t112, 113, 114, 115, 116, 117, 118, 119,\n");
-	output ("\t120, 121, 122, 123, 124, 125, 126, 127,\n");
-	output ("\t128, 129, 130, 131, 132, 133, 134, 135,\n");
-	output ("\t136, 137, 138, 139, 140, 141, 142, 143,\n");
-	output ("\t144, 145, 146, 147, 148, 149, 150, 151,\n");
-	output ("\t152, 153, 154, 155, 156, 157, 158, 159,\n");
-	output ("\t160, 161, 162, 163, 164, 165, 166, 167,\n");
-	output ("\t168, 169, 170, 171, 172, 173, 174, 175,\n");
-	output ("\t176, 177, 178, 179, 180, 181, 182, 183,\n");
-	output ("\t184, 185, 186, 187, 188, 189, 190, 191,\n");
-	output ("\t192, 193, 194, 195, 196, 197, 198, 199,\n");
-	output ("\t200, 201, 202, 203, 204, 205, 206, 207,\n");
-	output ("\t208, 209, 210, 211, 212, 213, 214, 215,\n");
-	output ("\t216, 217, 218, 219, 220, 221, 222, 223,\n");
-	output ("\t224, 225, 226, 227, 228, 229, 230, 231,\n");
-	output ("\t232, 233, 234, 235, 236, 237, 238, 239,\n");
-	output ("\t240, 241, 242, 243, 244, 245, 246, 247,\n");
-	output ("\t248, 249, 250, 251, 252, 253, 254, 255\n");
-	output ("};\n");
+	output_storage ("static const unsigned char\tcob_native[256] = {\n");
+	output_storage ("\t0, 1, 2, 3, 4, 5, 6, 7,\n");
+	output_storage ("\t8, 9, 10, 11, 12, 13, 14, 15,\n");
+	output_storage ("\t16, 17, 18, 19, 20, 21, 22, 23,\n");
+	output_storage ("\t24, 25, 26, 27, 28, 29, 30, 31,\n");
+	output_storage ("\t32, 33, 34, 35, 36, 37, 38, 39,\n");
+	output_storage ("\t40, 41, 42, 43, 44, 45, 46, 47,\n");
+	output_storage ("\t48, 49, 50, 51, 52, 53, 54, 55,\n");
+	output_storage ("\t56, 57, 58, 59, 60, 61, 62, 63,\n");
+	output_storage ("\t64, 65, 66, 67, 68, 69, 70, 71,\n");
+	output_storage ("\t72, 73, 74, 75, 76, 77, 78, 79,\n");
+	output_storage ("\t80, 81, 82, 83, 84, 85, 86, 87,\n");
+	output_storage ("\t88, 89, 90, 91, 92, 93, 94, 95,\n");
+	output_storage ("\t96, 97, 98, 99, 100, 101, 102, 103,\n");
+	output_storage ("\t104, 105, 106, 107, 108, 109, 110, 111,\n");
+	output_storage ("\t112, 113, 114, 115, 116, 117, 118, 119,\n");
+	output_storage ("\t120, 121, 122, 123, 124, 125, 126, 127,\n");
+	output_storage ("\t128, 129, 130, 131, 132, 133, 134, 135,\n");
+	output_storage ("\t136, 137, 138, 139, 140, 141, 142, 143,\n");
+	output_storage ("\t144, 145, 146, 147, 148, 149, 150, 151,\n");
+	output_storage ("\t152, 153, 154, 155, 156, 157, 158, 159,\n");
+	output_storage ("\t160, 161, 162, 163, 164, 165, 166, 167,\n");
+	output_storage ("\t168, 169, 170, 171, 172, 173, 174, 175,\n");
+	output_storage ("\t176, 177, 178, 179, 180, 181, 182, 183,\n");
+	output_storage ("\t184, 185, 186, 187, 188, 189, 190, 191,\n");
+	output_storage ("\t192, 193, 194, 195, 196, 197, 198, 199,\n");
+	output_storage ("\t200, 201, 202, 203, 204, 205, 206, 207,\n");
+	output_storage ("\t208, 209, 210, 211, 212, 213, 214, 215,\n");
+	output_storage ("\t216, 217, 218, 219, 220, 221, 222, 223,\n");
+	output_storage ("\t224, 225, 226, 227, 228, 229, 230, 231,\n");
+	output_storage ("\t232, 233, 234, 235, 236, 237, 238, 239,\n");
+	output_storage ("\t240, 241, 242, 243, 244, 245, 246, 247,\n");
+	output_storage ("\t248, 249, 250, 251, 252, 253, 254, 255\n");
+	output_storage ("};\n");
 
 	if (gen_native > 1) {
 		i = lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL, 0);
-		output ("static cob_field f_native = { 256, (cob_u8_ptr)cob_native, &%s%d };\n",
+		output_storage ("static cob_field f_native = { 256, (cob_u8_ptr)cob_native, &%s%d };\n",
 			CB_PREFIX_ATTR, i);
 	}
 
@@ -2605,7 +2608,7 @@ output_string_cache (void)
 	for (stp = string_cache; stp; stp = stp->next) {
 		if (!strrchr (stp->text, '\\')
 		 && !strrchr (stp->text, '"')) {
-			output ("static const char %s%d[]\t= \"%s\";\n",
+			output_storage ("static const char %s%d[]\t= \"%s\";\n",
 				CB_PREFIX_STRING, stp->id, stp->text);
 		} else {
 			char	text_cleaned[FILENAME_MAX];
@@ -2619,7 +2622,7 @@ output_string_cache (void)
 				text_cleaned[pos++] = *c;
 			}
 			text_cleaned[pos] = 0;
-			output ("static const char %s%d[]\t= \"%s\";\n",
+			output_storage ("static const char %s%d[]\t= \"%s\";\n",
 				CB_PREFIX_STRING, stp->id, text_cleaned);
 		}
 	}
@@ -2640,12 +2643,12 @@ output_source_cache (void)
 
 	output_storage ("\n/* Source file names */\n");
 	source_cache = string_list_reverse (source_cache);
-	output ("static const char *%ssource_files[]\t= { \"\" ", CB_PREFIX_STRING);
+	output_storage ("static const char *%ssource_files[]\t= { \"\" ", CB_PREFIX_STRING);
 	if (source_cache) {
 		for (stp = source_cache; stp; stp = stp->next) {
 			if (!strrchr (stp->text, '\\')
 			 && !strrchr (stp->text, '"')) {
-				output ("\n\t\t,\"%s\"", stp->text);
+				output_storage ("\n\t\t,\"%s\"", stp->text);
 			} else {
 				char	text_cleaned[FILENAME_MAX];
 				int		pos = 0;
@@ -2658,7 +2661,7 @@ output_source_cache (void)
 					text_cleaned[pos++] = *c;
 				}
 				text_cleaned[pos] = 0;
-				output ("\n\t\t,\"%s\"", text_cleaned);
+				output_storage ("\n\t\t,\"%s\"", text_cleaned);
 			}
 		}
 	}
@@ -6375,7 +6378,7 @@ output_perform_call (struct cb_label *lb, struct cb_label *le)
 	output_line ("frame_ptr++;");
 	if (cb_flag_stack_check) {
 		output_line ("if (unlikely(frame_ptr == frame_overflow))");
-		output_line ("    cob_fatal_error (COB_FERROR_STACK);");
+		output_line ("\tcob_fatal_error (COB_FERROR_STACK);");
 	}
 	output_line ("frame_ptr->perform_through = %d;", le->id);
 	if (!cb_flag_computed_goto) {
@@ -7227,15 +7230,13 @@ output_label_info (cb_tree x, struct cb_label *lp)
 		output ("Section   %-24s", (const char *)lp->name);
 		excp_current_section = (const char *)lp->name;
 		excp_current_paragraph = NULL;
+	} else if (lp->flag_entry) {
+		output ("Entry     %-24s", lp->orig_name);
+		excp_current_section = NULL;
+		excp_current_paragraph = NULL;
 	} else {
-		if (lp->flag_entry) {
-			output ("Entry     %-24s", lp->orig_name);
-			excp_current_section = NULL;
-			excp_current_paragraph = NULL;
-		} else {
-			output ("Paragraph %-24s", (const char *)lp->name);
-			excp_current_paragraph = (const char *)lp->name;
-		}
+		output ("Paragraph %-24s", (const char *)lp->name);
+		excp_current_paragraph = (const char *)lp->name;
 	}
 	if (x->source_file) {
 		output (": %s */\n", x->source_file);
@@ -7261,8 +7262,8 @@ output_alter_check (struct cb_label *lp)
 		     CB_PREFIX_LABEL, lp->id);
 	output_indent ("{");
 	for (aid = lp->alter_gotos; aid; aid = aid->next) {
-			output_line ("case %d:", aid->goto_id);
-			output_line ("goto %s%d;", CB_PREFIX_LABEL, aid->goto_id);
+		output_line ("case %d:", aid->goto_id);
+		output_line ("goto %s%d;", CB_PREFIX_LABEL, aid->goto_id);
 	}
 	output_indent ("}");
 	output_newline ();
@@ -7536,8 +7537,8 @@ output_stmt (cb_tree x)
 		output_label_info (x, lp);
 		if (lp->flag_section) {
 			for (pal = lp->para_label; pal; pal = pal->next) {
-				if (pal->para->segment > 49 &&
-				    pal->para->flag_alter) {
+				if (pal->para->segment > 49
+				 && pal->para->flag_alter) {
 					output_line ("label_%s%d = 0;",
 						     CB_PREFIX_LABEL, pal->para->id);
 				}
@@ -7864,18 +7865,18 @@ output_stmt (cb_tree x)
 			} else {
 				output_line ("; /* Nothing */");
 			}
-#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.1 */
+#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.2 */
 			if (gen_if_level > cb_if_cutoff) {
 				if (ip->stmt2) {
 					code = cb_id++;
-					output_line ("goto l_%d;", code);
+					output_line ("goto %s%d;", CB_PREFIX_LABEL, code);
 				}
 			}
 #endif
 			output_indent_level -= 2;
 			output_line ("}");
 		}
-#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.1 */
+#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.2 */
 		if (ip->stmt2) {
 			if (gen_if_level <= cb_if_cutoff) {
 				if (!skip_else) {
@@ -7894,7 +7895,7 @@ output_stmt (cb_tree x)
 				output_indent_level -= 2;
 				output_line ("}");
 			} else {
-				output_line ("l_%d:;", code);
+				output_line ("l_%d:;", CB_PREFIX_LABEL, code);
 			}
 		}
 		gen_if_level--;
@@ -8087,15 +8088,31 @@ output_file_allocation (struct cb_file *f)
 }
 
 static void
+output_key_components (struct cb_file* f, struct cb_key_component* key_component, int key)
+{
+	if (key_component != NULL) {
+		int			i_keycomp;
+		for (i_keycomp = 0;
+			key_component != NULL;
+			key_component = key_component->next, ++i_keycomp) {
+				output_prefix ();
+				output ("(%s%s + %d)->component[%d] = ", CB_PREFIX_KEYS, f->cname, key, i_keycomp);
+				output_param (key_component->component, -1);
+				output (";\n");
+		}
+		output_prefix ();
+		output ("(%s%s + %d)->count_components = %d;\n",
+			CB_PREFIX_KEYS, f->cname, key, i_keycomp);
+	}
+}
+
+static void
 output_file_initialization (struct cb_file *f)
 {
 	struct cb_alt_key	*l;
 	int			nkeys;
 	int			features;
 	char			key_ptr[64];
-
-	int			i_keycomp;
-	struct cb_key_component *key_component;
 
 	output_line ("/* File initialization for %s */", f->name);
 	if (f->organization == COB_ORG_RELATIVE
@@ -8125,7 +8142,6 @@ output_file_initialization (struct cb_file *f)
 	/* Output RELATIVE/RECORD KEY's */
 	if (f->organization == COB_ORG_RELATIVE
 	 || f->organization == COB_ORG_INDEXED) {
-		nkeys = 1;
 		output_prefix ();
 		output ("%s%s->field = ", CB_PREFIX_KEYS, f->cname);
 		if (f->organization == COB_ORG_RELATIVE
@@ -8137,19 +8153,7 @@ output_file_initialization (struct cb_file *f)
 		output (";\n");
 		output_prefix ();
 		output ("%s%s->tf_duplicates = 0;\n", CB_PREFIX_KEYS, f->cname);
-		output_prefix ();
-		if (f->component_list != NULL) {
-			for (key_component = f->component_list, i_keycomp = 0;
-				key_component != NULL;
-				key_component = key_component->next, ++i_keycomp) {
-					output_prefix ();
-					output ("(%s%s + %d)->component[%d] = ", CB_PREFIX_KEYS, f->cname, 0, i_keycomp);
-					output_param (key_component->component, -1);
-					output (";\n");
-			}
-			output_prefix ();
-			output ("(%s%s + %d)->count_components = %d;\n", CB_PREFIX_KEYS, f->cname, 0, i_keycomp);
-		}
+		output_key_components (f, f->component_list, 0);
 		if (f->key) {
 			output ("%s%s->offset = %d;\n", CB_PREFIX_KEYS, f->cname,
 				cb_code_field (f->key)->offset);
@@ -8174,18 +8178,7 @@ output_file_initialization (struct cb_file *f)
 			output_prefix ();
 			output ("(%s%s + %d)->offset = %d;\n", CB_PREFIX_KEYS,
 				f->cname, nkeys, cb_code_field (l->key)->offset);
-			if (l->component_list != NULL) {
-				for (key_component = l->component_list, i_keycomp = 0;
-					key_component != NULL;
-					key_component = key_component->next, ++i_keycomp) {
-						output_prefix ();
-						output ("(%s%s + %d)->component[%d] = ", CB_PREFIX_KEYS, f->cname, nkeys, i_keycomp);
-						output_param (key_component->component, -1);
-						output (";\n");
-				}
-				output_prefix ();
-				output ("(%s%s + %d)->count_components = %d;\n", CB_PREFIX_KEYS, f->cname, nkeys, i_keycomp);
-			}
+			output_key_components (f, l->component_list, nkeys);
 			nkeys++;
 		}
 	}
@@ -10786,14 +10779,13 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			output_line (" switch (frame_ptr->return_address_num) {");
 			for (pl = label_cache; pl; pl = pl->next) {
 				output_line (" case %d:", pl->call_num);
-				output_line ("   goto %s%d;", CB_PREFIX_LABEL,
-					     pl->id);
+				output_line ("   goto %s%d;", CB_PREFIX_LABEL, pl->id);
 			}
 			output_line (" }");
 		}
 	}
 	output_line ("P_cgerror:");
-	output_line (" cob_fatal_error (COB_FERROR_CODEGEN);");
+	output_line ("\tcob_fatal_error (COB_FERROR_CODEGEN);");
 	output_newline ();
 
 	/* Program initialization */
@@ -11084,9 +11076,8 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	output_line ("if (!initialized) {");
 	output_line ("\treturn 0;");
 	output_line ("}");
-	output_line ("if (module && module->module_active) {");
+	output_line ("if (module && module->module_active)");
 	output_line ("\tcob_fatal_error (COB_FERROR_CANCEL);");
-	output_line ("}");
 	output_newline ();
 
 	if (prog->flag_main) {
@@ -11938,12 +11929,14 @@ codegen (struct cb_program *prog, const int subsequent_call)
 			}
 			strftime (string_buffer, (size_t)COB_MINI_MAX,
 				  "%b %d %Y %H:%M:%S", loctime);
-			output_header (output_target, string_buffer, NULL);
-			output_header (cb_storage_file, string_buffer, NULL);
-			for (cp = prog; cp; cp = cp->next_program) {
-				output_header (cp->local_include->local_fp,
-						string_buffer, cp);
-			}
+		} else {
+			string_buffer[0] = 0;
+		}
+		output_header (output_target, string_buffer, NULL);
+		output_header (cb_storage_file, string_buffer, NULL);
+		for (cp = prog; cp; cp = cp->next_program) {
+			output_header (cp->local_include->local_fp,
+					string_buffer, cp);
 		}
 
 		output_standard_includes (prog);
@@ -12053,10 +12046,10 @@ codegen (struct cb_program *prog, const int subsequent_call)
 					output_target = current_prog->local_include->local_fp;
 					output_local ("\n/* Report data fields */\n\n");
 				}
-				output_emit_field(rep->line_counter,NULL);
-				output_emit_field(rep->page_counter,NULL);
+				output_emit_field (rep->line_counter ,NULL);
+				output_emit_field (rep->page_counter, NULL);
 				report_col_pos = 1;
-				output_report_data(rep->records);
+				output_report_data (rep->records);
 				output_local ("\n");
 			}
 		}

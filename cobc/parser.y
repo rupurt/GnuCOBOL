@@ -485,9 +485,10 @@ emit_entry_goto (const char *name)
 	snprintf (buff, (size_t)COB_MINI_MAX, "E$%s", name);
 	label = cb_build_label (cb_build_reference (buff), NULL);
 	CB_LABEL (label)->name = name;
-	CB_LABEL (label)->orig_name = current_program->orig_program_id;
+	CB_LABEL (label)->orig_name = name;
 	CB_LABEL (label)->flag_begin = 1;
 	CB_LABEL (label)->flag_entry = 1;
+	CB_LABEL (label)->flag_entry_for_goto = 1;
 	label->source_line = backup_source_line;
 	emit_statement (label);
 

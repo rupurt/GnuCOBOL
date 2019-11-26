@@ -955,6 +955,7 @@ struct cb_label {
 	unsigned int		flag_debugging_mode	: 1;	/* DEBUGGING MODE */
 	unsigned int		flag_is_debug_sect	: 1;	/* DEBUGGING sect */
 	unsigned int		flag_skip_label		: 1;	/* Skip label gen */
+	unsigned int		flag_entry_for_goto	: 1;	/* is ENTRY FOR GO TO */
 };
 
 #define CB_LABEL(x)		(CB_TREE_CAST (CB_TAG_LABEL, struct cb_label, x))
