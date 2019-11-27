@@ -23,6 +23,11 @@
 	  -fgen-c-line-directives and -fgen-c-labels
 	* codegen.c (output_cobol_info, output_c_info): added
 
+2019-10-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* typeck.c (valid_screen_pos): inlining some macro-like functions back
+	* typeck.c (cb_validate_crt_status, valid_screen_pos): more validation
+
 2019-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c: moved alignment defines from libcob/common.h here

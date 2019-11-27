@@ -1702,13 +1702,11 @@ cob_get_s64_param (int n)
 		return cob_get_s64_pic9 (cbl_data, size);
 	case COB_TYPE_NUMERIC_BINARY:
 #ifndef WORDS_BIGENDIAN
-		if (COB_FIELD_BINARY_SWAP (f)) {
-			return cob_get_s64_compx (cbl_data, size);
+		if (!COB_FIELD_BINARY_SWAP (f)) {
+			return cob_get_s64_comp5 (cbl_data, size);
 		}
-		return cob_get_s64_comp5 (cbl_data, size);
-#else
-		return cob_get_s64_compx (cbl_data, size);
 #endif
+		return cob_get_s64_compx (cbl_data, size);
 	case COB_TYPE_NUMERIC_PACKED:
 		return cob_get_s64_comp3 (cbl_data, size);
 	case COB_TYPE_NUMERIC_FLOAT:
@@ -1750,20 +1748,15 @@ cob_get_u64_param (int n)
 	switch (COB_MODULE_PTR->cob_procedure_params[n - 1]->attr->type) {
 	case COB_TYPE_NUMERIC_DISPLAY:
 		return cob_get_u64_pic9 (cbl_data, size);
-
 	case COB_TYPE_NUMERIC_BINARY:
 #ifndef WORDS_BIGENDIAN
-		if (COB_FIELD_BINARY_SWAP (f)) {
-			return cob_get_u64_compx (cbl_data, size);
+		if (!COB_FIELD_BINARY_SWAP (f)) {
+			return cob_get_u64_comp5 (cbl_data, size);
 		}
-		return cob_get_u64_comp5 (cbl_data, size);
-#else
-		return cob_get_u64_compx (cbl_data, size);
 #endif
-
+		return cob_get_u64_compx (cbl_data, size);
 	case COB_TYPE_NUMERIC_PACKED:
 		return cob_get_u64_comp3 (cbl_data, size);
-
 	case COB_TYPE_NUMERIC_FLOAT:
 		dbl = cob_get_comp1 (cbl_data);
 		val = (cob_u64_t)dbl; /* possible data loss is explicit requested */
@@ -1821,28 +1814,21 @@ cob_put_s64_param (int n, cob_s64_t val)
 	case COB_TYPE_NUMERIC_DISPLAY:
 		cob_put_s64_pic9 (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_BINARY:
 #ifndef WORDS_BIGENDIAN
-		if (COB_FIELD_BINARY_SWAP (f)) {
-			cob_put_s64_compx (val, cbl_data, size);
-		} else {
+		if (!COB_FIELD_BINARY_SWAP (f)) {
 			cob_put_s64_comp5 (val, cbl_data, size);
 		}
-#else
-		cob_put_s64_compx (val, cbl_data, size);
 #endif
+		cob_put_s64_compx (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_PACKED:
 		cob_put_s64_comp3 (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_FLOAT:
 		flt = (float)val;  /* possible data loss is explicit requested */
 		cob_put_comp1 (flt, cbl_data);
 		return;
-
 	case COB_TYPE_NUMERIC_DOUBLE:
 		dbl = (double)val; /* possible data loss is explicit requested */
 		cob_put_comp2 (dbl, cbl_data);
@@ -1883,28 +1869,21 @@ cob_put_u64_param (int n, cob_u64_t val)
 	case COB_TYPE_NUMERIC_DISPLAY:
 		cob_put_u64_pic9 (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_BINARY:
 #ifndef WORDS_BIGENDIAN
-		if (COB_FIELD_BINARY_SWAP (f)) {
-			cob_put_u64_compx (val, cbl_data, size);
-		} else {
+		if (!COB_FIELD_BINARY_SWAP (f)) {
 			cob_put_u64_comp5 (val, cbl_data, size);
 		}
-#else
-		cob_put_u64_compx (val, cbl_data, size);
 #endif
+		cob_put_u64_compx (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_PACKED:
 		cob_put_u64_comp3 (val, cbl_data, size);
 		return;
-
 	case COB_TYPE_NUMERIC_FLOAT:
 		flt = (float)val;  /* possible data loss is explicit requested */
 		cob_put_comp1 (flt, cbl_data);
 		return;
-
 	case COB_TYPE_NUMERIC_DOUBLE:
 		dbl = (double)val;  /* possible data loss is explicit requested */
 		cob_put_comp2 (dbl, cbl_data);

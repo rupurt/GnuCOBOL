@@ -1,4 +1,10 @@
 
+2019-10-15  Simon Sobisch <simonsobisch@gnu.org>
+
+	* screenio.c (pass_cursor_to_program): fixed return column being off by -1
+	* screenio.c (get_cursor_from_program): fixed alphanumeric CURSOR to only
+	  work for size 6
+
 2019-10-01  Edward Hart <edward.dan.hart@gmail.com>
 
 	* fileio.c: fixed location of definition of off_t (bug #596)

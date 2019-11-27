@@ -9403,7 +9403,7 @@ output_report_sum_counters (const int top, struct cb_field *f, struct cb_report 
 	if (p == NULL) {
 		output_local("NULL, /* No CONTROL field */");
 	}
-	if (f->report_flag & COB_REPORT_RESET_FINAL) {
+	if (f && f->report_flag & COB_REPORT_RESET_FINAL) {
 		output_local("1");
 	} else {
 		output_local("0");
@@ -11909,6 +11909,15 @@ output_function_prototypes (struct cb_program *prog)
 	cb_tree			entry_param;
 	cb_tree			prog_param;
 	cb_tree			l;
+
+	/* LCOV_EXCL_START */
+	if (!prog) {
+		/* checked to keep the analyzer happy, TODO: real fix later */
+		cobc_err_msg (_ ("call to '%s' with invalid parameter '%s'"),
+			"output_function_prototypes", "prog");;
+		COBC_ABORT ();
+	}
+	/* LCOV_EXCL_STOP */
 
 	output ("/* Function prototypes */");
 	output_newline ();
