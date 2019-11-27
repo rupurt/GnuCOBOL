@@ -122,6 +122,7 @@ build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 /cobc-dev.7 -text
 cobc/Makefile.am eol=lf
 cobc/debug.c -text
+cobc/sqlxfdgen.c -text
 config/Makefile.am eol=lf
 config/realia-strict.conf -text
 config/realia.conf -text
@@ -139,6 +140,9 @@ lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
 libcob/fileio.h -text
 libcob/flmdb.c -text
+libcob/foci.c -text
+libcob/fodbc.c -text
+libcob/fsqlxfd.c -text
 libcob/libcobci.c -text
 libcob/libcobdi.c -text
 libcob/libcobvb.c -text
