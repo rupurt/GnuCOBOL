@@ -1818,6 +1818,7 @@ cob_put_s64_param (int n, cob_s64_t val)
 #ifndef WORDS_BIGENDIAN
 		if (!COB_FIELD_BINARY_SWAP (f)) {
 			cob_put_s64_comp5 (val, cbl_data, size);
+			return;
 		}
 #endif
 		cob_put_s64_compx (val, cbl_data, size);
@@ -1873,6 +1874,7 @@ cob_put_u64_param (int n, cob_u64_t val)
 #ifndef WORDS_BIGENDIAN
 		if (!COB_FIELD_BINARY_SWAP (f)) {
 			cob_put_u64_comp5 (val, cbl_data, size);
+			return;
 		}
 #endif
 		cob_put_u64_compx (val, cbl_data, size);
