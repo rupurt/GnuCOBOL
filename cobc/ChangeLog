@@ -1,4 +1,9 @@
 
+2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y (sort_body): fixed class cast errors,
+	  actually use the specified order if no data-name was specified
+
 2019-11-18  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_key_components): extracted
@@ -2309,7 +2314,7 @@
 2017-02-06  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c:
-	  Emit routines cob_file_external_addr,cob_file_malloc,cob_file_free
+	  Emit routines cob_file_external_addr, cob_file_malloc, cob_file_free
 	  so that 'cob_file' is allocated within libcob
 	  This will allow the structure have fields added to the end
 	  without forcing a recompile. COB_FILE_VERSION is unchanged

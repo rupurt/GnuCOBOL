@@ -14134,36 +14134,44 @@ sort_statement:
 ;
 
 sort_body:
-  table_identifier sort_key_list _sort_duplicates _sort_collating
+  table_identifier _sort_key_list _sort_duplicates _sort_collating
   {
 	cb_tree		x = cb_ref ($1);
 
 	$$ = NULL;
 	if (CB_VALID_TREE (x)) {
-		if ($2 == NULL) {
+		if ($2 == NULL || CB_VALUE($2) == NULL) {
 			if (CB_FILE_P (x)) {
 				cb_error (_("file sort requires KEY phrase"));
+				$2 = cb_error_node;
 			} else {
 				struct cb_field	*f = CB_FIELD_PTR (x);
 /* TODO: add compiler configuration cb_sort_without_keys
 				if (f->nkeys
 				 && cb_verify (cb_sort_without_keys, _("table SORT without keys"))) {
 */
-				if (f->nkeys) {
+				if ($2 != NULL || f->nkeys) {
 					cb_tree lparm;
-					/* create reference to first key */
-					x = cb_ref (f->keys[0].key);
-					/* use this as single sort key, with search order derived from definition */
+					if ($2 == NULL) {
+						/* create reference to first key */
+						x = cb_ref (f->keys[0].key);
+					}
+					/* use the OCCURS field / its defined KEY as single sort key */
 					lparm = cb_list_add (NULL, x);
-					CB_PURPOSE (lparm) = cb_int(f->keys[0].dir);
+					/* search order is either specified, otherwise derived from definition */
+					if ($2 != NULL) {
+						CB_PURPOSE (lparm) = CB_PURPOSE ($2);
+					} else {
+						CB_PURPOSE (lparm) = cb_int (f->keys[0].dir);
+					}
 					$2 = cb_list_append (NULL, lparm);
-					cb_emit_sort_init ($1, $2, alphanumeric_collation, national_collation);
-					$$ = $1;
 				} else {
 					cb_error (_("table SORT requires KEY phrase"));
+					$2 = cb_error_node;
 				}
 			}
-		} else if ($2 != cb_error_node) {
+		}
+		if (CB_VALID_TREE ($2)) {
 			cb_emit_sort_init ($1, $2, alphanumeric_collation, national_collation);
 			$$ = $1;
 		}
@@ -14177,12 +14185,9 @@ sort_body:
   }
 ;
 
-sort_key_list:
-  /* empty */
-  {
-	$$ = NULL;
-  }
-| sort_key_list
+_sort_key_list:
+  /* empty */			{ $$ = NULL; }
+| _sort_key_list
   _on ascending_or_descending _key _key_sort_list
   {
 	cb_tree lparm = $5;
