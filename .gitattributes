@@ -6,7 +6,6 @@ bin/Makefile.am eol=lf
 bin/cob-config.1 -text
 bin/cob-config.in eol=lf
 bin/gcdiff.c -text
-bin/return_path eol=lf
 build_aux/bootstrap eol=lf
 build_aux/compile eol=lf
 build_aux/config.guess eol=lf
