@@ -1,6 +1,6 @@
 
 /* config.h, tested with x86/x64 VS2005-2019
-   and OrangeC 6.0.41.1 (which ignores the lib comments) */
+   and OrangeC 6.0.43.1 (which ignores the lib comments) */
 
 #define NOISAM       0
 #define BDB          1
@@ -329,6 +329,8 @@
 /* Define if you have the iconv() function and it works. */
 #if CONFIGURED_XML == XML2
 #define HAVE_ICONV 1
+#else
+/* #undef HAVE_ICONV */
 #endif
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -464,7 +466,7 @@
 #endif
 
 /* Define to 1 if you have the `setenv' function. */
-/* MSC does *NOT* has `setenv' (!)
+/* MSC does *NOT* have `setenv' (!)
    But as the handling of the fallback `putenv' is different in POSIX and _MSC
    (POSIX stores no duplicate of `putenv', where _MSC does), we pretend to
    have support for `setenv' and define it in common.c using _putenv_s,

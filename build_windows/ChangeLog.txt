@@ -1,4 +1,10 @@
 
+2020-02-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* makedist.cmd: renamed from makedist.bat
+	* makedist.cmd: use include and bin from VCPKG_EXPORT_DIR, if set;
+	  don't include gmp.h as not needed any more
+
 2019-06-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* config.h.in: allow to override library names by define LIB_...
