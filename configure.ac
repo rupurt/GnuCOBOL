@@ -2,7 +2,7 @@
 # Configure template for GnuCOBOL
 # Process this file with autoconf to produce a configure script.
 #
-# Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+# Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch,
 # Edward Hart
 #
@@ -440,12 +440,13 @@ if test "x$COB_CC" = "x"; then
 	COB_CC="$CC"
 fi
 
+# FIXME: -lm should only be used if needed (which it often is not), see Bug #559
 if test "$COB_USES_ICC_ONLY" = "yes"; then
-	LIBCOB_LIBS="-limf -lm"
+	COMMON_LIBS="-limf -lm"
 else
-	# FIXME: -lm should only be used if needed (which it often is not), see Bug #559
-	LIBCOB_LIBS="-lm"
+	COMMON_LIBS="-lm"
 fi
+LIBCOB_LIBS="$COMMON_LIBS"
 
 # Add --enable-code-coverage and test for code-coverage tools if enabled
 AX_CODE_COVERAGE
@@ -1376,10 +1377,13 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]],
 # GnuCOBOL Configuration
 
 COB_LIBS="-L$libdir -lcob"
-COB_LDFLAGS=""
+if test "x$COMMON_LIBS" != "x"; then
+	COB_LIBS="$COB_LIBS $COMMON_LIBS"
+fi
 if test "x$LDFLAGS" != "x"; then
-	COB_LIBS="$LDFLAGS $COB_LIBS"
 	COB_LDFLAGS="$LDFLAGS"
+else
+	COB_LDFLAGS=""
 fi
 
 COB_CONFIG_DIR="$datadir/$PACKAGE_TARNAME/config"

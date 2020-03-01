@@ -1,4 +1,8 @@
 
+2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: adjusted generation of built-in COB_LDFLAGS
+
 2019-08-12  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: check for make
@@ -1149,7 +1153,7 @@
 	* Version 0.9 released.
 
 
-Copyright 2002-2019 Free Software Foundation, Inc.
+Copyright 2002-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification, are
 permitted provided the copyright notice and this notice are preserved.

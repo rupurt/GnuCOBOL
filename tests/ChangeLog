@@ -1,4 +1,9 @@
 
+2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* atlocal.in: COB_LIBS during test be based on built-in COB_LIBS, not
+	  on built-in LIBCOB_LIBS
+
 2019-06-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* run_prog_manual.sh.in, Makefile.am: changed the manual test runner
@@ -929,7 +934,7 @@
 	* redef.at, subref.at, runtime.at: New files.
 
 
-Copyright 2002-2019 Free Software Foundation, Inc.
+Copyright 2002-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification, are
 permitted provided the copyright notice and this notice are preserved.
