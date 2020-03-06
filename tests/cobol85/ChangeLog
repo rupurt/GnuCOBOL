@@ -1,4 +1,11 @@
 
+2019-12-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am: allow to override URL_NEWCOB_Z and URL_NEWCOB_TAR_GZ
+	* Makefile.am: improved portability to non-gmake - passing absolute name
+	  for NEWCOB_VAL from either build or srcdir, removing the need to copy
+	  newcob.val from srcdir (only the archives are copied from there)
+
 2019-06-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am: added some additional output to show current status

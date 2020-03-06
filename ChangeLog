@@ -29,7 +29,7 @@
 
 2019-05-30  Simon Sobisch <simonsobisch@gnu.org>
 
-	* configure.ac: fix bug #599 avoid useless dependencies (all but libm,
+	* configure.ac: fix bug #559 avoid useless dependencies (all but libm,
 	  needs to be inspected later) by not copying LIBCOB_LIBS to COB_LIBS
 	  and resetting LIBS after XML2/CJSON check;
 	  now substituting LIBCOB_CPPFLAGS
@@ -1157,4 +1157,3 @@ Copyright 2002-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification, are
 permitted provided the copyright notice and this notice are preserved.
-
