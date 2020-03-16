@@ -1,4 +1,8 @@
 
+2020-03-16  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c [WITH_CISAM] (print_info): fixed bug #621 missing comma
+
 2020-02-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.h: definition of COB_A_NORETURN for newer HPUX (__HP_cc)
