@@ -1,4 +1,4 @@
-## Copyright (C) 2007-2012, 2014-2019 Free Software Foundation, Inc.
+## Copyright (C) 2007-2012, 2014-2020 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart,
 ## Ron Norman
 ##
@@ -4190,8 +4190,8 @@ AT_DATA([prog3.cob], [
            GOBACK.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:5: error: STATIC CALL and ON EXCEPTION are mutually exclusive
+AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
+[prog.cob:5: warning: ON EXCEPTION ignored because of STATIC CALL
 ])
 AT_CHECK([$COMPILE_ONLY prog2.cob], [0], [], [])
 AT_CHECK([$COMPILE_ONLY -static prog2.cob], [0], [], [])

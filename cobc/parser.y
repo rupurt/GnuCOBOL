@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch,
    Edward Hart
 
@@ -10614,9 +10614,9 @@ call_body:
 			call_conv_local = CB_INTEGER ($1)->val;
 			if ((CB_PAIR_X ($9) != NULL)
 			 && (call_conv_local & CB_CONV_STATIC_LINK)) {
-				cb_error_x ($1, _("%s and %s are mutually exclusive"),
-					"STATIC CALL", "ON EXCEPTION");
-				call_conv_local &= ~CB_CONV_STATIC_LINK;
+				cb_warning_x (COBC_WARN_FILLER, $1,
+					_("ON EXCEPTION ignored because of STATIC CALL"));
+				CB_PAIR_X ($9) = NULL;
 			}
 			call_conv |= call_conv_local;
 			if (CB_INTEGER ($1)->val & CB_CONV_COBOL) {
@@ -17130,7 +17130,7 @@ integer:
 	 || CB_LITERAL ($1)->sign
 	 || CB_LITERAL ($1)->scale) {
 		cb_error (_("unsigned integer value expected"));
-		$$ = cb_build_numeric_literal(-1, "1", 0);
+		$$ = cb_build_numeric_literal (-1, "1", 0);
 	} else {
 		$$ = $1;
 	}
@@ -17140,8 +17140,6 @@ integer:
 symbolic_integer:
   LITERAL
   {
-	int	n;
-
 	if (cb_tree_category ($1) != CB_CATEGORY_NUMERIC) {
 		cb_error (_("integer value expected"));
 		$$ = cb_int1;
@@ -17150,7 +17148,7 @@ symbolic_integer:
 		cb_error (_("integer value expected"));
 		$$ = cb_int1;
 	} else {
-		n = cb_get_int ($1);
+		int	n = cb_get_int ($1);
 		if (n < 1 || n > 256) {
 			cb_error (_("invalid symbolic integer"));
 			$$ = cb_int1;
@@ -17164,8 +17162,6 @@ symbolic_integer:
 unsigned_pos_integer:
   LITERAL
   {
-	int	n;
-
 	if (cb_tree_category ($1) != CB_CATEGORY_NUMERIC
 	 || !CB_LITERAL_P($1)
 	 || CB_LITERAL ($1)->sign
@@ -17173,8 +17169,7 @@ unsigned_pos_integer:
 		cb_error (_("unsigned positive integer value expected"));
 		$$ = cb_int1;
 	} else {
-		n = cb_get_int ($1);
-		if (n < 1) {
+		if (cb_get_int ($1) < 1) {
 			cb_error (_("unsigned positive integer value expected"));
 			$$ = cb_int1;
 		} else {
@@ -17198,13 +17193,11 @@ integer_or_zero:
 class_value:
   LITERAL
   {
-	int	n;
-
 	if (cb_tree_category ($1) == CB_CATEGORY_NUMERIC) {
 		if (CB_LITERAL ($1)->sign || CB_LITERAL ($1)->scale) {
 			cb_error (_("integer value expected"));
 		} else {
-			n = cb_get_int ($1);
+			int	n = cb_get_int ($1);
 			if (n < 1 || n > 256) {
 				cb_error (_("invalid CLASS value"));
 			}

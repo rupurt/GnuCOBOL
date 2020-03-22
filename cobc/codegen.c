@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2003-2019 Free Software Foundation, Inc.
+   Copyright (C) 2003-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch,
    Edward Hart
 
@@ -516,7 +516,7 @@ cb_init_codegen (void)
 
 /* Output routines */
 
-static inline void
+static COB_INLINE COB_A_INLINE void
 increase_output_line ()
 {
 	if (output_target == yyout) {

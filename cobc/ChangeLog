@@ -1,4 +1,10 @@
 
+2020-03-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y (call_body): warn ON EXCEPTION for CALL STATIC and ignore
+	  it instead of having them mutually exclusive
+	* codegen.c (increase_output_line): fixed declaration of inline
+
 2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (sort_body): fixed class cast errors,
@@ -1507,7 +1513,7 @@
 
 2017-10-18  Ron Norman <rjn@inglenet.com>
 
-	* codegen.c(output_internal_function): Fixed problem with braces in
+	* codegen.c (output_internal_function): Fixed problem with braces in
 	  variable dump code
 
 2017-10-17  Ron Norman <rjn@inglenet.com>
@@ -6820,7 +6826,7 @@
 	* cobc.h (cobc_verbose_flag): Declared.
 
 
-Copyright 2002-2019 Free Software Foundation, Inc.
+Copyright 2002-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification, are
 permitted provided the copyright notice and this notice are preserved.
