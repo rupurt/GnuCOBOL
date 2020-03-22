@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch,
    Edward Hart, Ron Norman, Dave Pitts
 
@@ -433,6 +433,9 @@ extern int			cb_flag_dump;
 #define COB_DUMP_SC	0x0010
 #define COB_DUMP_LS	0x0020
 #define COB_DUMP_ALL	(COB_DUMP_FD|COB_DUMP_WS|COB_DUMP_RD|COB_DUMP_SD|COB_DUMP_SC|COB_DUMP_LS)
+
+
+extern int			cb_unix_lf;
 
 extern int			cb_flag_main;	/* set if "main" requested by -x */
 extern int			cobc_flag_main;	/* set only until first program compiled, for general: use cb_flag_main*/

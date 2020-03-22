@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch,
    Brian Tiffin, Edward Hart, Dave Pitts
 
@@ -128,7 +128,7 @@ cobc_print_usage_warnings (void)
 	puts (_("Warning options:"));
 	puts (_("  -W                    enable all warnings"));
 	puts (_("  -Wall                 enable most warnings (all except as noted below)"));
-	puts (_("  -Wno-<warning>        disable warning enabled by -W or -Wall"));
+	puts (_("  -Wno-<warning>        disable warning enabled by default, -W or -Wall"));
 #define	CB_WARNDEF(var,name,doc)		\
 	puts (doc);
 #define	CB_ONWARNDEF(var,name,doc)		\

@@ -7823,6 +7823,14 @@ set_cobc_defaults (void)
 		cb_msg_style = CB_MSG_STYLE_GCC;
 	}
 #endif
+	p = cobc_getenv ("COB_UNIX_LF");
+	if (p
+	 &&	(*p == 'Y' || *p == 'y' ||
+		 *p == 'O' || *p == 'o' ||
+		 *p == 'T' || *p == 't' ||
+		 *p == '1')) {
+		cb_unix_lf = 1;
+	}
 }
 
 /* Setup for the C compiler/linker */

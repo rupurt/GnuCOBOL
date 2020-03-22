@@ -5,6 +5,10 @@
 	  it instead of having them mutually exclusive
 	* codegen.c (increase_output_line): fixed declaration of inline
 
+2020-02-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h: added check for COB_UNIX_LF again
+
 2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (sort_body): fixed class cast errors,
