@@ -1467,19 +1467,6 @@ error_if_record_delimiter_incompatible (const int organization,
 	}
 }
 
-static void
-error_if_invalid_level_for_renames (cb_tree item)
-{
-	int	level = CB_FIELD (cb_ref (item))->level;
-
-	if (level == 1 || level == 66 || level == 77) {
-	        cb_verify (cb_renames_uncommon_levels,
-			   _("RENAMES of 01-, 66- and 77-level items"));
-	} else if (level == 88) {
-		cb_error (_("RENAMES may not reference a level 88"));
-	}
-}
-
 static int
 set_current_field (cb_tree level, cb_tree name)
 {
@@ -6300,26 +6287,45 @@ pointer_len:
 ;
 
 renames_entry:
-  SIXTY_SIX user_entry_name RENAMES qualified_word _renames_thru
+  SIXTY_SIX user_entry_name RENAMES not_const_word qualified_word _renames_thru
   {
+	cb_tree renames_target = cb_ref ($5);
+
+	size_t sav = cb_needs_01;
+	cb_needs_01 = 0;
+
+	non_const_word = 0;
+
 	if (set_current_field ($1, $2)) {
-		YYERROR;
-	}
-
-	if (cb_ref ($4) != cb_error_node) {
-		error_if_invalid_level_for_renames ($4);
-		current_field->redefines = CB_FIELD (cb_ref ($4));
-	}
-
-	if ($5) {
-		error_if_invalid_level_for_renames ($5);
-		current_field->rename_thru = CB_FIELD (cb_ref ($5));
+		/* error in the definition, no further checks possible */
+	} else if (renames_target == cb_error_node) {
+		/* error in the target, skip further checks */
+		current_field->flag_invalid = 1;
 	} else {
-		/* If there is no THRU clause, RENAMES acts like REDEFINES. */
-		current_field->pic = current_field->redefines->pic;
-	}
+		cb_tree renames_thru = $6;
 
-	cb_validate_renames_item (current_field);
+		current_field->redefines = CB_FIELD (renames_target);
+		if (renames_thru) {
+			renames_thru = cb_ref (renames_thru);
+		}
+		if (CB_VALID_TREE (renames_thru)) {
+			current_field->rename_thru = CB_FIELD (renames_thru);
+		} else {
+			/* If there is no THRU clause, RENAMES acts like REDEFINES. */
+			current_field->pic = current_field->redefines->pic;
+		}
+
+		if (cb_validate_renames_item (current_field, $5, $6)) {
+			current_field->flag_invalid = 1;
+		} else {
+			/* ensure the reference was validated as this
+			   also calculates the reference' picture and size */
+			if (!current_field->redefines->flag_is_verified) {
+				cb_validate_field (current_field->redefines);
+			}
+		}
+	}
+	cb_needs_01 = sav;
   }
 ;
 

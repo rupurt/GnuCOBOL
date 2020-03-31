@@ -2345,6 +2345,12 @@ cb_build_length (cb_tree x)
 			return cb_build_any_intrinsic (CB_LIST_INIT (x));
 		}
 		f = CB_FIELD_PTR (x);
+		/* CHECKME: Why do we need this in the first place?
+		   Should be validated already, but isn't at least for some
+		   RENAMES entries! */
+		if (f->size == 0) {
+			cb_validate_field (f);
+		}
 		if (f->flag_any_length) {
 			return cb_build_any_intrinsic (CB_LIST_INIT (x));
 		}
@@ -3235,6 +3241,7 @@ cb_validate_program_data (struct cb_program *prog)
 				break;
 			}
 			for (; p->sister; p = p->sister) {
+				if (p->sister->level == 66) continue;
 				if (p->sister == depfld && x != xerr) {
 					xerr = x;
 					cb_error_x (x,

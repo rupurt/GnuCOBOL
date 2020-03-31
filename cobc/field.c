@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman,
    Edward Hart
 
@@ -2539,9 +2539,7 @@ cb_validate_78_item (struct cb_field *f, const cob_u32_t no78add)
 	} else if (f->flag_constant) {		/* 01 CONSTANT is verified in parser.y */
 		prec = 1;
 	} else {
-		if (!cb_verify (cb_constant_78, "78 VALUE")) {
-			return last_real_field;
-		}
+		cb_verify (cb_constant_78, "78 VALUE");
 		prec = 0;
 	}
 
@@ -2608,16 +2606,18 @@ error_if_rename_thru_is_before_redefines (const struct cb_field * const item)
 	return 0;
 }
 
-static void
+static int
 error_if_is_or_in_occurs (const struct cb_field * const field,
 			  const struct cb_field * const referring_field)
 {
 	struct cb_field *parent;
+	int	ret = 0;
 
 	if (field->flag_occurs) {
 		cb_error_x (CB_TREE (referring_field),
 			    _("RENAMES cannot start/end at the OCCURS item '%s'"),
 			    cb_name (CB_TREE (field)));
+		ret = 1;
 	}
 
 	for (parent = field->parent; parent; parent = parent->parent) {
@@ -2625,16 +2625,20 @@ error_if_is_or_in_occurs (const struct cb_field * const field,
 			cb_error_x (CB_TREE (referring_field),
 				    _("cannot use RENAMES on part of the table '%s'"),
 				    cb_name (CB_TREE (parent)));
+			ret = 1;
 		}
 	}
+
+	return ret;
 }
 
-static void
+static int
 error_if_invalid_type_in_renames_range (const struct cb_field * const item)
 {
 	const struct cb_field	*end;
 	const struct cb_field	*f = item->redefines;
 	enum cb_category	category;
+	int ret = 0;
 
 	/* Find last item in RENAMES range */
 	if (item->rename_thru) {
@@ -2659,11 +2663,12 @@ error_if_invalid_type_in_renames_range (const struct cb_field * const item)
 			cb_error_x (CB_TREE (item),
 				    _("RENAMES may not contain '%s' as it is a pointer or object reference"),
 				    cb_name (CB_TREE (f)));
+			ret = 1;
 		} else if (f->depending) {
 			cb_error_x (CB_TREE (item),
 				    _("RENAMES may not contain '%s' as it is an OCCURS DEPENDING table"),
 				    cb_name (CB_TREE (f)));
-
+			ret = 1;
 		}
 
 		if (f == end) {
@@ -2672,16 +2677,39 @@ error_if_invalid_type_in_renames_range (const struct cb_field * const item)
 			f = get_next_record_field (f);
 		}
 	}
+	return ret;
 }
 
-void
-cb_validate_renames_item (struct cb_field *item)
+static int
+error_if_invalid_level_for_renames (struct cb_field const *field, cb_tree ref)
+{
+	int	level = field->level;
+
+	if (level == 1 || level == 66 || level == 77) {
+		/* don't pass error here as this should not invalidate the field */
+		cb_verify_x (ref, cb_renames_uncommon_levels,
+			_("RENAMES of 01-, 66- and 77-level items"));
+	} else if (level == 88) {
+		cb_error_x (ref, _("RENAMES may not reference a level 88"));
+		return 1;
+	}
+	return 0;
+}
+
+int
+cb_validate_renames_item (struct cb_field *item,
+	cb_tree ref_renames, cb_tree ref_thru)
 {
 	const cb_tree	item_tree = CB_TREE (item);
 	const char	*redefines_name = cb_name (CB_TREE (item->redefines));
 	const char	*rename_thru_name = cb_name (CB_TREE (item->rename_thru));
 	struct cb_field *founder;
 	struct cb_field *f;
+	int ret = 0;
+
+	if (error_if_invalid_level_for_renames (item->redefines, ref_renames)) {
+		return 1;
+	}
 
 	founder = cb_field_founder (item->redefines);
 	if (item->parent != founder) {
@@ -2689,36 +2717,42 @@ cb_validate_renames_item (struct cb_field *item)
 			    _("'%s' must immediately follow the record '%s'"),
 			    cb_name (item_tree),
 			    cb_name (CB_TREE (founder)));
-	}
-
-	if (item->rename_thru
-	    && founder != cb_field_founder (item->rename_thru)) {
-		cb_error_x (item_tree,
-			    _("'%s' and '%s' must be in the same record"),
-			    redefines_name, rename_thru_name);
+		ret = 1;
 	}
 
 	if (item->redefines == item->rename_thru) {
 		cb_error_x (item_tree,
 			    _("THRU item must be different to '%s'"),
 			    redefines_name);
-	} else if (!error_if_rename_thru_is_before_redefines (item)) {
-		error_if_invalid_type_in_renames_range (item);
-	}
-
-	for (f = item->rename_thru; f; f = f->parent) {
-		if (f->parent == item->redefines) {
+		ret = 1;
+	} else if (item->rename_thru) {
+		if (founder != cb_field_founder (item->rename_thru)) {
 			cb_error_x (item_tree,
-				    _("THRU item '%s' may not be subordinate to '%s'"),
-				    rename_thru_name, redefines_name);
-			break;
+					_("'%s' and '%s' must be in the same record"),
+					redefines_name, rename_thru_name);
+			return 1;
+		}
+		if (error_if_rename_thru_is_before_redefines (item)
+		 || error_if_invalid_level_for_renames (item->rename_thru, ref_thru)) {
+			return 1;
+		}
+		for (f = item->rename_thru; f; f = f->parent) {
+			if (f->parent == item->redefines) {
+				cb_error_x (item_tree,
+						_("THRU item '%s' may not be subordinate to '%s'"),
+						rename_thru_name, redefines_name);
+				return 1;
+			}
 		}
 	}
+	ret |= error_if_invalid_type_in_renames_range (item);
 
-	error_if_is_or_in_occurs (item->redefines, item);
-	if (item->rename_thru) {
-		error_if_is_or_in_occurs (item->rename_thru, item);
+	if (!error_if_is_or_in_occurs (item->redefines, item)
+	 && item->rename_thru) {
+		ret |= error_if_is_or_in_occurs (item->rename_thru, item);
 	}
+
+	return ret;
 }
 
 void

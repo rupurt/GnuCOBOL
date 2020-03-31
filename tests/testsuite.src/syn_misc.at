@@ -5205,7 +5205,12 @@ AT_CHECK([$COMPILE_ONLY -std=ibm-strict prog.cob ], [1], [],
 [prog.cob:6: error: 78 VALUE does not conform to IBM COBOL
 prog.cob:7: error: 78 VALUE does not conform to IBM COBOL
 prog.cob:8: error: 78 VALUE does not conform to IBM COBOL
-prog.cob:8: error: syntax error, unexpected Identifier, expecting .
+prog.cob:8: error: missing right parenthesis
+prog.cob:9: error: 78 VALUE does not conform to IBM COBOL
+prog.cob:9: error: missing left parenthesis
+prog.cob:10: error: 78 VALUE does not conform to IBM COBOL
+prog.cob:10: error: '/' operator misplaced
+prog.cob:11: error: 78 VALUE does not conform to IBM COBOL
 ])
 
 AT_CHECK([$COMPILE_ONLY -std=ibm prog.cob], [1], [],

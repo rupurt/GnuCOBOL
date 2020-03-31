@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -781,7 +781,7 @@ struct cb_field {
 	struct cb_field		*children;	/* Top of lower level fields */
 	struct cb_field		*validation;	/* First level 88 field (if any) */
 	struct cb_field		*sister;	/* Fields at the same level */
-	struct cb_field		*redefines;	/* REDEFINES */
+	struct cb_field		*redefines;	/* REDEFINES or RENAMES */
 	struct cb_field		*rename_thru;	/* RENAMES THRU */
 	struct cb_field		*index_qual;	/* INDEXED BY qualifier */
 	struct cb_file		*file;		/* FD section file name */
@@ -1992,7 +1992,7 @@ extern struct cb_field	*cb_resolve_redefines (struct cb_field *, cb_tree);
 extern void		cb_validate_field (struct cb_field *);
 extern void		cb_validate_88_item (struct cb_field *);
 extern struct cb_field	*cb_validate_78_item (struct cb_field *, const cob_u32_t);
-extern void		cb_validate_renames_item (struct cb_field *);
+extern int		cb_validate_renames_item (struct cb_field *, cb_tree, cb_tree);
 extern struct cb_field	*cb_get_real_field (void);
 extern void		cb_clear_real_field (void);
 extern int		cb_is_figurative_constant (const cb_tree);
