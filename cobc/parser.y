@@ -5047,8 +5047,7 @@ file_status_clause:
 		 && !cb_relaxed_syntax_checks) {
 			cb_verify (CB_UNCONFORMABLE, "VSAM STATUS");
 		} else {
-			cb_warning (warningopt,
-				_("%s ignored"), "VSAM STATUS");
+			cb_warning (cb_warn_extra, _("%s ignored"), "VSAM STATUS");
 		}
 	}
   }
@@ -5185,17 +5184,15 @@ record_delimiter_option:
 	if (current_file->organization != COB_ORG_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with SEQUENTIAL files"),
 			  "STANDARD-1");
-	}
-
-	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
-		cb_warning (warningopt,
+	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
+		cb_warning (cb_warn_extra,
 			    _("%s ignored"), "RECORD DELIMITER STANDARD-1");
 	}
   }
 | LINE_SEQUENTIAL
   {
 	if (current_file->organization != COB_ORG_SEQUENTIAL
-	    && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
+	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with (LINE) SEQUENTIAL files"),
 			  "LINE-SEQUENTIAL");
 	}
@@ -5213,20 +5210,18 @@ record_delimiter_option:
 	}
 
 	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))
-	    && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
+	 && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
 		current_file->organization = COB_ORG_SEQUENTIAL;
 	}
   }
 | WORD
   {
 	if (current_file->organization != COB_ORG_SEQUENTIAL
-	    && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
+	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER clause only allowed with (LINE) SEQUENTIAL files"));
-	}
-
-	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
-		cb_warning (warningopt,
-			    _("Phrase in RECORD DELIMITER not recognized; will be ignored."));
+	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
+		cb_warning (cb_warn_extra,
+			    _("RECORD DELIMITER %s not recognized; will be ignored"), cb_name ($1));
 	}
   }
 ;
@@ -5631,7 +5626,7 @@ record_clause:
   {
 	check_repeated ("RECORD", SYN_CLAUSE_4, &check_duplicate);
 	if (current_file->organization == COB_ORG_LINE_SEQUENTIAL) {
-		cb_warning (warningopt, _("RECORD clause ignored for LINE SEQUENTIAL"));
+		cb_warning (cb_warn_extra, _("RECORD clause ignored for LINE SEQUENTIAL"));
 	} else {
 		set_record_size (NULL, $3);
 	}
@@ -5640,7 +5635,7 @@ record_clause:
   {
 	check_repeated ("RECORD", SYN_CLAUSE_4, &check_duplicate);
 	if (current_file->organization == COB_ORG_LINE_SEQUENTIAL) {
-		cb_warning (warningopt, _("RECORD clause ignored for LINE SEQUENTIAL"));
+		cb_warning (cb_warn_extra, _("RECORD clause ignored for LINE SEQUENTIAL"));
 	} else {
 		set_record_size ($3, $5);
 	}
@@ -5823,11 +5818,14 @@ code_set_clause:
 #endif
 		case CB_ALPHABET_CUSTOM:
 			current_file->code_set = al;
+			CB_PENDING ("CODE-SET");
 			break;
 		default:
-			if (CB_VALID_TREE ($3)) {
-				cb_warning_x (warningopt, $3, _("ignoring CODE-SET '%s'"),
+			if (cb_warn_extra) {
+				cb_warning_x (cb_warn_extra, $3, _("ignoring CODE-SET '%s'"),
 						  cb_name ($3));
+			} else {
+				CB_PENDING ("CODE-SET");
 			}
 			break;
 		}
@@ -5838,19 +5836,13 @@ code_set_clause:
 		cb_error (_("CODE-SET clause invalid for file type"));
 	}
 
-	if (warningopt) {
-		CB_PENDING ("CODE-SET");
-	}
   }
 ;
 
 _for_sub_records_clause:
 | FOR reference_list
   {
-	  if (warningopt) {
-		  CB_PENDING ("FOR sub-records");
-	  }
-
+	  CB_PENDING ("FOR sub-records");
 	  current_file->code_set_items = CB_LIST ($2);
   }
 ;
@@ -7035,7 +7027,7 @@ _occurs_keys_and_indexed:
 	if (!cb_relaxed_syntax_checks) {
 		cb_error (_("INDEXED should follow ASCENDING/DESCENDING"));
 	} else {
-		cb_warning (warningopt, _("INDEXED should follow ASCENDING/DESCENDING"));
+		cb_warning (cb_warn_extra, _("INDEXED should follow ASCENDING/DESCENDING"));
 	}
   }
   occurs_keys

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman,
    Edward Hart
 
@@ -780,7 +780,6 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 {
 	cb_tree		arg = CB_VALUE (args);
 	const char	*data;
-	int		error_found = 0;
 
 	/* Precondition: iso_8601_func (intr->intr_enum) */
 
@@ -788,15 +787,14 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 	if (data != NULL) {
 		if (!valid_format (intr->intr_enum, data)) {
 			cb_error_x (tree, _("FUNCTION '%s' has invalid date/time format"),
-				    intr->name);
-			error_found = 1;
+				intr->name);
+			return 0;
 		}
-	} else if (warningopt) {
-		cb_warning_x (COBC_WARN_FILLER, tree, _("FUNCTION '%s' has format in variable"),
-			      intr->name);
+		return 1;
 	}
-
-	return !error_found;
+	cb_warning_x (cb_warn_extra, tree,
+		_("FUNCTION '%s' has format in variable"), intr->name);
+	return 1;
 }
 
 static cb_tree
@@ -4214,17 +4212,11 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	for (p = records; p; p = p->sister) {
 		if (f->record_min > 0) {
 			if (p->size < f->record_min) {
-				if (cb_records_mismatch_record_clause == CB_OK && warningopt < 2) {
-					// nothing to do
-				} else if (cb_records_mismatch_record_clause < CB_ERROR) {
-					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p),
-						_("size of record '%s' (%d) smaller than minimum of file '%s' (%d)"),
-						  p->name, p->size, f->name, f->record_min);
+				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
+					_("size of record '%s' (%d) smaller than minimum of file '%s' (%d)"),
+					  p->name, p->size, f->name, f->record_min);
+				if (cb_records_mismatch_record_clause < CB_ERROR) {
 					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
-				} else {
-					cb_error_x (CB_TREE (p),
-						_("size of record '%s' (%d) smaller than minimum of file '%s' (%d)"),
-						  p->name, p->size, f->name, f->record_min);
 				}
 				f->record_min = p->size;
 			}
@@ -4235,19 +4227,13 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 			   the length specified in the RECORD clause,
 			   the maximum will be used. */
 			if (p->size > f->record_max) {
-				if (cb_records_mismatch_record_clause == CB_OK && warningopt < 2) {
-					// nothing to do
-				} else if (cb_records_mismatch_record_clause < CB_ERROR) {
-					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p),
-						_("size of record '%s' (%d) larger than maximum of file '%s' (%d)"),
-					 	  p->name, p->size, f->name, f->record_max);
-					if (cb_records_mismatch_record_clause > CB_OK || warningopt >= 2) {
-						cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
-					}
-				} else {
-					cb_error_x (CB_TREE (p),
-						_("size of record '%s' (%d) larger than maximum of file '%s' (%d)"),
-					 	  p->name, p->size, f->name, f->record_max);
+				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
+					_("size of record '%s' (%d) larger than maximum of file '%s' (%d)"),
+				 	  p->name, p->size, f->name, f->record_max);
+				if (cb_warn_extra
+				 && cb_records_mismatch_record_clause != CB_ERROR
+				 && cb_records_mismatch_record_clause != CB_OK) {
+					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
 				}
 				if (f->organization == COB_ORG_INDEXED
 				 && p->size > MAX_FD_RECORD_IDX) {
@@ -5911,18 +5897,16 @@ cb_build_perform_varying (cb_tree name, cb_tree from, cb_tree by, cb_tree until)
 	p->name = name;
 	p->from = from;
 	p->until = until;
-	if (warningopt) {
-		if (until == cb_false) {
-			cb_warning_x (COBC_WARN_FILLER, until,
-				_("PERFORM FOREVER since UNTIL is always FALSE"));
-		} else if (until == cb_true) {
-			if (after_until) {
-				cb_warning_x (COBC_WARN_FILLER, until,
-				_("PERFORM ONCE since UNTIL is always TRUE"));
-			} else {
-				cb_warning_x (COBC_WARN_FILLER, until,
-				_("PERFORM NEVER since UNTIL is always TRUE"));
-			}
+	if (until == cb_false) {
+		cb_warning_x (cb_warn_extra, until,
+			_("PERFORM FOREVER since UNTIL is always FALSE"));
+	} else if (until == cb_true) {
+		if (after_until) {
+			cb_warning_x (cb_warn_extra, until,
+			_("PERFORM ONCE since UNTIL is always TRUE"));
+		} else {
+			cb_warning_x (cb_warn_extra, until,
+			_("PERFORM NEVER since UNTIL is always TRUE"));
 		}
 	}
 

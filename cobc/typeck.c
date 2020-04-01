@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman,
    Edward Hart
 
@@ -1458,10 +1458,8 @@ cb_trim_program_id (cb_tree id_literal)
 			_("'%s' literal includes leading spaces which are omitted"), s);
 	}
 	if (s[len - 1] == ' ') {
-		if (warningopt) {
-			cb_warning_x (COBC_WARN_FILLER, id_literal,
-				_("'%s' literal includes trailing spaces which are omitted"), s);
-		}
+		cb_warning_x (cb_warn_extra, id_literal,
+			_("'%s' literal includes trailing spaces which are omitted"), s);
 	}
 	while (*s == ' ') {
 		memmove (s, s + 1, len--);
@@ -1552,7 +1550,7 @@ cb_check_word_length (unsigned int length, const char *word)
 			cb_error (_("word length exceeds %d characters: '%s'"),
 				  cb_word_length, word);
 		} else {
-			cb_warning (warningopt, _("word length exceeds %d characters: '%s'"),
+			cb_warning (cb_warn_extra, _("word length exceeds %d characters: '%s'"),
 				  cb_word_length, word);
 		}
 	}
@@ -1669,7 +1667,7 @@ org:
 build_lit:
 	/* Warn if name was changed */
 	if (name_ptr != orig_ptr) {
-		cb_warning (warningopt, _("ASSIGN %s interpreted as '%s'"),
+		cb_warning (cb_warn_extra, _("ASSIGN %s interpreted as '%s'"),
 			orig_ptr, name_ptr);
 	}
 	/* Convert the EXTERNAL name into literal */
@@ -2803,7 +2801,7 @@ cb_validate_program_environment (struct cb_program *prog)
 			}
 		}
 		if (dupls) {
-			cb_warning_x (warningopt, CB_VALUE(l),
+			cb_warning_x (cb_warn_extra, CB_VALUE(l),
 					_("duplicate character values in class '%s'"),
 					    cb_name (CB_VALUE(l)));
 			}
@@ -2973,14 +2971,17 @@ validate_record_depending (cb_tree x)
 		break;
 	default:
 		/* RXWRXW - This breaks old legacy programs; FIXME: use compiler configuration */
-		if (cb_relaxed_syntax_checks) {
-			if (warningopt) {
-				cb_warning_x (COBC_WARN_FILLER, x,
-					_("RECORD DEPENDING item '%s' should be defined in "
-					  "WORKING-STORAGE, LOCAL-STORAGE or LINKAGE SECTION"), p->name);
+		{
+			enum cb_support	missing_compiler_config;
+			if (!cb_relaxed_syntax_checks
+			 || cb_warn_extra == COBC_WARN_AS_ERROR) {
+				missing_compiler_config = CB_ERROR;
+			} else if (cb_warn_extra == COBC_WARN_ENABLED) {
+				missing_compiler_config = CB_WARNING;
+			} else {
+				missing_compiler_config = CB_OK;
 			}
-		} else {
-			cb_error_x (x,
+			cb_warning_dialect_x (missing_compiler_config, x,
 				_("RECORD DEPENDING item '%s' should be defined in "
 				  "WORKING-STORAGE, LOCAL-STORAGE or LINKAGE SECTION"), p->name);
 		}
@@ -6635,11 +6636,11 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 #ifndef	_WIN32
 	if (call_conv & CB_CONV_STDCALL) {
 		call_conv &= ~CB_CONV_STDCALL;
-		cb_warning (warningopt, _("STDCALL not available on this platform"));
+		cb_warning (cb_warn_extra, _("STDCALL not available on this platform"));
 	}
 #elif	defined(_WIN64)
 	if (call_conv & CB_CONV_STDCALL) {
-		cb_warning (warningopt, _("STDCALL used on 64-bit Windows platform"));
+		cb_warning (cb_warn_extra, _("STDCALL used on 64-bit Windows platform"));
 	}
 #endif
 	if ((call_conv & CB_CONV_STATIC_LINK) && !constant_call_name) {
@@ -8753,10 +8754,8 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value, int *move_
 				if (!suppress_warn) {
 					goto invalid;
 				}
-				if (warningopt) {
-					cb_warning_x (COBC_WARN_FILLER, loc,
-						_("numeric move to ALPHABETIC"));
-				}
+				cb_warning_x (cb_warn_extra, loc,
+					_("numeric move to ALPHABETIC"));
 				break;
 			default:
 				if (is_value) {
@@ -12297,7 +12296,8 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 	current_program->ml_trees = tree;
 
 	if (with_attrs && !tree->attrs) {
-		cb_warning (warningopt, _("WITH ATTRIBUTES specified, but no attributes can be generated"));
+		cb_warning (cb_warn_extra,
+			_("WITH ATTRIBUTES specified, but no attributes can be generated"));
 	}
 
 	cb_emit (cb_build_ml_suppress_checks (tree));

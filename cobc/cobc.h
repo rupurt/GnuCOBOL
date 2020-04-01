@@ -445,7 +445,6 @@ extern int			cobc_seen_stdin;
 
 extern int			errorcount;
 extern int			warningcount;
-extern int			warningopt;
 extern int			no_physical_cancel;
 extern cob_u32_t		optimize_defs[];
 

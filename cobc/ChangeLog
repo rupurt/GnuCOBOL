@@ -1,4 +1,15 @@
 
+2020-04-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* warning.def, cobc.h, cobc.c, error.c, field.c, typeck.c, parser.y:
+	  new warning option -Wextra, replacing previous warningopt, allowing to
+	  disable them or have them as error and fixing the previous behaviour
+	  where -W effectively set them to be handled as error
+	* parser.y: removed some duplicate warnings and always raise PENDING,
+	  not only in case of -W/-Wall
+	* tree.h, tree.c, error.c (cb_warning_dialect_x): new function,
+	  possibly to be replaced later
+
 2020-03-31  Simon Sobisch <simonsobisch@gnu.org>
 
 	* field.c.y (cb_validate_78_item): full validation and resolving
