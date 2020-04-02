@@ -3064,7 +3064,14 @@ cb_validate_crt_status (cb_tree ref, cb_tree field_tree) {
 			  "WORKING-STORAGE or LOCAL-STORAGE"), field->name);
 		return NULL;
 	}
-	if (field->size != 4) {
+	if (CB_TREE_CATEGORY (field_tree) == CB_CATEGORY_NUMERIC) {
+		if (field->size < 4) {
+			cb_error_x (ref, _("'%s' CRT STATUS must have at least 4 digits"),
+				field->name);
+			return NULL;
+		}
+	}
+	else if (field->size != 4) {
 		cb_error_x (ref, _("'%s' CRT STATUS must be 4 characters long"),
 			field->name);
 		return NULL;

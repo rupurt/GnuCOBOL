@@ -1123,6 +1123,95 @@ AT_CHECK([$COMPILE_ONLY prog2.cob], [0], [], [])
 AT_CLEANUP
 
 
+AT_SETUP([SPECIAL-NAMES clause])
+AT_KEYWORDS([misc extensions CURSOR CRT STATUS])
+
+# FIXME: actually this is the only place for some CRT STATUS checks...
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       ENVIRONMENT      DIVISION.
+       CONFIGURATION    SECTION.
+       SPECIAL-NAMES.
+           CRT STATUS IS MY-CRT-STATUS.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+           03  CURSOR-ROW         PIC 999.
+           03  CURSOR-COL         PIC 999.
+       77  MY-CRT-STATUS PIC 9(04).
+       77  CRT-STATUS IS SPECIAL-NAMES CRT STATUS PIC 9(5).
+       PROCEDURE        DIVISION.
+           ACCEPT OMITTED END-ACCEPT.
+           STOP RUN.
+])
+
+AT_DATA([prog2.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       77  CRT-STATUS IS SPECIAL-NAMES CRT STATUS PIC X(5).
+       PROCEDURE        DIVISION.
+           ACCEPT OMITTED END-ACCEPT.
+           STOP RUN.
+])
+
+AT_DATA([prog3.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+           03  CURSOR-ROW   PIC 999.
+           03  CURSOR-COL   PIC 999.
+       77  CRT-STATUS       PIC X(4) IS SPECIAL-NAMES CRT STATUS.
+       PROCEDURE        DIVISION.
+           ACCEPT OMITTED END-ACCEPT.
+           STOP RUN.
+])
+
+AT_DATA([prog4.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+           03  CURSOR-ROW   PIC 999.
+           03  CURSOR-COL   PIC 999.
+       77  CRT-STATUS       PIC 9(5) IS SPECIAL-NAMES CRT STATUS.
+       PROCEDURE        DIVISION.
+           ACCEPT OMITTED END-ACCEPT.
+           STOP RUN.
+])
+
+AT_DATA([prog5.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       77  CRT-STATUS   PIC 9(3) IS SPECIAL-NAMES CRT STATUS.
+       PROCEDURE        DIVISION.
+           ACCEPT OMITTED END-ACCEPT.
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
+[prog.cob:14: error: duplicate CRT STATUS clause
+])
+AT_CHECK([$COMPILE_ONLY prog2.cob], [1], [],
+[prog2.cob:6: error: 'CRT-STATUS' CRT STATUS must be 4 characters long
+])
+AT_CHECK([$COMPILE_ONLY prog3.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY prog4.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY prog5.cob], [1], [],
+[prog5.cob:6: error: 'CRT-STATUS' CRT STATUS must have at least 4 digits
+])
+
+AT_CLEANUP
+
+
 AT_SETUP([CURRENCY SIGN])
 AT_KEYWORDS([SPECIAL-NAMES misc])
 
@@ -3618,7 +3707,7 @@ prog.cob:56: error: HANDLE item not allowed here: 'mydir'
 AT_CHECK([$COMPILE_ONLY -std=rm-strict prog.cob], [1], [],
 [prog.cob:12: error: 'handle' is not defined, but is a reserved word in another dialect
 prog.cob:14: error: 'handle' is not defined, but is a reserved word in another dialect
-prog.cob:15: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
+prog.cob:15: error: syntax error, unexpected Identifier
 prog.cob:17: error: 'handle' is not defined, but is a reserved word in another dialect
 prog.cob:19: error: 'handle' is not defined, but is a reserved word in another dialect
 prog.cob:20: error: 'handle' is not defined, but is a reserved word in another dialect
@@ -5153,11 +5242,11 @@ prog.cob:9: error: '/' operator misplaced
 ])
 
 AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [1], [],
-[prog.cob:6: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
-prog.cob:7: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
-prog.cob:8: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
-prog.cob:9: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
-prog.cob:10: error: syntax error, unexpected Identifier, expecting EXTERNAL or EXTERNAL-FORM or GLOBAL or IDENTIFIED
+[prog.cob:6: error: syntax error, unexpected Identifier
+prog.cob:7: error: syntax error, unexpected Identifier
+prog.cob:8: error: syntax error, unexpected Identifier
+prog.cob:9: error: syntax error, unexpected Identifier
+prog.cob:10: error: syntax error, unexpected Identifier
 ])
 
 AT_CHECK([$COMPILE_ONLY -std=mf-strict -freserved=CONSTANT prog.cob], [1], [],

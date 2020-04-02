@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart
 
    This file is part of GnuCOBOL.
@@ -182,6 +182,9 @@ CB_CONFIG_SUPPORT (cb_top_level_occurs_clause, "top-level-occurs-clause",
 
 CB_CONFIG_SUPPORT (cb_synchronized_clause, "synchronized-clause",
 	_("SYNCHRONIZED clause"))
+
+CB_CONFIG_SUPPORT (cb_special_names_clause, "special-names-clause",
+	_("SPECIAL-NAMES clause"))
 
 CB_CONFIG_SUPPORT (cb_goto_statement_without_name, "goto-statement-without-name",
 	_("GOTO statement without name"))

@@ -6449,6 +6449,7 @@ data_description_clause_sequence:
 data_description_clause:
   redefines_clause
 | external_clause
+| special_names_clause
 | global_clause
 | picture_clause
 | usage_clause
@@ -6555,6 +6556,71 @@ global_clause:
   }
 ;
 
+/* SPECIAL-NAMES clause */
+
+special_names_clause:
+  _is SPECIAL_NAMES
+  {
+	if (current_program->nested_level) {
+		cb_error (_("%s not allowed in nested programs"), "SPECIAL-NAMES");
+	} else {
+		cb_verify (cb_special_names_clause, "SPECIAL-NAMES clause");
+	}
+  }
+  special_names_target
+;
+
+special_names_target:
+  CURSOR
+  {
+	if (current_program->cursor_pos) {
+		emit_duplicate_clause_message ("CURSOR");
+	} else {
+		current_program->cursor_pos = cb_build_reference (current_field->name);
+	}
+  }
+| CRT STATUS
+  {
+	if (current_program->crt_status) {
+		emit_duplicate_clause_message ("CRT STATUS");
+	} else {
+		current_program->crt_status = cb_build_reference (current_field->name);
+	}
+  }
+/* not included, possibly never will
+| CHART STATUS
+  {
+	if (current_program->chart_status) {
+		emit_duplicate_clause_message ("CHART STATUS");
+	} else {
+		current_program->chart_status = cb_build_reference (current_field->name);
+	}
+  } */
+| SCREEN_CONTROL
+  {
+#if 0 /* not yet implemented */
+	if (current_program->screen_control) {
+		emit_duplicate_clause_message ("SCREEN CONTROL");
+	} else {
+		CB_PENDING ("SCREEN CONTROL");
+	}
+#else
+	CB_PENDING ("SCREEN CONTROL");
+#endif
+  }
+| EVENT_STATUS
+  {
+#if 0 /* not yet implemented */
+	if (current_program->event_status) {
+		emit_duplicate_clause_message ("EVENT STATUS");
+	} else {
+		CB_PENDING ("EVENT STATUS");
+	}
+#else
+	CB_PENDING ("EVENT STATUS");
+#endif
+  }
+;
 
 /* VOLATILE clause */
 

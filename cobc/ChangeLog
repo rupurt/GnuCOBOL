@@ -14,6 +14,7 @@
 	  added missing implementation of "type of function depends on arguments"
 	  and "check that arguments are of a matching type"
 	* tree.c, parser.y: changed "FUNCTION parameter" to "FUNCTION argument"
+	* typeck.c: FR #222 numeric checks for CRT STATUS (may be >= 4 digits)
 
 2020-03-31  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -26,6 +27,8 @@
 	* field.c (cb_validate_renames_item), tree.h: cb_validate_program_data
 	* typeck.c (cb_build_length): workaround for bug #623 RENAMES with length 0
 	* parser.y (renames_entry): extended syntax checks for RENAMES
+	* parser.y (special_names_clause), config.def (cb_special_names_clause):
+	  FR #222 implemented SPECIAL-NAMES clause (variable-local definition)
 
 2020-03-22  Simon Sobisch <simonsobisch@gnu.org>
 
