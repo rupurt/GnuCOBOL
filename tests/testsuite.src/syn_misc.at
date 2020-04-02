@@ -4543,7 +4543,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE_ONLY -fprogram-prototypes=warning prog.cob], [0], [],
 [prog.cob:9: warning: PROGRAM phrase used
-prog.cob:8: warning: no definition/prototype seen for program 'test-prog'
+prog.cob:8: warning: no definition/prototype seen for PROGRAM 'test-prog'
 prog.cob:11: warning: CALL/CANCEL with program-prototype-name used
 prog.cob:12: warning: CALL/CANCEL with program-prototype-name used
 ])

@@ -1,4 +1,10 @@
 
+2020-04-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c: changed "FUNCTION/USING parameter" to "FUNCTION/USING argument"
+	* screenio.c: moved screen initialization from internal to external
+	  called function
+
 2020-03-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c [WITH_CISAM] (print_info): fixed bug #621 missing comma

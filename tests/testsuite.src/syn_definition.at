@@ -559,7 +559,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:8: warning: no definition/prototype seen for function 'func'
+[prog.cob:8: warning: no definition/prototype seen for FUNCTION 'func'
 prog.cob:12: error: syntax error, unexpected user function name
 ])
 AT_CLEANUP

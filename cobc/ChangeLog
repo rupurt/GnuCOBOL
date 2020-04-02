@@ -9,6 +9,11 @@
 	  not only in case of -W/-Wall
 	* tree.h, tree.c, error.c (cb_warning_dialect_x): new function,
 	  possibly to be replaced later
+	* reerved.c: added COBOL 202x FUNCTION CONCAT
+	* tree.c (get_category_from_arguments): new function;
+	  added missing implementation of "type of function depends on arguments"
+	  and "check that arguments are of a matching type"
+	* tree.c, parser.y: changed "FUNCTION parameter" to "FUNCTION argument"
 
 2020-03-31  Simon Sobisch <simonsobisch@gnu.org>
 

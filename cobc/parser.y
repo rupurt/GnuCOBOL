@@ -5192,7 +5192,7 @@ record_delimiter_option:
 | LINE_SEQUENTIAL
   {
 	if (current_file->organization != COB_ORG_SEQUENTIAL
-	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
+	    && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with (LINE) SEQUENTIAL files"),
 			  "LINE-SEQUENTIAL");
 	}
@@ -5210,7 +5210,7 @@ record_delimiter_option:
 	}
 
 	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))
-	 && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
+	    && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
 		current_file->organization = COB_ORG_SEQUENTIAL;
 	}
   }
@@ -9258,7 +9258,7 @@ _procedure_using_chaining:
   procedure_param_list
   {
 	if (cb_list_length ($3) > MAX_CALL_FIELD_PARAMS) {
-		cb_error (_("number of parameters exceeds maximum %d"),
+		cb_error (_("number of arguments exceeds maximum %d"),
 			  MAX_CALL_FIELD_PARAMS);
 	}
 	$$ = $3;
@@ -9275,7 +9275,7 @@ _procedure_using_chaining:
   procedure_param_list
   {
 	if (cb_list_length ($3) > MAX_CALL_FIELD_PARAMS) {
-		cb_error (_("number of parameters exceeds maximum %d"),
+		cb_error (_("number of arguments exceeds maximum %d"),
 			  MAX_CALL_FIELD_PARAMS);
 	}
 	$$ = $3;
@@ -9396,8 +9396,10 @@ size_is_integer:
   }
 ;
 
-/* The [MEMORY] SIZE phrase is used when the parameter in the USING phrase is a memory address (pointer to memory)
-  and you need to specify the size of the piece of memory that is located at that address. */
+/* The [MEMORY] SIZE phrase is used when the parameter in the
+   USING phrase is a memory address (pointer to memory)
+   and you need to specify the size of the piece of memory
+   that is located at that address. */
 _acu_size:
   /* empty */
 | _with MEMORY SIZE _is positive_id_or_lit
@@ -10787,7 +10789,7 @@ call_using:
   {
 	if (cb_list_length ($3) > MAX_CALL_FIELD_PARAMS) {
 		cb_error_x (CB_TREE (current_statement),
-			    _("number of parameters exceeds maximum %d"),
+			    _("number of arguments exceeds maximum %d"),
 			    MAX_CALL_FIELD_PARAMS);
 	}
 	$$ = $3;
@@ -10805,7 +10807,7 @@ call_param:
   {
 	if (call_mode != CB_CALL_BY_REFERENCE) {
 		cb_error_x (CB_TREE (current_statement),
-			    _("OMITTED only allowed when parameters are passed BY REFERENCE"));
+			    _("OMITTED only allowed when arguments are passed BY REFERENCE"));
 	}
 	$$ = CB_BUILD_PAIR (cb_int (call_mode), cb_null);
   }

@@ -2237,8 +2237,6 @@ field_display (cob_field *f, const int line, const int column, cob_field *fgc,
 	}
 	/* LCOV_EXCL_STOP */
 
-	init_cob_screen_if_needed ();
-
 	origin_y = 0;
 	origin_x = 0;
 
@@ -3043,6 +3041,7 @@ cob_field_display (cob_field *f, cob_field *line, cob_field *column,
 	int	sline;
 	int	scolumn;
 
+	init_cob_screen_if_needed ();
 	/*
 	  LINE/COL 0 is always allowed as it is impossible to specify it in the
 	  standard format (DISPLAY ... UPON CRT) and all implementations of the
