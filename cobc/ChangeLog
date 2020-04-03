@@ -1,4 +1,8 @@
 
+2020-04-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* typeck.c, tree.h: new field attribute flag_internal_register
+
 2020-04-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* warning.def, cobc.h, cobc.c, error.c, field.c, typeck.c, parser.y:

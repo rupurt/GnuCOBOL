@@ -642,15 +642,18 @@ cb_tree
 cb_check_numeric_value (cb_tree x)
 {
 	struct cb_field	*f, *sc;
+	enum cb_category cat;
+
 	if (cb_validate_one (x)) {
 		return cb_error_node;
 	}
 
-	if (CB_TREE_CATEGORY (x) == CB_CATEGORY_NUMERIC) {
+	cat = CB_TREE_CATEGORY (x);
+	if (cat == CB_CATEGORY_NUMERIC) {
 		return x;
 	}
 
-	switch(CB_TREE_CATEGORY (x)) {
+	switch (cat) {
 	case CB_CATEGORY_ALPHABETIC:
 		cb_error_x (x, _("'%s' is Alpha, instead of a numeric value"), cb_name (x));
 		break;
@@ -1058,6 +1061,7 @@ cb_build_register_return_code (const char *name, const char *definition)
 
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->index_type = CB_STATIC_INT_INDEX;
+	CB_FIELD_PTR (field)->flag_internal_register = 1;
 	current_program->cb_return_code = field;
 }
 
@@ -1076,6 +1080,7 @@ cb_build_register_sort_return (const char *name, const char *definition)
 
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->flag_no_init = 1;
+	CB_FIELD_PTR (field)->flag_internal_register = 1;
 	current_program->cb_sort_return = field;
 }
 
@@ -1095,8 +1100,15 @@ cb_build_register_number_parameters (const char *name, const char *definition)
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->flag_no_init = 1;
 	CB_FIELD_PTR (field)->flag_local = 1;
+	CB_FIELD_PTR (field)->flag_internal_register = 1;
 	CB_FIELD_PTR (field)->index_type = CB_INT_INDEX;
 	current_program->cb_call_params = field;
+}
+
+static void cb_build_constant_register (cb_tree name, cb_tree value)
+{
+	cb_tree constant = cb_build_constant (name, value);
+	CB_FIELD (constant)->flag_internal_register = 1;
 }
 
 /* WHEN-COMPILED */
@@ -1140,7 +1152,7 @@ cb_build_register_when_compiled (const char *name, const char *definition)
 		lit_size = 20;
 	}
 #endif
-	(void)cb_build_constant (cb_build_reference (name),
+	cb_build_constant_register (cb_build_reference (name),
 		cb_build_alphanumeric_literal (buff, lit_size));
 }
 
@@ -1245,6 +1257,7 @@ cb_build_generic_register (const char *name, const char *external_definition)
 		COB_UNUSED (p);	/* FIXME: parse actual VALUE */
 		field->values = CB_LIST_INIT (cb_zero);
 	}
+	field->flag_internal_register = 1;
 
 	/* TODO: check that the local definition is completely parsed -> spaces */
 
@@ -1288,6 +1301,7 @@ cb_build_register_xml_code (const char *name, const char *definition)
 	field->values = CB_LIST_INIT (cb_zero);
 	field->flag_no_init = 1;
 	field->flag_is_global = 1;
+	field->flag_internal_register = 1;
 	current_program->xml_code = tfield;
 }
 
@@ -1318,6 +1332,7 @@ cb_build_register_json_code (const char *name, const char *definition)
 	field->values = CB_LIST_INIT (cb_zero);
 	field->flag_no_init = 1;
 	field->flag_is_global = 1;
+	field->flag_internal_register = 1;
 	current_program->json_code = tfield;
 }
 
@@ -8240,6 +8255,8 @@ static void
 warning_destination (cb_tree x)
 {
 	struct cb_field		*f;
+	const char *usage;
+
 	if (CB_REFERENCE_P(x)) {
 		struct cb_reference	*r = CB_REFERENCE (x);
 		if (r->offset) {
@@ -8256,44 +8273,46 @@ warning_destination (cb_tree x)
 		COBC_ABORT ();
 	}
 
-	if (!strcmp (f->name, "RETURN-CODE") ||
-	    !strcmp (f->name, "SORT-RETURN") ||
-	    !strcmp (f->name, "NUMBER-OF-CALL-PARAMETERS")) {
-		cb_warning (COBC_WARN_FILLER, _("internal register '%s' defined as BINARY-LONG"),
-			    f->name);
-	} else if (f->flag_real_binary) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, f->pic->orig);
+#if 1  /* FIXME: this is wrong, should be removed and register building be
+	      adjusted, for example ACU has RETURN-CODE as SIGNED-LONG, EXTERNAL */
+	if (f->flag_internal_register) {
+		usage = "BINARY-LONG";
+	} else
+#endif
+	if (f->flag_real_binary) {
+		usage = f->pic->orig;
 	} else if (f->usage == CB_USAGE_FLOAT) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT");
+		usage = "FLOAT";
 	} else if (f->usage == CB_USAGE_DOUBLE) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "DOUBLE");
+		usage = "DOUBLE";
 	} else if (f->usage == CB_USAGE_LONG_DOUBLE) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT EXTENDED");
+		usage = "FLOAT EXTENDED";
 	} else if (f->usage == CB_USAGE_FP_BIN32) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT-BINARY-7");
+		usage = "FLOAT-BINARY-7";
 	} else if (f->usage == CB_USAGE_FP_BIN64) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT-BINARY-16");
+		usage = "FLOAT-BINARY-16";
 	} else if (f->usage == CB_USAGE_FP_BIN128) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT-BINARY-34");
+		usage = "FLOAT-BINARY-34";
 	} else if (f->usage == CB_USAGE_FP_DEC64) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT-DECIMAL-16");
+		usage = "FLOAT-DECIMAL-16";
 	} else if (f->usage == CB_USAGE_FP_DEC128) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, "FLOAT-DECIMAL-34");
+		usage = "FLOAT-DECIMAL-34";
 	} else if (f->pic) {
 		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as PIC %s"),
 			      cb_name (x), f->pic->orig);
+		return;
 	} else {
 		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as a group of length %d"),
 			      cb_name (x), f->size);
+		return;
+	}
+
+	if (f->flag_internal_register) {
+		cb_warning (COBC_WARN_FILLER, _("internal register '%s' defined as USAGE %s"),
+			    f->name, usage);
+	} else {
+		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
+			      f->name, usage);
 	}
 }
 
