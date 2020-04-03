@@ -2,6 +2,8 @@
 2020-04-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* typeck.c, tree.h: new field attribute flag_internal_register
+	* config.def, field.c, typeck.c: experimental numeric-pointer option
+	  (cb_numeric_pointer) to handle ACU's special POINTER handling
 
 2020-04-01  Simon Sobisch <simonsobisch@gnu.org>
 

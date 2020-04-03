@@ -446,6 +446,7 @@ test.conf: missing definitions:
 	no definition of 'line-col-zero-default'
 	no definition of 'display-special-fig-consts'
 	no definition of 'binary-comp-1'
+	no definition of 'numeric-pointer'
 	no definition of 'move-non-numeric-lit-to-numeric-is-zero'
 	no definition of 'comment-paragraphs'
 	no definition of 'memory-size-clause'

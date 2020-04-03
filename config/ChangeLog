@@ -1,4 +1,8 @@
 
+2020-04-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: added option numeric-pointer *EXPERIMENTAL*
+
 2020-03-31  Simon Sobisch <simonsobisch@gnu.org>
 
 	* general: added option special-names-clause

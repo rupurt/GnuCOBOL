@@ -8640,6 +8640,10 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value, int *move_
 		if (CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
 			return 0;
 		} else {
+			if (cb_numeric_pointer
+			 && CB_TREE_CLASS (src) == CB_CLASS_NUMERIC) {
+				return 0;
+			}
 			goto invalid;
 		}
 	}
@@ -9992,8 +9996,15 @@ cb_build_move (cb_tree src, cb_tree dst)
 		cobc_xref_set_receiving (dst);
 	}
 
-	if (CB_TREE_CLASS (dst) == CB_CLASS_POINTER ||
-	    CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
+	if (CB_TREE_CLASS (dst) == CB_CLASS_POINTER
+	 && CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
+		return cb_build_assign (dst, src);
+	}
+	if (CB_TREE_CLASS (dst) == CB_CLASS_POINTER
+	 || CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
+		if (cb_numeric_pointer) {
+			return CB_BUILD_FUNCALL_2 ("cob_move", src, dst);
+		}
 		return cb_build_assign (dst, src);
 	}
 
