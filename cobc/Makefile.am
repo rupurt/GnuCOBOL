@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol/cobc
 #
-# Copyright (C) 2003-2012, 2014-2019 Free Software Foundation, Inc.
+# Copyright (C) 2003-2012, 2014-2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -32,7 +32,7 @@ cobc_LDADD = $(COBC_LIBS) $(top_builddir)/libcob/libcob.la $(top_builddir)/lib/l
 	$(CODE_COVERAGE_LIBS)
 
 dist_man_MANS = cobc.1
-COBC = $(top_builddir)/pre-inst-env cobc$(EXEEXT)
+COBC = cobc$(EXEEXT)
 
 # sources that needs to be built *before* any other file
 # note: we actually want their header files...
@@ -47,8 +47,16 @@ CLEANFILES = parser.output ppparse.output
 CODE_COVERAGE_BRANCH_COVERAGE=1
 CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 
-cobc.1: help.c config.def flag.def warning.def $(top_srcdir)/configure.ac | cobc$(EXEEXT)
-	$(HELP2MAN) --output=$@ --info-page=$(PACKAGE) "$(COBC) -q"
+HELPSOURCES = help.c config.def flag.def warning.def $(top_srcdir)/configure.ac
+HELP2MAN_OPTS = --info-page=$(PACKAGE)
+
+if MAKE_HAS_PREREQ_ONLY
+cobc.1: $(HELPSOURCES) | $(COBC)
+	"$(top_builddir)/pre-inst-env" $(HELP2MAN) --output=$@ $(HELP2MAN_OPTS) $(COBC)
+else
+cobc.1: $(HELPSOURCES)
+	"$(top_builddir)/pre-inst-env" $(HELP2MAN) --output=$@ $(HELP2MAN_OPTS) $(COBC)
+endif
 
 .l.c:
 	LC_CTYPE=C $(LEX) -o$@ $<

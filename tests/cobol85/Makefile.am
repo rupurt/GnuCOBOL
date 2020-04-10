@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol/tests/cobol85
 #
-# Copyright (C) 2003-2012, 2015-2019 Free Software Foundation, Inc.
+# Copyright (C) 2003-2012, 2015-2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -146,8 +146,8 @@ newcob.val.tar.gz:
 	@wget $(WGET_FLAGS) -O $@ "$(URL_NEWCOB_TAR_GZ)"
 
 unpack-Z: newcob.val.Z
-	@echo "Unpacking $@..."
-	@gunzip "$<" || gzip -d "$<" || uncompress "$<"
+	@echo "Unpacking $<..."
+	@gunzip -f "$<" || gzip -d -f "$<" || uncompress "$<"
 
 unpack-gz: newcob.val.tar.gz
 	@echo "Unpacking $<..."

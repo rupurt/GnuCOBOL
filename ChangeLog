@@ -1,4 +1,9 @@
 
+2020-03-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: new check for MAKE supporting order-only prerequisites
+	  resulting in new conditional MAKE_HAS_PREREQ_ONLY
+
 2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: adjusted generation of built-in COB_LDFLAGS
@@ -483,7 +488,7 @@
 
 	* configure.ac: #44 Disable optimisation with --enable-debug
 
-2014-09-09  Philipp Böhme <phi.boehme@googlemail.com>
+2014-09-09  Philipp BÃ¶hme <phi.boehme@googlemail.com>
 
 	* configure.ac: new check for mp_get_memory_functions in
 	  libgmp and new preprocessor define HAVE_MP_GET_MEMORY_FUNCTIONS
@@ -496,7 +501,7 @@
 	  additional output of configuration summary to config.log;
 	  respect --quite (don't echo or printf to stdout)
 
-2014-06-20  Philipp Böhme <phi.boehme@googlemail.com>
+2014-06-20  Philipp BÃ¶hme <phi.boehme@googlemail.com>
 
 	* New folder build_windows
 	* Added project files for Visual Studio 2003 and newer
@@ -505,7 +510,7 @@
 
 	* General: Win compatibility: define COB_OBJEXT in defaults.h
 
-2014-04-14  Philipp Böhme <phi.boehme@googlemail.com>
+2014-04-14  Philipp BÃ¶hme <phi.boehme@googlemail.com>
 
 	* moved cobgetopt.c from lib to libcob
 	* link cobc to libcob

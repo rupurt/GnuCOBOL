@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol/bin
 #
-# Copyright (C) 2001-2012, 2014, 2017-2019 Free Software Foundation, Inc.
+# Copyright (C) 2001-2012, 2014, 2017-2020 Free Software Foundation, Inc.
 # Written by Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -23,7 +23,7 @@ bin_SCRIPTS = cob-config
 bin_PROGRAMS = cobcrun
 cobcrun_SOURCES = cobcrun.c
 dist_man_MANS = cobcrun.1 cob-config.1
-COBCRUN = "$(top_builddir)/pre-inst-env" cobcrun$(EXEEXT)
+COBCRUN = cobcrun$(EXEEXT)
 
 AM_LDFLAGS = $(COB_EXPORT_DYN)
 AM_CPPFLAGS = -I$(top_srcdir)
@@ -38,6 +38,13 @@ CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 
 MAINTAINERCLEANFILES = cobcrun.1
 
-cobcrun.1: cobcrun.c $(top_srcdir)/configure.ac |  cobcrun$(EXEEXT)
-	$(HELP2MAN) --output=$@ --info-page=$(PACKAGE) "$(COBCRUN) -q"
+HELPSOURCES = cobcrun.c $(top_srcdir)/configure.ac
+HELP2MAN_OPTS = --info-page=$(PACKAGE)
 
+if MAKE_HAS_PREREQ_ONLY
+cobcrun.1: $(HELPSOURCES) | $(COBCRUN)
+	"$(top_builddir)/pre-inst-env" $(HELP2MAN) --output=$@ $(HELP2MAN_OPTS) $(COBCRUN)
+else
+cobcrun.1: $(HELPSOURCES)
+	"$(top_builddir)/pre-inst-env" $(HELP2MAN) --output=$@ $(HELP2MAN_OPTS) $(COBCRUN)
+endif
