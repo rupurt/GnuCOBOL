@@ -4,6 +4,13 @@
 	* configure.ac: new check for MAKE supporting order-only prerequisites
 	  resulting in new conditional MAKE_HAS_PREREQ_ONLY
 
+2020-03-09  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: FR #372 new option --with-math to specify multiple
+	  precision library used (may have the value gmp or mpir or check);
+	  in case of MPIR (or not found GMP) checks for mpir.h (HAVE_MPIR_H)
+	  and libmpir; in general: check header first, then library
+
 2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: adjusted generation of built-in COB_LDFLAGS

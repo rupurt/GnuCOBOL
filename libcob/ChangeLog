@@ -1,4 +1,9 @@
 
+2020-04-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (print_info) [mpir_version]: fixed string overflow warnings
+	* numeric.c (cob_decimal_print): use of mpz_get_str in favor of gmp_sprintf
+
 2020-04-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c: changed "FUNCTION/USING parameter" to "FUNCTION/USING argument"
@@ -14,6 +19,10 @@
 	* Makefile.am: adjusted invocation of help2man, using new defines
 	  HELPSOURCES and HELP2MAN_OPTS
 	* Makefile.am: honor new conditional MAKE_HAS_PREREQ_ONLY
+
+2020-03-09  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c, intrinsic.c, numeric.c: FR #372 honor HAVE_GMP_H and HAVE_MPIR_H
 
 2020-02-27  Simon Sobisch <simonsobisch@gnu.org>
 

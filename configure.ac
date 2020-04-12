@@ -75,6 +75,7 @@ AH_TEMPLATE([COB_TREE_DEBUG], [Enable extra checks within the compiler (Develope
 AH_TEMPLATE([COB_PARAM_CHECK], [Enable minimum parameter check for system libraries])
 AH_TEMPLATE([PATCH_LEVEL], [Define a patch level (numeric, max. 8 digits)])
 AH_TEMPLATE([MAX_CALL_FIELD_PARAMS], [Define maximum parameters for CALL])
+AH_TEMPLATE([WITH_MATH], [Math multiple precision library])
 AH_TEMPLATE([WITH_INDEX_EXTFH], [Compile with an external ISAM handler])
 AH_TEMPLATE([WITH_SEQRA_EXTFH], [Compile with an external SEQ/RAN handler])
 AH_TEMPLATE([WITH_DB], [Use Berkeley DB library as emulation of ISAM handler])
@@ -115,7 +116,7 @@ AH_TEMPLATE([HAVE_DESIGNATED_INITS], [Has designated initializers])
 AH_TEMPLATE([HAVE_NANO_SLEEP], [Has nanosleep function])
 AH_TEMPLATE([HAVE_CLOCK_GETTIME], [Has clock_gettime function and CLOCK_REALTIME])
 AH_TEMPLATE([HAVE_ISFINITE], [Has isfinite function])
-AH_TEMPLATE([HAVE_MP_GET_MEMORY_FUNCTIONS], [Do we have mp_get_memory_functions in gmp])
+AH_TEMPLATE([HAVE_MP_GET_MEMORY_FUNCTIONS], [Do we have mp_get_memory_functions in GMP/MPIR])
 #AH_TEMPLATE([HAVE_RAISE], [Has raise function])
 AH_TEMPLATE([HAVE_FINITE_IEEEFP_H],
 	[Declaration of finite function in ieeefp.h instead of math.h])
@@ -479,6 +480,137 @@ if test "$COB_USES_GCC_NO_ICC" != yes -a "$enable_code_coverage" = "yes"; then
 fi
 
 
+# Checks for gmp.
+AC_MSG_NOTICE([Checks for GMP/MPIR ...])
+
+AC_ARG_WITH([math],
+  [AS_HELP_STRING([[--with-math[=ARG]]],
+    [(GnuCOBOL) Use math multiple precision library, where ARG may be:
+     check (default), gmp, mpir])],
+  [case "$with_math" in
+    gmp | mpir | check)
+		USE_MATH="$with_math"
+		;;
+	yes)
+		USE_MATH="check"
+		;;
+	no)
+		AC_MSG_ERROR([Cannot build GnuCOBOL without math multiple precision library)])
+		;;
+    *)
+		AC_MSG_ERROR([invalid value "$with_math" for --with-math,
+  must be one of the following:
+  gmp, mpir (use only the specified library)
+  check  (use whatever library is usable)])
+		;;
+  esac],
+  [USE_MATH="check"])
+
+MYOLDLIBS=$LIBS
+
+if test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"; then
+  AC_CHECK_HEADERS([gmp.h],
+    [AC_CHECK_LIB([gmp], [__gmpz_init],
+	  [USE_MATH="gmp"
+	   LIBCOB_LIBS="$LIBCOB_LIBS -lgmp"
+	   LIBS="$LIBS -lgmp"],
+	  [if test "$USE_MATH" = "gmp"; then
+         AC_MSG_ERROR([GMP library is required])
+       fi], [])],
+	[if test "$USE_MATH" = "gmp"; then
+	  AC_MSG_ERROR([gmp.h (GMP) is required])
+	fi], [])
+fi
+
+if test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"; then
+  AC_CHECK_HEADERS([mpir.h],
+    [AC_CHECK_LIB([mpir], [__gmpz_init],
+	  [USE_MATH="mpir"
+	   LIBCOB_LIBS="$LIBCOB_LIBS -lmpir"
+	   LIBS="$LIBS -lmpir"], 
+	  [if test "$USE_MATH" = "mpir"; then
+         AC_MSG_ERROR([MPIR library is required])
+       fi], [])],
+	[if test "$USE_MATH" = "mpir"; then
+	  AC_MSG_ERROR([mpir.h (MPIR) is required])
+	fi], [])
+fi
+
+if test "$USE_MATH" = "check"; then
+	AC_MSG_ERROR([neither GMP nor MPIR library are found, but one of those is mandatory])
+fi
+
+AC_MSG_CHECKING([matching GMP version])
+# Check just major/minor levels between header and library
+# get GMP version from lib
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+	#include <stdio.h>
+	#ifdef _WIN32
+	#ifndef __GMP_LIBGMP_DLL
+	#define __GMP_LIBGMP_DLL 1
+	#endif
+	#endif
+	#if defined HAVE_GMP_H
+	#include <gmp.h>
+	#elif defined HAVE_MPIR_H
+	#include <mpir.h>
+	#endif
+	int main (int argc, char **argv)
+	{
+		(void)argv;
+		if (argc > 1)
+			printf ("%s", gmp_version);
+		return 0;
+	}
+	]])],
+	[COB_GMP_LIB=`./conftest$ac_exeext x`],
+	[AC_MSG_ERROR([Unable to extract GMP version information from gmp_version])],
+	[AC_MSG_WARN([matching GMP version assumed])]
+	 COB_GMP_LIB="cross")
+if test "x$COB_GMP_LIB" = "x"; then
+	AC_MSG_ERROR([Unable to extract GMP version information (library)])
+fi
+
+# get GMP version from header
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+	#include <stdio.h>
+	#if defined HAVE_GMP_H
+	#include <gmp.h>
+	#elif defined HAVE_MPIR_H
+	#include <mpir.h>
+	#endif
+	int main (int argc, char **argv)
+	{
+		(void)argv;
+		if (argc > 1)
+			printf ("%d.%d", __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR);
+		return 0;
+	}
+	]])],
+	[COB_GMP_HEADER=`./conftest$ac_exeext x`],
+	[AC_MSG_ERROR([Unable to extract GMP version information from header])],
+	[AC_MSG_WARN([cannot run test program while cross-compiling])
+	 COB_GMP_HEADER="cross-compilation - assumed"])
+if test "x$COB_GMP_HEADER" = "x"; then
+	AC_MSG_ERROR([Unable to extract GMP version information (header)])
+fi
+
+COB_GMP_LIB_MAJOR=$(echo "$COB_GMP_LIB" | cut -d. -f1)
+COB_GMP_LIB_MINOR=$(echo "$COB_GMP_LIB" | cut -d. -f2)
+
+if test "$COB_GMP_HEADER" = "$COB_GMP_LIB_MAJOR.$COB_GMP_LIB_MINOR" -o "$COB_GMP_LIB" = "cross"; then
+	AC_MSG_RESULT([yes ($COB_GMP_HEADER)])
+else
+	AC_MSG_RESULT([no (header: $COB_GMP_HEADER / library: $COB_GMP_LIB)])
+	AC_MSG_ERROR([Unable to use GMP - Please check config.log])
+fi
+
+LIBS=$MYOLDLIBS
+
+AC_CHECK_LIB([$USE_MATH], [__gmp_get_memory_functions],
+ [AC_DEFINE([HAVE_MP_GET_MEMORY_FUNCTIONS], [1])], [], [])
+
+
 # set PKG_CONFIG to use (cross-compile aware)
 PKG_PROG_PKG_CONFIG
 
@@ -663,80 +795,6 @@ AC_ARG_WITH([varseq],
   [with_varseq=0])
 
 AC_DEFINE_UNQUOTED([WITH_VARSEQ], [$with_varseq])
-
-
-# Checks for gmp.
-AC_MSG_NOTICE([Checks for GMP ...])
-AC_CHECK_HEADERS([gmp.h], [], AC_MSG_ERROR([gmp.h (GMP) is required]), [])
-
-AC_CHECK_LIB([gmp], [__gmpz_init],
-	[LIBCOB_LIBS="$LIBCOB_LIBS -lgmp"],
-	AC_MSG_ERROR([GMP library is required]), [])
-
-# Check just major/minor levels between header and library
-# get GMP version from header
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-	#include <stdio.h>
-	#include <gmp.h>
-	int main (int argc, char **argv)
-	{
-		(void)argv;
-		if (argc > 1)
-			printf ("%d.%d", __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR);
-		return 0;
-	}
-	]])],
-	[COB_GMP_HEADER=`./conftest$ac_exeext x`],
-	[AC_MSG_ERROR([Unable to extract GMP version information from gmp.h])],
-	[AC_MSG_WARN([cannot run test program while cross-compiling])
-	 COB_GMP_HEADER="cross-compilation - assumed"])
-if test "x$COB_GMP_HEADER" = "x"; then
-	AC_MSG_ERROR([Unable to extract GMP version information (header)])
-fi
-
-MYOLDLIBS=$LIBS
-LIBS="$MYOLDLIBS -lgmp"
-# get GMP version from lib
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-	#include <stdio.h>
-	#ifdef _WIN32
-	#ifndef __GMP_LIBGMP_DLL
-	#define __GMP_LIBGMP_DLL 1
-	#endif
-	#endif
-	#include <gmp.h>
-	int main (int argc, char **argv)
-	{
-		(void)argv;
-		if (argc > 1)
-			printf ("%s", gmp_version);
-		return 0;
-	}
-	]])],
-	[COB_GMP_LIB=`./conftest$ac_exeext x`],
-	[AC_MSG_ERROR([Unable to extract GMP version information from gmp_version])],
-	[AC_MSG_WARN([matching GMP version assumed])]
-	 COB_GMP_LIB="cross")
-if test "x$COB_GMP_LIB" = "x"; then
-	AC_MSG_ERROR([Unable to extract GMP version information (library)])
-fi
-
-AC_MSG_CHECKING([matching GMP version])
-COB_GMP_LIB_MAJOR=$(echo "$COB_GMP_LIB" | cut -d. -f1)
-COB_GMP_LIB_MINOR=$(echo "$COB_GMP_LIB" | cut -d. -f2)
-
-if test "$COB_GMP_HEADER" = "$COB_GMP_LIB_MAJOR.$COB_GMP_LIB_MINOR" -o "$COB_GMP_LIB" = "cross"; then
-	AC_MSG_RESULT([yes ($COB_GMP_HEADER)])
-else
-	AC_MSG_RESULT([no (header: $COB_GMP_HEADER / library: $COB_GMP_LIB)])
-	AC_MSG_ERROR([Unable to use GMP - Please check config.log])
-fi
-LIBS=$MYOLDLIBS
-
-
-# Works fine as an alternative if necessary
-# AC_SEARCH_LIBS([__gmp_get_memory_functions], [gmp], [AC_DEFINE([HAVE_MP_GET_MEMORY_FUNCTIONS], [1])], [], [])
-AC_CHECK_LIB([gmp], [__gmp_get_memory_functions], [AC_DEFINE([HAVE_MP_GET_MEMORY_FUNCTIONS], [1])], [], [])
 
 
 # Solaris has nanosleep in other libraries
@@ -1807,6 +1865,7 @@ else
 fi
 AC_MSG_NOTICE([ Use gettext for international messages:      ${USE_NLS}])
 AC_MSG_NOTICE([ Use fcntl for file locking:                  ${ac_cv_func_fcntl}])
+AC_MSG_NOTICE([ Use math multiple precision library:         ${USE_MATH}])
 case "$USE_CURSES" in
   not_found)
     AC_MSG_NOTICE([ screen I/O (no curses found):                NO])
