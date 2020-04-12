@@ -321,7 +321,11 @@
 #endif
 
 /* Define to 1 if you have the <gmp.h> header file. */
+#if USED_MATHLIB == MATHLIB_MPIR
+/* #undef HAVE_GMP_H */
+#else
 #define HAVE_GMP_H 1
+#endif
 
 /* curses has has_mouse function */
 /* #undef HAVE_HAS_MOUSE */
@@ -428,7 +432,14 @@
 /* #undef HAVE_MOUSEINTERVAL */
 #endif
 
-/* Do we have mp_get_memory_functions in gmp */
+/* Define to 1 if you have the <mpir.h> header file. */
+#if USED_MATHLIB == MATHLIB_MPIR
+#define HAVE_MPIR_H 1
+#else
+/* #undef HAVE_MPIR_H */
+#endif
+
+/* Do we have mp_get_memory_functions in GMP/MPIR */
 #define HAVE_MP_GET_MEMORY_FUNCTIONS 1
 
 /* Has nanosleep function */
@@ -686,6 +697,13 @@
 
 /* Compile with an external ISAM handler */
 /* #undef WITH_INDEX_EXTFH */
+
+/* Math multiple precision library */
+#if USED_MATHLIB == MATHLIB_MPIR
+#define WITH_MATH "mpir"
+#else
+#define WITH_MATH "gmp"
+#endif
 
 /* Compile with an external SEQ/RAN handler */
 /* #undef WITH_SEQRA_EXTFH */
