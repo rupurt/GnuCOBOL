@@ -1,4 +1,8 @@
 
+2020-04-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.h.in: FR #372 allow use of "pure" MPIR (without gmp-compat)
+
 2020-02-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* makedist.cmd: renamed from makedist.bat
