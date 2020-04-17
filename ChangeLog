@@ -3,6 +3,10 @@
 
 	* gnucobol.spec: minor cleanup
 
+2020-04-16  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: fixed cleaning of COB_CFLAGS again (see Patches #49).
+
 2020-03-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: new check for MAKE supporting order-only prerequisites
@@ -18,6 +22,11 @@
 2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: adjusted generation of built-in COB_LDFLAGS
+
+2020-02-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: document the existing environment vars LIBCOB_CPPFLAGS,
+	  LIBCOB_LIBS and COBC_LIBS and test if those actually work
 
 2019-08-12  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -499,7 +508,7 @@
 
 	* configure.ac: #44 Disable optimisation with --enable-debug
 
-2014-09-09  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-09-09  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* configure.ac: new check for mp_get_memory_functions in
 	  libgmp and new preprocessor define HAVE_MP_GET_MEMORY_FUNCTIONS
@@ -512,7 +521,7 @@
 	  additional output of configuration summary to config.log;
 	  respect --quite (don't echo or printf to stdout)
 
-2014-06-20  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-06-20  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* New folder build_windows
 	* Added project files for Visual Studio 2003 and newer
@@ -521,7 +530,7 @@
 
 	* General: Win compatibility: define COB_OBJEXT in defaults.h
 
-2014-04-14  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-04-14  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* moved cobgetopt.c from lib to libcob
 	* link cobc to libcob

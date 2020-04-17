@@ -3790,7 +3790,7 @@ static int
 process_run (const char *name)
 {
 	int		ret, status;
-	size_t	curr_size;
+	size_t		curr_size;
 	const char	*buffer;
 
 	if (cb_compile_level < CB_LEVEL_MODULE) {
@@ -3821,12 +3821,23 @@ process_run (const char *name)
 	} else {  /* executable */
 		/* only add COB_EXE_EXT if it is not specified */
 		buffer = file_extension (name);
-		if (COB_EXE_EXT[0] && strcasecmp (buffer, COB_EXE_EXT + 1)) {
-			curr_size = snprintf (cobc_buffer, cobc_buffer_size, ".%c%s%s",
-				SLASH_CHAR, name, COB_EXE_EXT);
+		/* only prefix with ./ if there is no directory portion in name */
+		if (strchr (name, SLASH_CHAR) == NULL) {
+			if (COB_EXE_EXT[0] && strcasecmp (buffer, COB_EXE_EXT + 1)) {
+				curr_size = snprintf (cobc_buffer, cobc_buffer_size, ".%c%s%s",
+					SLASH_CHAR, name, COB_EXE_EXT);
+			} else {
+				curr_size = snprintf (cobc_buffer, cobc_buffer_size, ".%c%s",
+					SLASH_CHAR, name);
+			}
 		} else {
-			curr_size = snprintf (cobc_buffer, cobc_buffer_size, ".%c%s",
-				SLASH_CHAR, name);
+			if (COB_EXE_EXT[0] && strcasecmp (buffer, COB_EXE_EXT + 1)) {
+				curr_size = snprintf (cobc_buffer, cobc_buffer_size, "%s%s",
+					name, COB_EXE_EXT);
+			} else {
+				curr_size = snprintf (cobc_buffer, cobc_buffer_size, "%s",
+					name);
+			}
 		}
 	}
 #ifdef	_WIN32 /* "fix" given output name */
@@ -4114,10 +4125,6 @@ process (char *cmd)
 		ret = 0;
 	}
 	cobc_free (buffptr);
-
-	if ((ret == 0) && cobc_flag_run) {
-		ret = process_run (name);
-	}
 	return ret;
 }
 
@@ -7381,9 +7388,6 @@ process_module_direct (struct filename *fn)
 	}
 #endif
 #endif	/* _MSC_VER */
-	if ((ret == 0) && cobc_flag_run) {
-		ret = process_run (name);
-	}
 	return ret;
 }
 
@@ -7479,10 +7483,6 @@ process_module (struct filename *fn)
 	}
 #endif
 #endif	/* _MSC_VER */
-	/* cobcrun job? */
-	if ((ret == 0) && cobc_flag_run) {
-		ret = process_run (name);
-	}
 	return ret;
 }
 
@@ -7597,10 +7597,6 @@ process_library (struct filename *l)
 	}
 #endif
 #endif	/* _MSC_VER */
-	/* cobcrun job? */
-	if ((ret == 0) && cobc_flag_run) {
-		ret = process_run (name);
-	}
 	return ret;
 }
 
@@ -7726,11 +7722,6 @@ process_link (struct filename *l)
 #endif
 
 #endif	/* _MSC_VER */
-
-	/* run job? */
-	if ((ret == 0) && cobc_flag_run) {
-		ret = process_run (name);
-	}
 	return ret;
 }
 
@@ -8136,7 +8127,9 @@ main (int argc, char **argv)
 	unsigned int		iparams;
 	unsigned int		local_level;
 	int			status;
+	int			statuses;
 	int			i;
+	const char		*run_name = NULL;
 
 	/* Setup routines I */
 	begin_setup_internal_and_compiler_env ();
@@ -8251,6 +8244,9 @@ main (int argc, char **argv)
 
 	for (fn = file_list; fn; fn = fn->next) {
 		iparams++;
+		if (iparams == 1 && cobc_flag_run) {
+			run_name = fn->source;
+		}
 		if (iparams > 1 && cb_compile_level == CB_LEVEL_EXECUTABLE) {
 			/* only the first source has the compile_level and main flag set */
 			local_level = cb_compile_level;
@@ -8258,6 +8254,7 @@ main (int argc, char **argv)
 			cobc_flag_main = 0;
 		}
 		status = process_file (fn, status);
+		statuses += status;
 
 		/* take care for all intermediate files which aren't needed for linking */
 		clean_up_intermediates (fn, status);
@@ -8278,6 +8275,13 @@ main (int argc, char **argv)
 		cb_compile_level = CB_LEVEL_EXECUTABLE;
 	}
 
+	if ((cb_compile_level < CB_LEVEL_LIBRARY) && cobc_flag_run && run_name) {
+		/* Run job after module with cobcrun */
+		if (status == 0) {
+			status = process_run (run_name);
+		}
+	}
+	
 	if (cb_compile_level < CB_LEVEL_LIBRARY
 	 || status || cb_flag_syntax_only) {
 		/* Finished */
@@ -8288,6 +8292,9 @@ main (int argc, char **argv)
 	/* Allocate objects buffer */
 	cobc_objects_buffer = cobc_main_malloc (cobc_objects_len);
 
+	/* All processing must be ok before a job run will be attempted */
+	statuses = 0;
+
 	if (file_list) {
 		/* Link */
 		if (cb_compile_level == CB_LEVEL_LIBRARY) {
@@ -8297,6 +8304,12 @@ main (int argc, char **argv)
 			/* Executable */
 			status = process_link (file_list);
 		}
+		statuses += status;
+	}
+
+	/* Run job after compile? Use first (or only) filename */
+	if ((statuses == 0) && cobc_flag_run && run_name) {
+		status = process_run (file_basename(run_name, NULL));
 	}
 
 	/* We have completed */

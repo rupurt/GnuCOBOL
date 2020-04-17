@@ -36,6 +36,11 @@
 	* parser.y (special_names_clause), config.def (cb_special_names_clause):
 	  FR #222 implemented SPECIAL-NAMES clause (variable-local definition)
 
+2020-03-27  Edward Hart <edward.dan.hart@gmail.com>
+
+	* parser.y (check_preceding_tallying_phrases): allow consecutives
+	  CHARACTERS keywords (revival of bug #47).
+
 2020-03-22  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (call_body): warn ON EXCEPTION for CALL STATIC and ignore
@@ -52,9 +57,23 @@
 
 	* codegen.c: FR #372 honor HAVE_GMP_H and HAVE_MPIR_H
 
+2020-03-01  Brian Tiffin <btiffin@gnu.org>
+
+	* cobc.c: bug #618, fix -j mode with -o name that includes a directory
+	  and when multiple inputs are involved in a compile pass
+
 2020-02-02  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c, cobc.h: added check for COB_UNIX_LF again
+
+2020-01-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_module_init): split module initialization into
+	  calling of new generated function which includes every static reference
+	  and the "local" part that references program-local variables,
+	  fixing #611 RECURSIVE programs without correct source references
+	* codegen.c (output_function_prototypes, output_internal_function):
+	  generate module initialization function and invoke it
 
 2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -2508,7 +2527,7 @@
 
 	* tree.c (cb_name_1): output name for USER FUNCTIONs
 
-2017-01-11  MÃ¡rio Matos <matosma@users.sf.net>
+2017-01-11  Mário Matos <matosma@users.sf.net>
 
 	* codegen.c (output_entry_function):
 	  fixed bug #349 (compatibility for C89 / _MSC_VER < 1800) - moved
@@ -4260,11 +4279,11 @@
 	* parser.y, reserved.c, typeck.c: Added parser support for OCCURS DYNAMIC
 	  along with CAPACITY clause as not implemented
 
-2014-09-08  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-09-08  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* cobc.c (process) [_MSC_VER]: bugfix in output filter
 
-2014-09-03  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-09-03  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* cobc.c, cobc.h: added cobc_free() function
 	  (Own freeing functions for debugging purposes.
@@ -4312,11 +4331,11 @@
 	* pplex.l: fixed bug #86 whitespace handling for IDENTIFICATION DIVISION
 	  and DEBUGGING MODE
 
-2014-07-10  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-07-10  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* typeck.c (cb_emit_sort_init): calculation of table key offset fixed
 
-2014-07-02  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-07-02  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* cobc.c [_MSC_VER]: filter output of cl.exe (instead of redirecting to
 	  NUL), errors are printed in non-verbose mode now; new: (read_buffer_line)
@@ -4355,7 +4374,7 @@
 
 	* parser.y: Added extension "USE AT PROGRAM START/END" as not implemented
 
-2014-05-14  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-05-14  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* cobc.c: Catch and treat error when no disc space is available for
 	  output files
@@ -4368,7 +4387,7 @@
 
 	* parser.y: Added extension "GOBACK/EXIT PROGRAM RETURNING/GIVING x"
 
-2014-04-29  Philipp BÃ¶hme <phi.boehme@googlemail.com>
+2014-04-29  Philipp Böhme <phi.boehme@googlemail.com>
 
 	* codeoptim.c: Fixed bug in COB_ADD_PACKED_INT.
 	  Computing COMP-3 failed in MSVC-build versions,
