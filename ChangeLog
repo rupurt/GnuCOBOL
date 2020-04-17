@@ -1,4 +1,8 @@
 
+2020-04-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* gnucobol.spec: minor cleanup
+
 2020-03-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: new check for MAKE supporting order-only prerequisites
