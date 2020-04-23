@@ -1,4 +1,8 @@
 
+2020-04-23  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y: added ACCEPT with CURSOR parsing
+
 2020-04-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* typeck.c, tree.h: new field attribute flag_internal_register

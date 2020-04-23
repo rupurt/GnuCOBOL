@@ -10235,11 +10235,19 @@ at_line_column:
 ;
 
 line_number:
-  LINE _number num_id_or_lit	{ $$ = $3; }
+  LINE _number num_id_or_lit
+  {
+	/* FIXME: arithmetic expression should be possible, too, only numeric literals! */
+	$$ = $3;
+  }
 ;
 
 column_number:
-  column_or_col_or_position_or_pos _number num_id_or_lit	{ $$ = $3; }
+  column_or_col_or_position_or_pos _number num_id_or_lit
+  {
+	/* FIXME: arithmetic expression should be possible, too, only numeric literals! */
+	$$ = $3;
+  }
 ;
 
 mode_is_block:
@@ -10282,6 +10290,19 @@ accp_attr:
   {
 	check_repeated ("CONVERSION", SYN_CLAUSE_9, &check_duplicate);
 	CB_PENDING ("ACCEPT CONVERSION");
+  }
+| CURSOR _is positive_id_or_lit
+  {
+	/* FIXME: arithmetic expression should be possible, too! */
+	if (current_program->cursor_pos) {
+		emit_duplicate_clause_message ("CURSOR");
+	} else {
+		/* TODO: actually reasonable and easy extension: an 
+		         *offset within the field* [auto-correct to 1/max]
+				 (when variable also stored back on return)
+		*/
+		CB_PENDING ("ACCEPT ... WITH CURSOR");
+	}
   }
 | FULL
   {
@@ -10378,6 +10399,7 @@ accp_attr:
   }
 | _protected SIZE _is pos_num_id_or_lit_or_zero
   {
+	/* FIXME: arithmetic expression should be possible, too! */
 	check_repeated ("SIZE", SYN_CLAUSE_21, &check_duplicate);
 	set_attribs (NULL, NULL, NULL, NULL, NULL, $4, 0);
   }
@@ -10406,6 +10428,7 @@ accp_attr:
   }
 | COLOR _is num_id_or_lit
   {
+	/* FIXME: arithmetic expression should be possible, too! */
 	check_repeated ("FOREGROUND-COLOR", SYN_CLAUSE_26, &check_duplicate);
 	check_repeated ("BACKGROUND-COLOR", SYN_CLAUSE_27, &check_duplicate);
 	CB_PENDING ("COLOR");
