@@ -8327,7 +8327,7 @@ output_file_initialization (struct cb_file *f)
 		output_newline ();
 		output_line ("%s%s->tf_duplicates = 0;", CB_PREFIX_KEYS, f->cname);
 		output_key_components (f, f->component_list, 0);
-		if (f->key) {
+		if (f->key && !f->component_list) {
 			output_line ("%s%s->offset = %d;", CB_PREFIX_KEYS, f->cname,
 				cb_code_field (f->key)->offset);
 		} else {
@@ -8346,9 +8346,14 @@ output_file_initialization (struct cb_file *f)
 				f->cname, nkeys, l->tf_suppress);
 			output_line ("(%s%s + %d)->char_suppress = %d;", CB_PREFIX_KEYS, f->cname,
 				nkeys, l->char_suppress);
-			output_line ("(%s%s + %d)->offset = %d;", CB_PREFIX_KEYS,
-				f->cname, nkeys, cb_code_field (l->key)->offset);
-			output_key_components (f, l->component_list, nkeys);
+			if (!l->component_list) {
+				output_line ("(%s%s + %d)->offset = %d;", CB_PREFIX_KEYS,
+					f->cname, nkeys, cb_code_field (l->key)->offset);
+			} else {
+				output_line ("(%s%s + %d)->offset = 0;", CB_PREFIX_KEYS,
+					f->cname, nkeys);
+				output_key_components (f, l->component_list, nkeys);
+			}
 			nkeys++;
 		}
 	}

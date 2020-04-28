@@ -1,4 +1,10 @@
 
+2020-04-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_file_initialization): don't output key offset
+	  if it is part of a component; even if this has only a single part
+	  as components are not part of the record "KEYNAM = RECORD-FIELD"
+
 2020-04-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y: added ACCEPT with CURSOR parsing

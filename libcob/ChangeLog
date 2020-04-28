@@ -1,4 +1,9 @@
 
+2020-04-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c (indexed_keydesc): always use key component definition
+	  if available fixing broken 1-part "components" using wrong offset
+
 2020-04-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (print_info) [mpir_version]: fixed string overflow warnings

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2002-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2002-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Ron Norman
 
    This file is part of GnuCOBOL.
@@ -268,8 +268,9 @@ indexed_keydesc (cob_file *f, struct keydesc *kd, cob_file_key *key)
 	int	keylen,part;
 	memset (kd,0,sizeof (struct keydesc));
 	kd->k_flags = key->tf_duplicates ? ISDUPS : ISNODUPS;
-	if (key->count_components <= 1) {
-		kd->k_nparts = 1;		/* Single field key */
+	if (key->count_components < 1) {
+		/* backward compatibility for not generated components (pre 3.0) */
+		kd->k_nparts = 1;
 		kd->k_start = key->offset;
 		kd->k_leng = key->field->size;
 		kd->k_type = CHARTYPE;
@@ -281,8 +282,18 @@ indexed_keydesc (cob_file *f, struct keydesc *kd, cob_file_key *key)
 #endif
 		keylen = kd->k_leng;
 	} else {
+		/* multi- and single field key as component */
+		/* LCOV_EXCL_START */
+		if (key->count_components > COB_MAX_KEYCOMP) {
+			/* not translated as this is safety guard unlikely to be ever triggered */
+			cob_runtime_warning ("module specifies %d key components, "
+				"this runtime ignores all parts greater than %d",
+				key->count_components, COB_MAX_KEYCOMP);
+			key->count_components = COB_MAX_KEYCOMP;
+		}
+		/* LCOV_EXCL_STOP */
 		keylen = 0;
-		for (part=0; part < key->count_components && part < COB_MAX_KEYCOMP; part++) {
+		for (part=0; part < key->count_components; part++) {
 			kd->k_part[part].kp_start = key->component[part]->data - f->record->data;
 			kd->k_part[part].kp_leng = key->component[part]->size;
 			keylen += kd->k_part[part].kp_leng;
