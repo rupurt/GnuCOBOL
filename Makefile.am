@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol
 #
-# Copyright (C) 2003-2012, 2014-2019 Free Software Foundation, Inc.
+# Copyright (C) 2003-2012, 2014-2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -35,7 +35,7 @@ dist_noinst_SCRIPTS = autogen.sh build_aux/bootstrap po/update_linguas.sh \
 # wrapper for the build environment
 noinst_SCRIPTS = pre-inst-env
 
-EXTRA_DIST = gnucobol.spec
+EXTRA_DIST = gnucobol.spec DEPENDENCIES HACKING
 
 # add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
 CODE_COVERAGE_BRANCH_COVERAGE=1
