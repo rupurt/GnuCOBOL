@@ -1,5 +1,7 @@
 * text=auto !eol
+/DEPENDENCIES.md -text
 /Makefile.am eol=lf
+/README.md -text
 /autogen.sh eol=lf
 bin/Makefile.am eol=lf
 bin/cob-config.1 -text
