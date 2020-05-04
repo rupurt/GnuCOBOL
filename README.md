@@ -94,7 +94,6 @@ If for some reason the the COBOL85 testsuite is missing, `make test`
  
  *  `make checkall`
 
-============ 
 Installation
 ============
 
@@ -107,7 +106,6 @@ Unless you have taken steps to ensure you can create files in the
 PREFIX directory, you'll probably need super-user privileges for this step.  
 
 
-=============== 
 Un-installation
 ===============
 
