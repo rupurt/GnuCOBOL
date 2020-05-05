@@ -1,4 +1,8 @@
 
+2020-05-04  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pre-inst-env.in: portability update
+
 2019-07-06  Simon Sobisch <simonsobisch@gnu.org>
 
 	* create_mingw_bindist.sh: initial commit of script to generate binary
@@ -96,7 +100,7 @@
 	  without uname(1) [removed 2014-01-25] from old version
 
 
-Copyright 2015-2019 Free Software Foundation, Inc.
+Copyright 2015-2020 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification, are
 permitted provided the copyright notice and this notice are preserved.
