@@ -1,4 +1,9 @@
 
+2020-05-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* DEPENDENCIES: new file, moved out of README
+	* Makefile.am, gnucobol.spec, HACKING: adjusted for new DEPENDENCIES
+
 2020-04-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* gnucobol.spec: minor cleanup

@@ -1,7 +1,7 @@
 #
 # gnucobol/tests/cobol85/report.pl
 #
-# Copyright (C) 2001-2012, 2016-2019 Free Software Foundation, Inc.
+# Copyright (C) 2001-2012, 2016-2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart
 #
 # This file is part of GnuCOBOL.
@@ -30,7 +30,7 @@ $SIG{TERM} = sub { die "\nInterrupted\n" };
 
 # use high resolution time, if available
 # Time::HiRes is only a core module since Perl 5.7.3
-BEGIN { eval "use Time::HiRes 'ime';" }
+BEGIN { eval "use Time::HiRes 'time';" }
 
 my $opt = shift;
 
