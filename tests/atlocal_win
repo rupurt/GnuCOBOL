@@ -24,14 +24,14 @@
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
 
+TEMPLATE="${abs_srcdir}/testsuite.src"
+
 COB_SRC_PATH="$(cd ${abs_srcdir}/.. ; pwd)"
 COB_WIN_BUILDPATH="$COB_SRC_PATH/build_windows/Win32/Release"
 
 COBC="cobc.exe"
 COBCRUN="cobcrun.exe"
 COBCRUN_DIRECT="" # used for running created executables through tools
-
-TEMPLATE="${abs_srcdir}/testsuite.src"
 
 PATH="${COB_WIN_BUILDPATH}:${PATH}"
 export PATH
@@ -55,7 +55,8 @@ RUN_PROG_MANUAL="${abs_builddir}/run_prog_manual.sh"
 _unset_option () {
 	if test "$1" != "COB_CONFIG_DIR" \
 	     -a "$1" != "COB_RUNTIME_CONFIG" \
-	     -a "$1" != "COB_LIBRARY_PATH"; then
+	     -a "$1" != "COB_LIBRARY_PATH" \
+	     -a "$1" != "COB_UNIX_LF"; then
 		unset $1
 	fi
 }

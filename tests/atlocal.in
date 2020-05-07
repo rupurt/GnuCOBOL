@@ -20,20 +20,37 @@
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
 
-COBC="cobc@COB_EXE_EXT@"
-COBCRUN="cobcrun@COB_EXE_EXT@"
-COBCRUN_DIRECT="" # used for running created executables through tools
-
 TEMPLATE="${abs_srcdir}/testsuite.src"
 
+# TODO: add missing parts for installcheck
+
 if test "$GNUCOBOL_ENV_SETUP" != "1" -a "$GNUCOBOL_TEST_LOCAL" != "1"; then
+	COBC="cobc@COB_EXE_EXT@"
+	COBCRUN="cobcrun@COB_EXE_EXT@"
+	COBCRUN_DIRECT="" # used for running created executables through tools
 	# prepend PATH with the actual binaries to let the testsuite find them for
 	# general check and version output, otherwise not needed
-	#PATH="${abs_top_builddir}/libcob/.libs:${PATH}"
+	PATH="${abs_top_builddir}/libcob/.libs:${PATH}"
 	PATH="${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
 	export PATH
+else
+	if test "x${COBC}" = "x"; then
+		COBC="cobc@COB_EXE_EXT@"
+	fi
+	if test "x${COBCRUN}" = "x"; then
+		COBCRUN="cobcrun@COB_EXE_EXT@"
+	fi
+	if test "x${COBCRUN_DIRECT}" = "x"; then
+		COBCRUN_DIRECT=""
+	fi
+fi
+
+if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
 	ABS_COBC="${abs_top_builddir}/cobc/cobc@COB_EXE_EXT@"
 	ABS_COBCRUN="${abs_top_builddir}/bin/cobcrun@COB_EXE_EXT@"
+else
+	ABS_COBC="$(which cobc)"
+	ABS_COBCRUN="$(which cobcrun)"
 fi
 
 # be sure to use the English messages
@@ -51,11 +68,12 @@ UNIFY_LISTING="${abs_srcdir}/listings-sed.sh"
 # test runner for manual tests, content may be changed by the user
 RUN_PROG_MANUAL="${abs_builddir}/run_prog_manual.sh"
 
-# unset option if not internally set
+# unset option if not internally set in this script
 _unset_option () {
 	if test "$1" != "COB_CONFIG_DIR" \
 	     -a "$1" != "COB_RUNTIME_CONFIG" \
-	     -a "$1" != "COB_LIBRARY_PATH"; then
+	     -a "$1" != "COB_LIBRARY_PATH" \
+	     -a "$1" != "COB_UNIX_LF"; then
 		unset $1
 	fi
 }
