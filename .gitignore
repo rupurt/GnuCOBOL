@@ -22,6 +22,7 @@ bin/Makefile
 bin/Makefile.in
 bin/atlocal
 bin/cob-config
+bin/cob-config.1
 bin/cobcrun
 /build
 /build-*
