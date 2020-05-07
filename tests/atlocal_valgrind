@@ -23,11 +23,11 @@
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
 
+TEMPLATE="${abs_srcdir}/testsuite.src"
+
 COBC="cobc@COB_EXE_EXT@"
 COBCRUN="cobcrun@COB_EXE_EXT@"
 COBCRUN_DIRECT="" # used for running created executables through tools
-
-TEMPLATE="${abs_srcdir}/testsuite.src"
 
 # prepend PATH with the actual binaries to let the testsuite find them for
 # general check and version output, otherwise not needed

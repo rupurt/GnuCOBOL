@@ -20,10 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
-sep='@PATH_SEPARATOR@'
-
-PATH="@abs_top_builddir@/libcob/.libs${sep}$PATH"
-PATH="@abs_top_builddir@/cobc${sep}$PATH{sep}@abs_top_builddir@/bin${sep}$PATH"
+PATH="@abs_top_builddir@/libcob/.libs:${PATH}"
+PATH="@abs_top_builddir@/cobc:@abs_top_builddir@/bin:${PATH}"
 export PATH
 
 
@@ -43,11 +41,11 @@ COB_LDFLAGS="@COB_LDFLAGS@"
 COB_LIBS="-L@abs_top_builddir@/libcob/.libs @COB_LIBS@"
 COB_CONFIG_DIR="@abs_top_srcdir@/config"
 COB_COPY_DIR="@abs_top_srcdir@/copy"
-LD_LIBRARY_PATH="@abs_top_builddir@/libcob/.libs:$LD_LIBRARY_PATH"     # GNU/Linux, Solaris, ...
-DYLD_LIBRARY_PATH="@abs_top_builddir@/libcob/.libs:$DYLD_LIBRARY_PATH" # Mac OS
-SHLIB_PATH="@abs_top_builddir@/libcob/.libs:$SHLIB_PATH"               # HP-UX
-LIBPATH="@abs_top_builddir@/libcob/.libs:$LIBPATH"                     # AIX
-COB_LIBRARY_PATH="@abs_top_builddir@/extras:$COB_LIBRARY_PATH"         # only in pre-inst case: prepend
+LD_LIBRARY_PATH="@abs_top_builddir@/libcob/.libs:${LD_LIBRARY_PATH}"     # GNU/Linux, Solaris, ...
+DYLD_LIBRARY_PATH="@abs_top_builddir@/libcob/.libs:{$DYLD_LIBRARY_PATH}" # Mac OS
+SHLIB_PATH="@abs_top_builddir@/libcob/.libs:${SHLIB_PATH}"               # HP-UX
+LIBPATH="@abs_top_builddir@/libcob/.libs:${LIBPATH}"                     # AIX
+COB_LIBRARY_PATH="@abs_top_builddir@/extras:${COB_LIBRARY_PATH}"         # only in pre-inst case: prepend
 
 export COB_CFLAGS COB_LDFLAGS COB_LIBS
 export COB_CONFIG_DIR COB_COPY_DIR
