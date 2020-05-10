@@ -1,4 +1,9 @@
 
+2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, config.c, pplex.l, scanner.l: silenced char-subscript warnings
+	  by casts to unsigned char
+
 2020-04-28  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_file_initialization): don't output key offset

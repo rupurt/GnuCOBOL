@@ -2116,7 +2116,7 @@ scan_define_options (const char *text)
 	q = q - 7;
 	if (memcmp (q, "OVERRIDE", 8) == 0) {
 		override = 1;
-		while (isspace((unsigned char)(q[-1])) == ' ') q--;
+		while (isspace((unsigned char)(q[-1]))) q--;
 		strcpy (q,"\n");
 	} else {
 		override = 0;
