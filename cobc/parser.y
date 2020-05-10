@@ -3674,10 +3674,8 @@ program_coll_sequence_values:
 object_computer_segment:
   SEGMENT_LIMIT _is integer
   {
-	int segnum;
-
 	if (cb_verify (cb_section_segments, "SEGMENT LIMIT")) {
-		segnum = cb_get_int ($3);
+		int segnum = cb_get_int ($3);
 		if (segnum == 0 || segnum > 49) {
 			cb_error (_("segment-number must be in range of values 1 to 49"));
 			$$ = NULL;
@@ -8004,8 +8002,8 @@ column_clause:
   col_keyword_clause col_or_plus
   {
 	check_repeated ("COLUMN", SYN_CLAUSE_18, &check_pic_duplicate);
-	if((current_field->report_flag & (COB_REPORT_COLUMN_LEFT|COB_REPORT_COLUMN_RIGHT|COB_REPORT_COLUMN_CENTER))
-	&& (current_field->report_flag & COB_REPORT_COLUMN_PLUS)) {
+	if ((current_field->report_flag & (COB_REPORT_COLUMN_LEFT|COB_REPORT_COLUMN_RIGHT|COB_REPORT_COLUMN_CENTER))
+	 && (current_field->report_flag & COB_REPORT_COLUMN_PLUS)) {
 		if (cb_relaxed_syntax_checks) {
 			cb_warning (COBC_WARN_FILLER, _("PLUS is not recommended with LEFT, RIGHT or CENTER"));
 		} else {
@@ -8047,8 +8045,9 @@ col_or_plus:
 		if (current_field->parent
 		 && current_field->parent->children == current_field) {
 			cb_warning (COBC_WARN_FILLER, _("PLUS is ignored on first field of line"));
-			if (current_field->step_count == 0)
+			if (current_field->step_count == 0) {
 				current_field->step_count = colnum;
+			}
 		} else {
 			current_field->report_flag |= COB_REPORT_COLUMN_PLUS;
 		}
@@ -9733,10 +9732,9 @@ _segment:
   }
 | integer
   {
-	int segnum = cb_get_int ($1);
-
 	$$ = NULL;
 	if (cb_verify (cb_section_segments, "SECTION segment")) {
+		int segnum = cb_get_int ($1);
 		if (segnum > 99) {
 			cb_error (_("SECTION segment-number must be less than or equal to 99"));
 		} else {

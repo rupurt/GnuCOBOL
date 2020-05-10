@@ -3521,16 +3521,15 @@ cob_get_current_date_and_time (void)
 }
 
 static void
-check_current_date()
+check_current_date ()
 {
 	int		yr, mm, dd, hh, mi, ss, ns;
 	int		offset = 9999;
 	int		i, j, ret;
 	time_t		t;
 	struct tm	*tmptr;
-	char		iso_timezone[7] = { '\0' };
-	char		nanoseconds[10];
-	char		*iso_timezone_ptr = (char *)&iso_timezone;
+	char	iso_timezone[7] = { '\0' };
+	char	nanoseconds[10];
 
 	if (cobsetptr == NULL
 	 || cobsetptr->cob_date == NULL) {
@@ -3543,7 +3542,7 @@ check_current_date()
 	/* skip non-digits like quotes */
 	while (cobsetptr->cob_date[j] != 0
 	    && cobsetptr->cob_date[j] != 'Y'
-	    && !isdigit(cobsetptr->cob_date[j])) {
+	    && !isdigit((unsigned char)cobsetptr->cob_date[j])) {
 		 j++;
 	}
 
@@ -3551,7 +3550,7 @@ check_current_date()
 	if (cobsetptr->cob_date[j] != 0) {
 		yr = 0;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 			 	yr = yr * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3579,7 +3578,7 @@ check_current_date()
 	if (cobsetptr->cob_date[j] != 0) {
 		mm = 0;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				mm = mm * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3607,7 +3606,7 @@ check_current_date()
 	if (cobsetptr->cob_date[j] != 0) {
 		dd = 0;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				dd = dd * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3632,9 +3631,9 @@ check_current_date()
 	/* extract time */
 	if (cobsetptr->cob_date[j] != 0) {
 		hh = 0;
-		while (isspace (cobsetptr->cob_date[j])) j++;
+		while (isspace ((unsigned char)cobsetptr->cob_date[j])) j++;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				hh = hh * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3662,7 +3661,7 @@ check_current_date()
 	if (cobsetptr->cob_date[j] != 0) {
 		mi = 0;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				mi = mi * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3694,7 +3693,7 @@ check_current_date()
 	 && cobsetptr->cob_date[j] != '-') {
 		ss = 0;
 		for (i = 0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				ss = ss * 10 + COB_D2I (cobsetptr->cob_date[j]);
 			} else {
 				break;
@@ -3728,7 +3727,7 @@ check_current_date()
 		}
 		strcpy (nanoseconds, "000000000");
 		for (i=0; cobsetptr->cob_date[j] != 0; j++) {
-			if (isdigit (cobsetptr->cob_date[j])) {
+			if (isdigit ((unsigned char)cobsetptr->cob_date[j])) {
 				nanoseconds[i] = cobsetptr->cob_date[j];
 			} else {
 				break;
@@ -3747,6 +3746,7 @@ check_current_date()
 		iso_timezone[0] = 'Z';
 	} else if (cobsetptr->cob_date[j] == '+'
 	        || cobsetptr->cob_date[j] == '-') {
+		char *iso_timezone_ptr = (char *)&iso_timezone;
 		strncpy (iso_timezone_ptr, cobsetptr->cob_date + j, 6);
 		iso_timezone[6] = 0;	/* just to keep the analyzer happy */
 		if (strlen (iso_timezone_ptr) == 3) {
@@ -3755,7 +3755,7 @@ check_current_date()
 			strncpy (iso_timezone_ptr + 3, cobsetptr->cob_date + j + 4, 3);
 		}
 		for (i=1; iso_timezone[i] != 0; i++) {
-			if (!isdigit (iso_timezone[i])) {
+			if (!isdigit ((unsigned char)iso_timezone[i])) {
 				break;
 			}
 			if (++i == 4) {

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2003-2012, 2014-2017, 2019 Free Software Foundation, Inc.
+   Copyright (C) 2003-2012, 2014-2017, 2019-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch
 
    This file is part of GnuCOBOL.
@@ -582,9 +582,10 @@ cb_config_entry (char *buff, const char *fname, const int line)
 			}
 		} else if (strcmp (name, "reserved-words") == 0) {
 			/* store translated to lower case */
-			for (e = (char *)val; *e; e++) {
-				if (isupper (*e)) {
-					*e = (cob_u8_t)tolower (*e);
+			cob_u8_t *p;
+			for (p = (cob_u8_t *)val; *p; p++) {
+				if (isupper (*p)) {
+					*p = (cob_u8_t)tolower (*p);
 				}
 			}
 			/* if explicit requested: disable */
