@@ -42,6 +42,10 @@
 
 	* common.h: definition of COB_A_NORETURN for newer HPUX (__HP_cc)
 
+2019-10-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* numeric.c (cob_add_int): fixed floating-point case (bug #603)
+
 2019-10-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c (pass_cursor_to_program): fixed return column being off by -1

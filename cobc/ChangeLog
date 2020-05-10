@@ -90,6 +90,26 @@
 	* codegen.c (output_function_prototypes, output_internal_function):
 	  generate module initialization function and invoke it
 
+2020-01-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y, field.c (copy_into_field), tree.h, config.def:
+	  FR #193 implementation of SAME AS
+	* cobc.c: Copyright year update
+
+2019-12-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y: minor refactoring - use of set_current_field to remove
+	  duplicated code, limit scope of some variables
+	* parser.y: new identifier_field (checked field-identifier),
+	  adjustment of some msgIds (obviously not part of any test before)
+
+2019-10-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* tree.c (cb_name_1): prevent buffer overflows (bug #586)
+	* parser.y (end_scope_of_program_name): free correct program when a
+	  nested program has the same name as a containing program (bug #587)
+	* codegen.c, parser.y: fixed minor memory leaks
+
 2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (sort_body): fixed class cast errors,

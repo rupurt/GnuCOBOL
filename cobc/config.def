@@ -183,6 +183,9 @@ CB_CONFIG_SUPPORT (cb_data_records_clause, "data-records-clause",
 CB_CONFIG_SUPPORT (cb_top_level_occurs_clause, "top-level-occurs-clause",
 	_("OCCURS clause on top-level"))
 
+CB_CONFIG_SUPPORT (cb_same_as_clause, "same-as-clause",
+	_("SAME AS clause"))
+
 CB_CONFIG_SUPPORT (cb_synchronized_clause, "synchronized-clause",
 	_("SYNCHRONIZED clause"))
 

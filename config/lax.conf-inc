@@ -85,6 +85,7 @@ padding-character-clause:		+obsolete
 section-segments:			+ignore
 stop-literal-statement:			+obsolete
 stop-identifier-statement:		ok
+same-as-clause:				ok
 synchronized-clause:			ok
 special-names-clause:			+warning
 top-level-occurs-clause:		ok

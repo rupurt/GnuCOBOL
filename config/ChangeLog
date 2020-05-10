@@ -3,6 +3,10 @@
 
 	* general: added option numeric-pointer *EXPERIMENTAL*
 
+2020-01-01 Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: FR #193 added same-as-clause
+
 2019-09-30  Edward Hart <edward.dan.hart@gmail.com>
 
 	* realia.words: removed words belonging to other dialects - word list

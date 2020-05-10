@@ -810,6 +810,7 @@ struct cb_field {
 	cb_tree			report_control;	/* CONTROL identifier */
 	cb_tree			report_when;	/* PRESENT WHEN condition */
 	cb_tree			report_column_list;/* List of Column Numbers */
+	cb_tree			same_as;	/* SAME AS data-name (points to field) */
 
 	int			id;		/* Field id */
 	int			size;		/* Field size */
@@ -1992,6 +1993,7 @@ extern cb_tree		cb_build_field_tree (cb_tree, cb_tree, struct cb_field *,
 					     enum cb_storage, struct cb_file *,
 					     const int);
 extern struct cb_field	*cb_resolve_redefines (struct cb_field *, cb_tree);
+extern struct cb_field	*copy_into_field (struct cb_field *, struct cb_field *, const int);
 extern void		cb_validate_field (struct cb_field *);
 extern void		cb_validate_88_item (struct cb_field *);
 extern struct cb_field	*cb_validate_78_item (struct cb_field *, const cob_u32_t);

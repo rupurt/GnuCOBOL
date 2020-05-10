@@ -422,7 +422,7 @@ emit_entry (const char *name, const int encode, cb_tree using_list, cb_tree conv
 				cb_error_x (x, _("'%s' not level 01 or 77"), f->name);
 			}
 			if (f->redefines) {
-				cb_error_x (x, _ ("'%s' REDEFINES field not allowed here"), f->name);
+				cb_error_x (x, _("'%s' REDEFINES field not allowed here"), f->name);
 			}
 			/* add a "receiving" entry for the USING parameter */
 			if (cb_listing_xref) {
@@ -689,7 +689,7 @@ setup_occurs (void)
 {
 	check_repeated ("OCCURS", SYN_CLAUSE_7, &check_pic_duplicate);
 	if (current_field->indexes == COB_MAX_SUBSCRIPTS) {
-		cb_error (_ ("maximum OCCURS depth exceeded (%d)"),
+		cb_error (_("maximum OCCURS depth exceeded (%d)"),
 			COB_MAX_SUBSCRIPTS);
 	} else {
 		current_field->indexes++;
@@ -703,9 +703,9 @@ setup_occurs (void)
 	}
 
 	if (current_field->flag_item_based) {
-		cb_error (_ ("%s and %s are mutually exclusive"), "BASED", "OCCURS");
+		cb_error (_("%s and %s are mutually exclusive"), "BASED", "OCCURS");
 	} else if (current_field->flag_external) {
-		cb_error (_ ("%s and %s are mutually exclusive"), "EXTERNAL", "OCCURS");
+		cb_error (_("%s and %s are mutually exclusive"), "EXTERNAL", "OCCURS");
 	}
 	current_field->flag_occurs = 1;
 }
@@ -719,15 +719,15 @@ setup_occurs_min_max (cb_tree occurs_min, cb_tree occurs_max)
 			current_field->occurs_max = cb_get_int (occurs_max);
 			if (!current_field->depending) {
 				if (cb_relaxed_syntax_checks) {
-					cb_warning (COBC_WARN_FILLER, _ ("TO phrase without DEPENDING phrase"));
-					cb_warning (COBC_WARN_FILLER, _ ("maximum number of occurrences assumed to be exact number"));
+					cb_warning (COBC_WARN_FILLER, _("TO phrase without DEPENDING phrase"));
+					cb_warning (COBC_WARN_FILLER, _("maximum number of occurrences assumed to be exact number"));
 					current_field->occurs_min = 1; /* CHECKME: why using 1 ? */
 				} else {
-					cb_error (_ ("TO phrase without DEPENDING phrase"));
+					cb_error (_("TO phrase without DEPENDING phrase"));
 				}
 			}
 			if (current_field->occurs_max <= current_field->occurs_min) {
-				cb_error (_ ("OCCURS TO must be greater than OCCURS FROM"));
+				cb_error (_("OCCURS TO must be greater than OCCURS FROM"));
 			}
 		} else {
 			current_field->occurs_max = 0;
@@ -736,7 +736,7 @@ setup_occurs_min_max (cb_tree occurs_min, cb_tree occurs_max)
 		current_field->occurs_min = 1; /* CHECKME: why using 1 ? */
 		current_field->occurs_max = cb_get_int (occurs_min);
 		if (current_field->depending) {
-			cb_verify (cb_odo_without_to, _ ("OCCURS DEPENDING ON without TO phrase"));
+			cb_verify (cb_odo_without_to, _("OCCURS DEPENDING ON without TO phrase"));
 		}
 	}
 }
@@ -1106,9 +1106,11 @@ end_scope_of_program_name (struct cb_program *program, const unsigned char type)
 	if (!program->flag_common) {
 		l = (struct cb_list *) defined_prog_list;
 		while (l) {
-			if (strcmp (program->orig_program_id,
-				    CB_PROGRAM (l->value)->orig_program_id)
-			    == 0) {
+			/* The nested_level check is for the pathological case
+			   where two nested programs have the same name */
+			if (0 == strcmp (program->orig_program_id,
+					 CB_PROGRAM (l->value)->orig_program_id)
+			    && program->nested_level == CB_PROGRAM (l->value)->nested_level) {
 				remove_program_name (l, prev);
 				if (prev && prev->chain != NULL) {
 					l = CB_LIST (prev->chain);
@@ -1472,6 +1474,7 @@ set_current_field (cb_tree level, cb_tree name)
 {
 	cb_tree	x  = cb_build_field_tree (level, name, current_field,
 					  current_storage, current_file, 0);
+	/* Free tree associated with level number */
 	cobc_parse_free (level);
 
 	if (CB_INVALID_TREE (x)) {
@@ -1482,6 +1485,24 @@ set_current_field (cb_tree level, cb_tree name)
 	}
 
 	return 0;
+}
+
+/* verifies that no conflicting clauses are used and inherits the definition of the original field */
+static void
+inherit_same_as ()
+{
+	/* note: REDEFINES (clause 1) is allowed with RM/COBOL but not COBOL 2002+ */
+	static const cob_flags_t	allowed_clauses =
+		SYN_CLAUSE_1 | SYN_CLAUSE_2 | SYN_CLAUSE_3 | SYN_CLAUSE_7;
+	cob_flags_t	tested = check_pic_duplicate & ~(allowed_clauses);
+	if (tested != SYN_CLAUSE_30) {
+		cb_error_x (CB_TREE(current_field), _("illegal combination of %s with other clauses"), "SAME AS");
+		current_field->flag_is_verified = 1;
+		current_field->flag_invalid = 1;
+	} else {
+		struct cb_field* fld = CB_FIELD (current_field->same_as);
+		current_field = copy_into_field (fld, current_field, 1);
+	}
 }
 
 static void
@@ -1769,8 +1790,8 @@ check_not_88_level (cb_tree x)
 		cb_error (_("condition-name not allowed here: '%s'"), cb_name (x));
 		/* invalidate field to prevent same error in typeck.c (validate_one) */
 		/* FIXME: If we really need the additional check here then we missed
-		          a call to validate_one() somewhere */
-		return cb_error_node;
+		          a call to cb_validate_one() somewhere */
+		return cb_error_node; 
 	} else {
 		return x;
 	}
@@ -1964,7 +1985,7 @@ check_validate_item (cb_tree x)
 	if (is_screen_field(x)) {
 		cb_error (_("SCREEN item cannot be used here"));
 	} else if (f->level == 66) {
-		cb_error (_("level %02d item '%s' may not be used here"), 66, cb_name (x));
+		cb_error (_("RENAMES item may not be used here"));
 	} else if (f->flag_any_length) {
 		cb_error (_("ANY LENGTH item not allowed here"));
 	} else if (tree_class == CB_CLASS_INDEX
@@ -6210,6 +6231,10 @@ _record_description_list:
   record_description_list
   {
 	struct cb_field *p;
+	/* finalize last field if target of SAME AS */
+	if (current_field && !CB_INVALID_TREE (current_field->same_as)) {
+		inherit_same_as ();
+	}
 
 	for (p = description_field; p; p = p->sister) {
 		cb_validate_field (p);
@@ -6229,6 +6254,10 @@ data_description:
 | condition_name_entry
 | level_number _entry_name
   {
+	if (current_field && !CB_INVALID_TREE (current_field->same_as)) {
+		/* finalize last field if target of SAME AS */
+		inherit_same_as ();
+	}
 	if (set_current_field ($1, $2)) {
 		YYERROR;
 	}
@@ -6579,6 +6608,7 @@ data_description_clause_sequence:
 
 data_description_clause:
   redefines_clause
+| same_as_clause
 | external_clause
 | special_names_clause
 | global_clause
@@ -6614,6 +6644,66 @@ redefines_clause:
 		current_field->flag_is_verified = 1;
 		current_field->flag_invalid = 1;
 		YYERROR;
+	}
+  }
+;
+
+
+/* SAME AS clause ("AS" optional with RM-COBOL, not with COBOL2002+) */
+
+same_as_clause:
+  SAME _as identifier_field
+  {
+	cb_tree x = $3;
+	check_repeated ("SAME AS", SYN_CLAUSE_30, &check_pic_duplicate);
+	
+	/* note: syntax checks for conflicting clauses done in inherit_same_as */
+	if (cb_verify (cb_same_as_clause, _("SAME AS clause"))
+	 && x != cb_error_node) {
+		struct cb_field *f = CB_FIELD (cb_ref (x));
+		if (f->storage == CB_STORAGE_SCREEN) {
+			cb_error (_("SCREEN item cannot be used here"));
+			x = cb_error_node;
+		} else if (f->storage == CB_STORAGE_REPORT) {
+			cb_error (_("REPORT item cannot be used here"));
+			x = cb_error_node;
+		} else if (f->level == 88) {
+			cb_error (_("condition-name not allowed here: '%s'"), cb_name (x));
+			x = cb_error_node;
+		} else if (current_field->level == 77) {
+			if (f->children) {
+				cb_error (_("elementary item expected"));
+				x = cb_error_node;
+			}
+		} else {
+			struct cb_field *p;
+			for (p = current_field; p; p = p->parent) {
+				if (p == f) {
+					cb_error (_ ("SAME AS item may not reference itself"));
+					x = cb_error_node;
+					break;
+				}
+			}
+			for (p = f->parent; p; p = p->parent) {
+				if (p->usage != CB_USAGE_DISPLAY) {
+					cb_error (_("SAME AS item may not be subordinate to any item with USAGE clause"));
+				} else if (p->flag_sign_clause) {
+					cb_error (_("SAME AS item may not be subordinate to any item with SIGN clause"));
+				} else {
+					continue;
+				}
+				x = cb_error_node;
+				break;
+			}
+		}
+	}
+
+	if (x == cb_error_node) {
+		current_field->flag_is_verified = 1;
+		current_field->flag_invalid = 1;
+		current_field->same_as = x;
+	} else {
+		current_field->same_as = cb_ref (x);
 	}
   }
 ;
@@ -7342,7 +7432,7 @@ synchronized_clause:
   SYNCHRONIZED _left_or_right
   {
 	check_repeated ("SYNCHRONIZED", SYN_CLAUSE_9, &check_pic_duplicate);
-	if (cb_verify (cb_synchronized_clause, "SYNC")) {
+	if (cb_verify (cb_synchronized_clause, _("SYNCHRONIZED clause"))) {
 		current_field->flag_synchronized = 1;
 	}
   }
@@ -7826,18 +7916,9 @@ _report_group_description_list:
 report_group_description_entry:
   level_number _entry_name
   {
-	cb_tree	x;
-
-	x = cb_build_field_tree ($1, $2, current_field, current_storage,
-				 current_file, 0);
-	/* Free tree associated with level number */
-	cobc_parse_free ($1);
-	check_pic_duplicate = 0;
-	if (CB_INVALID_TREE (x)) {
+	if (set_current_field($1, $2)) {
 		YYERROR;
 	}
-
-	current_field = CB_FIELD (x);
 	if (!description_field) {
 		description_field = current_field;
 	}
@@ -8275,18 +8356,9 @@ screen_description:
   /* normal screen definition */
 | level_number _entry_name
   {
-	cb_tree	x;
-
-	x = cb_build_field_tree ($1, $2, current_field, current_storage,
-				 current_file, 0);
-	/* Free tree associated with level number */
-	cobc_parse_free ($1);
-	check_pic_duplicate = 0;
-	if (CB_INVALID_TREE (x)) {
+	if (set_current_field ($1, $2)) {
 		YYERROR;
 	}
-
-	current_field = CB_FIELD (x);
 	if (current_field->parent) {
 		current_field->screen_foreg = current_field->parent->screen_foreg;
 		current_field->screen_backg = current_field->parent->screen_backg;
@@ -8334,18 +8406,10 @@ screen_description:
   /* ACUCOBOL-GT control definition */
 | level_number _entry_name
   {
-	cb_tree	x;
-
-	x = cb_build_field_tree ($1, $2, current_field, current_storage,
-				 current_file, 0);
-	/* Free tree associated with level number */
-	cobc_parse_free ($1);
-	check_pic_duplicate = 0;
-	if (CB_INVALID_TREE (x)) {
+	if (set_current_field ($1, $2)) {
 		YYERROR;
 	}
 
-	current_field = CB_FIELD (x);
 	if (current_field->parent) {
 		current_field->screen_foreg = current_field->parent->screen_foreg;
 		current_field->screen_backg = current_field->parent->screen_backg;
@@ -9368,7 +9432,7 @@ procedure_division:
 		call_conv = $5;
 		if ($4) {
 			/* note: $4 is likely to be a reference to SPECIAL-NAMES */
-			cb_error_x ($5, _ ("%s and %s are mutually exclusive"),
+			cb_error_x ($5, _("%s and %s are mutually exclusive"),
 				"CALL-CONVENTION", "WITH LINKAGE");
 		}
 	}
@@ -9864,7 +9928,7 @@ _segment:
 | integer
   {
 	$$ = NULL;
-	if (cb_verify (cb_section_segments, "SECTION segment")) {
+	if (cb_verify (cb_section_segments, _("section segments"))) {
 		int segnum = cb_get_int ($1);
 		if (segnum > 99) {
 			cb_error (_("SECTION segment-number must be less than or equal to 99"));
@@ -13674,7 +13738,7 @@ perform_varying:
 _by_phrase:
   /*empty */
   {
-	cb_verify (cb_perform_varying_without_by, _ ("PERFORM VARYING without BY phrase"));
+	cb_verify (cb_perform_varying_without_by, _("PERFORM VARYING without BY phrase"));
 	$$ = cb_build_numeric_literal (0, "1", 0);
   }
 | BY arith_nonzero_x
@@ -15156,21 +15220,14 @@ debugging_list:
 debugging_target:
   identifier_1	/* note: check for subscript/refmod in typeck.c */
   {
-	cb_tree		l;
-	cb_tree		x;
-	cb_tree		z;
-
 	if (current_program->flag_debugging) {
-		CB_REFERENCE ($1)->debug_section = current_section;
-		CB_REFERENCE ($1)->flag_debug_code = 1;
-		CB_REFERENCE ($1)->flag_all_debug = 0;
 
-		z = CB_LIST_INIT ($1);
+		cb_tree		z = CB_LIST_INIT ($1);
 		current_program->debug_list =
 			cb_list_append (current_program->debug_list, z);
 		/* Check backward refs to file/data names */
 		if (CB_WORD_COUNT ($1) > 0) {
-			l = CB_VALUE (CB_WORD_ITEMS ($1));
+			cb_tree		l = CB_VALUE (CB_WORD_ITEMS ($1));
 			switch (CB_TREE_TAG (l)) {
 			case CB_TAG_CD:
 				if (CB_CD (l)->flag_field_debug) {
@@ -15191,18 +15248,24 @@ debugging_target:
 				}
 				break;
 			case CB_TAG_FIELD:
-				x = cb_ref ($1);
-				if (CB_INVALID_TREE (x)) {
-					break;
-				}
-				if (CB_FIELD (x)->flag_field_debug) {
-					cb_error_x ($1, _("duplicate DEBUGGING target: '%s'"),
-					    cb_name (x));
-				} else {
-					needs_field_debug = 1;
-					CB_FIELD (x)->debug_section = current_section;
-					CB_FIELD (x)->flag_field_debug = 1;
-					CB_PURPOSE (z) = x;
+				{
+					struct cb_field* fld;
+					cb_tree		x = cb_ref ($1);
+					if (!x || !CB_FIELD_P (x)) {
+						break;
+					}
+					fld = CB_FIELD (x);
+					if (fld->flag_item_78) {
+						cb_error_x ($1, _("constant item cannot be used here"));
+					} else if (fld->flag_field_debug) {
+						cb_error_x ($1, _("duplicate DEBUGGING target: '%s'"),
+							cb_name (x));
+					} else {
+						needs_field_debug = 1;
+						fld->debug_section = current_section;
+						fld->flag_field_debug = 1;
+						CB_PURPOSE (z) = x;
+					}
 				}
 				break;
 			default:
@@ -15210,6 +15273,9 @@ debugging_target:
 				break;
 			}
 		}
+		CB_REFERENCE ($1)->debug_section = current_section;
+		CB_REFERENCE ($1)->flag_debug_code = 1;
+		CB_REFERENCE ($1)->flag_all_debug = 0;
 	}
   }
 | ALL PROCEDURES
@@ -15222,29 +15288,24 @@ debugging_target:
 		}
 	}
   }
-| ALL _all_refs identifier_1	/* note: check for subscript/refmod in typeck.c */
+| ALL _all_refs identifier_field	/* note: check for subscript/refmod in typeck.c */
   {
-	cb_tree		x;
-
-	if (current_program->flag_debugging) {
-		/* Reference must be a data item */
-		x = cb_ref ($3);
-		if (CB_INVALID_TREE (x) || !CB_FIELD_P (x)) {
-			cb_error (_("invalid target for %s"), "DEBUGGING ALL");
+	if (current_program->flag_debugging && $3 != cb_error_node) {
+		cb_tree x = cb_ref ($3);
+		struct cb_field *fld = CB_FIELD (x);
+		if (fld->flag_field_debug) {
+			cb_error_x ($3, _("duplicate DEBUGGING target: '%s'"),
+				cb_name (x));
 		} else {
-			if (CB_FIELD (x)->flag_field_debug) {
-				cb_error_x ($3, _("duplicate DEBUGGING target: '%s'"),
-				    cb_name (x));
-			} else {
-				needs_field_debug = 1;
-				CB_FIELD (x)->debug_section = current_section;
-				CB_FIELD (x)->flag_field_debug = 1;
-				CB_FIELD (x)->flag_all_debug = 1;
-				CB_REFERENCE ($3)->debug_section = current_section;
-				CB_REFERENCE ($3)->flag_debug_code = 1;
-				CB_REFERENCE ($3)->flag_all_debug = 1;
-				CB_CHAIN_PAIR (current_program->debug_list, x, $3);
-			}
+			struct cb_reference *r = CB_REFERENCE ($3);
+			needs_field_debug = 1;
+			fld->debug_section = current_section;
+			fld->flag_field_debug = 1;
+			fld->flag_all_debug = 1;
+			r->debug_section = current_section;
+			r->flag_debug_code = 1;
+			r->flag_all_debug = 1;
+			CB_CHAIN_PAIR (current_program->debug_list, x, $3);
 		}
 	}
   }
@@ -15286,7 +15347,7 @@ program_start_end:
 use_reporting:
   use_global BEFORE REPORTING identifier
   {
-	char wrk[80];
+	char *wrk;
 	cb_tree x;
 	struct cb_field		*f;
 	struct cb_report	*r;
@@ -15302,7 +15363,9 @@ use_reporting:
 			r->has_declarative = 1;
 		}
 	}
-	sprintf(wrk,"USE BEFORE REPORTING %s is l_%d",cb_name($4),current_section->id);
+	wrk = cobc_main_malloc (COB_MINI_BUFF);
+	snprintf (wrk, COB_MINI_MAX, "USE BEFORE REPORTING %s is %s%d",
+		cb_name ($4), CB_PREFIX_LABEL, current_section->id);
 	current_section->flag_real_label = 1;
 	current_section->flag_declaratives = 1;
 	current_section->flag_begin = 1;
@@ -15310,7 +15373,7 @@ use_reporting:
 	current_section->flag_declarative_exit = 1;
 	current_section->flag_real_label = 1;
 	current_section->flag_skip_label = 0;
-	emit_statement (cb_build_comment (strdup(wrk)));
+	emit_statement (cb_build_comment (wrk));
   }
 ;
 
@@ -17145,6 +17208,26 @@ identifier_or_file_name:
 	} else {
 		if (x != cb_error_node) {
 			cb_error_x ($1, _("'%s' is not a field or file"), cb_name ($1));
+		}
+		$$ = cb_error_node;
+	}
+  }
+;
+
+/* guarantees a reference to a validated field-reference (or cb_error_node) */
+identifier_field:
+  identifier_1
+  {
+	cb_tree x = NULL;
+	if (CB_REFERENCE_P ($1)) {
+		x = cb_ref ($1);
+	}
+
+	if (x && CB_FIELD_P (x)) {
+		$$ = $1;
+	} else {
+		if (x != cb_error_node) {
+			cb_error_x ($1, _("'%s' is not a field"), cb_name ($1));
 		}
 		$$ = cb_error_node;
 	}
