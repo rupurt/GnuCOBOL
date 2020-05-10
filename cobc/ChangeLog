@@ -132,6 +132,11 @@
 	  __unaligned instead of overriding the attribute in the header
 	* tree.h: removed duplicate redefinition of atol/atoll
 
+2019-09-22  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c, field.c: Corrections to handling of COLUMN  (was off by +1);
+	  With OCCURS COLUMN + num is no longer an alternative for STEP
+
 2019-09-15  Ron Norman <rjn@inglenet.com>
 
 	* cobc.h: For HPUX set COB_ALLOW_UNALIGNED as undefined
