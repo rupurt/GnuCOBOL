@@ -1985,10 +1985,9 @@ cb_build_identifier (cb_tree x, const int subchk)
 	}
 
 	/* Reference modification check */
+	pseudosize = f->size;
 	if (f->usage == CB_USAGE_NATIONAL ) {
-		pseudosize = f->size / 2;
-	} else {
-		pseudosize = f->size;
+		pseudosize = pseudosize / 2;
 	}
 	if (r->offset) {
 		/* Compile-time check */
@@ -9970,6 +9969,15 @@ cb_build_move (cb_tree src, cb_tree dst)
 #endif
 	if (move_zero) {
 		src = cb_zero;
+	} else if (CB_LITERAL_P (src)) {
+		/* FIXME: don't do this for a DYNAMIC LENGTH target */
+		const struct cb_literal* lit = CB_LITERAL (src);
+		char* p = (char*)lit->data;
+		char* end = p + lit->size - 1;
+		if (*end == ' ') {
+			while (p < end && *p == ' ') p++;
+			if (p == end) src = cb_space;
+		}
 	}
 
 	if (current_program->flag_report) {
@@ -10143,6 +10151,9 @@ cb_emit_open (cb_tree file, cb_tree mode, cb_tree sharing)
 			sharing = cb_int0;
 		}
 	}
+
+	/* TODO: replace mode and sharing with tree containing a string constant
+	         (defines in common.h like COB_OPEN_I_O) */
 
 	if (f->extfh) {
 		cb_emit (CB_BUILD_FUNCALL_5 ("cob_extfh_open", f->extfh, file, mode,

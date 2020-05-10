@@ -124,6 +124,23 @@
 	* typeck.c (valid_screen_pos): inlining some macro-like functions back
 	* typeck.c (cb_validate_crt_status, valid_screen_pos): more validation
 
+2019-09-30  Edward Hart <edward.dan.hart@gmail.com>
+
+	* parser.y, reserved.c: added more (D)OS/VS and ACUCOBOL APPLY phrases.
+
+2019-09-29  Edward Hart <edward.dan.hart@gmail.com>
+
+	* parser.y, reserved.c: added detection of OS/VS-era I/O extensions.
+	* parser.y: added ASSIGN VARYING variant of ASSIGN USING.
+	* reserved.c (lookup_reserved_word): allow SELECT and I-O-CONTROL to
+	  have multiple context-sensitive words occur in one sentence.
+	* config.def: clarified -fline-col-zero-default.
+
+2019-09-28  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c: If MOVE "literal" is all SPACES then process as
+	  cb_space so MOVE SPACE & MOVE "   " are identical
+
 2019-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c: moved alignment defines from libcob/common.h here
