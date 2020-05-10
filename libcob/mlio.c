@@ -309,7 +309,7 @@ get_name_with_hex_prefix (const cob_field * const name)
 }
 
 static char
-int_to_hex (const int n)
+int_to_hex (int n)
 {
 	if (n < 10) {
 		n = n + '0';
