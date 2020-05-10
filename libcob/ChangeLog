@@ -1,4 +1,11 @@
 
+2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	* screenio.c (get_line_and_col_from_field): refactored from
+	  get_line_and_col_from_num and get_cursor_from_program, now
+	  containing additional handing of non-numeric group fields
+	  for the position, fixing bug #632
+
 2020-04-28  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c (indexed_keydesc): always use key component definition
