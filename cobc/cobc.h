@@ -150,6 +150,7 @@ enum cb_format {
 #define	CB_CS_JSON_GENERATE		(1U << 31)
 /* HACK: no more space - using minor one until re-written */
 #define	CB_CS_I_O_CONTROL		CB_CS_DAY
+#define	CB_CS_TYPEDEF			CB_CS_DAY
 
 /* Support for cobc from stdin */
 #define COB_DASH			"-"

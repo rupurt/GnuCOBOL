@@ -186,6 +186,12 @@ CB_CONFIG_SUPPORT (cb_top_level_occurs_clause, "top-level-occurs-clause",
 CB_CONFIG_SUPPORT (cb_same_as_clause, "same-as-clause",
 	_("SAME AS clause"))
 
+CB_CONFIG_SUPPORT (cb_type_to_clause, "type-to-clause",
+	_("TYPE TO clause"))
+
+CB_CONFIG_SUPPORT (cb_usage_type_name, "usage-type",
+	_("USAGE type-name"))
+
 CB_CONFIG_SUPPORT (cb_synchronized_clause, "synchronized-clause",
 	_("SYNCHRONIZED clause"))
 

@@ -1,4 +1,11 @@
 
+2020-05-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y, field.c, tree.h, config.def, reserved.c, cobc.h:
+	  FR #193 implementation of TYPEDEF, TYPE TO and USAGE type-name,
+	  fixed some issues with SAME AS
+	* tree.c (cb_ref_internal): limit scope of some variables
+
 2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c, config.c, pplex.l, scanner.l: silenced char-subscript warnings

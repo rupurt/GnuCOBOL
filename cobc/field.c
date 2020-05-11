@@ -450,13 +450,16 @@ cb_build_field_tree (cb_tree level, cb_tree name, struct cb_field *last_field,
 		}
 	}
 	if (last_field) {
-		if (last_field->same_as && f->level != 77 && f->level != 66 && f->level > last_field->level) {
-			cb_error_x (name, _("entry following SAME AS may not be subordinate to it"));
+#if 0 /* FIXME: wrong place - the last field is already part of the external definition here */
+		if (last_field->external_definition && f->level != 77 && f->level != 66 && f->level > last_field->level) {
+			cb_error_x (name, _("entry following %s may not be subordinate to it"),
+				CB_FIELD (last_field->external_definition)->flag_is_typedef ? "TYPE TO" : "SAME AS");
 			return cb_error_node;
 		}
+#endif
 		if (last_field->level == 77 && f->level != 01 &&
-		    f->level != 77 && f->level != 66 && f->level != 88) {
-			cb_error_x (name, _("level number must begin with 01 or 77"));
+			f->level != 77 && f->level != 66 && f->level != 88) {
+			cb_error_x (name, _ ("level number must begin with 01 or 77"));
 			return cb_error_node;
 		}
 	}
@@ -664,6 +667,7 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 	struct cb_field *parent = target->parent;
 	struct cb_field *result_fld = target;
 	struct cb_field *redefines = target->redefines;
+	cb_tree	external_definition = target->external_definition;
 
 	/* copy everything and restore */
 	memcpy (target, source, sizeof (struct cb_field));
@@ -677,11 +681,12 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 	target->flag_occurs = occurs;
 	target->occurs_min = occurs_min;
 	target->occurs_max = occurs_max;
+	target->external_definition = NULL; /* set later after duplicating childs */
 	if (name) {
 		target->name = name;
 	}
 	if (ename) {
-		target->name = ename;
+		target->ename = ename;
 	}
 	target->parent = parent;
 #if 0 /* temporary code to resolve a redefine from the source, likely not reasonable... */
@@ -701,19 +706,22 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 	}
 	target->children = NULL;
 	target->sister = NULL;
+	target->flag_is_typedef = 0;
 
 	/* likely more to reset here ... */
 
 	if (source->children) {
 		cb_tree n, x;
-		int level_new;
+		int level_child;
 		if (source->children->level > level) {
-			level_new = source->children->level;
+			level_child = source->children->level;
 		} else {
-			level_new = level + 1;
-			if (level_new == 66 || level_new == 77
-			 || level_new == 78 || level_new == 88) {
-				level_new++;
+			level_child = level + 1;
+			if (level_child == 66 || level_child == 77 || level_child == 88) {
+				level_child++;
+			}
+			if (level_child == 78) {
+				level_child = 79;
 			}
 		}
 
@@ -722,7 +730,7 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 		} else {
 			n = cb_build_filler ();
 		}
-		x = cb_build_field_tree (NULL, n, target, storage, NULL, level_new);
+		x = cb_build_field_tree (NULL, n, target, storage, NULL, level_child);
 		if (x != cb_error_node) {
 			result_fld = copy_into_field (source->children, CB_FIELD (x), 0);
 		}
@@ -744,6 +752,7 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 			result_fld = copy_into_field (source->sister, CB_FIELD (x), 0);
 		}
 	}
+	target->external_definition = external_definition;
 	return result_fld;
 }
 

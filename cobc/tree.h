@@ -810,7 +810,8 @@ struct cb_field {
 	cb_tree			report_control;	/* CONTROL identifier */
 	cb_tree			report_when;	/* PRESENT WHEN condition */
 	cb_tree			report_column_list;/* List of Column Numbers */
-	cb_tree			same_as;	/* SAME AS data-name (points to field) */
+	cb_tree			external_definition;	/* by SAME AS data-name or
+											 by type-name (points to field) */
 
 	int			id;		/* Field id */
 	int			size;		/* Field size */
@@ -896,6 +897,7 @@ struct cb_field {
 	unsigned int flag_internal_constant	: 1;	/* Is an internally generated CONSTANT */
 
 	unsigned int flag_internal_register	: 1;	/* Is an internally generated register */
+	unsigned int flag_is_typedef : 1;	/* TYPEDEF  */
 };
 
 #define CB_FIELD(x)		(CB_TREE_CAST (CB_TAG_FIELD, struct cb_field, x))

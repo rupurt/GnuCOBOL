@@ -86,6 +86,8 @@ section-segments:			+ignore
 stop-literal-statement:			+obsolete
 stop-identifier-statement:		ok
 same-as-clause:				ok
+type-to-clause:				ok
+usage-type:					ok
 synchronized-clause:			ok
 special-names-clause:			+warning
 top-level-occurs-clause:		ok

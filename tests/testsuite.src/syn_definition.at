@@ -1894,7 +1894,7 @@ AT_CLEANUP
 
 
 AT_SETUP([SAME AS clause])
-AT_KEYWORDS([definition EXTERNAL GLOBAL ])
+AT_KEYWORDS([definition EXTERNAL GLOBAL])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -1912,7 +1912,7 @@ AT_DATA([prog.cob], [
       
        77 OUTPUT-NAME SAME AS DETAIL-NO GLOBAL.
 
-       01 Z-MESSAGE-T2 SAME AS AUSGABE-FILE-NAME-2.       
+       01 Z-MESSAGE-T2 SAME AS AUSGABE-FILE-NAME-2.
        01 Z-MESSAGE-T3.
           49 MT3       SAME AS MESSAGE-TEXT-2.
           49 MT3-REN  REDEFINES MT3 SAME AS MESSAGE-TEXT-2.
@@ -1939,6 +1939,7 @@ AT_DATA([badprog.cob], [
        77 OUTPUT-NAME  SAME AS MESSAGE-TEXT-2.
 ])
 
+AT_CHECK([$COMPILE_ONLY prog.cob], [0], [], [])
 AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [1], [],
 [prog.cob:13: error: SAME AS clause does not conform to Micro Focus COBOL
 prog.cob:15: error: SAME AS clause does not conform to Micro Focus COBOL
@@ -1946,11 +1947,136 @@ prog.cob:17: error: SAME AS clause does not conform to Micro Focus COBOL
 prog.cob:19: error: SAME AS clause does not conform to Micro Focus COBOL
 prog.cob:20: error: SAME AS clause does not conform to Micro Focus COBOL
 ])
-AT_CHECK([$COMPILE_ONLY prog.cob], [0], [], [])
+# FXIME: should contain:
+# badprog.cob:10: error: entry following SAME AS may not be subordinate to it
 AT_CHECK([$COMPILE_ONLY badprog.cob], [1], [],
-[badprog.cob:8: error: SAME AS item may not reference itself
-badprog.cob:10: error: entry following SAME AS may not be subordinate to it
+[badprog.cob:8: error: item may not reference itself
 badprog.cob:11: error: illegal combination of SAME AS with other clauses
+badprog.cob:12: error: elementary item expected
+])
+
+AT_CLEANUP
+
+
+AT_SETUP([TYPEDEF clause])
+AT_KEYWORDS([definition EXTERNAL GLOBAL TYPE USAGE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 AUSGABE-FILE-NAME-T     PIC X(50) IS TYPEDEF.
+       01 DETAIL-NO-T             PIC 9999  IS TYPEDEF.
+       01 AUSGABE-FILE-NAME-2T              IS TYPEDEF.
+          05 FILLER    PIC 9999.
+          05 DETAIL-NO USAGE DETAIL-NO-T.
+      *
+       01  MESSAGE-TEXT-2T IS TYPEDEF.
+         02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
+         02 FILLER REDEFINES AUSGABE-FILE-NAME.
+             05 FILLER PIC 9999.
+         02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+         02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+      *
+       01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+      
+       77 OUTPUT-NAME USAGE DETAIL-NO-T GLOBAL.
+
+       01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+       01 Z-MESSAGE-T3.
+          49 MT3                    USAGE MESSAGE-TEXT-2T.
+          49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
+
+       PROCEDURE DIVISION.
+           DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
+           DISPLAY DETAIL-NO         OF Z-MESSAGE-T2
+           DISPLAY AUSGABE-FILE-NAME OF MT3
+           DISPLAY OUTPUT-NAME
+           GOBACK.
+])
+
+AT_DATA([progstd.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 AUSGABE-FILE-NAME-T     PIC X(50) IS TYPEDEF.
+       01 DETAIL-NO-T             PIC 9999  IS TYPEDEF.
+       01 AUSGABE-FILE-NAME-2T              IS TYPEDEF.
+          05 FILLER    PIC 9999.
+          05 DETAIL-NO TYPE TO DETAIL-NO-T.
+      *
+       01  MESSAGE-TEXT-2T IS TYPEDEF.
+         02 AUSGABE-FILE-NAME     TYPE AUSGABE-FILE-NAME-T.
+         02 FILLER REDEFINES AUSGABE-FILE-NAME.
+             05 FILLER PIC 9999.
+         02 AUSGABE-FILE-NAME-2   TYPE AUSGABE-FILE-NAME-2T.
+         02 FILLER                TYPE AUSGABE-FILE-NAME-T.
+      *
+       01  MESSAGE-TEXT-2 EXTERNAL TYPE MESSAGE-TEXT-2T.
+      
+       77 OUTPUT-NAME TYPE TO DETAIL-NO-T GLOBAL.
+
+       01 Z-MESSAGE-T2 TYPE AUSGABE-FILE-NAME-2T.
+       01 Z-MESSAGE-T3.
+          49 MT3                    TYPE MESSAGE-TEXT-2T.
+          49 MT3-REN  REDEFINES MT3 TYPE MESSAGE-TEXT-2T.
+
+       PROCEDURE DIVISION.
+           DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
+           DISPLAY DETAIL-NO         OF Z-MESSAGE-T2
+           DISPLAY AUSGABE-FILE-NAME OF MT3
+           DISPLAY OUTPUT-NAME
+           GOBACK.
+])
+
+AT_DATA([badprog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  MESSAGE-TEXT-2T IS TYPEDEF.
+         02 AUSGABE-FILE-NAME     PIC X(50).
+         02 F1      USAGE MESSAGE-TEXT-2T.
+       01 MT2 USAGE MESSAGE-TEXT-2T.
+             05 FILLER PIC 9999.
+       01 MT3 TYPE TO MESSAGE-TEXT-2T PIC X.
+       77 OUTPUT-NAME  TYPE TO MESSAGE-TEXT-2T.
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY -std=cobol2002 prog.cob], [1], [],
+[prog.cob:10: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:13: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:16: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:17: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:19: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:21: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:23: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:25: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:26: error: USAGE type-name does not conform to COBOL 2002
+])
+AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY progstd.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY -std=cobol2002 progstd.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY -std=mf-strict progstd.cob], [1], [],
+[progstd.cob:10: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:13: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:16: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:17: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:19: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:21: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:23: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:25: error: TYPE TO clause does not conform to Micro Focus COBOL
+progstd.cob:26: error: TYPE TO clause does not conform to Micro Focus COBOL
+])
+
+# FXIME: should contain:
+# badprog.cob:10: error: entry following TYPE TO may not be subordinate to it
+AT_CHECK([$COMPILE_ONLY badprog.cob], [1], [],
+[badprog.cob:8: error: item may not reference itself
+badprog.cob:11: error: illegal combination of TYPE TO with other clauses
 badprog.cob:12: error: elementary item expected
 ])
 

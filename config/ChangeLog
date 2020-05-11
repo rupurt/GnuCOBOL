@@ -1,4 +1,8 @@
 
+2020-05-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: added options type-to-clause and usage-type
+
 2020-04-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* general: added option numeric-pointer *EXPERIMENTAL*
