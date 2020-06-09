@@ -53,7 +53,7 @@
 #endif
 
 
-#if	defined(_WIN32) || defined(__CYGWIN__) || COB_NO_VISIBILITY_ATTRIBUTE
+#if	defined(_WIN32) || defined(__CYGWIN__) || defined(COB_NO_VISIBILITY_ATTRIBUTE)
 #define COB_HIDDEN	extern
 #elif	defined(__GNUC__) && \
 	(__GNUC__ > 4 ||  /* note: this check should be moved to configure... */ \
