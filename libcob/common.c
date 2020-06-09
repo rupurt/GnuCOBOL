@@ -86,12 +86,16 @@
 
 #if defined (HAVE_NCURSESW_NCURSES_H)
 #include <ncursesw/ncurses.h>
+#define COB_GEN_SCREENIO
 #elif defined (HAVE_NCURSESW_CURSES_H)
 #include <ncursesw/curses.h>
+#define COB_GEN_SCREENIO
 #elif defined (HAVE_NCURSES_H)
 #include <ncurses.h>
+#define COB_GEN_SCREENIO
 #elif defined (HAVE_NCURSES_NCURSES_H)
 #include <ncurses/ncurses.h>
+#define COB_GEN_SCREENIO
 #elif defined (HAVE_PDCURSES_H)
 /* will internally define NCURSES_MOUSE_VERSION with
    a recent version (for older version define manually): */
@@ -101,6 +105,7 @@
 #elif defined (HAVE_CURSES_H)
 #define PDC_NCMOUSE	/* see comment above */
 #include <curses.h>
+#define COB_GEN_SCREENIO
 #ifndef PDC_MOUSE_MOVED
 #undef PDC_NCMOUSE
 #endif
@@ -358,7 +363,7 @@ static struct config_enum timeopts[] = {{"0", "1000"}, {"1", "100"}, {"2", "10"}
 static struct config_enum syncopts[] = {{"P", "1"}, {NULL, NULL}};
 static struct config_enum varseqopts[] = {{"0", "0"}, {"1", "1"}, {"2", "2"}, {"3", "3"}, {NULL, NULL}};
 static char	varseq_dflt[8] = "0";
-static char min_conf_length = 0;
+static unsigned char min_conf_length = 0;
 static const char *not_set;
 
 /*
@@ -7282,54 +7287,22 @@ conf_runtime_error (const int finish_error, const char *fmt, ...)
 	}
 }
 
-
-void
-print_version (void)
+#if defined (COB_GEN_SCREENIO)
+/* resolve curses library related version information
+   stores the information in the version_buffer parameter
+   returns the mouse info */
+static const char *
+get_screenio_and_mouse_info (char *version_buffer, size_t size, const int verbose)
 {
-	char	cob_build_stamp[COB_MINI_BUFF];
-	char	month[64];
-	int		status, day, year;
-
-	/* Set up build time stamp */
-	memset (cob_build_stamp, 0, (size_t)COB_MINI_BUFF);
-	memset (month, 0, sizeof (month));
-	day = 0;
-	year = 0;
-	status = sscanf (__DATE__, "%s %d %d", month, &day, &year);
-	if (status == 3) {
-		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
-			  "%s %2.2d %4.4d %s", month, day, year, __TIME__);
-	} else {
-		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
-			  "%s %s", __DATE__, __TIME__);
-	}
-
-	printf ("libcob (%s) %s.%d\n",
-		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	puts ("Copyright (C) 2020 Free Software Foundation, Inc.");
-	puts (_("License LGPLv3+: GNU LGPL version 3 or later <http://gnu.org/licenses/lgpl.html>"));
-	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
-	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
-	printf (_("Written by %s\n"), "Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart");
-
-	/* TRANSLATORS: This msgid is indented as the "Packaged" msgid, %s expands to date and time */
-	printf (_("Built     %s"), cob_build_stamp);
-	putchar ('\n');
-	/* TRANSLATORS: This msgid is indented as the "Built" msgid, %s expands to date and time */
-	printf (_("Packaged  %s"), COB_TAR_DATE);
-	putchar ('\n');
-
-}
-
-void
-print_info (void)
-{
-	char	buff[16];
-	char	versbuff[56] = { '\0' };
-	char	*s;
+	const char	*mouse_support = _("unknown");
 	int	major, minor, patch;
 #if defined (__PDCURSES__)
 	int	opt1, opt2, opt3;
+#if defined (PDC_FORCE_UTF8)
+	const int utf8 = 1;
+#else
+	const int utf8 = 0;
+#endif
 #endif
 #if defined (__PDCURSES__) || defined (NCURSES_VERSION)
 #if defined (PDC_WIDE) || defined (NCURSES_WIDECHAR)
@@ -7338,72 +7311,36 @@ print_info (void)
 	const int wide = 0;
 #endif
 #endif
-	char	versbuff2[115];
+	char	buff[56] = {'\0'};
 
-	memset(versbuff2,0,sizeof(versbuff2));
-	print_version ();
-	putchar ('\n');
-	puts (_("build information"));
-	var_print (_("build environment"), 	COB_BLD_BUILD, "", 0);
-	var_print ("CC", COB_BLD_CC, "", 0);
-	/* Note: newline because most compilers define a long version string (> 30 characters) */
-	snprintf (versbuff, 55, "%s%s", GC_C_VERSION_PRF, GC_C_VERSION);
-	var_print ("C version", versbuff, "", 0);
-	var_print ("CPPFLAGS", COB_BLD_CPPFLAGS, "", 0);
-	var_print ("CFLAGS", COB_BLD_CFLAGS, "", 0);
-	var_print ("LD", COB_BLD_LD, "", 0);
-	var_print ("LDFLAGS", COB_BLD_LDFLAGS, "", 0);
-	putchar ('\n');
+	memset (version_buffer, 0, size--);
 
-	puts (_("GnuCOBOL information"));
-
-	var_print ("COB_MODULE_EXT", COB_MODULE_EXT, "", 0);
-#if 0 /* only relevant for cobc */
-	var_print ("COB_OBJECT_EXT", COB_OBJECT_EXT, "", 0);
-	var_print ("COB_EXE_EXT", COB_EXE_EXT, "", 0);
+	if (verbose) {
+		initscr ();
+	}
+#ifdef HAVE_HAS_MOUSE
+	if (verbose) {
+		int mouse_available = 0;
+		mousemask (ALL_MOUSE_EVENTS, NULL);
+		if (has_mouse () == TRUE) mouse_available = 1;
+		if (mouse_available) {
+			mouse_support = _("yes");
+		} else {
+			mouse_support = _("no");
+		}
+}
+#elif defined (NCURSES_MOUSE_VERSION)
+#if defined (__PDCURSES__)
+	mouse_support = _("yes");
 #endif
-
-#if	defined (USE_LIBDL) || defined (_WIN32)
-	var_print (_("dynamic loading"), 	"system", "", 0);
 #else
-	var_print (_("dynamic loading"), 	"libtool", "", 0);
+	mouse_support = _("disabled");
 #endif
+	if (verbose) {
+		endwin ();
+	}
 
-#if 0 /* Simon: only a marginal performance influence - removed from output */
-#ifdef	COB_PARAM_CHECK
-	var_print ("\"CBL_\" param check", 	_("enabled"), "", 0);
-#else
-	var_print ("\"CBL_\" param check", 	_("disabled"), "", 0);
-#endif
-#endif
-
-#ifdef COB_64_BIT_POINTER
-	var_print ("64bit-mode", 	_("yes"), "", 0);
-#else
-	var_print ("64bit-mode", 	_("no"), "", 0);
-#endif
-
-#ifdef	COB_LI_IS_LL
-	var_print ("BINARY-C-LONG", 	_("8 bytes"), "", 0);
-#else
-	var_print ("BINARY-C-LONG", _("4 bytes"), "", 0);
-#endif
-
-#ifdef WORDS_BIGENDIAN
-	var_print (_("endianness"),		_("big-endian"), "", 0);
-#else
-	var_print (_("endianness"),		_("little-endian"), "", 0);
-#endif
-
-#ifdef COB_EBCDIC_MACHINE
-	var_print (_("native EBCDIC"),		_("yes"), "", 0);
-#else
-	var_print (_("native EBCDIC"),		_("no"), "", 0);
-#endif
-
-#if !defined (__PDCURSES__) && !defined (NCURSES_VERSION)
-	var_print (_("extended screen I/O"), 	WITH_CURSES, "", 0);
-#else
+#if defined (__PDCURSES__) || defined (NCURSES_VERSION)
 #if defined (__PDCURSES__)
 #if defined (PDC_VER_MAJOR)
 #define CURSES_CMP_MAJOR	PDC_VER_MAJOR
@@ -7443,55 +7380,244 @@ print_info (void)
 #define CURSES_CMP_MINOR	NCURSES_VERSION_MINOR
 #endif
 #if !defined (RESOLVED_PDC_VER)
-	snprintf (versbuff2, 100, "%s", curses_version ());
+	snprintf (version_buffer, size, "%s", curses_version ());
 	major = 0, minor = 0, patch = 0;
-	if ((sscanf (versbuff2, "%s %s %d.%d.%d", (char *)&versbuff, (char *)&versbuff, &major, &minor, &patch) < 4)
-	 && (sscanf (versbuff2, "%s %d.%d.%d", (char *)&versbuff, &major, &minor, &patch) < 3)
-	 && (sscanf (versbuff2, "%d.%d.%d", &major, &minor, &patch) < 2)) {
+	if ((sscanf (version_buffer, "%s %s %d.%d.%d", (char *)&buff, (char *)&buff, &major, &minor, &patch) < 4)
+	 && (sscanf (version_buffer, "%s %d.%d.%d", (char *)&buff, &major, &minor, &patch) < 3)
+	 && (sscanf (version_buffer, "%d.%d.%d", &major, &minor, &patch) < 2)) {
 		major = 0, minor = 0;
 	}
 #endif
 	if (major == CURSES_CMP_MAJOR && minor == CURSES_CMP_MINOR) {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d"), WITH_CURSES, major, minor, patch);
+		snprintf (buff, 55, _("%s, version %d.%d.%d"), WITH_CURSES, major, minor, patch);
 	} else if (major != 0) {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+		snprintf (buff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
 			WITH_CURSES, major, minor, patch, CURSES_CMP_MAJOR, CURSES_CMP_MINOR);
 	} else {
-		snprintf (versbuff, 55, _("%s, version %s"), WITH_CURSES, versbuff2);
+		snprintf (buff, 55, _("%s, version %s"), WITH_CURSES, version_buffer);
 	}
-#ifdef RESOLVED_PDC_VER
-	snprintf (versbuff2, 114, "%s CHTYPE=%d(%d), WIDE=%d(%d), UTF-8=%d", versbuff,
-		opt1, (int)sizeof (chtype) * 8, wide, opt2,  opt3);
+#if defined (RESOLVED_PDC_VER) 
+	{
+		const int	chtype_val = (int)sizeof (chtype) * 8;
+		char	chtype_def[10] = { '\0' };
+		char	wide_def[5] = {'\0'};
+		char	utf8_def[5] = {'\0'};
+		const char	*match;
+		if (chtype_val != opt1) {
+			match = "!";
+		} else {
+			match = "";
+		}
+		snprintf (chtype_def, 9, "%d[%d%s]", chtype_val, opt1, match);
+		if (wide != opt2) {
+			match = "!";
+		} else {
+			match = "";
+		}
+		snprintf (wide_def, 4, "%d[%d%s]", wide, opt2, match);
+		if (wide != opt2) {
+			match = "!";
+		} else {
+			match = "";
+		}
+		snprintf (utf8_def, 4, "%d[%d%s]", utf8, opt3, match);
+		snprintf (version_buffer, size, "%s (CHTYPE=%s, WIDE=%s, UTF8=%s)",
+			buff, chtype_def, wide_def, utf8_def);
+	}
 #undef RESOLVED_PDC_VER
+#elif defined (__PDCURSES__)
+	snprintf (version_buffer, size, "%s (CHTYPE=%d, WIDE=%d, UTF8=%d)", buff,
+		(int)sizeof (chtype) * 8, wide, utf8);
 #else
-	snprintf (versbuff2, 114, "%s (CHTYPE=%d, WIDE=%d)", versbuff,
+	snprintf (version_buffer, size, "%s (CHTYPE=%d, WIDE=%d)", buff,
 		(int)sizeof (chtype) * 8, wide);
 #endif
-#endif
-	var_print (_("extended screen I/O"), 	versbuff2, "", 0);
 
-#ifdef HAVE_HAS_MOUSE
-	{
-		int mouse_available = 0;
-		initscr ();
-		mousemask (ALL_MOUSE_EVENTS, NULL);
-		if (has_mouse () == TRUE) mouse_available = 1;
+#else /* defined (__PDCURSES__) || defined (NCURSES_VERSION) */
+	snprintf (version_buffer, size, "%s (CHTYPE=%d)", WITH_CURSES,
+		(int)sizeof (chtype) * 8);
+#endif
+
+	if (verbose) {
+		size_t curr_size = strlen (version_buffer);
+		snprintf (version_buffer + curr_size, size - curr_size, " %s",
+			longname ());
 		endwin ();
-		if (mouse_available) {
-			var_print (_("mouse support"), 	_("yes"), "", 0);
-		} else {
-			var_print (_("mouse support"), 	_("no"), "", 0);
-		}
 	}
-#elif defined (NCURSES_MOUSE_VERSION)
-#if defined (__PDCURSES__)
-	var_print (_("mouse support"),		_("yes"), "", 0);
-#else
-	var_print (_("mouse support"),		_("unknown"), "", 0);
+
+	return mouse_support;
+}
 #endif
-#else
-	var_print (_("mouse support"), 		_("disabled"), "", 0);
+
+/* resolve math library related version information
+   stores the information in the version_buffer parameter */
+static void
+get_math_info (char *version_buffer, size_t size, const int verbose)
+{
+	int	major, minor, patch;
+#if defined (mpir_version)
+	size_t	curr_size;
 #endif
+	COB_UNUSED (verbose);
+
+	memset (version_buffer, 0, size--);
+	major = 0, minor = 0, patch = 0;
+	(void)sscanf (gmp_version, "%d.%d.%d", &major, &minor, &patch);
+	if (major == __GNU_MP_VERSION && minor == __GNU_MP_VERSION_MINOR) {
+		snprintf (version_buffer, size, _("%s, version %d.%d.%d"), "GMP", major, minor, patch);
+	} else {
+		snprintf (version_buffer, size, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+			"GMP", major, minor, patch, __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR);
+	}
+#if defined (mpir_version)
+	major = 0, minor = 0, patch = 0;
+	(void)sscanf (mpir_version, "%d.%d.%d", &major, &minor, &patch);
+	curr_size = strlen (version_buffer);
+	{
+		char *deli = " - ";
+		snprintf (version_buffer + curr_size, size - curr_size, "%s", deli);
+		curr_size += strlen (deli);
+	}
+
+	if (major == __MPIR_VERSION && minor == __MPIR_VERSION_MINOR) {
+		snprintf (version_buffer + curr_size, size - curr_size,
+			_("%s, version %d.%d.%d"),
+			"MPIR", major, minor, patch);
+	} else {
+		snprintf (version_buffer + curr_size, size - curr_size,
+			_("%s, version %d.%d.%d (compiled with %d.%d)"),
+			"MPIR", major, minor, patch, __MPIR_VERSION, __MPIR_VERSION_MINOR);
+	}
+#endif
+}
+
+
+void
+print_version (void)
+{
+	char	cob_build_stamp[COB_MINI_BUFF];
+	char	month[64];
+	int		status, day, year;
+
+	/* Set up build time stamp */
+	memset (cob_build_stamp, 0, (size_t)COB_MINI_BUFF);
+	memset (month, 0, sizeof (month));
+	day = 0;
+	year = 0;
+	status = sscanf (__DATE__, "%s %d %d", month, &day, &year);
+	if (status == 3) {
+		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
+			  "%s %2.2d %4.4d %s", month, day, year, __TIME__);
+	} else {
+		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
+			  "%s %s", __DATE__, __TIME__);
+	}
+
+	printf ("libcob (%s) %s.%d\n",
+		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
+	puts ("Copyright (C) 2020 Free Software Foundation, Inc.");
+	puts (_("License LGPLv3+: GNU LGPL version 3 or later <http://gnu.org/licenses/lgpl.html>"));
+	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
+	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
+	printf (_("Written by %s\n"), "Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart");
+
+	/* TRANSLATORS: This msgid is intended as the "Packaged" msgid, %s expands to date and time */
+	printf (_("Built     %s"), cob_build_stamp);
+	putchar ('\n');
+	/* TRANSLATORS: This msgid is intended as the "Built" msgid, %s expands to date and time */
+	printf (_("Packaged  %s"), COB_TAR_DATE);
+	putchar ('\n');
+}
+
+void
+print_info (void)
+{
+	print_info_detailed (0);
+}
+
+void
+print_info_detailed (const int verbose)
+{
+	char	screenio_info[150];
+	const char *mouse_support;
+
+	char	buff[56] = { '\0' };
+	char	*s;
+
+	/* resolving screenio related information before anything else as this
+	   function will possibly run initscr + endwin and therefore
+	   may interfer with other output */
+#if defined (COB_GEN_SCREENIO)
+	mouse_support = get_screenio_and_mouse_info
+	((char*)&screenio_info, sizeof (screenio_info), verbose);
+#else
+	snprintf ((char *)&screenio_info, sizeof(screenio_info) - 1,
+		"%s", _("disabled"));
+	mouse_support = _("disabled");
+#endif
+
+	print_version ();
+	putchar ('\n');
+	puts (_("build information"));
+	var_print (_("build environment"), 	COB_BLD_BUILD, "", 0);
+	var_print ("CC", COB_BLD_CC, "", 0);
+	/* Note: newline because most compilers define a long version string (> 30 characters) */
+	snprintf (buff, 55, "%s%s", GC_C_VERSION_PRF, GC_C_VERSION);
+	var_print ("C version", buff, "", 0);
+	var_print ("CPPFLAGS", COB_BLD_CPPFLAGS, "", 0);
+	var_print ("CFLAGS", COB_BLD_CFLAGS, "", 0);
+	var_print ("LD", COB_BLD_LD, "", 0);
+	var_print ("LDFLAGS", COB_BLD_LDFLAGS, "", 0);
+	putchar ('\n');
+
+	puts (_("GnuCOBOL information"));
+
+	var_print ("COB_MODULE_EXT", COB_MODULE_EXT, "", 0);
+#if 0 /* only relevant for cobc */
+	var_print ("COB_OBJECT_EXT", COB_OBJECT_EXT, "", 0);
+	var_print ("COB_EXE_EXT", COB_EXE_EXT, "", 0);
+#endif
+
+#if	defined (USE_LIBDL) || defined (_WIN32)
+	var_print (_("dynamic loading"), 	"system", "", 0);
+#else
+	var_print (_("dynamic loading"), 	"libtool", "", 0);
+#endif
+
+	if (verbose) {
+#ifdef	COB_PARAM_CHECK
+		var_print ("\"CBL_\" param check", 	_("enabled"), "", 0);
+#else
+		var_print ("\"CBL_\" param check", 	_("disabled"), "", 0);
+#endif
+	}
+#ifdef COB_64_BIT_POINTER
+	var_print ("64bit-mode", 	_("yes"), "", 0);
+#else
+	var_print ("64bit-mode", 	_("no"), "", 0);
+#endif
+
+#ifdef	COB_LI_IS_LL
+	var_print ("BINARY-C-LONG", 	_("8 bytes"), "", 0);
+#else
+	var_print ("BINARY-C-LONG", 	_("4 bytes"), "", 0);
+#endif
+
+#ifdef WORDS_BIGENDIAN
+	var_print (_("endianness"),		_("big-endian"), "", 0);
+#else
+	var_print (_("endianness"),		_("little-endian"), "", 0);
+#endif
+
+#ifdef COB_EBCDIC_MACHINE
+	var_print (_("native EBCDIC"),		_("yes"), "", 0);
+#else
+	var_print (_("native EBCDIC"),		_("no"), "", 0);
+#endif
+
+	var_print (_("extended screen I/O"), (char*)&screenio_info, "", 0);
+
+	var_print (_("mouse support"), 	mouse_support, "", 0);
 
 	snprintf (buff, sizeof (buff), "%d", WITH_VARSEQ);
 	var_print (_("variable file format"), buff, "", 0);
@@ -7508,15 +7634,19 @@ print_info (void)
 #if defined	(WITH_INDEX_EXTFH)
 	var_print (_("ISAM file handler"), 		"EXTFH", "", 0);
 #elif defined	(WITH_DB)
-	major = 0, minor = 0, patch = 0;
-	db_version (&major, &minor, &patch);
-	if (major == DB_VERSION_MAJOR && minor == DB_VERSION_MINOR) {
-		snprintf (versbuff, 55, "%s, version %d.%d%d", "BDB", major, minor, patch);
-	} else {
-		snprintf (versbuff, 55, "%s, version %d.%d%d (compiled with %d.%d)",
-			"BDB", major, minor, patch, DB_VERSION_MAJOR, DB_VERSION_MINOR);
+	{
+		int	major, minor, patch;
+		major = 0, minor = 0, patch = 0;
+		db_version (&major, &minor, &patch);
+		if (major == DB_VERSION_MAJOR && minor == DB_VERSION_MINOR) {
+			snprintf (buff, 55, _("%s, version %d.%d.%d"),
+				"BDB", major, minor, patch);
+		} else {
+			snprintf (buff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+				"BDB", major, minor, patch, DB_VERSION_MAJOR, DB_VERSION_MINOR);
+		}
 	}
-	var_print (_("ISAM file handler"), 		versbuff, "", 0);
+	var_print (_("ISAM file handler"), 		buff, "", 0);
 #elif defined	(WITH_CISAM)
 	var_print (_("ISAM file handler"), 		"C-ISAM", "", 0);
 #elif defined	(WITH_DISAM)
@@ -7531,56 +7661,44 @@ print_info (void)
 	var_print (_("ISAM file handler"), 		_("disabled"), "", 0);
 #endif
 
-	major = 0, minor = 0, patch = 0;
-	(void)sscanf (gmp_version, "%d.%d.%d", &major, &minor, &patch);
-	if (major == __GNU_MP_VERSION && minor == __GNU_MP_VERSION_MINOR) {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d"), "GMP", major, minor, patch);
-	} else {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
-			"GMP", major, minor, patch, __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR);
+	{
+		char	math_info[115];
+		get_math_info ((char*)&math_info, sizeof (math_info), verbose);
+		var_print (_("mathematical library"), 	(char *)&math_info, "", 0);
 	}
-#if defined (mpir_version)
-	major = 0, minor = 0, patch = 0;
-	(void)sscanf (mpir_version, "%d.%d.%d", &major, &minor, &patch);
-	if (major == __MPIR_VERSION && minor == __MPIR_VERSION_MINOR) {
-		snprintf (versbuff2, 55, _("%s, version %d.%d.%d"), "MPIR", major, minor, patch);
-	} else {
-		snprintf (versbuff2, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
-			"MPIR", major, minor, patch, __MPIR_VERSION, __MPIR_VERSION_MINOR);
-	}
-	versbuff[55] = versbuff2[55] = 0; /* silence VS analyzer */
-	strncat (versbuff2, " - ", 4);
-	strncat (versbuff2, versbuff, 56);
-	var_print (_("mathematical library"), 		versbuff2, "", 0);
-#else
-	var_print (_("mathematical library"), 		versbuff, "", 0);
-#endif
 
 #ifdef WITH_XML2
-	major = LIBXML_VERSION / 10000;
-	minor = (LIBXML_VERSION - major * 10000) / 100 ;
-	patch = LIBXML_VERSION - major * 10000 - minor * 100;
-	snprintf (versbuff, 55, _("%s, version %d.%d.%d"),
-		"libxml2", major, minor, patch);
-	var_print (_("XML library"), 		versbuff, "", 0);
-	LIBXML_TEST_VERSION
+	{
+		int	major, minor, patch;
+		major = LIBXML_VERSION / 10000;
+		minor = (LIBXML_VERSION - major * 10000) / 100 ;
+		patch = LIBXML_VERSION - major * 10000 - minor * 100;
+		snprintf (buff, 55, _("%s, version %d.%d.%d"),
+			"libxml2", major, minor, patch);
+		var_print (_("XML library"), 		buff, "", 0);
+		LIBXML_TEST_VERSION
 #if defined (HAVE_LIBXML_XMLWRITER_H) && HAVE_LIBXML_XMLWRITER_H
-	xmlCleanupParser ();
+		xmlCleanupParser ();
 #endif
+	}
 #else
 	var_print (_("XML library"), 		_("disabled"), "", 0);
 #endif
 
 #ifdef WITH_CJSON
-	major = 0, minor = 0, patch = 0;
-	(void)sscanf (cJSON_Version(), "%d.%d.%d", &major, &minor, &patch);
-	if (major == CJSON_VERSION_MAJOR && minor == CJSON_VERSION_MINOR) {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d"), "cJSON", major, minor, patch);
-	} else {
-		snprintf (versbuff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
-			"cJSON", major, minor, patch, CJSON_VERSION_MAJOR, CJSON_VERSION_MINOR);
+	{
+		int	major, minor, patch;
+		major = 0, minor = 0, patch = 0;
+		(void)sscanf (cJSON_Version(), "%d.%d.%d", &major, &minor, &patch);
+		if (major == CJSON_VERSION_MAJOR && minor == CJSON_VERSION_MINOR) {
+			snprintf (buff, 55, _("%s, version %d.%d.%d"),
+				"cJSON", major, minor, patch);
+		} else {
+			snprintf (buff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+				"cJSON", major, minor, patch, CJSON_VERSION_MAJOR, CJSON_VERSION_MINOR);
+		}
 	}
-	var_print (_("JSON library"), 		versbuff, "", 0);
+	var_print (_("JSON library"), 		buff, "", 0);
 #else
 	var_print (_("JSON library"), 		_("disabled"), "", 0);
 #endif

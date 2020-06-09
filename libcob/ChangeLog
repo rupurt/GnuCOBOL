@@ -1,4 +1,21 @@
 
+2020-06-09  Simon Sobisch <simonsobisch@gnu.org>
+
+	Bug #616 cannot redirect output of cobcrun --info
+	FR #385 more details for screenio in cobcrun --info
+	* cobcrun.c (get_screenio_and_mouse_info): new function,
+	  extracted and extended from print_info (showing longname);
+	  reasonable output for curses that isn't NCurses or PDCurses;
+	  all curses calls but version info only in verbose mode
+	* cobcrun.c (get_math_info): new function,
+	  extracted and adjusted from print_info
+	* cobcrun.c, common.h: (print_info) as delegate for
+	  new (print_info_detailed) which handles verbose option
+
+	* coblocal.h: adjusted GCC-version for definition of visibility attribute
+	  COB_HIDDEN and option to disable via COB_NO_VISIBILITY_ATTRIBUTE;
+	  not a solution (-> move to configure) but a workaround...
+
 2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c (get_line_and_col_from_field): refactored from
