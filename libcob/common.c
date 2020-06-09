@@ -680,6 +680,49 @@ cob_get_strerror (void)
 	return msg;
 }
 
+/* LCOV_EXCL_START */
+static const char *
+get_signal_name (int signal_value)
+{
+	switch (signal_value) {
+#ifdef	SIGINT
+	case SIGINT:
+		return "SIGINT";
+#endif
+#ifdef	SIGHUP
+	case SIGHUP:
+		return "SIGHUP";
+#endif
+#ifdef	SIGQUIT
+	case SIGQUIT:
+		return "SIGQUIT";
+#endif
+#ifdef	SIGTERM
+	case SIGTERM:
+		return "SIGTERM";
+#endif
+#ifdef	SIGPIPE
+	case SIGPIPE:
+		return "SIGPIPE";
+#endif
+#ifdef	SIGSEGV
+	case SIGSEGV:
+		return "SIGSEGV";
+#endif
+#ifdef	SIGBUS
+	case SIGBUS:
+		return "SIGBUS";
+#endif
+#ifdef	SIGFPE
+	case SIGFPE:
+		return "SIGFPE";
+#endif
+	default:
+		return NULL;
+	}
+}
+/* LCOV_EXCL_STOP */
+
 #ifdef	HAVE_SIGNAL_H
 DECLNORET static void COB_A_NORETURN
 cob_sig_handler_ex (int sig)
@@ -704,7 +747,7 @@ cob_sig_handler_ex (int sig)
 
 
 DECLNORET static void COB_A_NORETURN
-cob_sig_handler (int sig)
+cob_sig_handler (int signal_value)
 {
 	const char *signal_name;
 	char	reason[80];
@@ -713,61 +756,24 @@ cob_sig_handler (int sig)
 	struct sigaction	sa;
 #endif
 
+#if 0	/* Do we flush whatever we may have in our streams ? */
+	fflush (stdout);
+	fflush (stderr);
+#endif
+
 #ifdef	HAVE_SIG_ATOMIC_T
 	if (sig_is_handled) {
-		cob_sig_handler_ex (sig);
+		cob_sig_handler_ex (signal_value);
 	}
 	sig_is_handled = 1;
 #endif
-
+	signal_name = get_signal_name (signal_value);
 	/* LCOV_EXCL_START */
-	switch (sig) {
-#ifdef	SIGINT
-	case SIGINT:
-		signal_name = "SIGINT";
-		break;
-#endif
-#ifdef	SIGHUP
-	case SIGHUP:
-		signal_name = "SIGHUP";
-		break;
-#endif
-#ifdef	SIGQUIT
-	case SIGQUIT:
-		signal_name = "SIGQUIT";
-		break;
-#endif
-#ifdef	SIGTERM
-	case SIGTERM:
-		signal_name = "SIGTERM";
-		break;
-#endif
-#ifdef	SIGPIPE
-	case SIGPIPE:
-		signal_name = "SIGPIPE";
-		break;
-#endif
-#ifdef	SIGSEGV
-	case SIGSEGV:
-		signal_name = "SIGSEGV";
-		break;
-#endif
-#ifdef	SIGBUS
-	case SIGBUS:
-		signal_name = "SIGBUS";
-		break;
-#endif
-#ifdef	SIGFPE
-	case SIGFPE:
-		signal_name = "SIGFPE";
-		break;
-#endif
-	default:
-		signal_name = _("unknown");
+	if (!signal_name) {
 		/* not translated as it is a very unlikely error case */
-		fprintf (stderr, "cob_sig_handler caught not handled signal: %d", sig);
+		fprintf (stderr, "cob_sig_handler caught not handled signal: %d", signal_value);
 		putc ('\n', stderr);
-		break;
+		signal_name = _("unknown");
 	}
 	/* LCOV_EXCL_STOP */
 
@@ -776,10 +782,10 @@ cob_sig_handler (int sig)
 	memset (&sa, 0, sizeof (sa));
 	sa.sa_handler = SIG_DFL;
 	(void)sigemptyset (&sa.sa_mask);
-	(void)sigaction (sig, &sa, NULL);
+	(void)sigaction (signal_value, &sa, NULL);
 #endif
 #else
-	(void)signal (sig, SIG_DFL);
+	(void)signal (signal_value, SIG_DFL);
 #endif
 	cob_exit_screen ();
 	putc ('\n', stderr);
@@ -792,7 +798,7 @@ cob_sig_handler (int sig)
 	}
 
 	/* LCOV_EXCL_START */
-	switch (sig) {
+	switch (signal_value) {
 #ifdef	SIGSEGV
 	case SIGSEGV:
 		fprintf (stderr, _("attempt to reference unallocated memory"));
@@ -813,7 +819,7 @@ cob_sig_handler (int sig)
 		break;
 	}
 	/* LCOV_EXCL_STOP */
-	snprintf (reason, sizeof (reason),_("signal %s"), signal_name);
+	snprintf (reason, sizeof (reason), _("signal %s"), signal_name);
 	fprintf (stderr, " (%s)\n", reason);
 
 	if (cob_initialized) {
@@ -824,7 +830,7 @@ cob_sig_handler (int sig)
 	putc ('\n', stderr);
 	fflush (stderr);
 
-	cob_sig_handler_ex (sig);
+	cob_sig_handler_ex (signal_value);
 }
 #endif /* HAVE_SIGNAL_H */
 
@@ -4674,28 +4680,26 @@ cob_sys_error_proc (const void *dispo, const void *pptr)
 int
 cob_sys_system (const void *cmdline)
 {
-	const char	*cmd;
-	char		*buff;
-	int		i;
-
 	COB_CHK_PARMS (SYSTEM, 1);
 
 	if (COB_MODULE_PTR->cob_procedure_params[0]) {
-		cmd = cmdline;
-		i = (int)COB_MODULE_PTR->cob_procedure_params[0]->size;
-		/* LCOV_EXCL_START */
-		if (unlikely (i > COB_MEDIUM_MAX)) {
-			cob_runtime_error (_("parameter to SYSTEM call is larger than %d characters"), COB_MEDIUM_MAX);
-			cob_stop_run (1);
-		}
-		/* LCOV_EXCL_STOP */
+		const char* cmd = cmdline;
+		size_t		i = COB_MODULE_PTR->cob_procedure_params[0]->size;
+
 		i--;
-		for (; i >= 0; --i) {
+		do {
 			if (cmd[i] != ' ' && cmd[i] != 0) {
 				break;
 			}
-		}
-		if (i >= 0) {
+		} while (--i != 0);
+		if (i > 0) {
+			char	*command;
+			/* LCOV_EXCL_START */
+			if (unlikely (i > COB_MEDIUM_MAX)) {
+				cob_runtime_warning (_("parameter to SYSTEM call is larger than %d characters"), COB_MEDIUM_MAX);
+				return 1;
+			}
+			/* LCOV_EXCL_STOP */
 #ifdef _WIN32
 			/* All known _WIN32 implementations use MSVCRT's system()
 			   which passes the given commandline as paramter to "cmd /k".
@@ -4706,28 +4710,49 @@ cob_sys_system (const void *cmdline)
 			*/
 			if (i > 2 && cmd[0] == '"' && cmd[i] == '"'
 			&& (cmd[1] != '"' || cmd[i - 1] != '"')) {
-				buff = cob_malloc ((size_t)i + 4);
-				buff[0] = '"';
-				memcpy (buff + 1, cmd, (size_t)i + 1);
-				buff[i + 1] = '"';
+				command = cob_malloc ((size_t)i + 4);
+				command[0] = '"';
+				memcpy (command + 1, cmd, (size_t)i + 1);
+				command[i + 1] = '"';
 			} else {
 #endif /* _WIN32 */
-				buff = cob_malloc ((size_t)i + 2);
-				memcpy (buff, cmd, (size_t)i + 1);
+				command = cob_malloc ((size_t)i + 2);
+				memcpy (command, cmd, (size_t)i + 1);
 #ifdef _WIN32
 			}
 #endif 
-			if (cobglobptr->cob_screen_initialized) {
-				cob_screen_set_mode (0);
+			{
+				int status;
+				if (cobglobptr->cob_screen_initialized) {
+					cob_screen_set_mode (0);
+				}
+				/* note: if the command cannot be executed _WIN32 always returns 1
+				   while GNU/Linux returns -1 */
+				status = system (command);
+				if (cobglobptr->cob_screen_initialized) {
+					cob_screen_set_mode (1U);
+				}
+#ifdef	WIFSIGNALED
+				if (WIFSIGNALED (status)) {
+					int signal_value = WTERMSIG (status);
+					const char * signal_name = get_signal_name (signal_value);
+					/* LCOV_EXCL_START */
+					if (!signal_name) {
+						signal_name = _("unknown");
+					}
+					/* LCOV_EXCL_STOP */
+					cob_runtime_warning (_("external process \"%s\" ended with signal %s (%d)"),
+						command, signal_name, signal_value);
+				}
+#endif
+				cob_free (command);
+#ifdef WEXITSTATUS
+				if (WIFEXITED (status)) {
+					status = WEXITSTATUS (status);
+				}
+#endif
+				return status;
 			}
-			/* note: if the command cannot be executed _WIN32 always returns 1
-			   while GNU/Linux returns -1 */
-			i = system (buff);
-			cob_free (buff);
-			if (cobglobptr->cob_screen_initialized) {
-				cob_screen_set_mode (1U);
-			}
-			return i;
 		}
 	}
 	return 1;

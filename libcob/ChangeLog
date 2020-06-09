@@ -15,6 +15,13 @@
 	* coblocal.h: adjusted GCC-version for definition of visibility attribute
 	  COB_HIDDEN and option to disable via COB_NO_VISIBILITY_ATTRIBUTE;
 	  not a solution (-> move to configure) but a workaround...
+	
+	Work on signal and call SYSTEM handling
+	* common.c (get_signal_name): extracted from (cob_sig_handler)
+	* common.c (cob_sys_system): don't abort if the command is too long
+	  and always remove trailing space/low-value before the size check;
+	  added a runtime warning if the command resulted in a signal and
+	  translate the status via WEXITSTATUS if available
 
 2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
 

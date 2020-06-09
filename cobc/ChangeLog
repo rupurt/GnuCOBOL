@@ -1,4 +1,12 @@
 
+2020-06-09  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (call_system. output_return): new functions extracted from
+	  different places to have the nearly identical calls to system and the
+	  code handling verbosity and exit codes in one place
+	* cobc.c (call_system): don't raise SIGINT/SIGQUIT because of sub-process
+	* cobc.c (get_signal_name): copied from libcob/common.c
+
 2020-05-26  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c (output_local_field_cache): use output_emit_field

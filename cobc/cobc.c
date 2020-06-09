@@ -2079,12 +2079,12 @@ cobc_abort_terminate (int should_be_reported)
 static void
 cobc_sig_handler (int sig)
 {
-#if defined (SIGINT) ||defined (SIGQUIT) || defined (SIGTERM) || defined (SIGPIPE)
+#if defined (SIGINT) || defined (SIGQUIT) || defined (SIGTERM) || defined (SIGPIPE)
 	int ret = 0;
 #endif
 
 	cobc_abort_msg ();
-#if defined (SIGINT) ||defined (SIGQUIT) || defined (SIGTERM) || defined (SIGPIPE)
+#if defined (SIGINT) || defined (SIGQUIT) || defined (SIGTERM) || defined (SIGPIPE)
 #ifdef SIGINT
 	if (sig == SIGINT) ret = 1;
 #endif
@@ -3785,11 +3785,109 @@ line_contains (char* line_start, char* line_end, char* search_patterns)
 }
 #endif
 
+
+/* LCOV_EXCL_START */
+static const char *
+get_signal_name (int signal_value)
+{
+	switch (signal_value) {
+#ifdef	SIGINT
+	case SIGINT:
+		return "SIGINT";
+#endif
+#ifdef	SIGHUP
+	case SIGHUP:
+		return "SIGHUP";
+#endif
+#ifdef	SIGQUIT
+	case SIGQUIT:
+		return "SIGQUIT";
+#endif
+#ifdef	SIGTERM
+	case SIGTERM:
+		return "SIGTERM";
+#endif
+#ifdef	SIGPIPE
+	case SIGPIPE:
+		return "SIGPIPE";
+#endif
+#ifdef	SIGSEGV
+	case SIGSEGV:
+		return "SIGSEGV";
+#endif
+#ifdef	SIGBUS
+	case SIGBUS:
+		return "SIGBUS";
+#endif
+#ifdef	SIGFPE
+	case SIGFPE:
+		return "SIGFPE";
+#endif
+	default:
+		return _("unknown");
+	}
+}
+/* LCOV_EXCL_STOP */
+
+static COB_INLINE COB_A_INLINE void
+output_return (const int status)
+{
+	if (verbose_output) {
+		fputs (_("return status:"), stderr);
+		fprintf (stderr, "\t%d\n", status);
+		fflush (stderr);
+	}
+}
+
+/* do system call, with handling verbose options and return */
+static int
+call_system (const char* command)
+{
+	int status;
+
+	if (verbose_output) {
+		cobc_cmd_print (command);
+	}
+	if (verbose_output < 0) {
+		return 0;
+	}
+
+#if 0	/* Is there a need to flush whatever we may have in our streams? */
+	fflush (stdout);
+	fflush (stderr);
+#endif
+
+	status = system (command);
+
+#ifdef	WIFSIGNALED
+	if (WIFSIGNALED (status)) {
+		int signal_value = WTERMSIG (status);
+#if 0
+		if (signal == SIGINT || signal == SIGQUIT) {
+			save_temps = 0;
+			cobc_clean_up (1);
+			cob_raise (signal);
+		}
+#endif
+		cobc_err_msg (_("external process \"%s\" ended with signal %s (%d)"),
+			command, get_signal_name (signal_value), signal_value);
+	}
+#endif
+#ifdef WEXITSTATUS
+	if (WIFEXITED (status)) {
+		status = WEXITSTATUS (status);
+	}
+#endif
+
+	output_return (status);
+	return status;
+}
+
+
 /** -j run job after build */
 static int
 process_run (const char *name)
 {
-	int		ret, status;
 	size_t		curr_size;
 	const char	*buffer;
 
@@ -3853,28 +3951,7 @@ process_run (const char *name)
 		strncat (cobc_buffer, " ", cobc_buffer_size);
 		strncat (cobc_buffer, cobc_run_args, cobc_buffer_size);
 	}
-	if (verbose_output) {
-		cobc_cmd_print (cobc_buffer);
-	}
-	if (verbose_output < 0) {
-		return 0;
-	}
-	status = system (cobc_buffer);
-#ifdef WEXITSTATUS
-	if (WIFEXITED(status)) {
-		ret = WEXITSTATUS(status);
-	} else {
-		ret = status;
-	}
-#else
-	ret = status;
-#endif
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", ret);
-		fflush (stderr);
-	}
-	return ret;
+	return call_system (cobc_buffer);
 }
 
 #ifdef	__OS400__
@@ -4052,19 +4129,7 @@ process (char *cmd)
 		if (cobc_gen_listing) {
 			strcat (buffptr, " OUTPUT(*PRINT)");
 		}
-		if (verbose_output) {
-			cobc_cmd_print (buffptr);
-		}
-		if (verbose_output >= 0) {
-			ret = system (buffptr);
-			if (verbose_output) {
-				fputs (_("return status:"), stderr);
-				fprintf (stderr, "\t%d\n", ret);
-				fflush (stderr);
-			}
-		} else {
-			ret = 0;
-		}
+		ret = call_system (buffptr);
 		if (comp_only || ret != 0) {
 			cobc_free (buffptr);
 			return ret;
@@ -4111,19 +4176,7 @@ process (char *cmd)
 	if (shared) {
 		strcat (buffptr, " EXPORT(*ALL)");
 	}
-	if (verbose_output) {
-		cobc_cmd_print (buffptr);
-	}
-	if (verbose_output >= 0) {
-		ret = system (buffptr);
-		if (verbose_output) {
-			fputs (_("return status:"), stderr);
-			fprintf (stderr, "\t%d\n", ret);
-			fflush (stderr);
-		}
-	} else {
-		ret = 0;
-	}
+	ret = call_system (buffptr);
 	cobc_free (buffptr);
 	return ret;
 }
@@ -4135,20 +4188,7 @@ process (char *cmd)
 static int
 process (const char *cmd)
 {
-	int ret;
-
-	if (verbose_output) {
-		cobc_cmd_print (cmd);
-	}
-	if (verbose_output < 0) {
-		return 0;
-	}
-	ret = system (cmd);
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", ret);
-		fflush (stderr);
-	}
+	int ret = call_system (cmd);
 	return !!ret;
 }
 
@@ -4233,11 +4273,8 @@ process_filtered (const char *cmd, struct filename *fn)
 	/* close pipe and get return code of cl.exe */
 	ret = !!_pclose (pipe);
 
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", ret);
-		fflush (stderr);
-	}
+
+	output_return (ret);
 	return ret;
 }
 
@@ -4268,35 +4305,12 @@ process (const char *cmd)
 		*p = 0;
 	}
 
-	if (verbose_output) {
-		cobc_cmd_print (buffptr);
-	}
-
-	ret = system (buffptr);
+	ret = call_system (buffptr);
 
 	if (unlikely(buffptr != cmd)) {
 		cobc_free (buffptr);
 	}
 
-#ifdef	WIFSIGNALED
-	if (WIFSIGNALED(ret)) {
-#ifdef	SIGINT
-		if (WTERMSIG(ret) == SIGINT) {
-			cob_raise (SIGINT);
-		}
-#endif
-#ifdef	SIGQUIT
-		if (WTERMSIG(ret) == SIGQUIT) {
-			cob_raise (SIGQUIT);
-		}
-#endif
-	}
-#endif
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", ret);
-		fflush (stderr);
-	}
 	return !!ret;
 }
 #endif
@@ -4412,15 +4426,7 @@ preprocess (struct filename *fn)
 			snprintf (cobc_buffer, cobc_buffer_size,
 				 "cobxref %s -R", fn->listing_file);
 			cobc_buffer[cobc_buffer_size] = 0;
-			if (verbose_output) {
-				cobc_cmd_print (cobc_buffer);
-			}
-			ret = system (cobc_buffer);
-			if (verbose_output) {
-				fputs (_("return status:"), stderr);
-				fprintf (stderr, "\t%d\n", ret);
-				fflush (stderr);
-			}
+			ret = call_system (cobc_buffer);
 			if (ret) {
 				fputs (_("'cobxref' execution unsuccessful"),
 					stderr);
@@ -4432,7 +4438,7 @@ preprocess (struct filename *fn)
 				putc ('\n', stderr);
 				fflush (stderr);
 			}
-			if (cb_listing_outputfile) {
+			if (cb_listing_outputfile && verbose_output >= 0) {
 				if (strcmp (cb_listing_outputfile, COB_DASH) == 0) {
 					cb_src_list_file = stdout;
 				} else {
@@ -4455,11 +4461,7 @@ preprocess (struct filename *fn)
 		cb_listing_file = NULL;
 	}
 
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", errorcount);
-		fflush (stderr);
-	}
+	output_return (errorcount);
 	return !!errorcount;
 }
 
@@ -6979,11 +6981,7 @@ process_translate (struct filename *fn)
 	/* Release flex buffers - After file close */
 	ylex_call_destroy ();
 
-	if (verbose_output) {
-		fputs (_("return status:"), stderr);
-		fprintf (stderr, "\t%d\n", ret);
-		fflush (stderr);
-	}
+	output_return (ret);
 
 	if (ret) {
 		/* If processing raised errors set syntax-only flag to not
