@@ -4905,10 +4905,10 @@ AT_DATA([prog.cob], [
                               BY CONTENT   p o
                               BY REFERENCE p o(2:).
 ])
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:9: error: duplicate USING BY REFERENCE item 'p'
-prog.cob:10: error: duplicate USING BY REFERENCE item 'p'
-prog.cob:13: error: duplicate USING BY REFERENCE item 'p'
+AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
+[prog.cob:9: warning: duplicate USING BY REFERENCE item 'p'
+prog.cob:10: warning: duplicate USING BY REFERENCE item 'p'
+prog.cob:13: warning: duplicate USING BY REFERENCE item 'p'
 ])
 AT_CLEANUP
 

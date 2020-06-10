@@ -6823,7 +6823,7 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 			if (x != cb_error_node) {
 				for (l2 = check_list; l2 != l; l2 = CB_CHAIN (l2)) {
 					if (cb_ref (CB_VALUE (l2)) == x) {
-						cb_error_x (l,
+						cb_warning_x (COBC_WARN_FILLER, l,
 							_("duplicate USING BY REFERENCE item '%s'"),
 							cb_name (CB_VALUE (l)));
 						CB_VALUE (l) = cb_error_node;
