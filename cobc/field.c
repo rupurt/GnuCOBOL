@@ -756,6 +756,7 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 	cb_tree	index_list = target->index_list;
 	cb_tree	external_definition = target->external_definition;
 	cb_tree	values = target->values;
+	cb_tree	like_modifier = target->like_modifier;
 
 	/* copy everything and restore */
 	memcpy (target, source, sizeof (struct cb_field));
@@ -796,16 +797,38 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 	}
 
 	/* duplicate and reset */
-	if (target->pic) {
-		target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
-	}
 	target->children = NULL;
 	target->sister = NULL;
 	target->flag_is_typedef = 0;
 
 	/* likely more to reset here ... */
-
-	copy_children (source, target, result_fld, level, storage);
+	if (!like_modifier) {
+		if (target->pic) {
+			target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
+		}
+		copy_children (source, target, result_fld, level, storage);
+	} else {
+		int modifier = cb_get_int (like_modifier);
+		if (modifier) {
+#if 0		/* TODO, also syntax-check for usage here */
+			if (target->cat is_numeric) {
+				sprintf (pic, "9(%d)", size_implied);
+			} else {
+				sprintf (pic, "X(%d)", size_implied);
+			}
+			target->pic = CB_PICTURE (cb_build_picture (pic));
+#else
+			if (target->pic) {
+				target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
+			}
+#endif
+		} else {
+			if (target->pic) {
+				target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
+			}
+		}
+		target->like_modifier = like_modifier;
+	}
 
 	/* adjust reference counter to allow "no codegen" if only used as type */
 	source->count--;

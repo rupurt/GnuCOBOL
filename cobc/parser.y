@@ -6777,7 +6777,7 @@ like_clause:
 		}
 		setup_external_definition ($2, 0);
 		current_field->like_modifier = $3;
-		CB_PENDING_X ($2, "LIKE clause");)
+		CB_PENDING_X ($2, "LIKE clause");
 	}
   }
 ;
