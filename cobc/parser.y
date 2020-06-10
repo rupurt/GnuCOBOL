@@ -1526,7 +1526,7 @@ set_current_field (cb_tree level, cb_tree name)
 }
 
 static void
-setup_external_definition (cb_tree x, const int is_type_name)
+setup_external_definition (cb_tree x, const int type)
 {
 	/* note: syntax checks for conflicting clauses
 	         are done in inherit_external_definition */
@@ -1535,11 +1535,13 @@ setup_external_definition (cb_tree x, const int is_type_name)
 		struct cb_field *f = CB_FIELD (cb_ref (x));
 
 		/* additional checks if the definition isn't provided by type */
-		if (!is_type_name) {
+		if (type != 1 /* called with SAME AS / LIKE data-name */ ) {
 			if (f->level == 88) {
 				cb_error (_("condition-name not allowed here: '%s'"), cb_name (x));
 				x = cb_error_node;
 			}
+			/* note: the following are not explicit specified but implied with
+			   LIKE as ILE-COBOL does not have those sections */
 			if (f->storage == CB_STORAGE_SCREEN) {
 				cb_error (_("SCREEN item cannot be used here"));
 				x = cb_error_node;
@@ -1547,14 +1549,18 @@ setup_external_definition (cb_tree x, const int is_type_name)
 				cb_error (_("REPORT item cannot be used here"));
 				x = cb_error_node;
 			}
-			if (f->flag_is_typedef) {
-				cb_error (_("TYPEDEF item cannot be used here"));
-				x = cb_error_node;
+			if (type == 0) {
+				/* rules that apply only to SAME AS */
+				if (f->flag_is_typedef) {
+					cb_error (_("TYPEDEF item cannot be used here"));
+					x = cb_error_node;
+				}
 			}
 		}
 
 		if (current_field->level == 77) {
-			if (f->children) {
+			if (type != 2 /* called with LIKE */
+			 && f->children) {
 				cb_error (_("elementary item expected"));
 				x = cb_error_node;
 			}
@@ -1619,7 +1625,7 @@ inherit_external_definition ()
 		current_field->flag_invalid = 1;
 	} else {
 		struct cb_field *fld = CB_FIELD (current_field->external_definition);
-		current_field = copy_into_field (fld, current_field, 1);
+		current_field = copy_into_field (fld, current_field);
 	}
 }
 
@@ -2650,6 +2656,7 @@ set_record_size (cb_tree min, cb_tree max)
 %token LESS
 %token LESS_OR_EQUAL		"LESS OR EQUAL"
 %token LEVEL_NUMBER		"level-number"		/* 01 thru 49, 77 */
+%token LIKE
 %token LIMIT
 %token LIMITS
 %token LINAGE
@@ -6717,6 +6724,7 @@ data_description_clause:
   redefines_clause
 | same_as_clause
 | typedef_clause
+| like_clause
 | external_clause
 | special_names_clause
 | global_clause
@@ -6757,6 +6765,33 @@ redefines_clause:
   }
 ;
 
+
+/* LIKE clause (ILE extension) */
+
+like_clause:
+  LIKE identifier_field _length_modifier
+  {
+	if (!check_repeated ("LIKE", SYN_CLAUSE_30, &check_pic_duplicate)) {
+		if (current_field->external_definition) {
+			emit_conflicting_clause_message ("TYPE TO", "SAME AS");
+		}
+		setup_external_definition ($2, 0);
+		current_field->like_modifier = $3;
+		CB_PENDING_X ($2, "LIKE clause");)
+	}
+  }
+;
+
+_length_modifier:
+  /* empty */	{ $$ = cb_int0; }
+| length_modifier;
+
+length_modifier:
+  TOK_OPEN_PAREN nonzero_numeric_literal TOK_CLOSE_PAREN
+  {
+	$$ = $2;
+  }
+;
 
 /* SAME AS clause ("AS" optional with RM-COBOL, not with COBOL2002+) */
 

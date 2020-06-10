@@ -649,8 +649,92 @@ cb_resolve_redefines (struct cb_field *field, cb_tree redefines)
 	return f;
 }
 
+static struct cb_field* copy_into_field_recursive (struct cb_field*, struct cb_field*);
+
+static void
+copy_children (struct cb_field *source, struct cb_field *target, struct cb_field *result_fld,
+	const int level, const enum cb_storage storage)
+{
+	if (source->children) {
+		cb_tree n, x;
+		int level_child;
+		if (source->children->level > level) {
+			level_child = source->children->level;
+		} else {
+			level_child = level + 1;
+			if (level_child == 66 || level_child == 77 || level_child == 88) {
+				level_child++;
+			}
+			if (level_child == 78) {
+				level_child = 79;
+			}
+		}
+
+		if (source->children->name) {
+			n = cb_build_reference (source->children->name);
+		} else {
+			n = cb_build_filler ();
+		}
+		x = cb_build_field_tree (NULL, n, target, storage, NULL, level_child);
+		if (x != cb_error_node) {
+			result_fld = copy_into_field_recursive (source->children, CB_FIELD (x));
+		}
+	}
+}
+
+static struct cb_field *
+copy_into_field_recursive (struct cb_field *source, struct cb_field *target)
+{
+	/* backup some entries */
+	struct cb_tree_common	common = target->common;
+	int		id = target->id;
+	int		level = target->level;
+	enum cb_storage storage = target->storage;
+	struct cb_field *parent = target->parent;
+	struct cb_field *redefines = target->redefines;
+	struct cb_field *result_fld = target;
+
+	/* copy everything and restore */
+	memcpy (target, source, sizeof (struct cb_field));
+
+	target->common = common;
+	target->id = id;
+	target->level = level;
+	target->storage = storage;
+	target->external_definition = NULL; /* set later after duplicating childs */
+	target->parent = parent;
+	target->redefines = redefines;
+
+	/* duplicate and reset */
+	if (target->pic) {
+		target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
+	}
+	target->children = NULL;
+	target->sister = NULL;
+	target->flag_is_typedef = 0;
+
+	/* likely more to reset here ... */
+
+	copy_children (source, target, result_fld, level, storage);
+
+	if (source->sister) {
+		/* for children: all sister entries need to be copied */
+		cb_tree n, x;
+		if (source->sister->name) {
+			n = cb_build_reference (source->sister->name);
+		} else {
+			n = cb_build_filler ();
+		}
+		x = cb_build_field_tree (NULL, n, target, storage, NULL, level);
+		if (x != cb_error_node) {
+			result_fld = copy_into_field_recursive (source->sister, CB_FIELD (x));
+		}
+	}
+	return result_fld;
+}
+
 struct cb_field *
-copy_into_field (struct cb_field *source, struct cb_field *target, const int first)
+copy_into_field (struct cb_field *source, struct cb_field *target)
 {
 	/* backup some entries */
 	struct cb_tree_common	common = target->common;
@@ -671,6 +755,7 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 	struct cb_field *index_qual = target->index_qual;
 	cb_tree	index_list = target->index_list;
 	cb_tree	external_definition = target->external_definition;
+	cb_tree	values = target->values;
 
 	/* copy everything and restore */
 	memcpy (target, source, sizeof (struct cb_field));
@@ -706,6 +791,9 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 #else
 	target->redefines = redefines;
 #endif
+	if (values) {
+		target->values = values;
+	}
 
 	/* duplicate and reset */
 	if (target->pic) {
@@ -717,48 +805,11 @@ copy_into_field (struct cb_field *source, struct cb_field *target, const int fir
 
 	/* likely more to reset here ... */
 
-	if (source->children) {
-		cb_tree n, x;
-		int level_child;
-		if (source->children->level > level) {
-			level_child = source->children->level;
-		} else {
-			level_child = level + 1;
-			if (level_child == 66 || level_child == 77 || level_child == 88) {
-				level_child++;
-			}
-			if (level_child == 78) {
-				level_child = 79;
-			}
-		}
+	copy_children (source, target, result_fld, level, storage);
 
-		if (source->children->name) {
-			n = cb_build_reference (source->children->name);
-		} else {
-			n = cb_build_filler ();
-		}
-		x = cb_build_field_tree (NULL, n, target, storage, NULL, level_child);
-		if (x != cb_error_node) {
-			result_fld = copy_into_field (source->children, CB_FIELD (x), 0);
-		}
-	}
-	if (first) {
-		/* adjust reference counter to allow "no codegen" if only used as type */
-		source->count--;
-		target->count--;
-	} else if (source->sister) {
-		/* for children: all sister entries need to be copied */
-		cb_tree n, x;
-		if (source->sister->name) {
-			n = cb_build_reference (source->sister->name);
-		} else {
-			n = cb_build_filler ();
-		}
-		x = cb_build_field_tree (NULL, n, target, storage, NULL, level);
-		if (x != cb_error_node) {
-			result_fld = copy_into_field (source->sister, CB_FIELD (x), 0);
-		}
-	}
+	/* adjust reference counter to allow "no codegen" if only used as type */
+	source->count--;
+	target->count--;
 	target->external_definition = external_definition;
 	return result_fld;
 }

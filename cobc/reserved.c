@@ -1659,6 +1659,9 @@ static struct cobc_reserved default_reserved_words[] = {
   { "LESS",			0, 0, LESS,			/* 2002 */
 				0, 0
   },
+  { "LIKE",			0, 0, LIKE,			/* ILE COBOL */
+				0, 0
+  },
   { "LIMIT",			0, 0, LIMIT,			/* 2002 */
 				0, 0
   },
