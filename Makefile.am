@@ -21,7 +21,7 @@
 
 include_HEADERS = libcob.h
 
-SUBDIRS = . lib libcob bin cobc config copy po doc extras tests
+SUBDIRS = . lib libcob bin cobc config copy po extras doc tests
 
 all: tarstamp.h defaults.h
 

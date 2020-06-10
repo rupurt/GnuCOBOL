@@ -10,6 +10,9 @@
 	  include specified VALUE clause from definition
 	* parser.y, reserved.c, tree.h: added parsing for LIKE clause as pending
 
+	* cobc.c: don't do pointer arithemetic on string constant (fixing Bug #644
+	  warning on MacOS)
+
 2020-06-09  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (call_system, output_return): new functions extracted from

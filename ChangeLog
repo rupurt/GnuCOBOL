@@ -1,4 +1,9 @@
 
+2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: Bug #644 (MacOS) check for declaration of fdatasync
+	* Makefile.am: build extras before documentation
+
 2020-05-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* DEPENDENCIES: new file, moved out of README

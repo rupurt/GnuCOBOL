@@ -3918,10 +3918,12 @@ process_run (const char *name)
 		}
 	} else {  /* executable */
 		/* only add COB_EXE_EXT if it is not specified */
+		const char *exe_ext = COB_EXE_EXT;
+		exe_ext++; /* drop the "." */
 		buffer = file_extension (name);
 		/* only prefix with ./ if there is no directory portion in name */
 		if (strchr (name, SLASH_CHAR) == NULL) {
-			if (COB_EXE_EXT[0] && strcasecmp (buffer, COB_EXE_EXT + 1)) {
+			if (COB_EXE_EXT[0] && strcasecmp (buffer, exe_ext)) {
 				curr_size = snprintf (cobc_buffer, cobc_buffer_size, ".%c%s%s",
 					SLASH_CHAR, name, COB_EXE_EXT);
 			} else {
@@ -3929,7 +3931,7 @@ process_run (const char *name)
 					SLASH_CHAR, name);
 			}
 		} else {
-			if (COB_EXE_EXT[0] && strcasecmp (buffer, COB_EXE_EXT + 1)) {
+			if (COB_EXE_EXT[0] && strcasecmp (buffer, exe_ext)) {
 				curr_size = snprintf (cobc_buffer, cobc_buffer_size, "%s%s",
 					name, COB_EXE_EXT);
 			} else {
@@ -7706,10 +7708,14 @@ process_link (struct filename *l)
 
 #ifdef	COB_STRIP_CMD
 	if (strip_output && ret == 0) {
+		const char *exe_ext = COB_EXE_EXT;
+		if (*exe_ext) {
+			exe_ext++; /* drop the "." */
+		}
 		cobc_chk_buff_size (strlen (COB_STRIP_CMD) + 3 + strlen (name) + strlen (COB_EXE_EXT));
 		/* only add COB_EXE_EXT if it is not specified */
 		exe_name = file_extension (name);
-		if (COB_EXE_EXT[0] && strcasecmp (exe_name, COB_EXE_EXT + 1)) {
+		if (strcasecmp (exe_name, exe_ext)) {
 			sprintf (cobc_buffer, "%s \"%s%s\"",
 				 COB_STRIP_CMD, name, COB_EXE_EXT);
 		} else {
