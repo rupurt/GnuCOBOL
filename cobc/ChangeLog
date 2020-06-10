@@ -1,7 +1,13 @@
 
+2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	Bug #635 added checks for duplicate USING BY REFERENCE items
+	* parser.y (emit_entry), typeck.c (cb_emit_call): collect BY REFERENCE
+	  items and check for duplicates
+
 2020-06-09  Simon Sobisch <simonsobisch@gnu.org>
 
-	* cobc.c (call_system. output_return): new functions extracted from
+	* cobc.c (call_system, output_return): new functions extracted from
 	  different places to have the nearly identical calls to system and the
 	  code handling verbosity and exit codes in one place
 	* cobc.c (call_system): don't raise SIGINT/SIGQUIT because of sub-process

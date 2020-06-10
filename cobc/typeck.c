@@ -3347,9 +3347,9 @@ cb_validate_program_data (struct cb_program *prog)
 		for (l = prog->apply_commit; l; l = CB_CHAIN(l)) {
 			cb_tree	l2 = CB_VALUE (l);
 			x = cb_ref (l2);
-			for (l2 = prog->apply_commit; l2 != l; l2 = CB_CHAIN(l2)) {
-				if (cb_ref (CB_VALUE (l2)) == x) {
-					if (x != cb_error_node) {
+			if (x != cb_error_node) {
+				for (l2 = prog->apply_commit; l2 != l; l2 = CB_CHAIN(l2)) {
+					if (cb_ref (CB_VALUE (l2)) == x) {
 						cb_error_x (l,
 							_("duplicate APPLY COMMIT target: '%s'"),
 							cb_name (CB_VALUE (l)));
@@ -6612,6 +6612,7 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 	      int call_line_number)
 {
 	cb_tree				l;
+	cb_tree				check_list;
 	cb_tree				x;
 	struct cb_field			*f;
 	const struct system_table	*psyst;
@@ -6676,7 +6677,7 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 	}
 
 	numargs = 0;
-
+	check_list = NULL;
 	for (l = par_using; l; l = CB_CHAIN (l), numargs++) {
 		x = CB_VALUE (l);
 		if (x == cb_error_node) {
@@ -6788,25 +6789,46 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 				continue;
 			}
 		}
-		if ((CB_REFERENCE_P (x) && CB_FIELD_P(CB_REFERENCE(x)->value)) ||
-		    CB_FIELD_P (x)) {
-			f = CB_FIELD_PTR (x);
+		if (CB_FIELD_P (x)) {	/* TODO: remove after 3.1 RC1 */
+			cobc_abort ("should be not be a field", 1);
+		}
+		if ((CB_REFERENCE_P (x) && CB_FIELD_P(CB_REFERENCE(x)->value))) {
+			f = CB_FIELD (cb_ref (x));
 			if (f->level == 88) {
 				cb_error_x (x, _("'%s' is not a valid data name"), CB_NAME (x));
 				error_ind = 1;
 				continue;
 			}
-			if (f->flag_any_length &&
-			    CB_PURPOSE_INT (l) != CB_CALL_BY_REFERENCE) {
+			if (CB_PURPOSE_INT (l) == CB_CALL_BY_REFERENCE) {
+				if (cb_warn_call_params) {
+					if (f->level != 01 && f->level != 77) {
+						cb_warning_x (cb_warn_call_params, x,
+							_("'%s' is not a 01 or 77 level item"), CB_NAME (x));
+					}
+				}
+				check_list = cb_list_add (check_list, x);
+			} else if (f->flag_any_length) {
 				cb_error_x (x, _("'%s' ANY LENGTH item not passed BY REFERENCE"), CB_NAME (x));
 				error_ind = 1;
 				continue;
 			}
-			if (cb_warn_call_params &&
-			    CB_PURPOSE_INT (l) == CB_CALL_BY_REFERENCE) {
-				if (f->level != 01 && f->level != 77) {
-					cb_warning_x (cb_warn_call_params, x,
-						_("'%s' is not a 01 or 77 level item"), CB_NAME (x));
+
+		}
+	}
+
+	if (check_list != NULL) {
+		for (l = check_list; l; l = CB_CHAIN (l)) {
+			cb_tree	l2 = CB_VALUE (l);
+			x = cb_ref (l2);
+			if (x != cb_error_node) {
+				for (l2 = check_list; l2 != l; l2 = CB_CHAIN (l2)) {
+					if (cb_ref (CB_VALUE (l2)) == x) {
+						cb_error_x (l,
+							_("duplicate USING BY REFERENCE item '%s'"),
+							cb_name (CB_VALUE (l)));
+						CB_VALUE (l) = cb_error_node;
+						break;
+					}
 				}
 			}
 		}
