@@ -1,6 +1,9 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.1-rc1/final to be released (in May/June 2020)
+ GnuCOBOL 3.1-final to be released (in Aug-Sept 2020)
+
+ 
+ GnuCOBOL 3.1-rc1 to be released (in June 2020)
 
 * New GnuCOBOL features
 
@@ -78,6 +81,10 @@ NEWS - user visible changes				-*- outline -*-
    Note: As a special case you may built-in cJSON by placing its source in
    the folder "libcob". If there is no working cJSON in the system or explicit
    specified by --with-cjson=local this version will be compiled into libcob.
+
+** To adjust the build system for GMP/MPIR you may use the new variables
+   GMP_CFLAGS / MPIR_CFLAGS and GMP_LIBS / MPIR_LIBS.
+   If unset configure will try pkg-config.
 
 ** To adjust configure to use libxml2 you may use the new variables XML2_CFLAGS
    and XML2_LIBS. If unset configure will use pkg-config / xml2-config.

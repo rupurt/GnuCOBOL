@@ -3785,7 +3785,7 @@ line_contains (char* line_start, char* line_end, char* search_patterns)
 }
 #endif
 
-
+#ifdef	WIFSIGNALED
 /* LCOV_EXCL_START */
 static const char *
 get_signal_name (int signal_value)
@@ -3828,6 +3828,7 @@ get_signal_name (int signal_value)
 	}
 }
 /* LCOV_EXCL_STOP */
+#endif
 
 static COB_INLINE COB_A_INLINE void
 output_return (const int status)

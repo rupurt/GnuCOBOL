@@ -28,7 +28,7 @@ AC_INIT([GnuCOBOL],
 	[bug-gnucobol@gnu.org],
 	[gnucobol],
 	[https://www.gnu.org/software/gnucobol/])
-AC_REVISION([GnuCOBOL snapshot $Revision: 2248 $])
+AC_REVISION([GnuCOBOL snapshot $Revision$])
 AC_CONFIG_SRCDIR([libcob.h])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_TESTDIR([tests])
@@ -519,6 +519,10 @@ if test "$COB_USES_GCC_NO_ICC" != yes -a "$enable_code_coverage" = "yes"; then
 fi
 
 
+# set PKG_CONFIG to use (cross-compile aware)
+PKG_PROG_PKG_CONFIG
+
+
 # Checks for gmp.
 AC_MSG_NOTICE([Checks for GMP/MPIR ...])
 
@@ -546,34 +550,72 @@ AC_ARG_WITH([math],
   [USE_MATH="check"])
 
 MYOLDLIBS=$LIBS
+MYOLDCPPFLAGS=$CPPFLAGS
 
-if test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"; then
-  AC_CHECK_HEADERS([gmp.h],
-    [AC_CHECK_LIB([gmp], [__gmpz_init],
-	  [USE_MATH="gmp"
-	   LIBCOB_LIBS="$LIBCOB_LIBS -lgmp"
-	   LIBS="$LIBS -lgmp"],
-	  [if test "$USE_MATH" = "gmp"; then
-         AC_MSG_ERROR([GMP library is required])
-       fi], [])],
-	[if test "$USE_MATH" = "gmp"; then
-	  AC_MSG_ERROR([gmp.h (GMP) is required])
-	fi], [])
-fi
+AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
+	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
+	PKG_CHECK_MODULES([GMP], [gmp], [], [#])
+	if test -n "$GMP_CFLAGS"; then
+	  CPPFLAGS="$CPPFLAGS $GMP_CFLAGS"
+	fi
+	if test -z "$GMP_LIBS"; then
+	  GMP_LIBS="-lgmp"
+	fi
+	LIBS="$LIBS $GMP_LIBS"
+	AC_CHECK_HEADERS([gmp.h],
+		[AC_CHECK_HEADERS([gmp.h], [
+		AC_MSG_CHECKING([if linking against libgmp with "$GMP_LIBS" works])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <gmp.h>]],
+		  [[mpz_t integ; mpz_init (integ);]])],
+		  [AC_MSG_RESULT([yes])
+		   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $GMP_CFLAGS"
+		   LIBCOB_LIBS="$LIBCOB_LIBS $GMP_LIBS"
+		   USE_MATH=gmp],
+		  [AC_MSG_RESULT([no])
+		   if test "$USE_MATH" = "gmp"; then 
+		     AC_MSG_ERROR([[GMP is required for --with-math=gmp, you may adjust GMP_LIBS]])
+		   fi
+		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"])
+		],
+		[if test "$USE_MATH" = "gmp"; then 
+		    AC_MSG_ERROR([gmp.h is required for --with-math=gmp, you may adjust GMP_CFLAGS])
+		 fi
+		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
+	)])
+])
 
-if test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"; then
-  AC_CHECK_HEADERS([mpir.h],
-    [AC_CHECK_LIB([mpir], [__gmpz_init],
-	  [USE_MATH="mpir"
-	   LIBCOB_LIBS="$LIBCOB_LIBS -lmpir"
-	   LIBS="$LIBS -lmpir"], 
-	  [if test "$USE_MATH" = "mpir"; then
-         AC_MSG_ERROR([MPIR library is required])
-       fi], [])],
-	[if test "$USE_MATH" = "mpir"; then
-	  AC_MSG_ERROR([mpir.h (MPIR) is required])
-	fi], [])
-fi
+AS_IF([test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"], [
+	# note: currently MPIR does not ship a .pc file, but is expected to follow GMP
+	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
+	PKG_CHECK_MODULES([MPIR], [mpir], [], [#])
+	if test -n "$MPIR_CFLAGS"; then
+	  CPPFLAGS="$CPPFLAGS $MPIR_CFLAGS"
+	fi
+	if test -z "$MPIR_LIBS"; then
+	  GMP_LIBS="-lmpir"
+	fi
+	LIBS="$LIBS $MPIR_LIBS"
+	AC_CHECK_HEADERS([mpir.h],
+		[AC_CHECK_HEADERS([mpir.h], [
+		AC_MSG_CHECKING([if linking against libmpir with "$MPIR_LIBS" works])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <mpir.h>]],
+		  [[mpz_t integ; mpz_init (integ);]])],
+		  [AC_MSG_RESULT([yes])
+		   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $MPIR_CFLAGS"
+		   LIBCOB_LIBS="$LIBCOB_LIBS $MPIR_LIBS"
+		   USE_MATH=mpir],
+		  [AC_MSG_RESULT([no])
+		   if test "$USE_MATH" = "mpir"; then 
+		     AC_MSG_ERROR([[MPIR is required for --with-math=mpir, you may adjust GMP_LIBS]])
+		   fi
+		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"])
+		],
+		[if test "$USE_MATH" = "mpir"; then 
+		    AC_MSG_ERROR([mpir.h is required for --with-math=mpir, you may adjust GMP_CFLAGS])
+		 fi
+		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
+	)])
+])
 
 if test "$USE_MATH" = "check"; then
 	AC_MSG_ERROR([neither GMP nor MPIR library are found, but one of those is mandatory])
@@ -644,14 +686,11 @@ else
 	AC_MSG_ERROR([Unable to use GMP - Please check config.log])
 fi
 
-LIBS=$MYOLDLIBS
+LIBS="$MYOLDLIBS"
+CPPFLAGS="$MYOLDCPPFLAGS"
 
 AC_CHECK_LIB([$USE_MATH], [__gmp_get_memory_functions],
  [AC_DEFINE([HAVE_MP_GET_MEMORY_FUNCTIONS], [1])], [], [])
-
-
-# set PKG_CONFIG to use (cross-compile aware)
-PKG_PROG_PKG_CONFIG
 
 
 # Configure options part II (needing compilation)
@@ -752,7 +791,7 @@ AS_IF([test "$with_cjson" = "yes" -o "$with_cjson" = "local" -o "$with_cjson" = 
 	  )
 	fi
 	CPPFLAGS="$curr_cppflags"
-	if test "$with_cjson_local" = "no"; then
+	AS_IF([test "$with_cjson_local" = "no"], [
 		AC_MSG_NOTICE([using local cJSON: no])
 		if test "$with_cjson" = "local"; then 
 		  AC_MSG_ERROR([[cJSON source is required in directory "libcob" for --with-cjson=local]])
@@ -795,12 +834,12 @@ AS_IF([test "$with_cjson" = "yes" -o "$with_cjson" = "local" -o "$with_cjson" = 
 		     with_cjson=no
 		   fi])
 		fi
-	else
+	], [
 		AC_MSG_NOTICE([using local cJSON: $with_cjson_local])
 		with_cjson="local"
 		AC_DEFINE([WITH_CJSON], [1])
 		AC_DEFINE([HAVE_CJSON_H], [1])
-	fi
+	])
 	LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
 ])
 
@@ -837,23 +876,18 @@ AC_DEFINE_UNQUOTED([WITH_VARSEQ], [$with_varseq])
 
 
 # Solaris has nanosleep in other libraries
-AC_MSG_CHECKING([for nanosleep])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <time.h>]],
   [[nanosleep (NULL, NULL);]])],
-  [AC_DEFINE([HAVE_NANO_SLEEP], [1]) AC_MSG_RESULT([yes])],
+  [AC_DEFINE([HAVE_NANO_SLEEP], [1])],
   [AC_CHECK_LIB([rt], [nanosleep], [], [], [])
    if test "x$ac_cv_lib_rt_nanosleep" = "xyes"; then
      AC_DEFINE([HAVE_NANO_SLEEP], [1])
-     AC_MSG_RESULT([yes])
      LIBCOB_LIBS="$LIBCOB_LIBS -lrt"
    else
      AC_CHECK_LIB([posix4], [nanosleep], [], [], [])
      if test "x$ac_cv_lib_posix4_nanosleep" = "xyes"; then
        AC_DEFINE([HAVE_NANO_SLEEP], [1])
-       AC_MSG_RESULT([yes])
        LIBCOB_LIBS="$LIBCOB_LIBS -lposix4"
-     else
-       AC_MSG_RESULT([no])
      fi
    fi])
 

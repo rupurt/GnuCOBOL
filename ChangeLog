@@ -1,4 +1,14 @@
 
+2020-06-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: use pkg-config for GMP and MPIR
+	* Makefile.am: build extras before documentation
+	* m4/m4_ax_check_define.m4: renamed to m4/ax_check_define.m4
+	* m4/m4_ax_code_coverage.m4: renamed to m4/ax_code_coverage.m4
+	* m4/fcntl-o.m4, m4/gettext.m4, m4/iconv.m4, m4/intdiv0.m4, m4/intl.m4,
+	  m4/intlmacosx.m4, m4/nls.m4, m4/po.m4, m4/progtest.m4, m4/size_max.m4,
+	  m4/visibility.m4: Upgrade to gettext-runtime-0.20.2.
+
 2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: Bug #644 (MacOS) check for declaration of fdatasync
@@ -170,7 +180,7 @@
 2018-08-19  Simon Sobisch <simonsobisch@gnu.org>
 
 	* m4/pkg.m4: added for PKG_PROG_PKG_CONFIG / PKG_CHECK_MODULES macros
-	  from current pkg-config release
+	  from current pkg-config release (0.29.2)
 	* configure.ac: included optional pkg-config (cross-compile aware),
 	  currently only used for libxml2 (and only if xml2-config not found);
 	  always check for existing header / linkable library for xml2

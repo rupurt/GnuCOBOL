@@ -7392,6 +7392,10 @@ get_screenio_and_mouse_info (char *version_buffer, size_t size, const int verbos
 		opt2 = PDC_version.is_wide;
 		opt3 = PDC_version.is_forced_utf8;
 	}
+#else
+	COB_UNUSED (opt1);
+	COB_UNUSED (opt2);
+	COB_UNUSED (opt3);
 #endif
 #else
 #define CURSES_CMP_MAJOR	(PDC_BUILD / 1000)
