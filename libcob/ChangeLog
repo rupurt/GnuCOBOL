@@ -1,4 +1,11 @@
 
+2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobgetopt.c: nearly redo the copy of GnuCOBOL's getopt implementation
+	  from gnulib's 2020 version (still without: libc parts, structure,
+	  more headers; undefine lock function calls, keep \n from msgids);
+	  most important user change: we honor environment POSIXLY_CORRECT now
+
 2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c: define fdatasync if missing (fixing Bug #644 warning on MacOS)
