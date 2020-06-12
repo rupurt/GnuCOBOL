@@ -148,13 +148,6 @@
 	* parser.y: new identifier_field (checked field-identifier),
 	  adjustment of some msgIds (obviously not part of any test before)
 
-2019-10-25  Edward Hart <edward.dan.hart@gmail.com>
-
-	* tree.c (cb_name_1): prevent buffer overflows (bug #586)
-	* parser.y (end_scope_of_program_name): free correct program when a
-	  nested program has the same name as a containing program (bug #587)
-	* codegen.c, parser.y: fixed minor memory leaks
-
 2019-12-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (sort_body): fixed class cast errors,
@@ -183,6 +176,17 @@
 	* flag.def, cobc.c: added flags for adjusted C source generation
 	  -fgen-c-line-directives and -fgen-c-labels
 	* codegen.c (output_cobol_info, output_c_info): added
+
+2019-10-27  Ron Norman <rjn@inglenet.com>
+
+	* tree.c: correct computing size of REPORT lines and fields
+
+2019-10-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* tree.c (cb_name_1): prevent buffer overflows (bug #586)
+	* parser.y (end_scope_of_program_name): free correct program when a
+	  nested program has the same name as a containing program (bug #587)
+	* codegen.c, parser.y: fixed minor memory leaks
 
 2019-10-17  Simon Sobisch <simonsobisch@gnu.org>
 
