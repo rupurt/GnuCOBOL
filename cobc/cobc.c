@@ -2562,27 +2562,27 @@ process_command_line (const int argc, char **argv)
 	int			list_intrinsics = 0;
 	int			list_system_names = 0;
 	int			list_system_routines = 0;
-#if defined (_WIN32) || defined (__DJGPP__)
-	int 			argnum;
-#endif
 	enum cob_exception_id	i;
 	char			ext[COB_MINI_BUFF];
 	char			*conf_label;	/* we want a dynamic address for erroc.c, not a static one */
 	char			*conf_entry;
 	const char		*copt = NULL;	/* C optimization options */
-#if defined (_MSC_VER)
-	const char		*extension;
-#endif
 
 	int			conf_ret = 0;
 	int			error_all_warnings = 0;
 
 #if defined (_WIN32) || defined (__DJGPP__)
-	/* Translate command line arguments from DOS/WIN to UNIX style */
-	argnum = 1;
-	while (++argnum <= argc) {
-		if (strrchr(argv[argnum - 1], '/') == argv[argnum - 1]) {
-			argv[argnum - 1][0] = '-';
+	if (!getenv ("POSIXLY_CORRECT")) {
+		/* Translate command line arguments from DOS/WIN to UNIX style */
+		int argnum = 0;
+		while (++argnum < argc) {
+			if (strrchr(argv[argnum], '/') == argv[argnum]) {
+				if (argv[argnum][1] == '?' && !argv[argnum][2]) {
+					argv[argnum] = "--help";
+					continue;
+				}
+				argv[argnum][0] = '-';
+			}
 		}
 	}
 #endif
@@ -3132,9 +3132,8 @@ process_command_line (const int argc, char **argv)
 				cobc_err_exit (COBC_INV_PAR, "-l");
 			}
 #ifdef	_MSC_VER
-			extension = file_extension (cob_optarg);
 			/* note: strcasecmp because of possible different specified extension */
-			if (!strcasecmp (extension, "lib")) {
+			if (!strcasecmp (file_extension (cob_optarg), "lib")) {
 				COBC_ADD_STR (cobc_libs, " \"", cob_optarg, "\"");
 			} else {
 				COBC_ADD_STR (cobc_libs, " \"", cob_optarg, ".lib\"");

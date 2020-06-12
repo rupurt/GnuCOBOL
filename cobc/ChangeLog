@@ -1,4 +1,10 @@
 
+2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (process_command_line) [_WIN32]: simplified code;
+	  only convert from /opt to -opt if POSIXLY_CORRECT is not set;
+	  added conversion from /? to --help
+
 2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	Bug #635 added checks for duplicate USING BY REFERENCE items

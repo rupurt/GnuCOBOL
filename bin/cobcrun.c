@@ -103,7 +103,7 @@ cobcrun_print_version (void)
 
 	printf ("cobcrun (%s) %s.%d\n",
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
-	puts ("Copyright (C) 2019 Free Software Foundation, Inc.");
+	puts ("Copyright (C) 2020 Free Software Foundation, Inc.");
 	puts (_("License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>"));
 	puts (_("This is free software; see the source for copying conditions.  There is NO\n"
 	        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
@@ -248,14 +248,19 @@ process_command_line (int argc, char *argv[])
 {
 	int			c, idx;
 	const char		*err_msg;
-#ifdef _WIN32
-	int			argnum;
-
-	/* Translate command line arguments from WIN to UNIX style */
-	argnum = 1;
-	while (++argnum <= argc) {
-		if (strrchr(argv[argnum - 1], '/') == argv[argnum - 1]) {
-			argv[argnum - 1][0] = '-';
+	
+#if defined (_WIN32) || defined (__DJGPP__)
+	if (!getenv ("POSIXLY_CORRECT")) {
+		/* Translate command line arguments from DOS/WIN to UNIX style */
+		int argnum = 0;
+		while (++argnum < argc) {
+			if (strrchr(argv[argnum], '/') == argv[argnum]) {
+				if (argv[argnum][1] == '?' && !argv[argnum][2]) {
+					argv[argnum] = "--help";
+					continue;
+				}
+				argv[argnum][0] = '-';
+			}
 		}
 	}
 #endif
