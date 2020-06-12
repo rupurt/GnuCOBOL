@@ -5,6 +5,8 @@
 	  from gnulib's 2020 version (still without: libc parts, structure,
 	  more headers; undefine lock function calls, keep \n from msgids);
 	  most important user change: we honor environment POSIXLY_CORRECT now
+	* move.c (cob_move_display_to_binary, cob_move_binary_to_display): approach
+	  to fix runtime error (overflow in assignment) recognized with bug #384
 
 2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
 
