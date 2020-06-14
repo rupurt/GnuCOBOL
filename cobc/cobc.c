@@ -3901,14 +3901,75 @@ process_run (const char *name)
 		name = output_name;
 		/* ensure enough space (output name) */
 		cobc_chk_buff_size (strlen (output_name) + 18);
-	} else {
-		name = file_basename (name, NULL);
 	}
 
-	if (cb_compile_level == CB_LEVEL_MODULE ||
-	    cb_compile_level == CB_LEVEL_LIBRARY) {
-		curr_size = snprintf (cobc_buffer, cobc_buffer_size, "cobcrun%s %s",
-			COB_EXE_EXT, name);
+	if (cb_compile_level == CB_LEVEL_MODULE
+	 || cb_compile_level == CB_LEVEL_LIBRARY) {
+		const char *cobcrun_path = getenv ("COBCRUN");
+		char* cobcrun_path_malloced = NULL;
+
+		if (!cobcrun_path || !cobcrun_path[0]) {
+			const char *cobc_path = getenv ("COBC");
+			char *cobc_path_malloced = NULL;
+			int cobc_path_length, i;
+			if (!cobc_path || !cobc_path[0]) {
+#if	defined(HAVE_CANONICALIZE_FILE_NAME)
+				/* Malloced path or NULL */
+				cobc_path_malloced = canonicalize_file_name (cb_saveargv[0]);
+#elif	defined(HAVE_REALPATH)
+				{
+					char *s = cobc_malloc ((size_t)COB_NORMAL_BUFF);
+					if (realpath (cb_saveargv[0], s) != NULL) {
+						cobc_path_malloced = cob_strdup (s);
+					}
+					cobc_free (s);
+				}
+	}
+#elif defined (_WIN32)
+				/* Malloced path or NULL */
+				cobc_path_malloced = _fullpath (NULL, cb_saveargv[0], 1);
+#endif
+			} else if (verbose_output > 1) {
+				fprintf (stderr, _("%s is resolved by environment as: %s"),
+					"COBC", cobc_path);
+				fputc ('\n', stderr);
+			}
+			if (cobc_path_malloced) {
+				cobc_path = cobc_path_malloced;
+			} else {
+				cobc_path = "cobc" COB_EXE_EXT;
+			}
+			cobc_path_length = (int)strlen (cobc_path);
+			/* note, we cannot subtract strlen (COB_EXE_EXT) as this may be called with/without it */
+			for (i = cobc_path_length - 4; i >= 0; i--) {
+				if (!strncasecmp ("cobc", cobc_path + i, 4)) {
+					size_t length = cobc_path_length + 3 + 1;
+					i += 4;
+					cobcrun_path_malloced = cobc_malloc (length);
+					memcpy (cobcrun_path_malloced, cobc_path, i);
+					memcpy (cobcrun_path_malloced + i, "run", 3);
+					memcpy (cobcrun_path_malloced + i + 3, cobc_path + i, length - i);
+					break;
+				}
+			}
+			if (cobc_path_malloced) {
+				cobc_free (cobc_path_malloced);
+			}
+			if (cobcrun_path_malloced) {
+				cobcrun_path = cobcrun_path_malloced;
+			} else {
+				cobcrun_path = "cobcrun" COB_EXE_EXT;
+			}
+		} else if (verbose_output > 1) {
+			fprintf (stderr, _("%s is resolved by environment as: %s"),
+				"COBCRUN", cobcrun_path);
+			fputc ('\n', stderr);
+		}
+		curr_size = snprintf (cobc_buffer, cobc_buffer_size, "%s %s",
+			cobcrun_path, name);
+		if (cobcrun_path_malloced) {
+			cobc_free (cobcrun_path_malloced);
+		}
 		/* strip period + COB_MODULE_EXT if specified */
 		if (output_name && curr_size < cobc_buffer_size) {
 			buffer = file_extension (output_name);
@@ -8250,7 +8311,13 @@ main (int argc, char **argv)
 	for (fn = file_list; fn; fn = fn->next) {
 		iparams++;
 		if (iparams == 1 && cobc_flag_run) {
-			run_name = fn->source;
+			if (fn->file_is_stdin
+			 && cb_compile_level == CB_LEVEL_EXECUTABLE) {
+				run_name = COB_DASH_OUT;
+			} else {
+				run_name = file_basename (fn->source, NULL);
+			}
+			run_name = cobc_strdup (run_name);
 		}
 		if (iparams > 1 && cb_compile_level == CB_LEVEL_EXECUTABLE) {
 			/* only the first source has the compile_level and main flag set */
@@ -8313,8 +8380,11 @@ main (int argc, char **argv)
 	}
 
 	/* Run job after compile? Use first (or only) filename */
-	if ((statuses == 0) && cobc_flag_run && run_name) {
-		status = process_run (file_basename(run_name, NULL));
+	if (run_name) {
+		if ((statuses == 0) && cobc_flag_run) {
+			status = process_run (run_name);
+		}
+		cobc_free ((void *)run_name);
 	}
 
 	/* We have completed */

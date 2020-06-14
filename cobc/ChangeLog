@@ -1,4 +1,13 @@
 
+2020-06-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (process_run): instead of hard-wired call of
+	  "cobcrun + COB_EXE_EXT" resolve its name by environment COBCRUN or,
+	  in case it isn't set, by cobc's fullpath with replacing cobc->cobcrun,
+	  fixing bug #573
+	* cobc.c (main, process_run): fix compile from stdin with job-run
+	* field.c (validate_any_length_item): allow ANY LENGTH for PIC 1
+
 2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (process_command_line) [_WIN32]: simplified code;

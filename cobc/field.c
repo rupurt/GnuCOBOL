@@ -1057,8 +1057,9 @@ validate_any_length_item (struct cb_field *f)
 				  f->name);
 		}
 	} else if (f->pic->category != CB_CATEGORY_ALPHANUMERIC
-			&& f->pic->category != CB_CATEGORY_NATIONAL) {
-		cb_error_x (x, _("'%s' ANY LENGTH must be PIC X or PIC N"),
+			&& f->pic->category != CB_CATEGORY_NATIONAL
+			&& f->pic->category != CB_CATEGORY_BOOLEAN) {
+		cb_error_x (x, _("'%s' ANY LENGTH must be PIC X, PIC N or PIC 1"),
 			  f->name);
 	}
 	/*
@@ -1075,7 +1076,7 @@ validate_any_length_item (struct cb_field *f)
 		return 1;
 	}
 
-	/* TO-DO: Why do we increase the reference counter here and not in another place? */
+	/* CHECKME: Why do we increase the reference counter here and not in another place? */
 	f->count++;
 	return 0;
 }
