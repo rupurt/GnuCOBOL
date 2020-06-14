@@ -3278,6 +3278,12 @@ cob_external_addr (const char *exname, const int exlength)
 {
 	struct cob_external *eptr;
 
+	/* special external "C" registers */
+	if (exlength == sizeof (int)
+	 && !strcmp (exname, "ERRNO")) {
+		return &errno;
+	}
+
 	/* Locate or allocate EXTERNAL item */
 	for (eptr = basext; eptr; eptr = eptr->next) {
 		if (!strcmp (exname, eptr->ename)) {
@@ -3327,7 +3333,7 @@ get_function_ptr_for_precise_time (void)
 }
 #endif
 
-/* Set the offset from UTC */
+/* split the timep to cob_time and set the offset from UTC */
 void
 static set_cob_time_from_localtime (time_t curtime, struct cob_time *cb_time) {
 
@@ -8192,10 +8198,7 @@ cob_init (const int argc, char **argv)
 #endif
 
 	if (argc && argv && argv[0]) {
-#ifdef	_WIN32
-		/* Returns malloced path or NULL */
-		cobglobptr->cob_main_argv0 = _fullpath (NULL, argv[0], 1);
-#elif	defined (HAVE_CANONICALIZE_FILE_NAME)
+#if	defined (HAVE_CANONICALIZE_FILE_NAME)
 		/* Returns malloced path or NULL */
 		cobglobptr->cob_main_argv0 = canonicalize_file_name (argv[0]);
 #elif	defined (HAVE_REALPATH)
@@ -8204,6 +8207,9 @@ cob_init (const int argc, char **argv)
 			cobglobptr->cob_main_argv0 = cob_strdup (s);
 		}
 		cob_free (s);
+#elif	defined	(_WIN32)
+		/* Returns malloced path or NULL */
+		cobglobptr->cob_main_argv0 = _fullpath (NULL, argv[0], 1);
 #endif
 		if (!cobglobptr->cob_main_argv0) {
 			cobglobptr->cob_main_argv0 = cob_strdup (argv[0]);
