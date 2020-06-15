@@ -1,6 +1,6 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.1-final to be released (in Aug-Sept 2020)
+ GnuCOBOL 3.1 final to be released (in Aug-Sept 2020)
 
  
  GnuCOBOL 3.1-rc1 to be released (in June 2020)
@@ -17,9 +17,12 @@ NEWS - user visible changes				-*- outline -*-
    
 ** CONTINUE AFTER statement (COBOL 202x) implemented, also handle fractions
    of seconds in C$SLEEP now
+   
+** TYPEDEF and SAME AS (COBOL 2002) implemented, including the MicroFocus
+   and RM/COBOL variants
 
 ** Improved support for different compiler extensions (ACUCOBOL, IBM,
-   Fujitsu, MicroFocus COBOL, Microsoft COBOL, RM/COBOL and more)
+   Fujitsu, MicroFocus COBOL, Microsoft COBOL, RM/COBOL, CA Realia and more)
 
 ** file handling: include support for a callable EXTFH interface also provided
    by several compilers including Micro Focus
@@ -30,7 +33,7 @@ NEWS - user visible changes				-*- outline -*-
    In turn `yourfh()` may call `EXTFH()` to use I/O functions from GnuCOBOL.
    The external file handler can also be directly invoked from COBOL, too,
    using `CALL "EXTFH"`.
-   ** Note: Not all flags contained in the FCD3 are handled already **
+   ** Note: Not each flag contained in the FCD3 is handled already **
    
 ** screen i/o: initial mouse support (for details see runtime.cfg),
    use of CURSOR clause in SPECIAL-NAMES for positioning on ACCEPT
@@ -44,9 +47,15 @@ NEWS - user visible changes				-*- outline -*-
    if used replace by standard "LINE / COL +/- integer"
 
 
-* Changed cobc options:
+* Changes to the COBOL compiler (cobc) options:
 
-  CHECKME - are there any?
+** adjustments to warning options:
+   -Wextra "new" option to enable every possible warning that is not dialect
+       specific (this option used to be called -W)
+   -Wadditional  new warning group for all warnings that don't have a group
+       on their own
+   -Wno-error and -Wno-error=<warning> to treat (specific <warning>s) not as error
+
 
 * Changes in the COBOL runtime (libcob)
 

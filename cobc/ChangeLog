@@ -7,6 +7,11 @@
 	* warning.def, help.c: define -Wextra with fallback -W
 	* cobc.c: implement -Wno-error[=warning]
 
+	* cobc.c (process_run): use of new COBC_NAME + COBCRUN_NAME now defined in
+	  defaults.h, if available use the fullname of the current process instead
+	  of fixed "cobc" to get the path for cobcrun, extract some code to
+	  resolve_name_from_cobc
+
 2020-06-14  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (process_run): instead of hard-wired call of

@@ -121,6 +121,9 @@ AH_TEMPLATE([HAVE_MP_GET_MEMORY_FUNCTIONS], [Do we have mp_get_memory_functions 
 AH_TEMPLATE([HAVE_FINITE_IEEEFP_H],
 	[Declaration of finite function in ieeefp.h instead of math.h])
 
+# preparation for cross-compilation
+AC_ARG_PROGRAM
+
 # Configure options part I (not needing any compilation)
 
 AC_ARG_ENABLE([debug],
@@ -270,7 +273,6 @@ AC_PROG_CC_STDC
 AC_PROG_CPP
 
 AC_USE_SYSTEM_EXTENSIONS
-
 
 # general flags for compiler and linker and tests for those
 AC_ARG_VAR([LIBCOB_CPPFLAGS], [see CPPFLAGS, but only applied during generation of libcob])
@@ -422,7 +424,7 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset setlocale fcntl strerror strcasecmp \
 	strchr strrchr strdup strstr strtol gettimeofday localeconv \
 	getexecname canonicalize_file_name popen raise readlink realpath \
-	setenv strcoll])
+	setenv strcoll flockfile])
 
 # Check for timezone
 AC_MSG_CHECKING([for timezone variable access])
@@ -1208,7 +1210,7 @@ AC_ARG_WITH([cisam],
     fi ],
   [])
 
-if test "$with_cisam" != "yes"; then
+AS_IF([test "$with_cisam" != "yes"], [
   AC_ARG_WITH([disam],
   [AS_HELP_STRING([--with-disam],
     [(GnuCOBOL) Use DISAM for ISAM I/O])],
@@ -1234,9 +1236,9 @@ if test "$with_cisam" != "yes"; then
 	unset cob_got_disam
     fi ],
   [])
-fi
+])
 
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes"; then
+AS_IF([test "$with_cisam" != "yes" -a "$with_disam" != "yes"], [
   AC_ARG_WITH([vbisam],
   [AS_HELP_STRING([--with-vbisam],
     [(GnuCOBOL) Use VBISAM for ISAM I/O])],
@@ -1250,9 +1252,9 @@ if test "$with_cisam" != "yes" -a "$with_disam" != "yes"; then
 		AC_MSG_ERROR([libvbisam >= 2.0 is required for VBISAM]), [])
     fi ],
   [])
-fi
+])
 
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes"; then
+AS_IF([test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes"], [
   AC_ARG_WITH([index-extfh],
   [AS_HELP_STRING([--with-index-extfh],
     [(GnuCOBOL) Use external ISAM file handler])],
@@ -1260,15 +1262,15 @@ if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "y
 	AC_DEFINE([WITH_INDEX_EXTFH], [1])
     fi ],
   [])
-fi
+])
 
-if test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes" -a "$with_index_extfh" != "yes"; then
+AS_IF([test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes" -a "$with_index_extfh" != "yes"], [
   AC_ARG_WITH([db],
   [AS_HELP_STRING([--with-db],
     [(GnuCOBOL) Use Berkeley DB >= 4.1 for ISAM I/O (default)])],
   [],
   [with_db=yes])
-fi
+])
 
 # Checks for db.
 if test "$with_db" = "yes"; then

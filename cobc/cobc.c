@@ -3927,6 +3927,44 @@ call_system (const char* command)
 }
 
 
+static const char *
+resolve_name_from_cobc (const char *cobc_path, const char *cobc_path_malloced)
+{
+	char *	cobcrun_path_malloced = NULL;
+
+	const char	*cobc_real_name;
+	size_t	cobc_name_length;
+	size_t	cobc_path_length;
+	int		i;
+
+	if (cobc_path != NULL) {
+		return NULL;
+	}
+
+	cobc_real_name = file_basename (cobc_path, NULL);
+	cobc_name_length = strlen (cobc_real_name);
+	cobc_path_length = (int)strlen (cobc_path);
+	/* note, we cannot subtract strlen (COB_EXE_EXT)
+	   as we may be called with/without it */
+	for (i = cobc_path_length - cobc_name_length; i >= 0; i--) {
+		if (!strncasecmp (cobc_real_name, cobc_path + i, cobc_name_length)) {
+			const size_t cobcrun_name_length = strlen (COBCRUN_NAME);
+			size_t length = cobc_path_length - cobc_name_length + cobcrun_name_length + 1;
+			cobcrun_path_malloced = cobc_malloc (length);
+			memcpy (cobcrun_path_malloced, cobc_path, i);
+			memcpy (cobcrun_path_malloced + i, COBCRUN_NAME, cobcrun_name_length);
+			length = cobc_path_length - i - cobc_name_length + 1;
+			memcpy (cobcrun_path_malloced + i + cobcrun_name_length, cobc_path + i + cobc_name_length, length);
+			break;
+		}
+	}
+	if (cobc_path_malloced) {
+		cobc_free (cobc_path_malloced);
+	}
+	return cobcrun_path_malloced;
+}
+
+
 /** -j run job after build */
 static int
 process_run (const char *name)
@@ -3954,7 +3992,7 @@ process_run (const char *name)
 		if (!cobcrun_path || !cobcrun_path[0]) {
 			const char *cobc_path = getenv ("COBC");
 			char *cobc_path_malloced = NULL;
-			int cobc_path_length, i;
+
 			if (!cobc_path || !cobc_path[0]) {
 #if	defined(HAVE_CANONICALIZE_FILE_NAME)
 				/* Malloced path or NULL */
@@ -3972,36 +4010,21 @@ process_run (const char *name)
 				/* Malloced path or NULL */
 				cobc_path_malloced = _fullpath (NULL, cb_saveargv[0], 1);
 #endif
+				if (cobc_path_malloced) {
+					cobc_path = cobc_path_malloced;
+				} else {
+					cobc_path = NULL;
+				}
 			} else if (verbose_output > 1) {
 				fprintf (stderr, _("%s is resolved by environment as: %s"),
 					"COBC", cobc_path);
 				fputc ('\n', stderr);
 			}
-			if (cobc_path_malloced) {
-				cobc_path = cobc_path_malloced;
-			} else {
-				cobc_path = "cobc" COB_EXE_EXT;
-			}
-			cobc_path_length = (int)strlen (cobc_path);
-			/* note, we cannot subtract strlen (COB_EXE_EXT) as this may be called with/without it */
-			for (i = cobc_path_length - 4; i >= 0; i--) {
-				if (!strncasecmp ("cobc", cobc_path + i, 4)) {
-					size_t length = cobc_path_length + 3 + 1;
-					i += 4;
-					cobcrun_path_malloced = cobc_malloc (length);
-					memcpy (cobcrun_path_malloced, cobc_path, i);
-					memcpy (cobcrun_path_malloced + i, "run", 3);
-					memcpy (cobcrun_path_malloced + i + 3, cobc_path + i, length - i);
-					break;
-				}
-			}
-			if (cobc_path_malloced) {
-				cobc_free (cobc_path_malloced);
-			}
+			cobcrun_path_malloced = resolve_name_from_cobc (cobc_path, cobc_path_malloced);
 			if (cobcrun_path_malloced) {
 				cobcrun_path = cobcrun_path_malloced;
 			} else {
-				cobcrun_path = "cobcrun" COB_EXE_EXT;
+				cobcrun_path = COBCRUN_NAME COB_EXE_EXT;
 			}
 		} else if (verbose_output > 1) {
 			fprintf (stderr, _("%s is resolved by environment as: %s"),

@@ -1,4 +1,9 @@
 
+2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: fixed missing use of AS_IF
+	* Makefile.am: include possibly transformed program names to defaults.h
+
 2020-06-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: use pkg-config for GMP and MPIR
