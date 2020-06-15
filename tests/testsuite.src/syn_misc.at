@@ -1698,7 +1698,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY -W prog.cob], [0], [],
+AT_CHECK([$COMPILE_ONLY -Wextra prog.cob], [0], [],
 [prog.cob:8: warning: source text after program-text area (column 72)
 ])
 
@@ -1732,19 +1732,19 @@ AT_DATA([prog_tmpl.cob], [
 # AT_DATA workaround via sed:
 AT_CHECK([sed -e 's/_$//' prog_tmpl.cob > prog.cob], [0], [], [])
 
-AT_CHECK([$COMPILE_ONLY -fixed -W prog.cob], [0], [],
+AT_CHECK([$COMPILE_ONLY -fixed -Wextra prog.cob], [0], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:11: warning: source text after program-text area (column 72)
 ])
 
-AT_CHECK([$COMPILE_ONLY -free -W prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY -free -Wextra prog.cob], [1], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: error: unknown statement 'This'
 ])
 
-AT_CHECK([$COMPILE_ONLY -F -W prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY -F -Wextra prog.cob], [1], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: error: unknown statement 'This'

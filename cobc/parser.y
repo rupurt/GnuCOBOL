@@ -5210,7 +5210,7 @@ file_status_clause:
 		 && !cb_relaxed_syntax_checks) {
 			cb_verify (CB_UNCONFORMABLE, "VSAM STATUS");
 		} else {
-			cb_warning (cb_warn_extra, _("%s ignored"), "VSAM STATUS");
+			cb_warning (cb_warn_additional, _("%s ignored"), "VSAM STATUS");
 		}
 	}
   }
@@ -5348,7 +5348,7 @@ record_delimiter_option:
 		cb_error (_("RECORD DELIMITER %s only allowed with SEQUENTIAL files"),
 			  "STANDARD-1");
 	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
-		cb_warning (cb_warn_extra,
+		cb_warning (cb_warn_additional,
 			    _("%s ignored"), "RECORD DELIMITER STANDARD-1");
 	}
   }
@@ -5383,7 +5383,7 @@ record_delimiter_option:
 	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER clause only allowed with (LINE) SEQUENTIAL files"));
 	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
-		cb_warning (cb_warn_extra,
+		cb_warning (cb_warn_additional,
 			    _("RECORD DELIMITER %s not recognized; will be ignored"), cb_name ($1));
 	}
   }
@@ -5892,7 +5892,7 @@ record_clause:
   {
 	check_repeated ("RECORD", SYN_CLAUSE_4, &check_duplicate);
 	if (current_file->organization == COB_ORG_LINE_SEQUENTIAL) {
-		cb_warning (cb_warn_extra, _("RECORD clause ignored for LINE SEQUENTIAL"));
+		cb_warning (cb_warn_additional, _("RECORD clause ignored for LINE SEQUENTIAL"));
 	} else {
 		set_record_size (NULL, $3);
 	}
@@ -5901,7 +5901,7 @@ record_clause:
   {
 	check_repeated ("RECORD", SYN_CLAUSE_4, &check_duplicate);
 	if (current_file->organization == COB_ORG_LINE_SEQUENTIAL) {
-		cb_warning (cb_warn_extra, _("RECORD clause ignored for LINE SEQUENTIAL"));
+		cb_warning (cb_warn_additional, _("RECORD clause ignored for LINE SEQUENTIAL"));
 	} else {
 		set_record_size ($3, $5);
 	}
@@ -6087,8 +6087,8 @@ code_set_clause:
 			CB_PENDING ("CODE-SET");
 			break;
 		default:
-			if (cb_warn_extra) {
-				cb_warning_x (cb_warn_extra, $3, _("ignoring CODE-SET '%s'"),
+			if (cb_warn_additional) {
+				cb_warning_x (cb_warn_additional, $3, _("ignoring CODE-SET '%s'"),
 						  cb_name ($3));
 			} else {
 				CB_PENDING ("CODE-SET");
@@ -7475,7 +7475,7 @@ _occurs_keys_and_indexed:
 	if (!cb_relaxed_syntax_checks) {
 		cb_error (_("INDEXED should follow ASCENDING/DESCENDING"));
 	} else {
-		cb_warning (cb_warn_extra, _("INDEXED should follow ASCENDING/DESCENDING"));
+		cb_warning (cb_warn_additional, _("INDEXED should follow ASCENDING/DESCENDING"));
 	}
   }
   occurs_keys

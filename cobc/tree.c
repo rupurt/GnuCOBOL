@@ -801,7 +801,7 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 		}
 		return 1;
 	}
-	cb_warning_x (cb_warn_extra, tree,
+	cb_warning_x (cb_warn_additional, tree,
 		_("FUNCTION '%s' has format in variable"), intr->name);
 	return 1;
 }
@@ -4258,7 +4258,7 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
 					_("size of record '%s' (%d) larger than maximum of file '%s' (%d)"),
 				 	  p->name, p->size, f->name, f->record_max);
-				if (cb_warn_extra
+				if (cb_warn_additional
 				 && cb_records_mismatch_record_clause != CB_ERROR
 				 && cb_records_mismatch_record_clause != CB_OK) {
 					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
@@ -5927,14 +5927,14 @@ cb_build_perform_varying (cb_tree name, cb_tree from, cb_tree by, cb_tree until)
 	p->from = from;
 	p->until = until;
 	if (until == cb_false) {
-		cb_warning_x (cb_warn_extra, until,
+		cb_warning_x (cb_warn_additional, until,
 			_("PERFORM FOREVER since UNTIL is always FALSE"));
 	} else if (until == cb_true) {
 		if (after_until) {
-			cb_warning_x (cb_warn_extra, until,
+			cb_warning_x (cb_warn_additional, until,
 			_("PERFORM ONCE since UNTIL is always TRUE"));
 		} else {
-			cb_warning_x (cb_warn_extra, until,
+			cb_warning_x (cb_warn_additional, until,
 			_("PERFORM NEVER since UNTIL is always TRUE"));
 		}
 	}

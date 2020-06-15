@@ -43,6 +43,64 @@ AT_CHECK([$COBC --list-system], [0], [ignore], [])
 AT_CLEANUP
 
 
+AT_SETUP([Compiler warnings])
+AT_KEYWORDS([runmisc cobc])
+
+AT_DATA([prog.cob],[
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        PROCEDURE DIVISION.
+        PERFORM UNTIL 0 = 1
+           DISPLAY 'BLA'
+        END-PERFORM.
+])
+AT_CHECK([$COBC -fsyntax-only prog.cob], [0], [], [])
+# increasing to more warnings
+AT_CHECK([$COBC -fsyntax-only -Wadditional prog.cob], [0], [],
+[prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE
+])
+# which in this case is also included in -Wall
+AT_CHECK([$COBC -fsyntax-only -Wall prog.cob], [0], [],
+[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE
+prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE
+])
+# -Wextra is more descriptive ...
+AT_CHECK([$COBC -fsyntax-only -Wextra prog.cob], [0], [],
+[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE
+prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE
+prog.cob:6: warning: DISPLAY statement not terminated by END-DISPLAY
+])
+# ... the old -W is in for backwards portability
+AT_CHECK([$COBC -fsyntax-only -W prog.cob], [0], [],
+[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE
+prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE
+prog.cob:6: warning: DISPLAY statement not terminated by END-DISPLAY
+])
+# a global "error" use implies no warning settings
+AT_CHECK([$COBC -fsyntax-only -Werror prog.cob], [0], [], [])
+# a concrete "error" use implies setting the warning
+AT_CHECK([$COBC -fsyntax-only -Werror=additional prog.cob], [1], [],
+[prog.cob:5: error [[-Werror]]: PERFORM FOREVER since UNTIL is always FALSE
+])
+# a "no-error" use implies nothing
+AT_CHECK([$COBC -fsyntax-only -Wno-error=additional prog.cob], [0], [], [])
+# ... now combined
+AT_CHECK([$COBC -fsyntax-only -Werror -Wno-error=additional prog.cob], [0], [], [])
+AT_CHECK([$COBC -fsyntax-only -Werror=additional -Wno-error prog.cob], [1], [],
+[prog.cob:5: error [[-Werror]]: PERFORM FOREVER since UNTIL is always FALSE
+])
+# TODO: unknown warnings should only get a diagnostic (in verbose mode)
+#AT_CHECK([$COBC -fsyntax-only -Wunknown-warning prog.cob], [0], [], [])
+#AT_CHECK([$COBC -fsyntax-only -Wno-unknown-warning prog.cob], [0], [], [])
+#AT_CHECK([$COBC -fsyntax-only -v -Wunknown-warning prog.cob], [0], [],
+#[cobc: unknown warning option 'unknown-warning'
+#])
+#AT_CHECK([$COBC -fsyntax-only -v -Wno-unknown-warning prog.cob], [0], [],
+#[cobc: unknown warning option 'unknown-warning'
+#])
+AT_CLEANUP
+
+
 AT_SETUP([Compiler outputs (general)])
 AT_KEYWORDS([runmisc cobc])
 
@@ -290,10 +348,6 @@ AT_CHECK([$COMPILE -q --thisoptiondoesntexist prog.cob], [1], [],
 # flag
 AT_CHECK([$COMPILE -q -flagdoesntexist prog.cob], [1], [],
 [cobc: unrecognized option '-flagdoesntexist'
-])
-# warning
-AT_CHECK([$COMPILE -q -Wdoesntexist prog.cob], [1], [],
-[cobc: unrecognized option '-Wdoesntexist'
 ])
 
 AT_CLEANUP

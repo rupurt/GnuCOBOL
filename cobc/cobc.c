@@ -547,10 +547,17 @@ static const struct option long_options[] = {
 	{"A",			CB_RQ_ARG, NULL, 'A'},
 	{"P",			CB_OP_ARG, NULL, 'P'},
 	{"Xref",		CB_NO_ARG, NULL, 'X'},
-	{"use-extfh",		CB_RQ_ARG, NULL, 9},	/* This is used by COBOL-IT; Same is -fcallfh= */
+	{"use-extfh",		CB_RQ_ARG, NULL, 9},	/* this is used by COBOL-IT; Same is -fcallfh= */
 	{"Wall",		CB_NO_ARG, NULL, 'W'},
+	{"Wextra",		CB_NO_ARG, NULL, 'Y'},		/* this option used to be called -W */
+#if 1
 	{"W",			CB_NO_ARG, NULL, 'Y'},
+#else /* TODO */
+	{"W",			CB_OP_ARG, NULL, 'Y'},
+	{"Wno",			CB_RQ_ARG, NULL, 'y'},		/* just a catch-all for unknown warnings */
+#endif
 	{"Werror",		CB_OP_ARG, NULL, 'Z'},
+	{"Wno-error",		CB_OP_ARG, NULL, 'z'},
 	{"tlines",		CB_RQ_ARG, NULL, '*'},
 	{"tsymbols",		CB_NO_ARG, &cb_listing_symbols, 1},		/* kept for backwards-compatibility */
 
@@ -3268,7 +3275,7 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 'w':
-			/* -w : Turn off all warnings (disables -W/-Wall if passed later) */
+			/* -w : Turn off all warnings (disables -Wall/-Wextra if passed later) */
 #define	CB_WARNDEF(var,name,doc)	var = 0;
 #define	CB_ONWARNDEF(var,name,doc)	var = 0;
 #define	CB_NOWARNDEF(var,name,doc)	var = 0;
@@ -3290,7 +3297,7 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 'Y':
-			/* -W : Turn on every warning */
+			/* -Wextra : Turn on every warning that is not dialect related */
 #define	CB_WARNDEF(var,name,doc)	var = 1;
 #define	CB_ONWARNDEF(var,name,doc)
 #define	CB_NOWARNDEF(var,name,doc)	var = 1;
@@ -3299,6 +3306,16 @@ process_command_line (const int argc, char **argv)
 #undef	CB_ONWARNDEF
 #undef	CB_NOWARNDEF
 			break;
+
+#if 0 /* TODO */
+		case 'y':
+			/* -Wunknown-option, -Wno-unknown-option: ignore with diagnostic */
+			if (verbose_output) {
+				cobc_err_msg (_("unknown warning option '%s'"),
+					cob_optarg);
+			}
+			break;
+#endif
 
 		case 'Z':
 			/* -Werror[=warning] : Treat all/single warnings as errors */
@@ -3322,6 +3339,32 @@ process_command_line (const int argc, char **argv)
 				}
 			} else {
 				error_all_warnings = 1;
+			}
+			break;
+
+		case 'z':
+			/* -Wno-error[=warning] : Treat all/single warnings as errors */
+			if (cob_optarg) {
+#define CB_CHECK_WARNING(var,name)  \
+				if (strcmp (cob_optarg, name) == 0	\
+				 && var == COBC_WARN_AS_ERROR) {	\
+					var = COBC_WARN_ENABLED;		\
+				} else
+#define	CB_WARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
+#define	CB_ONWARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
+#define	CB_NOWARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
+#include "warning.def"
+#undef	CB_CHECK_WARNING
+#undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
+#undef	CB_NOWARNDEF
+				/* note: ends block from last CB_CHECK_WARNING */
+				/* else */ if (verbose_output) {
+					cobc_err_msg (_("unknown warning option '%s'"),
+						cob_optarg);
+				}
+			} else {
+				error_all_warnings = 0;
 			}
 			break;
 

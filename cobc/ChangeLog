@@ -1,4 +1,12 @@
 
+2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #382 -Wextra instead of -W
+	* warning.def, cobc.c, error.c, field.c, tree.c, typeck.c, parser.y:
+	  renamed cb_warn_extra to cb_warn_additional
+	* warning.def, help.c: define -Wextra with fallback -W
+	* cobc.c: implement -Wno-error[=warning]
+
 2020-06-14  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (process_run): instead of hard-wired call of

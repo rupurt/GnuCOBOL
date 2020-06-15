@@ -1009,7 +1009,7 @@ create_implicit_picture (struct cb_field *f)
 	
 	/* Checkme: should we raise an error for !cb_relaxed_syntax_checks? */
 	if (!ret) {
-		cb_warning_x (cb_warn_extra, x, _("defining implicit picture size %d for '%s'"),
+		cb_warning_x (cb_warn_additional, x, _("defining implicit picture size %d for '%s'"),
 			    size_implied, cb_name (x));
 	}
 	if (is_numeric) {
@@ -1434,7 +1434,7 @@ warn_full_on_numeric_items_is_useless (const struct cb_field * const f)
 {
 	if ((f->screen_flag & COB_SCREEN_FULL)
 	    && f->pic && f->pic->category == CB_CATEGORY_NUMERIC) {
-		cb_warning_x (cb_warn_extra, CB_TREE (f),
+		cb_warning_x (cb_warn_additional, CB_TREE (f),
 			      _("FULL has no effect on numeric items; you may want REQUIRED or PIC Z"));
 	}
 }
@@ -1482,7 +1482,7 @@ warn_from_to_using_without_pic (const struct cb_field * const f)
 
 	if ((f->screen_from || f->screen_to) && !f->pic) {
 		/* TO-DO: Change to dialect option */
-		cb_warning_x (cb_warn_extra, x,
+		cb_warning_x (cb_warn_additional, x,
 			      _("'%s' has FROM, TO or USING without PIC; PIC will be implied"),
 			      cb_name (x));
 		/* TO-DO: Add setting of PIC below here or move warnings to the code which sets the PIC */
@@ -1496,7 +1496,7 @@ static int
 warn_pic_for_numeric_value_implied (const struct cb_field * const f)
 {
 	if (f->values && CB_NUMERIC_LITERAL_P (CB_VALUE (f->values))) {
-		cb_warning_x (cb_warn_extra, CB_TREE (f),
+		cb_warning_x (cb_warn_additional, CB_TREE (f),
 			      _("'%s' has numeric VALUE without PIC; PIC will be implied"),
 			      cb_name (CB_TREE (f)));
 		return 1;
@@ -2343,7 +2343,7 @@ compute_size (struct cb_field *f)
 
 		/* Groups */
 		if (f->flag_synchronized) {
-			cb_warning_x (cb_warn_extra, CB_TREE (f),
+			cb_warning_x (cb_warn_additional, CB_TREE (f),
 				_("ignoring SYNCHRONIZED for group item '%s'"),
 				cb_name (CB_TREE (f)));
 		}
@@ -2359,7 +2359,7 @@ unbounded_again:
 				    c->size * c->occurs_max >
 				    c->redefines->size * c->redefines->occurs_max) {
 					if (cb_larger_redefines_ok) {
-						cb_warning_x (cb_warn_extra, CB_TREE (c),
+						cb_warning_x (cb_warn_additional, CB_TREE (c),
 							_("size of '%s' larger than size of '%s'"),
 							c->name, c->redefines->name);
 						maxsz = c->redefines->size * c->redefines->occurs_max;
@@ -2616,7 +2616,7 @@ unbounded_again:
 	if (f->redefines && f->redefines->flag_external &&
 	    (f->size * f->occurs_max > f->redefines->size * f->redefines->occurs_max)) {
 		if (cb_larger_redefines_ok) {
-			cb_warning_x (cb_warn_extra, CB_TREE (f),
+			cb_warning_x (cb_warn_additional, CB_TREE (f),
 				_("size of '%s' larger than size of '%s'"),
 				f->name, f->redefines->name);
 		} else {
