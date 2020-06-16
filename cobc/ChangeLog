@@ -2,7 +2,14 @@
 2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (print_fields): minor improvement to the symbol listing:
-	  note EXTERNAL and BASED attributes
+	  note EXTERNAL, BASED and GLOBAL attributes
+	* field.c (pic_digits): changed type from int to unsigned char as it
+	  is used for accessing arrays
+
+	FR #193 work on TYPE TO / SAME AS, LIKE
+	* parser.y (usage_clause): fixes for USAGE type-name
+	* field.c (copy_into_field): first working draft for LIKE-integer,
+	  fixes for TYPE TO / USAGE type-name
 
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 

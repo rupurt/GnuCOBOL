@@ -7076,7 +7076,11 @@ usage_clause:
 					emit_conflicting_clause_message ("USAGE", "SAME AS / TYPE TO");
 				} else {
 					cb_verify (cb_usage_type_name, _("USAGE type-name"));
+					/* replace usage by type definition */
+					check_pic_duplicate &= ~SYN_CLAUSE_5;
+					check_repeated ("USAGE/TYPE", SYN_CLAUSE_31, &check_pic_duplicate);
 					setup_external_definition ($3, 1);
+					break;	/* everything done here */
 				}
 			}
 			YYERROR;

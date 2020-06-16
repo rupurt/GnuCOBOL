@@ -814,7 +814,7 @@ AT_CLEANUP
 
 
 AT_SETUP([COPY multiple files])
-AT_KEYWORDS([listing symbols BASED EXTERNAL])
+AT_KEYWORDS([listing symbols BASED EXTERNAL GLOBAL])
 
 AT_CAPTURE_FILE([prog.lst])
 
@@ -893,6 +893,8 @@ AT_DATA([tstcpybk.cob], [
               'Name:tstcpybk.cbl  Version:1.7.1  Date:2017-03-15'.
            03 FILLER         PIC X(002)     VALUE LOW-VALUES.
       *
+       77  GLOB              PIC 99         GLOBAL.
+      *
            COPY "copy-ws-1.inc".
            COPY "copy-ws-2.inc".
 
@@ -960,7 +962,9 @@ LINE    PG/LN  A...B............................................................
 000025                'Name:tstcpybk.cbl  Version:1.7.1  Date:2017-03-15'.
 000026             03 FILLER         PIC X(002)     VALUE LOW-VALUES.
 000027        *
-000028             COPY "copy-ws-1.inc".
+000028         77  GLOB              PIC 99         GLOBAL.
+000029        *
+000030             COPY "copy-ws-1.inc".
 000001C
 000002C        01  TEXTFILE-1-NAME          PIC X(080)     VALUE "TEXTFILE.1".
 000003C        01  TEXTFILE-1-OCFG          PIC X(001)     VALUE "C".
@@ -968,7 +972,7 @@ LINE    PG/LN  A...B............................................................
 000005C            88 TEXTFILE-1-IS-OPEN    VALUE "I", "O", "U".
 000006C        01  TEXTFILE-1-SIZE          PIC 9(004) EXTERNAL.
 000007C       *
-000029             COPY "copy-ws-2.inc".
+000031             COPY "copy-ws-2.inc".
 000001C
 000002C        01  TEXTFILE-2-NAME          PIC X(080)     VALUE "TEXTFILE.2".
 000003C        01  TEXTFILE-2-OCFG          PIC X(001)     VALUE "C".
@@ -976,13 +980,13 @@ LINE    PG/LN  A...B............................................................
 000005C            88 TEXTFILE-2-IS-OPEN    VALUE "I", "O", "U".
 000006C        01  TEXTFILE-2-SIZE          PIC 9(004).
 000007C       *
-000030
-000031         PROCEDURE DIVISION.
-000032         MAIN-PROCEDURE SECTION.
-000033         MAIN-PROCEDURE-0000.
-000034             CONTINUE.
-000035         MAIN-PROCEDURE-EXIT.
-000036             STOP RUN.
+000032
+000033         PROCEDURE DIVISION.
+000034         MAIN-PROCEDURE SECTION.
+000035         MAIN-PROCEDURE-0000.
+000036             CONTINUE.
+000037         MAIN-PROCEDURE-EXIT.
+000038             STOP RUN.
 
 SIZE  TYPE           LVL  NAME                           PICTURE
 
@@ -1000,6 +1004,8 @@ SIZE  TYPE           LVL  NAME                           PICTURE
 00016 ALPHANUMERIC   03   FILLER                         X(016)
 00064 ALPHANUMERIC   03   FILLER                         X(064)
 00002 ALPHANUMERIC   03   FILLER                         X(002)
+
+00002 ALPHANUMERIC   77   GLOB                           99 GLOBAL
 
 00080 ALPHANUMERIC   01   TEXTFILE-1-NAME                X(080)
 

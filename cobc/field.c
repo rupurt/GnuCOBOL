@@ -52,7 +52,7 @@ size_t			cb_needs_01 = 0;
 
 static struct cb_field	*last_real_field = NULL;
 static int		occur_align_size = 0;
-static const int	pic_digits[] = { 2, 4, 7, 9, 12, 14, 16, 18 };
+static const unsigned char	pic_digits[] = { 2, 4, 7, 9, 12, 14, 16, 18 };
 #define CB_MAX_OPS	32
 static int			op_pos = 1, op_val_pos;
 static char			op_type	[CB_MAX_OPS+1];
@@ -765,8 +765,16 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 	target->id = id;
 	target->level = level;
 	target->storage = storage;
+	/* note: GLOBAL is always applied from the original definition,
+	         the typedef has it only for its scope */
 	target->flag_is_global = global;
-	target->flag_external = external;
+	/* note: EXTERNAL is always applied from the typedef (if level (1/77),
+	         but may be specified on the field */
+	if (target->level != 1 && target->level != 77) {
+		target->flag_external = 0;
+	} else if (!target->flag_external) {
+		target->flag_external = external;
+	}
 	target->flag_occurs = occurs;
 	target->occurs_min = occurs_min;
 	target->occurs_max = occurs_max;
@@ -775,12 +783,8 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 	target->index_list = index_list;
 	target->index_qual = index_qual;
 	target->external_definition = NULL; /* set later after duplicating childs */
-	if (name) {
-		target->name = name;
-	}
-	if (ename) {
-		target->ename = ename;
-	}
+	target->name = name;
+	target->ename = ename;
 	target->parent = parent;
 #if 0 /* temporary code to resolve a redefine from the source, likely not reasonable... */
 	if (target->redefines) {
@@ -808,24 +812,75 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 		}
 		copy_children (source, target, result_fld, level, storage);
 	} else {
+		struct cb_picture* new_pic = NULL;
 		int modifier = cb_get_int (like_modifier);
-		if (modifier) {
+		if (modifier) {			
+			switch (target->usage) {
+
+			case CB_USAGE_COMP_X:
+			case CB_USAGE_COMP_N:
+				if (target->pic->category == CB_CATEGORY_ALPHANUMERIC) {
+					char		pic[8];
+					unsigned char		newsize;
+					if (target->pic->size > 8) {
+						newsize = 36;
+					} else {
+						newsize = pic_digits[target->pic->size - 1];
+					}
+					newsize += modifier;
+					if (newsize > 36) {
+						newsize = 36;
+					}
+					sprintf (pic, "9(%u)", newsize);
+					new_pic = CB_PICTURE (cb_build_picture (pic));
+					break;
+				}
+
+			case CB_USAGE_BINARY:
+			case CB_USAGE_PACKED:
+			case CB_USAGE_COMP_5:
+			case CB_USAGE_COMP_6:
+				if (target->pic->orig[0] == '9') {
+					char		pic[38];
+					/* only a prototype here,
+					   TODO: add handling for S and friends... */
+					if (modifier > 0) {
+						sprintf (pic, "9(%d)", modifier);
+						strcat (pic, target->pic->orig);
+						new_pic = CB_PICTURE (cb_build_picture (pic));
+					} else {
+						CB_PENDING_X (CB_TREE (target), "LIKE ... negative-integer");
+					}
+				} else {
+					cb_error_x (CB_TREE (target), _ ("%s clause not compatible with PIC %s"),
+						"LIKE", target->pic->orig);
+					target->flag_invalid = 1;
+				}
+				break;
+
+			case CB_USAGE_DISPLAY:
+			case CB_USAGE_NATIONAL:
+				break;
+
+			default:
+				cb_error_x (CB_TREE (target), _("%s clause not compatible with USAGE %s"),
+					"LIKE", cb_get_usage_string (target->usage));
+				target->flag_invalid = 1;
+			}
+ 
 #if 0		/* TODO, also syntax-check for usage here */
 			if (target->cat is_numeric) {
 				sprintf (pic, "9(%d)", size_implied);
 			} else {
 				sprintf (pic, "X(%d)", size_implied);
 			}
-			target->pic = CB_PICTURE (cb_build_picture (pic));
-#else
-			if (target->pic) {
-				target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
-			}
+			new_pic = CB_PICTURE (cb_build_picture (pic));
 #endif
-		} else {
-			if (target->pic) {
-				target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
-			}
+		}
+		if (new_pic) {
+			target->pic = new_pic;
+		} else if (target->pic) {
+			target->pic = CB_PICTURE (cb_build_picture (target->pic->orig));
 		}
 		target->like_modifier = like_modifier;
 	}
@@ -840,8 +895,8 @@ copy_into_field (struct cb_field *source, struct cb_field *target)
 static COB_INLINE COB_A_INLINE void
 emit_incompatible_pic_and_usage_error (cb_tree item, const enum cb_usage usage)
 {
-	cb_error_x (item, _("PICTURE clause not compatible with USAGE %s"),
-		    cb_get_usage_string (usage));
+	cb_error_x (item, _("%s clause not compatible with USAGE %s"),
+		    "PICTURE", cb_get_usage_string (usage));
 }
 
 static COB_INLINE COB_A_INLINE int
@@ -2058,7 +2113,7 @@ setup_parameters (struct cb_field *f)
 				f->pic = CB_PICTURE (cb_build_picture ("9(36)"));
 			} else {
 				char		pic[8];
-				sprintf (pic, "9(%d)", pic_digits[f->pic->size - 1]);
+				sprintf (pic, "9(%u)", pic_digits[f->pic->size - 1]);
 				f->pic = CB_PICTURE (cb_build_picture (pic));
 			}
 		}

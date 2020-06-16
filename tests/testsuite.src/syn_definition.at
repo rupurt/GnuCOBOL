@@ -1959,7 +1959,7 @@ AT_CLEANUP
 
 
 AT_SETUP([TYPEDEF clause])
-AT_KEYWORDS([definition EXTERNAL GLOBAL TYPE USAGE])
+AT_KEYWORDS([definition EXTERNAL GLOBAL TYPE USAGE listing symbols])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -2097,6 +2097,84 @@ AT_CHECK([$COMPILE_ONLY badprog.cob], [1], [],
 badprog.cob:11: error: illegal combination of TYPE TO with other clauses
 badprog.cob:12: error: elementary item expected
 ])
+
+AT_CAPTURE_FILE([symbols.lst])
+AT_CHECK([$COMPILE_ONLY -std=mf-strict -t symbols.lst -tsymbols -fno-tsource -fno-tmessages -tlines=0 prog.cob],
+[0], [], [])
+
+AT_DATA([prog.lst],
+[GnuCOBOL V.R.P               prog.cob                   DDD MMM dd HH:MM:SS YYYY
+
+SIZE  TYPE           LVL  NAME                           PICTURE
+
+      WORKING-STORAGE SECTION
+
+00050 ALPHANUMERIC   01   AUSGABE-FILE-NAME-T            X(50)
+
+00004 ALPHANUMERIC   01   DETAIL-NO-T                    9999
+
+00008 GROUP          01   AUSGABE-FILE-NAME-2T
+00004 ALPHANUMERIC   05   FILLER                         9999
+00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+
+00108 GROUP          01   MESSAGE-TEXT-2T
+00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
+00004 GROUP          02   FILLER, REDEFINES AUSGABE-FILE-NAME
+00004 ALPHANUMERIC   05   FILLER                         9999
+00008 GROUP          02   AUSGABE-FILE-NAME-2
+00004 ALPHANUMERIC   05   FILLER                         9999
+00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00050 ALPHANUMERIC   02   FILLER                         X(50)
+
+00112 GROUP          01   MESSAGE-TEXT-2 EXTERNAL
+00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
+00004 GROUP          02   FILLER
+00004 ALPHANUMERIC   05   FILLER                         9999
+00008 GROUP          02   AUSGABE-FILE-NAME-2
+00004 ALPHANUMERIC   05   FILLER                         9999
+00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00050 ALPHANUMERIC   02   FILLER                         X(50)
+
+00004 ALPHANUMERIC   77   OUTPUT-NAME                    9999 GLOBAL
+
+00008 GROUP          01   Z-MESSAGE-T2
+00004 ALPHANUMERIC   05   FILLER                         9999
+00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+
+00112 GROUP          01   Z-MESSAGE-T3
+00112 GROUP          49   MT3
+00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
+00004 GROUP          50   FILLER
+00004 ALPHANUMERIC   51   FILLER                         9999
+00008 GROUP          50   AUSGABE-FILE-NAME-2
+00004 ALPHANUMERIC   51   FILLER                         9999
+00004 ALPHANUMERIC   51   DETAIL-NO                      9999
+00050 ALPHANUMERIC   50   FILLER                         X(50)
+00112 GROUP          49   MT3-REN, REDEFINES MT3
+00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
+00004 GROUP          50   FILLER
+00004 ALPHANUMERIC   51   FILLER                         9999
+00008 GROUP          50   AUSGABE-FILE-NAME-2
+00004 ALPHANUMERIC   51   FILLER                         9999
+00004 ALPHANUMERIC   51   DETAIL-NO                      9999
+00050 ALPHANUMERIC   50   FILLER                         X(50)
+
+00018 ALPHANUMERIC   77   CALCULUS                       S9(15)V9(03)
+
+01818 GROUP          01   FILLER
+00018 NUMERIC        02   AMOUNT                         S9(15)V9(03)
+01800 GROUP          02   FILLER                         OCCURS 100
+00018 NUMERIC        05   GRP-AMOUNT                     S9(15)V9(03)
+
+
+])
+
+
+AT_CHECK([$UNIFY_LISTING symbols.lst symbols.lis once], [0], [], [])
+AT_CHECK([diff prog.lst symbols.lis], [0], [], [])
+
+
+
 
 AT_CLEANUP
 

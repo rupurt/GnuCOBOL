@@ -5026,6 +5026,9 @@ print_fields (struct cb_field *top, int *found)
 		if (top->flag_external) {
 			pd_off += sprintf (print_data + pd_off, " EXTERNAL");
 		}
+		if (top->flag_is_global) {
+			pd_off += sprintf (print_data + pd_off, " GLOBAL");
+		}
 		if (top->flag_item_based) {
 			pd_off += sprintf (print_data + pd_off, " BASED");
 		}
