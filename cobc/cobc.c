@@ -4002,7 +4002,6 @@ process_run (const char *name)
 					}
 					cobc_free (s);
 				}
-	}
 #elif defined (_WIN32)
 				/* Malloced path or NULL */
 				cobc_path_malloced = _fullpath (NULL, cb_saveargv[0], 1);
