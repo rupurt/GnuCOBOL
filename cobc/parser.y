@@ -1615,7 +1615,7 @@ inherit_external_definition ()
 {
 	/* note: REDEFINES (clause 1) is allowed with RM/COBOL but not COBOL 2002+ */
 	static const cob_flags_t	allowed_clauses =
-		SYN_CLAUSE_1 | SYN_CLAUSE_2 | SYN_CLAUSE_3 | SYN_CLAUSE_7;
+		SYN_CLAUSE_1 | SYN_CLAUSE_2 | SYN_CLAUSE_3 | SYN_CLAUSE_7 | SYN_CLAUSE_12;
 	cob_flags_t	tested = check_pic_duplicate & ~(allowed_clauses);
 	if (tested != SYN_CLAUSE_30 && tested != SYN_CLAUSE_31
 	 && tested != 0 /* USAGE as TYPE TO */) {
