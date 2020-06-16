@@ -5023,6 +5023,12 @@ print_fields (struct cb_field *top, int *found)
 				pd_off += sprintf (print_data + pd_off, "OCCURS %d", top->occurs_max);
 			}
 		}
+		if (top->flag_external) {
+			pd_off += sprintf (print_data + pd_off, " EXTERNAL");
+		}
+		if (top->flag_item_based) {
+			pd_off += sprintf (print_data + pd_off, " BASED");
+		}
 		if (top->redefines && !top->file) {
 			pd_off += sprintf (print_data + pd_off, ", REDEFINES %s", top->redefines->name);
 		}

@@ -1,4 +1,9 @@
 
+2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (print_fields): minor improvement to the symbol listing:
+	  note EXTERNAL and BASED attributes
+
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #382 -Wextra instead of -W

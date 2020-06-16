@@ -814,7 +814,7 @@ AT_CLEANUP
 
 
 AT_SETUP([COPY multiple files])
-AT_KEYWORDS([listing symbols])
+AT_KEYWORDS([listing symbols BASED EXTERNAL])
 
 AT_CAPTURE_FILE([prog.lst])
 
@@ -839,7 +839,7 @@ AT_DATA([copy-ws-1.inc], [
        01  TEXTFILE-1-OCFG          PIC X(001)     VALUE "C".
            88 TEXTFILE-1-NOTOPEN    VALUE "C".
            88 TEXTFILE-1-IS-OPEN    VALUE "I", "O", "U".
-       01  TEXTFILE-1-SIZE          PIC 9(004).
+       01  TEXTFILE-1-SIZE          PIC 9(004) EXTERNAL.
       *
 ])
 
@@ -887,7 +887,7 @@ AT_DATA([tstcpybk.cob], [
            COPY "copy-fd-2.inc".
 
        WORKING-STORAGE SECTION.
-       01  FILLER.
+       01  HEADER BASED.
            03 FILLER         PIC X(016)     VALUE 'FCSI CodeWerks:'.
            03 FILLER         PIC X(064)     VALUE
               'Name:tstcpybk.cbl  Version:1.7.1  Date:2017-03-15'.
@@ -954,7 +954,7 @@ LINE    PG/LN  A...B............................................................
 000006C       *
 000020
 000021         WORKING-STORAGE SECTION.
-000022         01  FILLER.
+000022         01  HEADER BASED.
 000023             03 FILLER         PIC X(016)     VALUE 'FCSI CodeWerks:'.
 000024             03 FILLER         PIC X(064)     VALUE
 000025                'Name:tstcpybk.cbl  Version:1.7.1  Date:2017-03-15'.
@@ -966,7 +966,7 @@ LINE    PG/LN  A...B............................................................
 000003C        01  TEXTFILE-1-OCFG          PIC X(001)     VALUE "C".
 000004C            88 TEXTFILE-1-NOTOPEN    VALUE "C".
 000005C            88 TEXTFILE-1-IS-OPEN    VALUE "I", "O", "U".
-000006C        01  TEXTFILE-1-SIZE          PIC 9(004).
+000006C        01  TEXTFILE-1-SIZE          PIC 9(004) EXTERNAL.
 000007C       *
 000029             COPY "copy-ws-2.inc".
 000001C
@@ -996,7 +996,7 @@ SIZE  TYPE           LVL  NAME                           PICTURE
 
       WORKING-STORAGE SECTION
 
-00082 GROUP          01   FILLER
+00082 GROUP          01   HEADER BASED
 00016 ALPHANUMERIC   03   FILLER                         X(016)
 00064 ALPHANUMERIC   03   FILLER                         X(064)
 00002 ALPHANUMERIC   03   FILLER                         X(002)
@@ -1007,7 +1007,7 @@ SIZE  TYPE           LVL  NAME                           PICTURE
       CONDITIONAL    88   TEXTFILE-1-NOTOPEN
       CONDITIONAL    88   TEXTFILE-1-IS-OPEN
 
-00004 ALPHANUMERIC   01   TEXTFILE-1-SIZE                9(004)
+00004 ALPHANUMERIC   01   TEXTFILE-1-SIZE                9(004) EXTERNAL
 
 00080 ALPHANUMERIC   01   TEXTFILE-2-NAME                X(080)
 
