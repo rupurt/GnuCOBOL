@@ -10027,12 +10027,9 @@ cb_build_move (cb_tree src, cb_tree dst)
 	}
 
 	if (CB_TREE_CLASS (dst) == CB_CLASS_POINTER
-	 && CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
-		return cb_build_assign (dst, src);
-	}
-	if (CB_TREE_CLASS (dst) == CB_CLASS_POINTER
 	 || CB_TREE_CLASS (src) == CB_CLASS_POINTER) {
-		if (cb_numeric_pointer) {
+		if (cb_numeric_pointer
+		 && CB_TREE_CLASS (dst) != CB_TREE_CLASS (src)) {
 			return CB_BUILD_FUNCALL_2 ("cob_move", src, dst);
 		}
 		return cb_build_assign (dst, src);
@@ -10126,7 +10123,11 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 			continue;
 		}
 		if (!tempval) {
+#if 0 /* CHECKME: this is way to much to cater for sum field */
 			m = cb_build_move (src, cb_check_sum_field(x));
+#else
+			m = cb_build_move (src, x);
+#endif
 		} else {
 			m = CB_BUILD_FUNCALL_1 ("cob_get_indirect_field", x);
 		}

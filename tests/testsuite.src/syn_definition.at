@@ -2111,55 +2111,55 @@ SIZE  TYPE           LVL  NAME                           PICTURE
 
 00050 ALPHANUMERIC   01   AUSGABE-FILE-NAME-T            X(50)
 
-00004 ALPHANUMERIC   01   DETAIL-NO-T                    9999
+00004 NUMERIC        01   DETAIL-NO-T                    9999
 
 00008 GROUP          01   AUSGABE-FILE-NAME-2T
-00004 ALPHANUMERIC   05   FILLER                         9999
-00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00004 NUMERIC        05   FILLER                         9999
+00004 NUMERIC        05   DETAIL-NO                      9999
 
 00108 GROUP          01   MESSAGE-TEXT-2T
 00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
 00004 GROUP          02   FILLER, REDEFINES AUSGABE-FILE-NAME
-00004 ALPHANUMERIC   05   FILLER                         9999
+00004 NUMERIC        05   FILLER                         9999
 00008 GROUP          02   AUSGABE-FILE-NAME-2
-00004 ALPHANUMERIC   05   FILLER                         9999
-00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00004 NUMERIC        05   FILLER                         9999
+00004 NUMERIC        05   DETAIL-NO                      9999
 00050 ALPHANUMERIC   02   FILLER                         X(50)
 
 00112 GROUP          01   MESSAGE-TEXT-2 EXTERNAL
 00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
 00004 GROUP          02   FILLER
-00004 ALPHANUMERIC   05   FILLER                         9999
+00004 NUMERIC        05   FILLER                         9999
 00008 GROUP          02   AUSGABE-FILE-NAME-2
-00004 ALPHANUMERIC   05   FILLER                         9999
-00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00004 NUMERIC        05   FILLER                         9999
+00004 NUMERIC        05   DETAIL-NO                      9999
 00050 ALPHANUMERIC   02   FILLER                         X(50)
 
-00004 ALPHANUMERIC   77   OUTPUT-NAME                    9999 GLOBAL
+00004 NUMERIC        77   OUTPUT-NAME                    9999 GLOBAL
 
 00008 GROUP          01   Z-MESSAGE-T2
-00004 ALPHANUMERIC   05   FILLER                         9999
-00004 ALPHANUMERIC   05   DETAIL-NO                      9999
+00004 NUMERIC        05   FILLER                         9999
+00004 NUMERIC        05   DETAIL-NO                      9999
 
 00112 GROUP          01   Z-MESSAGE-T3
 00112 GROUP          49   MT3
 00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
 00004 GROUP          50   FILLER
-00004 ALPHANUMERIC   51   FILLER                         9999
+00004 NUMERIC        51   FILLER                         9999
 00008 GROUP          50   AUSGABE-FILE-NAME-2
-00004 ALPHANUMERIC   51   FILLER                         9999
-00004 ALPHANUMERIC   51   DETAIL-NO                      9999
+00004 NUMERIC        51   FILLER                         9999
+00004 NUMERIC        51   DETAIL-NO                      9999
 00050 ALPHANUMERIC   50   FILLER                         X(50)
 00112 GROUP          49   MT3-REN, REDEFINES MT3
 00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
 00004 GROUP          50   FILLER
-00004 ALPHANUMERIC   51   FILLER                         9999
+00004 NUMERIC        51   FILLER                         9999
 00008 GROUP          50   AUSGABE-FILE-NAME-2
-00004 ALPHANUMERIC   51   FILLER                         9999
-00004 ALPHANUMERIC   51   DETAIL-NO                      9999
+00004 NUMERIC        51   FILLER                         9999
+00004 NUMERIC        51   DETAIL-NO                      9999
 00050 ALPHANUMERIC   50   FILLER                         X(50)
 
-00018 ALPHANUMERIC   77   CALCULUS                       S9(15)V9(03)
+00018 NUMERIC        77   CALCULUS                       S9(15)V9(03)
 
 01818 GROUP          01   FILLER
 00018 NUMERIC        02   AMOUNT                         S9(15)V9(03)

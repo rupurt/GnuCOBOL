@@ -1629,6 +1629,23 @@ inherit_external_definition ()
 	}
 }
 
+static cb_tree
+get_finalized_description_tree (void)
+{
+	struct cb_field *p;
+
+	/* finalize last field if target of SAME AS / TYPEDEF */
+	if (current_field && !CB_INVALID_TREE (current_field->external_definition)) {
+		inherit_external_definition ();
+	}
+
+	/* validate the complete current "block" */
+	for (p = description_field; p; p = p->sister) {
+		cb_validate_field (p);
+	}
+	return CB_TREE (description_field);
+}
+
 static void
 check_not_both (const cob_flags_t flag1, const cob_flags_t flag2,
 		const char *flag1_name, const char *flag2_name,
@@ -6344,16 +6361,7 @@ _record_description_list:
   }
   record_description_list
   {
-	struct cb_field *p;
-	/* finalize last field if target of SAME AS / TYPEDEF */
-	if (current_field && !CB_INVALID_TREE (current_field->external_definition)) {
-		inherit_external_definition ();
-	}
-
-	for (p = description_field; p; p = p->sister) {
-		cb_validate_field (p);
-	}
-	$$ = CB_TREE (description_field);
+	$$ = get_finalized_description_tree ();
   }
 ;
 
@@ -7005,13 +7013,13 @@ picture_clause:
 	check_repeated ("PICTURE", SYN_CLAUSE_4, &check_pic_duplicate);
 	current_field->pic = CB_PICTURE ($1);
 
-	if ($2 && $2 != cb_error_node) {
+	if (CB_VALID_TREE ($2)) {
 		if (  (current_field->pic->category != CB_CATEGORY_NUMERIC
 		    && current_field->pic->category != CB_CATEGORY_NUMERIC_EDITED)
 		 || strpbrk (current_field->pic->orig, " CRDB-*") /* the standard seems to forbid also ',' */) {
 			cb_error_x ($1, _("a locale-format PICTURE string must only consist of '9', '.', '+', 'Z' and the currency-sign"));
 		} else {
-			/* TODO: check that not in or part of CONSTANT RECORD */
+			/* TODO: check that not we're not within a CONSTANT RECORD */
 			CB_PENDING_X ($1, "locale-format PICTURE");
 		}
 	}
@@ -7823,18 +7831,14 @@ report_description:
   _report_description_options TOK_DOT
   _report_group_description_list
   {
-	struct cb_field *p;
+	$$ = get_finalized_description_tree ();
 
-	for (p = description_field; p; p = p->sister) {
-		cb_validate_field (p);
-	}
 	current_program->report_storage = description_field;
 	current_program->flag_report = 1;
 	if (current_report->records == NULL) {
 		current_report->records = description_field;
 	}
 	finalize_report (current_report, description_field);
-	$$ = CB_TREE (description_field);
   }
 ;
 
@@ -8495,12 +8499,8 @@ _screen_section:
   }
   _screen_description_list
   {
-	struct cb_field *p;
-
 	if (description_field) {
-		for (p = description_field; p; p = p->sister) {
-			cb_validate_field (p);
-		}
+		get_finalized_description_tree ();
 		current_program->screen_storage = description_field;
 		current_program->flag_screen = 1;
 	}

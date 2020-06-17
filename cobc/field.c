@@ -412,8 +412,8 @@ cb_build_field_tree (cb_tree level, cb_tree name, struct cb_field *last_field,
 	int			lv;
 
 	if (!expl_level) {
-		/* note: the level number is always a valid tree,
-		   the name may be a defined constant which leads to an error node here */
+		/* note: the level number is always a valid tree here, but the
+		   name may be a defined constant which leads to an error node */
 		if (name == cb_error_node) {
 			return cb_error_node;
 		}
@@ -2126,6 +2126,12 @@ setup_parameters (struct cb_field *f)
 			f->flag_binary_swap = 1;
 		}
 #endif
+		break;
+
+	case CB_USAGE_DISPLAY:
+		/* in case of usage display we often don't have the category
+		   setup correctly, work around this explicit resolving it here */
+		cb_tree_category (CB_TREE (f));
 		break;
 
 	default:

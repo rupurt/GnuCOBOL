@@ -1,4 +1,15 @@
 
+2020-06-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y (get_finalized_description_tree): extracted to remove
+	  duplicate code (part of it was missing in some old places)
+	* typeck.c (cb_build_move): simplified special handling for
+	  cb_numeric_pointer
+	* typeck.c (cb_emit_move): removed checking of rw-sum-field on nearly
+	  every codegen of a move instruction
+	* field.c (setup_parameters): early setup of tree category for fields with
+	  USAGE DISPLAY as this was broken for at least all unreferenced fields
+
 2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (print_fields): minor improvement to the symbol listing:
