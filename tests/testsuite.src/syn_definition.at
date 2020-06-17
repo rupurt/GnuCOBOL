@@ -1966,11 +1966,11 @@ AT_DATA([prog.cob], [
        PROGRAM-ID.      prog.
        DATA             DIVISION.
        WORKING-STORAGE  SECTION.
-       01 AUSGABE-FILE-NAME-T     PIC X(50) IS TYPEDEF.
-       01 DETAIL-NO-T             PIC 9999  IS TYPEDEF.
-       01 AUSGABE-FILE-NAME-2T              IS TYPEDEF.
+       01 AUSGABE-FILE-NAME-T          PIC X(50) IS TYPEDEF.
+       01 SOME-VERY-LONG-TYPEDEF-NAME  PIC 9999  IS TYPEDEF.
+       01 AUSGABE-FILE-NAME-2T         IS TYPEDEF.
           05 FILLER    PIC 9999.
-          05 DETAIL-NO USAGE DETAIL-NO-T.
+          05 DETAIL-NO USAGE SOME-VERY-LONG-TYPEDEF-NAME.
       *
        01  MESSAGE-TEXT-2T IS TYPEDEF.
          02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
@@ -1981,7 +1981,7 @@ AT_DATA([prog.cob], [
       *
        01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
       
-       77 OUTPUT-NAME USAGE DETAIL-NO-T GLOBAL.
+       77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
 
        01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
        01 Z-MESSAGE-T3.
@@ -1989,10 +1989,11 @@ AT_DATA([prog.cob], [
           49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
 
        77 CALCULUS             PIC S9(15)V9(03) IS TYPEDEF.
-       01 FILLER.
+       01 USER-TYPE            IS TYPEDEF.
           02 AMOUNT            USAGE CALCULUS.
           02 FILLER            OCCURS 100.
              05 GRP-AMOUNT     USAGE CALCULUS.
+       01 USER-VAR             USAGE USER-TYPE.
 
        PROCEDURE DIVISION.
            DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
@@ -2072,6 +2073,7 @@ prog.cob:25: error: USAGE type-name does not conform to COBOL 2002
 prog.cob:26: error: USAGE type-name does not conform to COBOL 2002
 prog.cob:30: error: USAGE type-name does not conform to COBOL 2002
 prog.cob:32: error: USAGE type-name does not conform to COBOL 2002
+prog.cob:33: error: USAGE type-name does not conform to COBOL 2002
 ])
 AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [0], [], [])
 AT_CHECK([$COMPILE_ONLY progstd.cob], [0], [], [])
@@ -2111,60 +2113,37 @@ SIZE  TYPE           LVL  NAME                           PICTURE
 
 00050 ALPHANUMERIC   01   AUSGABE-FILE-NAME-T            X(50)
 
-00004 NUMERIC        01   DETAIL-NO-T                    9999
+00004 NUMERIC        01   SOME-VERY-LONG-TYPEDEF-NAME    9999
 
 00008 GROUP          01   AUSGABE-FILE-NAME-2T
 00004 NUMERIC        05   FILLER                         9999
-00004 NUMERIC        05   DETAIL-NO                      9999
+00004 NUMERIC        05   DETAIL-NO                      SOME-VERY-LONG-TYPEDE...
 
 00108 GROUP          01   MESSAGE-TEXT-2T
-00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
+00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              AUSGABE-FILE-NAME-T
 00004 GROUP          02   FILLER, REDEFINES AUSGABE-FILE-NAME
 00004 NUMERIC        05   FILLER                         9999
-00008 GROUP          02   AUSGABE-FILE-NAME-2
-00004 NUMERIC        05   FILLER                         9999
-00004 NUMERIC        05   DETAIL-NO                      9999
-00050 ALPHANUMERIC   02   FILLER                         X(50)
+00008 GROUP          02   AUSGABE-FILE-NAME-2            AUSGABE-FILE-NAME-2T
+00050 ALPHANUMERIC   02   FILLER                         AUSGABE-FILE-NAME-T
 
-00112 GROUP          01   MESSAGE-TEXT-2 EXTERNAL
-00050 ALPHANUMERIC   02   AUSGABE-FILE-NAME              X(50)
-00004 GROUP          02   FILLER
-00004 NUMERIC        05   FILLER                         9999
-00008 GROUP          02   AUSGABE-FILE-NAME-2
-00004 NUMERIC        05   FILLER                         9999
-00004 NUMERIC        05   DETAIL-NO                      9999
-00050 ALPHANUMERIC   02   FILLER                         X(50)
+00112 GROUP          01   MESSAGE-TEXT-2                 MESSAGE-TEXT-2T EXTERNAL
 
-00004 NUMERIC        77   OUTPUT-NAME                    9999 GLOBAL
+00004 NUMERIC        77   OUTPUT-NAME                    SOME-VERY-LONG-TYPEDE... GLOBAL
 
-00008 GROUP          01   Z-MESSAGE-T2
-00004 NUMERIC        05   FILLER                         9999
-00004 NUMERIC        05   DETAIL-NO                      9999
+00008 GROUP          01   Z-MESSAGE-T2                   AUSGABE-FILE-NAME-2T
 
 00112 GROUP          01   Z-MESSAGE-T3
-00112 GROUP          49   MT3
-00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
-00004 GROUP          50   FILLER
-00004 NUMERIC        51   FILLER                         9999
-00008 GROUP          50   AUSGABE-FILE-NAME-2
-00004 NUMERIC        51   FILLER                         9999
-00004 NUMERIC        51   DETAIL-NO                      9999
-00050 ALPHANUMERIC   50   FILLER                         X(50)
-00112 GROUP          49   MT3-REN, REDEFINES MT3
-00050 ALPHANUMERIC   50   AUSGABE-FILE-NAME              X(50)
-00004 GROUP          50   FILLER
-00004 NUMERIC        51   FILLER                         9999
-00008 GROUP          50   AUSGABE-FILE-NAME-2
-00004 NUMERIC        51   FILLER                         9999
-00004 NUMERIC        51   DETAIL-NO                      9999
-00050 ALPHANUMERIC   50   FILLER                         X(50)
+00112 GROUP          49   MT3                            MESSAGE-TEXT-2T
+00112 GROUP          49   MT3-REN                        MESSAGE-TEXT-2T, REDEFINES MT3
 
 00018 NUMERIC        77   CALCULUS                       S9(15)V9(03)
 
-01818 GROUP          01   FILLER
-00018 NUMERIC        02   AMOUNT                         S9(15)V9(03)
+01818 GROUP          01   USER-TYPE
+00018 NUMERIC        02   AMOUNT                         CALCULUS
 01800 GROUP          02   FILLER                         OCCURS 100
-00018 NUMERIC        05   GRP-AMOUNT                     S9(15)V9(03)
+00018 NUMERIC        05   GRP-AMOUNT                     CALCULUS
+
+01818 GROUP          01   USER-VAR                       USER-TYPE
 
 
 ])

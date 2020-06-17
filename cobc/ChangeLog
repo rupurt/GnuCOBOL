@@ -10,6 +10,13 @@
 	* field.c (setup_parameters): early setup of tree category for fields with
 	  USAGE DISPLAY as this was broken for at least all unreferenced fields
 
+	FR #193 work on TYPE TO / SAME AS, LIKE
+	* tree.c (cb_ref_internal): don't consider items within a typedef as
+	  candidate for a reference
+	* cobc.c (set_picture): use originating field as USAGE/PICTURE
+	* cobc.c (print_fields): skip details in symbol listing for fields that
+	  only reference another field
+
 2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (print_fields): minor improvement to the symbol listing:

@@ -1216,7 +1216,7 @@ cb_tree_category (cb_tree x)
 	case CB_TAG_FIELD:
 		f = CB_FIELD (x);
 		if (f->children) {
-			/* CHECKME: may should be alphabetic/national depending on the content */
+			/* CHECKME: may should be alphabetic/national/... depending on the content */
 			x->category = CB_CATEGORY_ALPHANUMERIC;
 		} else if (f->usage == CB_USAGE_POINTER && f->level != 88) {
 			x->category = CB_CATEGORY_DATA_POINTER;
@@ -1226,7 +1226,7 @@ cb_tree_category (cb_tree x)
 			switch (f->level) {
 			case 66:
 				if (f->rename_thru) {
-					/* CHECKME: may should be alphabetic/national depending on the content */
+					/* CHECKME: may should be alphabetic/national/... depending on the content */
 					x->category = CB_CATEGORY_ALPHANUMERIC;
 				} else {
 					x->category = cb_tree_category (CB_TREE (f->redefines));
@@ -4593,6 +4593,10 @@ cb_ref_internal (cb_tree x, const int emit_error)
 		switch (CB_TREE_TAG (v)) {
 		case CB_TAG_FIELD: {
 			struct cb_field* fld = CB_FIELD (v);
+			/* ignore sub-items of typedefs */
+			if (fld->parent != NULL && cb_field_founder (fld)->flag_is_typedef) {
+				continue;
+			}
 			/* In case the value is a field, it might be qualified
 			   by its parent names and a file name */
 			if (fld->flag_indexed_by) {

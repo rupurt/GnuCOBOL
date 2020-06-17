@@ -4779,7 +4779,21 @@ set_picture (struct cb_field *field, char *picture, size_t picture_len)
 
 	memset (picture, 0, CB_LIST_PICSIZE);
 
-	/* Check non-picture information first */
+	/* check for external definition first */
+	if (field->external_definition) {
+		if (field->external_definition == cb_error_node) {
+			strcpy (picture, "INVALID");
+		} else {
+			const char *name = CB_FIELD (field->external_definition)->name;
+			strncpy (picture, name, picture_len);
+			if (strlen (name) > picture_len - 1) {
+				strcpy (picture + picture_len - 3, "...");
+			}
+		}
+		return 1;
+	}
+
+	/* Check non-picture information next */
 	switch (field->usage) {
 	case CB_USAGE_INDEX:
 	case CB_USAGE_LENGTH:
@@ -4949,7 +4963,7 @@ print_fields (struct cb_field *top, int *found)
 	int	get_cat;
 	int	got_picture;
 	int	old_level = 0;
-	size_t	picture_len = cb_listing_wide ? 64 : 24;
+	const size_t	picture_len = cb_listing_wide ? 64 : 24;
 	char	type[20];
 	char	picture[CB_LIST_PICSIZE];
 	char	lcl_name[LCL_NAME_LEN];
@@ -4975,16 +4989,15 @@ print_fields (struct cb_field *top, int *found)
 		if (top->children) {
 			strcpy (type, "GROUP");
 			get_cat = 0;
-			got_picture = 0;
-			if (top->level == 01 && !first) {
-				print_program_data ("");
+			if (!top->external_definition) {
+				got_picture = 0;
+			} else {
+				got_picture = set_picture (top, picture, picture_len);
 			}
-		} else if (top->level == 01) {
-			if (!first) {
-				print_program_data ("");
-			}
-		} else if (top->level == 77 && !first
-			   && old_level != 77) {
+		}
+		if ((top->level == 01
+		  || (top->level == 77 && old_level != 77))
+		 && !first) {
 			print_program_data ("");
 		}
 
@@ -5038,6 +5051,12 @@ print_fields (struct cb_field *top, int *found)
 
 		first = 0;
 		old_level = top->level;
+
+		/* skip printing of details for TYPEDEF / SAME-AS /LIKE */
+		if (top->external_definition) {
+			continue;
+		}
+
 		print_88_values (top);
 
 		if (top->children) {
