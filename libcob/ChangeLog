@@ -50,6 +50,12 @@
 	  added a runtime warning if the command resulted in a signal and
 	  translate the status via WEXITSTATUS if available
 
+2020-05-16  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c<-fisam.c (restorefileposition): Fixed bug #589 with
+	  READ PREVIOUS/DELETE/READ PREVIOUS when reading thru a group of
+	  duplicate keys
+
 2020-05-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c (get_line_and_col_from_field): refactored from
