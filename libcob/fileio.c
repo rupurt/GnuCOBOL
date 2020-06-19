@@ -2505,7 +2505,7 @@ restorefileposition (cob_file *f)
 		/* Read by record number */
 		isread (fh->isfd, (void *)fh->recwrk, ISEQUAL);
 		/* Read by current key value */
-		isstart (fh->isfd, &fh->key[f->curkey], 0,
+		isstart (fh->isfd, &fh->key[fh->curkey], 0,
 			 (void *)fh->recwrk, ISGTEQ);
 		isread (fh->isfd, (void *)fh->recwrk, ISGTEQ);
 		while (ISRECNUM != fh->saverecnum) {
