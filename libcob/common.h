@@ -2360,10 +2360,10 @@ COB_EXPIMP void cob_unlock_file	(cob_file *, cob_field *);
 COB_EXPIMP void cob_commit	(void);
 COB_EXPIMP void cob_rollback	(void);
 
-/*********************************************/
-/* EXTFH functions */
 
+/* functions in fileio.c for the MF style EXTFH interface */
 COB_EXPIMP int	EXTFH		(unsigned char *opcode, FCD3 *fcd);
+
 COB_EXPIMP void	cob_extfh_open		(int (*callfh)(unsigned char *opcode, FCD3 *fcd),
 					cob_file *, const int, const int, cob_field *);
 COB_EXPIMP void cob_extfh_close		(int (*callfh)(unsigned char *opcode, FCD3 *fcd),

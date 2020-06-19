@@ -253,8 +253,7 @@ indexed_cmpkey (struct indexfile *fh, unsigned char *data, int idx, int partlen)
 	for (part = 0; part < fh->key[idx].k_nparts && partlen > 0; part++) {
 		cl = partlen > fh->key[idx].k_part[part].kp_leng ? fh->key[idx].k_part[part].kp_leng : partlen;
 		sts = memcmp(	data  + fh->key[idx].k_part[part].kp_start,
-				fh->savekey + totlen,
-				cl);
+					fh->savekey + totlen, cl);
 		if (sts != 0) {
 			return sts;
 		}
@@ -1672,6 +1671,7 @@ cob_file_close (cob_file *f, const int opt)
 		} else {
 			if (f->fd >= 0) {
 				close (f->fd);
+				f->fd = -1;
 			}
 		}
 		if (opt == COB_CLOSE_NO_REWIND) {
@@ -2102,6 +2102,10 @@ relative_start (cob_file *f, const int cond, cob_field *k)
 		}
 		off = (off_t)kindex * relsize;
 		if (off >= st.st_size) {
+			if (kcond == COB_LT || kcond == COB_LE) {
+				kindex--;
+				continue;
+			}
 			break;
 		}
 		if (lseek (f->fd, off, SEEK_SET) == (off_t)-1) {
@@ -3386,9 +3390,11 @@ dobuild:
 		}
 		isfd = isopen ((void *)filename, omode | lmode | vmode);
 		if (isfd < 0) {
+			if (ISERRNO == EFLOCKED)
+				return COB_STATUS_61_FILE_SHARING;
 			if (f->flag_optional) {
-				if (mode == COB_OPEN_EXTEND ||
-				    mode == COB_OPEN_I_O) {
+				if (mode == COB_OPEN_EXTEND
+				 || mode == COB_OPEN_I_O) {
 					dobld = 1;
 					ret = COB_STATUS_05_SUCCESS_OPTIONAL;
 					goto dobuild;
@@ -3420,7 +3426,7 @@ dobuild:
 				if (fh->lenkey < indexed_keylen(fh, k)) {
 					fh->lenkey = indexed_keylen(fh, k);
 				}
-				/* Verify that COBOL keys match real ISAM keys */
+				/* Verify that COBOL keys match exactly to real ISAM keys */
 				len = indexed_keydesc(f, &kd, &f->keys[k]);
 				if (fh->lenkey < len) {
 					fh->lenkey = len;
@@ -3716,7 +3722,9 @@ dobuild:
 	}
 
 	f->open_mode = mode;
-	if (f->flag_optional && nonexistent) {
+	if (f->flag_optional 
+	 && nonexistent
+	 && mode != COB_OPEN_OUTPUT) {
 		return COB_STATUS_05_SUCCESS_OPTIONAL;
 	}
 	return 0;
@@ -4146,6 +4154,7 @@ indexed_read_next (cob_file *f, const int read_opts)
 					}
 					break;
 				case COB_LT:
+					isread (fh->isfd, (void *)f->record->data, ISPREV);
 					while (ISERRNO == 0
 					&& indexed_cmpkey(fh, f->record->data, fh->curkey, 0) >= 0) {
 						isread (fh->isfd, (void *)f->record->data, ISPREV);
@@ -4168,8 +4177,7 @@ indexed_read_next (cob_file *f, const int read_opts)
 			memcpy (f->record->data, fh->recwrk, f->record_max);
 			if (fh->lmode & ISLOCK) {
 				/* Now lock 'peek ahead' record */
-				if (isread (fh->isfd, (void *)f->record->data,
-				    ISCURR | fh->lmode)) {
+				if (isread (fh->isfd, (void *)f->record->data, ISCURR | fh->lmode)) {
 					ret = fisretsts (COB_STATUS_10_END_OF_FILE);
 				}
 			}
@@ -4204,7 +4212,10 @@ indexed_read_next (cob_file *f, const int read_opts)
 			} else {
 				switch (fh->startcond) {
 				case COB_LE:
-					domoveback = 0;
+					if(indexed_cmpkey(fh, f->record->data, fh->curkey, 0) > 0)
+						domoveback = 1;
+					else
+						domoveback = 0;
 					while (ISERRNO == 0
 					&& indexed_cmpkey(fh, f->record->data, fh->curkey, 0) == 0) {
 						isread (fh->isfd, (void *)f->record->data, ISNEXT);
@@ -4322,11 +4333,11 @@ indexed_read_next (cob_file *f, const int read_opts)
 
 	bdb_opts = read_opts;
 	if (bdb_env != NULL) {
-		if (f->open_mode != COB_OPEN_I_O ||
-		    (f->lock_mode & COB_FILE_EXCLUSIVE)) {
+		if (f->open_mode != COB_OPEN_I_O
+		 || (f->lock_mode & COB_FILE_EXCLUSIVE)) {
 			bdb_opts &= ~COB_READ_LOCK;
-		} else if ((f->lock_mode & COB_LOCK_AUTOMATIC) &&
-			   !(bdb_opts & COB_READ_NO_LOCK)) {
+		} else if ((f->lock_mode & COB_LOCK_AUTOMATIC) 
+			&& !(bdb_opts & COB_READ_NO_LOCK)) {
 			bdb_opts |= COB_READ_LOCK;
 		}
 		unlock_record (f);

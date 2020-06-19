@@ -724,8 +724,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -1168,8 +1168,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([cat file2], [0],
 [A4X
 A3XX
@@ -1249,8 +1249,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([cat file3], [0],
 [A4X
 A4*
@@ -1396,8 +1396,8 @@ AT_DATA([prog.cob], [
           END-IF.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -1448,8 +1448,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([cat file2], [0],
 [A4
 A3
@@ -3529,8 +3529,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CLEANUP
 
 
@@ -3700,8 +3700,8 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -3959,8 +3959,8 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -4235,9 +4235,9 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_MODULE fexists_signed.c], [0], , [])
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([unset COB_FILE_PATH && ./prog], [0])
+AT_CHECK([$COMPILE_MODULE fexists_signed.c], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([unset COB_FILE_PATH && ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -4272,8 +4272,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -4338,8 +4338,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -4378,7 +4378,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [(a   )
 (ab  )
@@ -4448,7 +4448,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [20: >+12345678++12345678+<
 19: >+12345678++12345678<
@@ -4522,7 +4522,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [20: >+12345678++12345678+<
 19: >+12345678++12345678<
@@ -4643,8 +4643,8 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -4713,9 +4713,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -4779,9 +4779,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -4847,9 +4847,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -4921,9 +4921,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -4993,9 +4993,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5028,8 +5028,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -5078,8 +5078,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -5140,7 +5140,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [20: >+12345678++12345678+<
 19: >+12345678++12345678<
@@ -5190,8 +5190,8 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -5260,7 +5260,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [22: >+12345678++12345678+<
 21: >+12345678++12345678<
@@ -5348,9 +5348,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5424,9 +5424,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5501,9 +5501,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5584,9 +5584,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5665,9 +5665,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5753,9 +5753,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 
 AT_CLEANUP
@@ -5834,7 +5834,7 @@ AT_DATA([prog2.cob], [
        working-storage section.
        1    fs pic xx.
        procedure division.
-           open i-o file1.
+           open input file1.
            move "X" to file1-key.
            read file1.
            if fs not = "00"
@@ -5844,9 +5844,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -5932,9 +5932,9 @@ AT_DATA([prog2.cob], [
            stop run.
 ])
 
-AT_CHECK([$COMPILE prog1.cob], [0], , [])
-AT_CHECK([$COMPILE prog2.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog1], [0])
+AT_CHECK([$COMPILE prog1.cob], [0], [], [])
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog1], [0], [], [])
 
 AT_CLEANUP
 
@@ -6012,8 +6012,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -6082,6 +6082,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
                DISPLAY "FAILED 1: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "AAB" TO f-key1-1
@@ -6091,6 +6092,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 3)
                DISPLAY "FAILED 2: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "AAA" TO f-key1-1
@@ -6100,6 +6102,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
                DISPLAY "FAILED 3: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "aab" TO f-key2-1
@@ -6109,6 +6112,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
                DISPLAY "FAILED 4: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "aab" TO f-key2-1
@@ -6118,6 +6122,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 3)
                DISPLAY "FAILED 5: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "aaa" TO f-key2-1
@@ -6127,6 +6132,7 @@ AT_DATA([prog.cob], [
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
                DISPLAY "FAILED 6: status " f-status
+                       "serial: " file1-serial
            END-IF
 
            MOVE "XX-" TO f-key3-1
@@ -6148,8 +6154,8 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -6314,8 +6320,8 @@ AT_DATA([prog.cob], [
           STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -6406,8 +6412,8 @@ AT_DATA([prog.cob], [
               move "Street: Rue des Anglais" to pipe-msg-out.
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], , [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([cat test-data-out], [0],
 [Name: M. Hulot
 Street: Rue des Anglais
@@ -7711,7 +7717,7 @@ AT_CLEANUP
 
 
 AT_SETUP([INDEXED File READ/DELETE/READ])
-AT_KEYWORDS([FileIo])
+AT_KEYWORDS([runfile READ DELETE])
 
 AT_SKIP_IF([test "$COB_HAS_ISAM" = "no"])
 

@@ -103,6 +103,13 @@
 
 	* numeric.c (cob_add_int): fixed floating-point case (bug #603)
 
+2019-10-19  Ron Norman <rjn@inglenet.com>
+
+	* fisam.c->fileio.c (indexed_read_next): correction for START LESS EQUAL
+	  followed by READ PREVIOUS
+	* fbdb.c->fileio.c (indexed_open) [WITH_DB]: correction to not return 05
+	  status when OPEN OUTPUT for an optional file
+
 2019-10-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c (pass_cursor_to_program): fixed return column being off by -1
@@ -266,6 +273,11 @@
 	  moved the actual sleep code from cob_sys_oc_nanosleep and cob_sys_sleep
 	  to a common place and finally allow fractions of seconds in C$SLEEP
 	* common.c, common.h (cob_continue_after): new function for FR #354
+
+2019-04-01  Ron Norman <rjn@inglenet.com>
+
+	* fileio.c (cob_file_close): reset internal fd reference on close
+	* fileio.c (relative_start): fix seek operation for "less"-conditions
 
 2019-03-25  Simon Sobisch <simonsobisch@gnu.org>
 
