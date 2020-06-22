@@ -9,7 +9,7 @@
 	  rewritten, now copies single attributes explicit instead of copying the
 	  complete source and restore some items later; re-create "local" fields
 	  like indices and keys for OCCURS in the target space
-	* field.c (copy_into_field): handle VALUE clause on source and target	  
+	* field.c (copy_into_field): handle VALUE clause on source and target
 
 	* parser.y (occurs_keys): removed unneeded NULL check
 	* parser.y (occurs_key_field): only build up field reference once and

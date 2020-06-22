@@ -1301,11 +1301,19 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 
 	nonexistent = 0;
 	errno = 0;
-	if (access (filename, F_OK) && errno == ENOENT) {
-		if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
-			return COB_STATUS_35_NOT_EXISTS;
+	if (access (filename, F_OK)) {
+		if (errno == ENOENT) {
+			if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
+				return COB_STATUS_35_NOT_EXISTS;
+			}
+			nonexistent = 1;
+#if 0 /* CHECKME: how to handle stuff like ENOTDIR here ?*/
+		} else if (errno == ENOTDIR) {
+				return COB_STATUS_30_PERMANENT_ERROR;
+		} else {
+			...
+#endif
 		}
-		nonexistent = 1;
 	}
 
 	fdmode = O_BINARY;
@@ -1364,7 +1372,6 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 		break;
 	case ENOENT:
 		if (mode == COB_OPEN_EXTEND || mode == COB_OPEN_OUTPUT) {
-
 			return COB_STATUS_30_PERMANENT_ERROR;
 		}
 		if (f->flag_optional) {
