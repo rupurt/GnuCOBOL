@@ -191,6 +191,7 @@ static cb_tree			save_tree;
 static cb_tree			start_tree;
 
 static unsigned int		check_unreached;
+static unsigned int		within_typedef_definition;
 static unsigned int		in_declaratives;
 static unsigned int		in_debugging;
 static unsigned int		current_linage;
@@ -675,6 +676,7 @@ setup_use_file (struct cb_file *fileptr)
 	}
 }
 
+/* note: same message in field.c */
 static int
 emit_duplicate_clause_message (const char *clause)
 {
@@ -1520,6 +1522,9 @@ set_current_field (cb_tree level, cb_tree name)
 	} else {
 		current_field = CB_FIELD (x);
 		check_pic_duplicate = 0;
+		if (current_field->level == 1 || current_field->level == 77) {
+			within_typedef_definition = 0;
+		}
 	}
 
 	return 0;
@@ -1611,7 +1616,7 @@ setup_external_definition_type (cb_tree x)
    inherits the definition of the original field specified
    by SAME AS or by type_name */
 static void
-inherit_external_definition ()
+inherit_external_definition (cb_tree lvl)
 {
 	/* note: REDEFINES (clause 1) is allowed with RM/COBOL but not COBOL 2002+ */
 	static const cob_flags_t	allowed_clauses =
@@ -1619,13 +1624,20 @@ inherit_external_definition ()
 	cob_flags_t	tested = check_pic_duplicate & ~(allowed_clauses);
 	if (tested != SYN_CLAUSE_30 && tested != SYN_CLAUSE_31
 	 && tested != 0 /* USAGE as TYPE TO */) {
+		struct cb_field *fld = CB_FIELD (current_field->external_definition);
 		cb_error_x (CB_TREE(current_field), _("illegal combination of %s with other clauses"),
-			CB_FIELD (current_field->external_definition)->flag_is_typedef ? "TYPE TO" : "SAME AS");
+			fld->flag_is_typedef ? "TYPE TO" : "SAME AS");
 		current_field->flag_is_verified = 1;
 		current_field->flag_invalid = 1;
 	} else {
 		struct cb_field *fld = CB_FIELD (current_field->external_definition);
-		current_field = copy_into_field (fld, current_field);
+		int new_level = lvl ? cb_get_level (lvl) : 0;
+		int old_level = current_field->level;
+		copy_into_field (fld, current_field);
+		if (new_level > 1 && new_level < 66 && new_level > old_level) {
+			cb_error_x (lvl, _("entry following %s may not be subordinate to it"),
+				fld->flag_is_typedef ? "TYPE TO" : "SAME AS");
+		}
 	}
 }
 
@@ -1636,7 +1648,7 @@ get_finalized_description_tree (void)
 
 	/* finalize last field if target of SAME AS / TYPEDEF */
 	if (current_field && !CB_INVALID_TREE (current_field->external_definition)) {
-		inherit_external_definition ();
+		inherit_external_definition (NULL);
 	}
 
 	/* validate the complete current "block" */
@@ -3418,6 +3430,7 @@ _program_body:
 	/* note:
 	   we also validate all references we found so far here */
 	cb_validate_program_data (current_program);
+	within_typedef_definition = 0;
   }
   _procedure_division
 ;
@@ -6378,7 +6391,7 @@ data_description:
   {
 	if (current_field && !CB_INVALID_TREE (current_field->external_definition)) {
 		/* finalize last field if target of SAME AS / type-name */
-		inherit_external_definition ();
+		inherit_external_definition ($1);
 	}
 	if (set_current_field ($1, $2)) {
 		YYERROR;
@@ -6830,6 +6843,7 @@ typedef_clause:
 	}
 	/* note: no explicit verification as all dialects with this reserved word use it */
 	current_field->flag_is_typedef = 1;
+	within_typedef_definition = 1;
 
 	if (current_field->level != 1 && current_field->level != 77) {
 		cb_error (_("%s only allowed at 01/77 level"), "TYPEDEF");
@@ -7498,24 +7512,22 @@ _occurs_keys_and_indexed:
 occurs_keys:
   occurs_key_list
   {
-	if ($1) {
-		cb_tree		l;
-		struct cb_key	*keys;
-		int		i;
-		int		nkeys;
+	cb_tree		l;
+	struct cb_key	*keys;
+	int		i;
+	int		nkeys;
 
-		l = $1;
-		nkeys = cb_list_length ($1);
-		keys = cobc_parse_malloc (sizeof (struct cb_key) * nkeys);
+	l = $1;
+	nkeys = cb_list_length ($1);
+	keys = cobc_parse_malloc (sizeof (struct cb_key) * nkeys);
 
-		for (i = 0; i < nkeys; i++) {
-			keys[i].dir = CB_PURPOSE_INT (l);
-			keys[i].key = CB_VALUE (l);
-			l = CB_CHAIN (l);
-		}
-		current_field->keys = keys;
-		current_field->nkeys = nkeys;
+	for (i = 0; i < nkeys; i++) {
+		keys[i].dir = CB_PURPOSE_INT (l);
+		keys[i].key = CB_VALUE (l);
+		l = CB_CHAIN (l);
 	}
+	current_field->keys = keys;
+	current_field->nkeys = nkeys;
   }
 ;
 
@@ -7527,29 +7539,21 @@ occurs_key_list:
 occurs_key_field:
   ascending_or_descending _key _is single_reference_list
   {
-	cb_tree l, item;
-	struct cb_field *field;
+	cb_tree ref = NULL;
+	cb_tree rchain = NULL;
+	cb_tree l;
+
+	/* create reference chaing all the way up
+	   as later fields may have same name */
+	if (!within_typedef_definition) {
+		rchain = cb_build_full_field_reference (current_field->parent);
+	}
 
 	for (l = $4; l; l = CB_CHAIN (l)) {
 		CB_PURPOSE (l) = $1;
-		item = CB_VALUE (l);
-		if (item == cb_error_node) {
-			continue;
-		}
-		/* internally reference-modify each of the given keys */
-		if (qualifier
-#if 0 /* Simon: those are never reference-modified ... */
-		  && !CB_REFERENCE(item)->chain
-#endif /* the following is perfectly fine and would raise a syntax error
-		  if we add the self-reference */
-		  && strcasecmp (CB_NAME(item), CB_NAME(qualifier))) {
-			/* reference by the OCCURS item */
-			CB_REFERENCE(item)->chain = qualifier;
-		}
-		/* reference all the way up as later fields may have same name */
-		for (field = CB_FIELD(cb_ref(qualifier))->parent; field; field = field->parent) {
-			if (field->flag_filler) continue;
-			CB_REFERENCE(item)->chain = cb_build_reference(field->name);
+		ref = CB_VALUE (l);
+		if (CB_VALID_TREE(ref)) {
+			CB_REFERENCE (ref)->chain = rchain;
 		}
 	}
 	keys_list = cb_list_append (keys_list, $4);
@@ -16939,7 +16943,9 @@ single_reference_list:
 single_reference:
   unqualified_word
   {
-	CB_ADD_TO_CHAIN ($1, current_program->reference_list);
+	if (!within_typedef_definition) {
+		CB_ADD_TO_CHAIN ($1, current_program->reference_list);
+	}
   }
 ;
 

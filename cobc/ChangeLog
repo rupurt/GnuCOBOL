@@ -1,4 +1,22 @@
 
+2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #193 work on TYPE TO / SAME AS, LIKE
+	* parser.y (inherit_external_definition): added missing syntax check
+	* parser.y (single_reference): don't add entries in typedef to
+	  reference_list as those are not accesible outside of it
+	* field.c (copy_into_field, copy_into_field_recursive): completely
+	  rewritten, now copies single attributes explicit instead of copying the
+	  complete source and restore some items later; re-create "local" fields
+	  like indices and keys for OCCURS in the target space
+	* field.c (copy_into_field): handle VALUE clause on source and target	  
+
+	* parser.y (occurs_keys): removed unneeded NULL check
+	* parser.y (occurs_key_field): only build up field reference once and
+	  reuse it for every key definition
+	* field.c, tree.h, parser.y (occurs_key_field): new function in field.c:
+	  cb_build_full_field_reference, extracted and simplified from parser.y
+
 2020-06-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y (get_finalized_description_tree): extracted to remove

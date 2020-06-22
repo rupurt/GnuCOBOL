@@ -1995,8 +1995,9 @@ extern int		cb_get_level (cb_tree);
 extern cb_tree		cb_build_field_tree (cb_tree, cb_tree, struct cb_field *,
 					     enum cb_storage, struct cb_file *,
 					     const int);
+extern cb_tree		cb_build_full_field_reference (struct cb_field *);
 extern struct cb_field	*cb_resolve_redefines (struct cb_field *, cb_tree);
-extern struct cb_field	*copy_into_field (struct cb_field *, struct cb_field *);
+extern void		copy_into_field (struct cb_field *, struct cb_field *);
 extern void		cb_validate_field (struct cb_field *);
 extern void		cb_validate_88_item (struct cb_field *);
 extern struct cb_field	*cb_validate_78_item (struct cb_field *, const cob_u32_t);
