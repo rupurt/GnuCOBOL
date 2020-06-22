@@ -1362,6 +1362,8 @@ typedef struct __cob_file {
 	unsigned char		file_version;		/* File I/O version */
 
 	unsigned char		flag_line_adv;		/* LINE ADVANCING */
+	short				curkey;			/* Current file index read sequentially */
+	short 				mapkey;			/* Remapped index number, when FD does not match file */
 
 } cob_file;
 
@@ -2345,6 +2347,8 @@ COB_EXPIMP void	cob_file_external_addr (const char *,
 COB_EXPIMP void	cob_file_malloc (cob_file **, cob_file_key **,
 				 const int nkeys, const int linage);
 COB_EXPIMP void	cob_file_free   (cob_file **, cob_file_key **);
+
+COB_EXPIMP int	cob_findkey (cob_file *, cob_field *, int *, int *);
 
 COB_EXPIMP void cob_open	(cob_file *, const int, const int, cob_field *);
 COB_EXPIMP void cob_close	(cob_file *, cob_field *, const int, const int);

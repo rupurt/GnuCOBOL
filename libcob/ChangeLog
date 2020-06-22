@@ -1,4 +1,12 @@
 
+2020-06-20  Ron Norman <rjn@inglenet.com>
+
+	* common.h: add mapkey to cob_file
+	* fileio.c<-fisam.c: Fix to handle old VBISAM that does not support
+	  sparse indexes
+	* fileio.c<-fisam.c,fbdb.c: Fix to return status 21 instead of 22
+	  when OPEN OUTPUT
+
 2020-06-16  Ron Norman <rjn@inglenet.com>
 
 	* call.c (cob_get_dbl_param, cob_put_dbl_param), common.h: new functions
@@ -103,6 +111,13 @@
 2020-02-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.h: definition of COB_A_NORETURN for newer HPUX (__HP_cc)
+
+2019-12-27  Ron Norman <rjn@inglenet.com>
+
+	* common.h: added cob_file.curkey to record recent file index
+	* fileio.c: cob_read_next will check for records returned with
+	  a key that has all SUPPRESS character and skip the record.
+	  This will handle old VBISAM which do not support key suppression.
 
 2019-10-25  Edward Hart <edward.dan.hart@gmail.com>
 
