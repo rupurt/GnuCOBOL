@@ -2039,10 +2039,8 @@ skip_to_eol (void)
 static void
 display_finish (void)
 {
-	int	msg_len;
-
 	if (!plex_skip_input) {
-		msg_len = strlen (display_msg) - 1;
+		int msg_len = strlen (display_msg) - 1;
 		while (msg_len != 0 && display_msg[msg_len] == ' ') {
 			display_msg[msg_len--] = 0;
 		}

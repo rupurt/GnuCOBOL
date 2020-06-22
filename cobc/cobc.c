@@ -1616,6 +1616,141 @@ cobc_check_valid_name (const char *name, const enum cobc_name_type prechk)
 	return 0;
 }
 
+/* Turn generation of runtime exceptions on/off */
+
+#define PENDING(x)		cb_warning (COBC_WARN_FILLER, _("'%s' not implemented"), x)
+unsigned int
+cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
+{
+	cob_u32_t ec_code, i;
+	struct cb_text_list	*ec, *ec_dupchk, *ec_file, *ec_file_ec;
+
+	unsigned char *upme;
+
+	if (to_on_off) {
+		cb_flag_source_location = 1;
+	}
+
+	for (ec = ec_list; ec; ec = ec->next) {
+		/* Extract exception code via text comparison */
+		ec_code = 0;
+		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
+			if (!strcasecmp (ec->text, CB_EXCEPTION_NAME (i))) {
+				ec_code = i;
+				break;
+			}
+		}
+
+		if (ec_code == 0) {
+			upme = (unsigned char *)ec->text;
+			for (i = 0; i < strlen(ec->text); ++i) {
+				if (islower (upme[i])) {
+					upme[i] = (cob_u8_t)toupper (upme[i]);
+				}
+			}
+			cb_error (_("invalid exception-name: %s"), ec->text);
+			return 1;
+		}
+
+		/* Duplicate check */
+		for (ec_dupchk = ec_list; ec_dupchk; ec_dupchk = ec_dupchk->next) {
+			if (ec_dupchk == ec) {
+				break;
+			}
+			if (!strcasecmp(ec->text, ec_dupchk->text)) {
+				cb_error (_("duplicate exception '%s'"), CB_EXCEPTION_NAME (ec_code));
+				ec_dupchk = NULL;
+				break;
+			}
+		}
+
+		
+		/* EC-ALL:
+		   Turn all exception conditions
+		*/
+		if (!strcmp(CB_EXCEPTION_NAME(ec_code),"EC-ALL")) {
+			for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
+				CB_EXCEPTION_ENABLE (i) = to_on_off;
+			}
+			continue;
+		}
+
+
+
+		
+		/* Simon: ToDo: Group activation; check occurences of EC-generation */
+
+		
+		/* Simon: ToDo:	Move save/restore of activated exceptions before preparse; after C generation
+						A dynamic save (only if changed) and restore (only if set) would be nice */
+
+
+
+
+
+		/* EC-I-O (complete set):
+		   Skip possible filenames in exception list then fall through
+		*/
+		if (!strncmp(CB_EXCEPTION_NAME(ec_code), "EC-I-O", 6)) {
+			ec_file_ec = ec;
+			for (ec_file = ec_file_ec->next; ec_file; ec_file = ec_file->next) {
+				/* Check entry for something else than a new exception */
+				if (strlen (ec_file->text) >= 3 && !strncasecmp (ec_file->text, "EC-", 3)) {
+					break;
+				}
+				ec = ec_file;
+				/* Pending message for first entry only, elsewise duplicate check */
+				if (ec_file == ec_file_ec->next) {
+					PENDING ("file specific exceptions");
+					ec_dupchk = ec_file;
+				} else {
+					for (ec_dupchk = ec_file_ec->next; ec_dupchk && ec_dupchk != ec_file;
+					     ec_dupchk = ec_dupchk->next) {
+						if (!strcasecmp(ec_file->text, ec_dupchk->text)) {
+							cb_error (_("duplicate filename '%s' for exception '%s'"),
+										ec_dupchk->text, CB_EXCEPTION_NAME (ec_code));
+							ec_dupchk = NULL;
+							break;
+							
+						}
+					}
+				}
+				if (ec_dupchk) {
+					cb_warning (COBC_WARN_FILLER, _("exception '%s' is turned on globally, not only for file '%s'"), 
+								CB_EXCEPTION_NAME (ec_code), ec_file->text);
+				}
+
+			}
+		}
+
+		/* Verified EC-xyz:
+		   Turn exception condition
+		*/
+		CB_EXCEPTION_ENABLE (ec_code) = to_on_off;
+	}
+	return 0;
+}
+
+static unsigned int
+cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
+{
+	struct cb_text_list	*cb_ec_list = NULL;
+
+	char	*p;
+	char	*q;
+
+	p = cobc_strdup (opt);
+	q = strtok (p, " ");
+	while (q) {
+		CB_TEXT_LIST_ADD (cb_ec_list, q);
+		q = strtok (NULL, " ");
+	}
+	cobc_free (p);
+
+	return cobc_turn_ec (cb_ec_list, to_on_off);
+
+}
+
 /* Local functions */
 
 static void
@@ -3263,6 +3398,20 @@ process_command_line (const int argc, char **argv)
 			cobc_deciph_funcs (cob_optarg);
 			break;
 
+		case 11:
+			/* -fenable-ec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW */
+			if (cobc_deciph_ec (cob_optarg, 1U)) {
+				cobc_err_exit (COBC_INV_PAR, "-fenable-ec");
+			};
+			break;
+
+		case 12:
+			/* -fdisable-ec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW */
+			if (cobc_deciph_ec (cob_optarg, 0)) {
+				cobc_err_exit (COBC_INV_PAR, "-fenable-ec");
+			};
+			break;
+
 		case 'A':
 			/* -A <xx> : Add options to C compile phase */
 			COBC_ADD_STR (cobc_cflags, " ", cob_optarg, NULL);
@@ -4455,6 +4604,7 @@ static int
 preprocess (struct filename *fn)
 {
 	const char		*sourcename;
+	struct cb_exception	save_exception_table[COB_EC_MAX];
 	int			save_source_format;
 	int			save_fold_copy;
 	int			save_fold_call;
@@ -4511,7 +4661,8 @@ preprocess (struct filename *fn)
 	plex_clear_vars ();
 	ppparse_clear_vars (cb_define_list);
 
-	/* Save default flags in case program directives change them */
+	/* Save default exceptions and flags in case program directives change them */
+	memcpy(save_exception_table, cb_exception_table, sizeof(struct cb_exception) * COB_EC_MAX);
 	save_source_format = cb_source_format;
 	save_fold_copy = cb_fold_copy;
 	save_fold_call = cb_fold_call;
@@ -4519,7 +4670,8 @@ preprocess (struct filename *fn)
 	/* Preprocess */
 	ppparse ();
 
-	/* Restore default flags */
+	/* Restore default exceptions and flags */
+	memcpy(cb_exception_table, save_exception_table, sizeof(struct cb_exception) * COB_EC_MAX);
 	cb_source_format = save_source_format;
 	cb_fold_copy = save_fold_copy;
 	cb_fold_call = save_fold_call;
@@ -8125,8 +8277,9 @@ begin_setup_internal_and_compiler_env (void)
 	cb_flag_computed_goto = 1;
 #endif
 
-	/* Enable default I/O exceptions */
-	CB_EXCEPTION_ENABLE (COB_EC_I_O) = 1;
+	/* Enable default I/O exceptions without source locations */
+	cobc_deciph_ec("EC-I-O", 1U);
+	cb_flag_source_location = 0;
 
 #ifndef	HAVE_DESIGNATED_INITS
 	cobc_init_reserved ();

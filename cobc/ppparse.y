@@ -641,6 +641,7 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %type <l>	alnum_list
 %type <l>	alnum_equality
 %type <l>	alnum_equality_list
+%type <l>	ec_list
 
 %type <r>	copy_replacing
 %type <r>	replacing_list
@@ -653,6 +654,7 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %type <ui>	_also
 %type <ui>	_last
 %type <ui>	lead_trail
+%type <ui>	on_or_off
 
 %%
 
@@ -1026,19 +1028,38 @@ leap_second_directive:
 turn_directive:
   ec_list CHECKING on_or_off
   {
-	CB_PENDING (_("TURN directive"));
+	cobc_turn_ec ($1, $3);
   }
 ;
 
 ec_list:
   VARIABLE_NAME
+  {
+	$$ = ppp_list_add (NULL, $1);
+  }
 | ec_list VARIABLE_NAME
+  {
+	$$ = ppp_list_add ($1, $2);
+  }
 ;
 
 on_or_off:
-  /* Empty */
+  on_with_loc
+  {
+	$$ = 2U;
+  }
+| ON
+  {
+	$$ = 1U;
+  }
 | OFF
-| ON with_loc
+  {
+	$$ = 0;
+  }
+;
+
+on_with_loc:
+  ON with_loc
 | with_loc
 ;
 

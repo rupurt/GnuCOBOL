@@ -367,6 +367,7 @@ COB_EXCEPTION  (1203, COB_EC_STORAGE_NOT_AVAIL,
 
 
 /* User-defined exception condition */
+/* Only valid in TURN directive + RAISE + EXIT PROGRAM / GOBACK */
 COB_EXCEPTION  (1300, COB_EC_USER,
 		"EC-USER", 0)
 
@@ -396,7 +397,7 @@ COB_EXCEPTION  (1405, COB_EC_VALIDATE_VARYING,
 		"EC-VALIDATE-VARYING", 1)
 
 
-/* FUNCTION exception */
+/* FUNCTION exception (nonstandard) */
 COB_EXCEPTION  (1500, COB_EC_FUNCTION,
 		"EC-FUNCTION", 0)
 
@@ -409,7 +410,7 @@ COB_EXCEPTION  (1502, COB_EC_FUNCTION_PTR_NULL,
 		"EC-FUNCTION-PTR-NULL", 1)
 
 
-/* XML exception */
+/* XML exception  (nonstandard) */
 COB_EXCEPTION  (1600, COB_EC_XML,
 		"EC-XML", 0)
 

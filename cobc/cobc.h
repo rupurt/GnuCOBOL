@@ -521,6 +521,8 @@ DECLNORET extern void		cobc_too_many_errors (void) COB_A_NORETURN;
 extern size_t			cobc_check_valid_name (const char *,
 						       const enum cobc_name_type);
 
+extern unsigned int		cobc_turn_ec (struct cb_text_list *, const cob_u32_t);
+
 /* help.c (used only within cobc.c) */
 
 extern void		cobc_print_usage (char *);
