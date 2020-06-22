@@ -1,4 +1,9 @@
 
+2020-06-16  Ron Norman <rjn@inglenet.com>
+
+	* call.c (cob_get_dbl_param, cob_put_dbl_param), common.h: new functions
+	  in C API
+
 2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* screenio.c (cob_screen_init) [HAVE_LIBPDCURSES]: fixed possible endless
