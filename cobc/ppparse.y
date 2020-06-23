@@ -1050,7 +1050,7 @@ turn_directive:
 	}
 
 	/*
-	  Output #TURN so we can assign a line number to this datalater in the
+	  Output #TURN so we can assign a line number to this data later in the
 	  scanner.
 	*/
 	fprintf (ppout, "#TURN\n");

@@ -1755,15 +1755,18 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
 void
 cobc_apply_turn_directives (void)
 {
-	struct cb_turn_list	*l;
-
-	for (l = cb_turn_list;
-	     l && l->line <= cb_source_line && l->line != -1;
-	     l = l->next) {
-		if (l->with_location) {
+	/* Apply all >>TURN directives the scanner has passed */
+	while (cb_turn_list
+	       && cb_turn_list->line <= cb_source_line
+	       && cb_turn_list->line != -1) {
+		if (cb_turn_list->with_location) {
 			cb_flag_source_location = 1;
 		}
-		cobc_turn_ec (l->ec_names, l->enable);
+		cobc_turn_ec (cb_turn_list->ec_names, cb_turn_list->enable);
+
+		cb_turn_list = cb_turn_list->next;
+		/* CHECKME: Should head of cb_turn_list be freed? Why doesn't
+		   cobc_plex_free exist? */
 	}
 }
 
