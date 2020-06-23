@@ -290,6 +290,15 @@ struct cb_exception {
 	int		explicit_enable_val;	/* enable has been set explicitly */
 };
 
+/* >>TURN directive list */
+struct cb_turn_list {
+	struct cb_turn_list	*next;
+	struct cb_text_list	*ec_names;
+	int		line;
+	int		enable;
+	int		with_location;
+};
+
 /* Basic memory structure */
 struct cobc_mem_struct {
 	struct	cobc_mem_struct	*next;			/* next pointer */
@@ -361,6 +370,8 @@ extern struct cb_exception	cb_exception_table[];
 #define CB_EXCEPTION_CODE(id)	cb_exception_table[id].code
 #define CB_EXCEPTION_ENABLE(id)	cb_exception_table[id].enable
 #define CB_EXCEPTION_EXPLICIT(id)	cb_exception_table[id].explicit_enable_val
+
+extern struct cb_turn_list	*cb_turn_list;
 
 /* undef macros that are only for internal use with def-files */
 
@@ -524,6 +535,7 @@ extern size_t			cobc_check_valid_name (const char *,
 						       const enum cobc_name_type);
 
 extern unsigned int		cobc_turn_ec (struct cb_text_list *, const cob_u32_t);
+extern void			cobc_apply_turn_directives (void);
 
 /* help.c (used only within cobc.c) */
 

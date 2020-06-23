@@ -1,6 +1,6 @@
 /*
-   Copyright (C) 2001-2012, 2015-2019 Free Software Foundation, Inc.
-   Written by Keisuke Nishida, Roger While, Simon Sobisch
+   Copyright (C) 2001-2012, 2015-2020 Free Software Foundation, Inc.
+   Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart
 
    This file is part of GnuCOBOL.
 
@@ -1028,7 +1028,32 @@ leap_second_directive:
 turn_directive:
   ec_list CHECKING on_or_off
   {
-	cobc_turn_ec ($1, $3);
+	struct cb_turn_list	*l;
+	struct cb_turn_list	*turn_list_end;
+
+	/* Add turn directive data to end of cb_turn_list */
+	l = cobc_plex_malloc (sizeof (struct cb_turn_list));
+	l->ec_names = $1;
+	l->enable = !!$3;
+	l->with_location = $3 == 2U;
+	l->next = NULL;
+	/* The line number is set properly in the scanner */
+	l->line = -1;
+	
+	if (cb_turn_list) {
+		for (turn_list_end = cb_turn_list;
+		     turn_list_end->next;
+		     turn_list_end = turn_list_end->next);
+		turn_list_end->next = l;
+	} else {
+		cb_turn_list = l;
+	}
+
+	/*
+	  Output #TURN so we can assign a line number to this datalater in the
+	  scanner.
+	*/
+	fprintf (ppout, "#TURN\n");
   }
 ;
 

@@ -10178,14 +10178,18 @@ statements:
 			emit_entry (current_program->program_id, 0, NULL, NULL);
 		}
 	}
+
+	cobc_apply_turn_directives ();
   }
   statement
   {
 	cobc_cs_check = 0;
+	cobc_apply_turn_directives ();
   }
 | statements statement
   {
 	cobc_cs_check = 0;
+	cobc_apply_turn_directives ();
   }
 ;
 

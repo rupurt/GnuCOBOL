@@ -306,6 +306,8 @@ struct cb_exception cb_exception_table[] = {
 };
 #undef	COB_EXCEPTION
 
+struct cb_turn_list	*cb_turn_list = NULL;
+
 #define	CB_FLAG(var,print_help,name,doc)	int var = 0;
 #define	CB_FLAG_ON(var,print_help,name,doc)	int var = 1;
 #define	CB_FLAG_RQ(var,print_help,name,def,opt,doc)	int var = def;
@@ -1748,6 +1750,21 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
 	}
 	
 	return 0;
+}
+
+void
+cobc_apply_turn_directives (void)
+{
+	struct cb_turn_list	*l;
+
+	for (l = cb_turn_list;
+	     l && l->line <= cb_source_line && l->line != -1;
+	     l = l->next) {
+		if (l->with_location) {
+			cb_flag_source_location = 1;
+		}
+		cobc_turn_ec (l->ec_names, l->enable);
+	}
 }
 
 static unsigned int

@@ -273,6 +273,15 @@ static void *	copy_literal (cb_tree l);
 	cobc_free (word);
 }
 
+<*>^[ ]?"#TURN".*\n {
+	struct cb_turn_list	*l;
+
+	for (l = cb_turn_list; l && l->line != -1; l = l->next);
+	if (l) {
+		l->line = cb_source_line;
+	}
+}
+
 <*>\n {
 	cb_source_line++;
 }
