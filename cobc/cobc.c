@@ -298,11 +298,11 @@ unsigned int	cb_correct_program_order = 0;
 
 cob_u32_t		optimize_defs[COB_OPTIM_MAX] = { 0 };
 
-#define	COB_EXCEPTION(code,tag,name,critical) {name, 0x##code, 0},
+#define	COB_EXCEPTION(code,tag,name,critical) {name, 0x##code, 0, 0},
 struct cb_exception cb_exception_table[] = {
-	{NULL, 0, 0},		/* CB_EC_ZERO */
+	{NULL, 0, 0, 0},		/* CB_EC_ZERO */
 #include "libcob/exception.def"
-	{NULL, 0, 0}		/* CB_EC_MAX */
+	{NULL, 0, 0, 0}		/* CB_EC_MAX */
 };
 #undef	COB_EXCEPTION
 
@@ -1619,115 +1619,134 @@ cobc_check_valid_name (const char *name, const enum cobc_name_type prechk)
 /* Turn generation of runtime exceptions on/off */
 
 #define PENDING(x)		cb_warning (COBC_WARN_FILLER, _("'%s' not implemented"), x)
+
+static unsigned int
+cobc_turn_ec_io (void)
+{
+	/* ec_file_ec = ec; */
+	/* for (ec_file = ec_file_ec->next; ec_file; ec_file = ec_file->next) { */
+	/* 	/\* Check entry for something else than a new exception *\/ */
+	/* 	if (strlen (ec_file->text) >= 3 && !strncasecmp (ec_file->text, "EC-", 3)) { */
+	/* 		break; */
+	/* 	} */
+	/* 	ec = ec_file; */
+	/* 	/\* Pending message for first entry only, elsewise duplicate check *\/ */
+	/* 	if (ec_file == ec_file_ec->next) { */
+	/* 		PENDING ("file specific exceptions"); */
+	/* 		ec_dupchk = ec_file; */
+	/* 	} else { */
+	/* 		for (ec_dupchk = ec_file_ec->next; ec_dupchk && ec_dupchk != ec_file; */
+	/* 		     ec_dupchk = ec_dupchk->next) { */
+	/* 			if (!strcasecmp(ec_file->text, ec_dupchk->text)) { */
+	/* 				cb_error (_("duplicate filename '%s' for exception '%s'"), */
+	/* 					  ec_dupchk->text, CB_EXCEPTION_NAME (ec_idx)); */
+	/* 				ec_dupchk = NULL; */
+	/* 				break; */
+							
+	/* 			} */
+	/* 		} */
+	/* 	} */
+	/* 	if (ec_dupchk) { */
+	/* 		cb_warning (COBC_WARN_FILLER, _("exception '%s' is turned on globally, not only for file '%s'"),  */
+	/* 			    CB_EXCEPTION_NAME (ec_idx), ec_file->text); */
+	/* 	} */
+
+	/* } */
+	return 0;
+}
+
+static unsigned int
+ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec, const cob_u32_t ec_idx)
+{
+	struct cb_text_list	*ec_dupchk;
+	
+	/* TO-DO: Is duplication a problem? */
+	/* TO-DO: Does this algo work? */
+	for (ec_dupchk = ec_list; ec_dupchk; ec_dupchk = ec_dupchk->next) {
+		if (ec_dupchk == ec) {
+			return 0;
+		}
+		if (!strcasecmp(ec->text, ec_dupchk->text)) {
+			cb_error (_("duplicate exception '%s'"), CB_EXCEPTION_NAME (ec_idx));
+			ec_dupchk = NULL;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/*
+  Simon: ToDo: Move save/restore of activated exceptions before
+  preparse; after C generation A dynamic save (only if changed)
+  and restore (only if set) would be nice
+*/
 unsigned int
 cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
 {
-	cob_u32_t ec_code, i;
-	struct cb_text_list	*ec, *ec_dupchk, *ec_file, *ec_file_ec;
-
+	cob_u32_t ec_idx, i;
+	struct cb_text_list	*ec;
 	unsigned char *upme;
 
 	if (to_on_off) {
+		/* TO-DO: Only if >>TURN ... ON WITH LOCATION found? */
+		/* TO-DO: Only if to_on_off = 1? */
 		cb_flag_source_location = 1;
 	}
 
 	for (ec = ec_list; ec; ec = ec->next) {
 		/* Extract exception code via text comparison */
-		ec_code = 0;
+		ec_idx = 0;
 		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
 			if (!strcasecmp (ec->text, CB_EXCEPTION_NAME (i))) {
-				ec_code = i;
+				ec_idx = i;
 				break;
 			}
 		}
 
-		if (ec_code == 0) {
+		/* Error if not a known exception name */
+		/* TO-DO: What about EC-USER? */
+		if (ec_idx == 0) {
 			upme = (unsigned char *)ec->text;
 			for (i = 0; i < strlen(ec->text); ++i) {
-				if (islower (upme[i])) {
-					upme[i] = (cob_u8_t)toupper (upme[i]);
-				}
+				upme[i] = (cob_u8_t)toupper (upme[i]);
 			}
 			cb_error (_("invalid exception-name: %s"), ec->text);
 			return 1;
 		}
 
-		/* Duplicate check */
-		for (ec_dupchk = ec_list; ec_dupchk; ec_dupchk = ec_dupchk->next) {
-			if (ec_dupchk == ec) {
-				break;
-			}
-			if (!strcasecmp(ec->text, ec_dupchk->text)) {
-				cb_error (_("duplicate exception '%s'"), CB_EXCEPTION_NAME (ec_code));
-				ec_dupchk = NULL;
-				break;
-			}
+		if (ec_duped (ec_list, ec, ec_idx)) {
+			break;
 		}
 
-		
-		/* EC-ALL:
-		   Turn all exception conditions
-		*/
-		if (!strcmp(CB_EXCEPTION_NAME(ec_code),"EC-ALL")) {
+		if (!strncmp(CB_EXCEPTION_NAME(ec_idx), "EC-I-O", 6)) {
+			cobc_turn_ec_io ();
+		} else if (CB_EXCEPTION_CODE (ec_idx) & 0x00FF) {
+			/* Set individual level-1 EC */
+			CB_EXCEPTION_ENABLE (ec_idx) = to_on_off;
+			CB_EXCEPTION_EXPLICIT (ec_idx) = 1;
+		} else if (CB_EXCEPTION_CODE (ec_idx) != 0) {
+			/*
+			  Simon: ToDo: Group activation; check occurences of
+			  EC-generation
+			*/
+			/* Set all ECs subordinate to level-2 EC */
+			for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
+				if ((CB_EXCEPTION_CODE (i) & 0xFF00)
+				    == CB_EXCEPTION_CODE (ec_idx)) {
+					CB_EXCEPTION_ENABLE (i) = to_on_off;
+					CB_EXCEPTION_EXPLICIT (i) = 1;
+				}
+			}
+		} else {
+			/* EC-ALL; set all ECs */
 			for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
 				CB_EXCEPTION_ENABLE (i) = to_on_off;
-			}
-			continue;
-		}
-
-
-
-		
-		/* Simon: ToDo: Group activation; check occurences of EC-generation */
-
-		
-		/* Simon: ToDo:	Move save/restore of activated exceptions before preparse; after C generation
-						A dynamic save (only if changed) and restore (only if set) would be nice */
-
-
-
-
-
-		/* EC-I-O (complete set):
-		   Skip possible filenames in exception list then fall through
-		*/
-		if (!strncmp(CB_EXCEPTION_NAME(ec_code), "EC-I-O", 6)) {
-			ec_file_ec = ec;
-			for (ec_file = ec_file_ec->next; ec_file; ec_file = ec_file->next) {
-				/* Check entry for something else than a new exception */
-				if (strlen (ec_file->text) >= 3 && !strncasecmp (ec_file->text, "EC-", 3)) {
-					break;
-				}
-				ec = ec_file;
-				/* Pending message for first entry only, elsewise duplicate check */
-				if (ec_file == ec_file_ec->next) {
-					PENDING ("file specific exceptions");
-					ec_dupchk = ec_file;
-				} else {
-					for (ec_dupchk = ec_file_ec->next; ec_dupchk && ec_dupchk != ec_file;
-					     ec_dupchk = ec_dupchk->next) {
-						if (!strcasecmp(ec_file->text, ec_dupchk->text)) {
-							cb_error (_("duplicate filename '%s' for exception '%s'"),
-										ec_dupchk->text, CB_EXCEPTION_NAME (ec_code));
-							ec_dupchk = NULL;
-							break;
-							
-						}
-					}
-				}
-				if (ec_dupchk) {
-					cb_warning (COBC_WARN_FILLER, _("exception '%s' is turned on globally, not only for file '%s'"), 
-								CB_EXCEPTION_NAME (ec_code), ec_file->text);
-				}
-
+				CB_EXCEPTION_EXPLICIT (i) = 1;
 			}
 		}
-
-		/* Verified EC-xyz:
-		   Turn exception condition
-		*/
-		CB_EXCEPTION_ENABLE (ec_code) = to_on_off;
 	}
+	
 	return 0;
 }
 
@@ -3643,7 +3662,9 @@ process_command_line (const int argc, char **argv)
 	/* debug: Turn on all exception conditions */
 	if (cobc_wants_debug) {
 		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
-			CB_EXCEPTION_ENABLE (i) = 1;
+			if (!CB_EXCEPTION_EXPLICIT (i)) {
+				CB_EXCEPTION_ENABLE (i) = 1;
+			}
 		}
 		if (verbose_output > 1) {
 			fputs (_("all runtime checks are enabled"), stderr);

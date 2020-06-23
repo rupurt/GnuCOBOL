@@ -1,4 +1,13 @@
 
+2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, cobc.h: completed initial implementation on disabling ECs.
+
+2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h, flag.def, ppparse.y: draft work on >>TURN and
+	  disabling exceptions (FR #53).
+
 2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #193 work on TYPE TO / SAME AS, LIKE

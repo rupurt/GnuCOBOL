@@ -287,6 +287,7 @@ struct cb_exception {
 	const char	*name;			/* Exception name */
 	const int	code;			/* Exception code */
 	int		enable;			/* If turned on */
+	int		explicit_enable_val;	/* enable has been set explicitly */
 };
 
 /* Basic memory structure */
@@ -359,6 +360,7 @@ extern struct cb_exception	cb_exception_table[];
 #define CB_EXCEPTION_NAME(id)	cb_exception_table[id].name
 #define CB_EXCEPTION_CODE(id)	cb_exception_table[id].code
 #define CB_EXCEPTION_ENABLE(id)	cb_exception_table[id].enable
+#define CB_EXCEPTION_EXPLICIT(id)	cb_exception_table[id].explicit_enable_val
 
 /* undef macros that are only for internal use with def-files */
 

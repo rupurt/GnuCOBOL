@@ -284,3 +284,38 @@ FOUND
 
 AT_CLEANUP
 
+
+
+
+AT_SETUP([Disable subscript check])
+AT_KEYWORDS([runsubscripts subscripts debug])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  x.
+           03  y PIC X OCCURS 5 TIMES.
+           03  z PIC X VALUE "!".
+       01  idx PIC 99 VALUE 6.
+           
+       PROCEDURE DIVISION.
+           DISPLAY y (idx)
+           DISPLAY FUNCTION TRIM(FUNCTION EXCEPTION-STATUS)
+           .
+])
+
+AT_CHECK([$COMPILE -fdisable-ec=EC-BOUND-SUBSCRIPT prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[!
+
+])
+AT_CHECK([$COMPILE -fdisable-ec=EC-BOUND prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[!
+
+])
+
+AT_CLEANUP
