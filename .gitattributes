@@ -147,6 +147,8 @@ libcob/libcobci.c -text
 libcob/libcobdi.c -text
 libcob/libcobvb.c -text
 libcob/sysdefines.h -text
+m4/ax_check_define.m4 -text
+m4/ax_code_coverage.m4 -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
@@ -172,8 +174,6 @@ m4/ltoptions.m4 eol=lf
 m4/ltsugar.m4 eol=lf
 m4/ltversion.m4 eol=lf
 m4/lt~obsolete.m4 eol=lf
-m4/m4_ax_check_define.m4 -text
-m4/m4_ax_code_coverage.m4 -text
 m4/nls.m4 eol=lf
 m4/pkg.m4 -text
 m4/po.m4 eol=lf
