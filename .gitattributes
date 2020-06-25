@@ -3,7 +3,6 @@
 /NOTES -text
 /autogen.sh eol=lf
 bin/Makefile.am eol=lf
-bin/cob-config.1 -text
 bin/cob-config.in eol=lf
 bin/gcdiff.c -text
 build_aux/bootstrap eol=lf
