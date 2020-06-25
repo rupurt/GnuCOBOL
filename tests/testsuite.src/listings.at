@@ -1065,7 +1065,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE_ONLY -t prog.lst prog.cob], [1], [],
 [copy.inc:8: error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or SEQUENTIAL
 copy.inc:5: error: missing file description for FILE testfile
-prog.cob:7: warning: 'filename' will be implicitly defined
+prog.cob:7: warning: variable 'filename' will be implicitly defined
 prog.cob:8: error: 'FIRST-MATCH' is not defined
 ])
 
@@ -1093,7 +1093,7 @@ error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or
 000005         DATA             DIVISION.
 000006         WORKING-STORAGE  SECTION.
 000007         PROCEDURE        DIVISION.
-warning: 'filename' will be implicitly defined
+warning: variable 'filename' will be implicitly defined
 000008             DISPLAY FIRST-MATCH NO ADVANCING
 error: 'FIRST-MATCH' is not defined
 000009             END-DISPLAY.
@@ -1106,7 +1106,7 @@ Error/Warning summary:
 
 copy.inc:8: error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or SEQUENTIAL
 copy.inc:5: error: missing file description for FILE testfile
-prog.cob:7: warning: 'filename' will be implicitly defined
+prog.cob:7: warning: variable 'filename' will be implicitly defined
 prog.cob:8: error: 'FIRST-MATCH' is not defined
 
 1 warning in compilation group
@@ -1119,7 +1119,7 @@ AT_CHECK([diff prog12.lst prog.lis], [0], [], [])
 AT_CHECK([$COMPILE_ONLY -T prog.lst prog.cob], [1], [],
 [copy.inc:8: error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or SEQUENTIAL
 copy.inc:5: error: missing file description for FILE testfile
-prog.cob:7: warning: 'filename' will be implicitly defined
+prog.cob:7: warning: variable 'filename' will be implicitly defined
 prog.cob:8: error: 'FIRST-MATCH' is not defined
 ])
 
@@ -1146,7 +1146,7 @@ error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or SEQUE
 000005         DATA             DIVISION.
 000006         WORKING-STORAGE  SECTION.
 000007         PROCEDURE        DIVISION.
-warning: 'filename' will be implicitly defined
+warning: variable 'filename' will be implicitly defined
 000008             DISPLAY FIRST-MATCH NO ADVANCING
 error: 'FIRST-MATCH' is not defined
 000009             END-DISPLAY.
@@ -1159,7 +1159,7 @@ Error/Warning summary:
 
 copy.inc:8: error: syntax error, unexpected Identifier, expecting DYNAMIC or RANDOM or SEQUENTIAL
 copy.inc:5: error: missing file description for FILE testfile
-prog.cob:7: warning: 'filename' will be implicitly defined
+prog.cob:7: warning: variable 'filename' will be implicitly defined
 prog.cob:8: error: 'FIRST-MATCH' is not defined
 
 1 warning in compilation group

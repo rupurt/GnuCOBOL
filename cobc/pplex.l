@@ -642,6 +642,9 @@ CONTROL_STATEMENT_STATE>{
   "ADD-SYN"		{
 	return ADDSYN;
   }
+  "ASSIGN"		{
+	return ASSIGN;
+  }
   "CALLFH"		{
 	return CALLFH;
   }
