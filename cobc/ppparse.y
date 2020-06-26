@@ -666,6 +666,7 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 
 %type <s>	copy_in
 %type <s>	copy_source
+%type <s>	_literal
 
 %type <l>	token_list
 %type <l>	identifier
@@ -916,7 +917,7 @@ set_choice:
 		cb_current_file->source_format = cb_source_format;
 	}
   }
-| SSRANGE LITERAL
+| SSRANGE _literal
   {
 	char	*p = $2;
 	size_t	size;
@@ -924,20 +925,22 @@ set_choice:
 
 	
 	/* Remove surrounding quotes/brackets */
-	++p;
-	size = strlen (p) - 1;
-	p[size] = '\0';
+	if (p) {
+		++p;
+		size = strlen (p) - 1;
+		p[size] = '\0';
+	}
 
 	/* Enable EC-BOUND-SUBSCRIPT and -REF-MOD checking */
-	if (!strcasecmp (p, "1")) {
+	if (p && !strcasecmp (p, "1")) {
 		/* At runtime only */
 		CB_PENDING ("SSRANGE(1)");
-	} else if (!strcasecmp (p, "2")) {
+	} else if (!p || !strcasecmp (p, "2")) {
 		/*  At compile- and runtime */
 		txt = ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT");
 		txt = ppp_list_add (txt, "EC-BOUND-REF-MOD");
 		append_to_turn_list (txt, 1, 0);
-	} else if (!strcasecmp (p, "3")) {
+	} else if (p && !strcasecmp (p, "3")) {
 		/*
 		  At compile- and runtime, and allowing zero-length ref mod at
 		  runtime
@@ -1016,6 +1019,11 @@ format_type:
 	cb_error (_("invalid %s directive"), "SOURCE");
 	YYERROR;
   }
+;
+
+_literal:
+  /* empty */	{ $$ = NULL; }
+| LITERAL
 ;
 
 define_directive:
