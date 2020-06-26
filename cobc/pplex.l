@@ -642,6 +642,9 @@ CONTROL_STATEMENT_STATE>{
   "ADD-SYN"		{
 	return ADDSYN;
   }
+  "BOUND"		{
+	 return BOUND;
+  }
   "CALLFH"		{
 	return CALLFH;
   }
@@ -660,16 +663,27 @@ CONTROL_STATEMENT_STATE>{
   "MAKE-SYN"		{
 	return MAKESYN;
   }
+  "NOBOUND" |
+  "NO-BOUND"		{
+	return NOBOUND;
+  }
   "NOFOLDCOPYNAME" |
   "NOFOLD-COPY-NAME" |
   "NO-FOLD-COPY-NAME"	{
 	return NOFOLDCOPYNAME;
+  }
+  "NOSSRANGE" |
+  "NO-SSRANGE"		{
+	return NOSSRANGE;
   }
   "OVERRIDE"		{
 	return OVERRIDE;
   }
   "REMOVE"		{
 	return REMOVE;
+  }
+  "SSRANGE"		{
+	return SSRANGE;
   }
   "SOURCEFORMAT" |
   "SOURCE-FORMAT"	{
@@ -681,7 +695,6 @@ CONTROL_STATEMENT_STATE>{
   {DEFNUM_LITERAL} |
   {ALNUM_LITERAL} |
   {SET_PAREN_LIT}	{
-	  
 	pplval.s = cobc_plex_strdup (yytext);
 	return LITERAL;
   }

@@ -459,6 +459,37 @@ ppp_error_invalid_option (const char *directive, const char *option)
 	cb_error (_("invalid %s directive option '%s'"), directive, option);
 }
 
+static void
+append_to_turn_list (struct cb_text_list *ec_names, int enable, int with_location)
+{
+	struct cb_turn_list	*l;
+	struct cb_turn_list	*turn_list_end;
+
+	/* Add turn directive data to end of cb_turn_list */
+	l = cobc_plex_malloc (sizeof (struct cb_turn_list));
+	l->ec_names = ec_names;
+	l->enable = enable;
+	l->with_location = with_location;
+	l->next = NULL;
+	/* The line number is set properly in the scanner */
+	l->line = -1;
+	
+	if (cb_turn_list) {
+		for (turn_list_end = cb_turn_list;
+		     turn_list_end->next;
+		     turn_list_end = turn_list_end->next);
+		turn_list_end->next = l;
+	} else {
+		cb_turn_list = l;
+	}
+
+	/*
+	  Output #TURN so we can assign a line number to this data later in the
+	  scanner.
+	*/
+	fprintf (ppout, "#TURN\n");
+}
+
 /* Global functions */
 
 void
@@ -584,15 +615,19 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %token SET_DIRECTIVE
 %token ADDRSV
 %token ADDSYN
+%token BOUND
 %token CALLFH
 %token COMP1
 %token CONSTANT
 %token FOLDCOPYNAME
 %token MAKESYN
+%token NOBOUND
 %token NOFOLDCOPYNAME
+%token NOSSRANGE
 /* OVERRIDE token defined above. */
 %token REMOVE
 %token SOURCEFORMAT
+%token SSRANGE
 
 %token IF_DIRECTIVE
 %token ELSE_DIRECTIVE
@@ -744,6 +779,11 @@ set_choice:
 	      fprintf (ppout, "#ADDSYN %s %s\n", l->text, l->next->text);
       }
   }
+| BOUND
+  {
+	/* Enable EC-BOUND-SUBSCRIPT checking */
+	append_to_turn_list (ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT"), 1, 0);
+  }
 | CALLFH LITERAL
   {
 	char	*p = $2;
@@ -798,9 +838,22 @@ set_choice:
   {
 	fprintf (ppout, "#MAKESYN %s %s\n", $2->text, $2->next->text);
   }
+| NOBOUND
+  {
+	/* Disable EC-BOUND-SUBSCRIPT checking */
+	append_to_turn_list (ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT"), 0, 0);
+  }
 | NOFOLDCOPYNAME
   {
 	cb_fold_copy = 0;
+  }
+| NOSSRANGE
+  {
+	/* Disable EC-BOUND-SUBSCRIPT and -REF-MOD checking */
+	struct cb_text_list	*txt = ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT");
+	txt = ppp_list_add (txt, "EC-BOUND-REF-MOD");
+	
+	append_to_turn_list (txt, 0, 0);
   }
 | OVERRIDE alnum_equality_list
   {
@@ -842,6 +895,37 @@ set_choice:
 	}
 	if (cb_src_list_file) {
 		cb_current_file->source_format = cb_source_format;
+	}
+  }
+| SSRANGE LITERAL
+  {
+	char	*p = $2;
+	size_t	size;
+	struct cb_text_list	*txt;
+
+	
+	/* Remove surrounding quotes/brackets */
+	++p;
+	size = strlen (p) - 1;
+	p[size] = '\0';
+
+	/* Enable EC-BOUND-SUBSCRIPT and -REF-MOD checking */
+	if (!strcasecmp (p, "1")) {
+		/* At runtime only */
+		CB_PENDING ("SSRANGE(1)");
+	} else if (!strcasecmp (p, "2")) {
+		/*  At compile- and runtime */
+		txt = ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT");
+		txt = ppp_list_add (txt, "EC-BOUND-REF-MOD");
+		append_to_turn_list (txt, 1, 0);
+	} else if (!strcasecmp (p, "3")) {
+		/*
+		  At compile- and runtime, and allowing zero-length ref mod at
+		  runtime
+		*/
+		CB_PENDING ("SSRANGE(3)");
+	} else {
+		ppp_error_invalid_option ("SSRANGE", p);
 	}
   }
 ;
@@ -1028,32 +1112,7 @@ leap_second_directive:
 turn_directive:
   ec_list CHECKING on_or_off
   {
-	struct cb_turn_list	*l;
-	struct cb_turn_list	*turn_list_end;
-
-	/* Add turn directive data to end of cb_turn_list */
-	l = cobc_plex_malloc (sizeof (struct cb_turn_list));
-	l->ec_names = $1;
-	l->enable = !!$3;
-	l->with_location = $3 == 2U;
-	l->next = NULL;
-	/* The line number is set properly in the scanner */
-	l->line = -1;
-	
-	if (cb_turn_list) {
-		for (turn_list_end = cb_turn_list;
-		     turn_list_end->next;
-		     turn_list_end = turn_list_end->next);
-		turn_list_end->next = l;
-	} else {
-		cb_turn_list = l;
-	}
-
-	/*
-	  Output #TURN so we can assign a line number to this data later in the
-	  scanner.
-	*/
-	fprintf (ppout, "#TURN\n");
+	append_to_turn_list ($1, !!$3, $3 == 2U);
   }
 ;
 

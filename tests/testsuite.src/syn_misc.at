@@ -4556,61 +4556,29 @@ AT_KEYWORDS([misc])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
+       *> Valid
+       >> TURN ec-i-o f CHECKING ON
+       *> Invalid
        >> TURN dd CHECKING ON
+       >> TURN ec-all f CHECKING ON
+       >> TURN EC-I-O-invalid-KEY not-exist CHECKING OFF
        PROGRAM-ID.      prog.
+       ENVIRONMENT      DIVISION.
+       INPUT-OUTPUT     SECTION.
+       FILE-CONTROL.
+           SELECT f ASSIGN "f.txt", SEQUENTIAL.
        DATA             DIVISION.
-       WORKING-STORAGE  SECTION.
+       FILE             SECTION.
+       FD  f.
+       01  f-rec        PIC X.
        PROCEDURE        DIVISION.
            STOP RUN.
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:3: error: syntax error, unexpected CHECKING, expecting Variable
-])
-
-AT_DATA([prog1.cob], [
-       IDENTIFICATION   DIVISION.
-       >> TURN EC-ALL CHECKING ON
-       PROGRAM-ID.      prog1.
-       DATA             DIVISION.
-       WORKING-STORAGE  SECTION.
-       PROCEDURE        DIVISION.
-           STOP RUN.
-])
-
-AT_CHECK([$COMPILE_ONLY prog1.cob], [1], [],
-[prog1.cob:3: error: syntax error, unexpected end of line, expecting WITH or LOCATION
-])
-
-AT_DATA([prog2.cob], [
-    IDENTIFICATION   DIVISION.
-    >> TURN me CHECKING OFF
-    >> TURN EC-ALL CHECKING ON LOCATION
-    >> TURN EC-ALL somefile CHECKING ON WITH LOCATION
-    >> TURN EC-I-O somefile someotherfile CHECKING ON WITH LOCATION
-    >> TURN EC-I-O-FILE-SHARING somefile someotherfile EC-I-O-INVALID-KEY somefile CHECKING OFF
-    >> TURN ec-i-o-eop-overflow somefile somefile checking off
-    PROGRAM-ID.      prog1.
-    DATA             DIVISION.
-    WORKING-STORAGE  SECTION.
-    PROCEDURE        DIVISION.
-        STOP RUN.
-])
-
-AT_CHECK([$COMPILE_ONLY -free prog2.cob], [1], [],
-[prog2.cob:3: error: invalid exception-name: ME
-prog2.cob:5: error: invalid exception-name: SOMEFILE
-prog2.cob:6: warning: 'file specific exceptions' not implemented
-prog2.cob:6: warning: exception 'EC-I-O' is turned global, not only for file 'somefile'
-prog2.cob:6: warning: exception 'EC-I-O' is turned global, not only for file 'someotherfile'
-prog2.cob:7: warning: 'file specific exceptions' not implemented
-prog2.cob:7: warning: exception 'EC-I-O-FILE-SHARING' is turned global, not only for file 'somefile'
-prog2.cob:7: warning: exception 'EC-I-O-FILE-SHARING' is turned global, not only for file 'someotherfile'
-prog2.cob:7: warning: 'file specific exceptions' not implemented
-prog2.cob:7: warning: exception 'EC-I-O-INVALID-KEY' is turned global, not only for file 'somefile'
-prog2.cob:8: warning: 'file specific exceptions' not implemented
-prog2.cob:8: warning: exception 'EC-I-O-EOP-OVERFLOW' is turned global, not only for file 'somefile'
-prog2.cob:8: error: duplicate filename 'somefile' for exception 'EC-I-O-EOP-OVERFLOW'
+[prog.cob:6: error: invalid exception-name: DD
+prog.cob:7: error: invalid exception-name: F
+prog.cob:8: error: file 'not-exist' does not exist
 ])
 
 AT_CLEANUP

@@ -1,4 +1,9 @@
 
+2020-06-26  Edward Hart <edward.dan.hart@gmail.com>
+
+	* exception.def: split I/O exceptions into exception-io.def to control
+	  exceptions for specific files (>>TURN EC-I-O file).
+
 2020-06-20  Ron Norman <rjn@inglenet.com>
 
 	* common.h: add mapkey to cob_file

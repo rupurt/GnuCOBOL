@@ -139,14 +139,14 @@ struct strcache {
 #define GC_C_VERSION	CB_XSTRINGIFY(__TINYC__)
 #elif  defined(__HP_cc)
 #define GC_C_VERSION_PRF       "(HP aC++/ANSI C) "
-#define GC_C_VERSION   CB_XSTRINGIFY(__HP_cc) 
+#define GC_C_VERSION   CB_XSTRINGIFY(__HP_cc)
 #elif  defined(__hpux) || defined(_HPUX_SOURCE)
 #if  defined(__ia64)
 #define GC_C_VERSION_PRF       "(HPUX IA64) "
 #else
 #define GC_C_VERSION_PRF       "(HPUX PA-RISC) "
 #endif
-#define GC_C_VERSION   " C"  
+#define GC_C_VERSION   " C"
 #else
 #define GC_C_VERSION_PRF	""
 #define GC_C_VERSION	_("unknown")
@@ -304,7 +304,15 @@ struct cb_exception cb_exception_table[] = {
 #include "libcob/exception.def"
 	{NULL, 0, 0, 0}		/* CB_EC_MAX */
 };
+
+const struct cb_exception cb_io_exception_table[] = {
+	{NULL, 0, 0, 0},
+#include "libcob/exception-io.def"
+	{NULL, 0, 0, 0}		/* CB_EC_MAX */
+};
 #undef	COB_EXCEPTION
+const size_t	cb_io_exception_table_len = sizeof (cb_io_exception_table) / sizeof (struct cb_exception);
+static const size_t	cb_exception_table_len = sizeof (cb_exception_table) / sizeof (struct cb_exception);
 
 struct cb_turn_list	*cb_turn_list = NULL;
 
@@ -1620,56 +1628,102 @@ cobc_check_valid_name (const char *name, const enum cobc_name_type prechk)
 
 /* Turn generation of runtime exceptions on/off */
 
-#define PENDING(x)		cb_warning (COBC_WARN_FILLER, _("'%s' not implemented"), x)
+static void
+turn_ec_for_table (struct cb_exception *table, const size_t table_len,
+		   struct cb_exception ec, const int to_on_off)
+{
+	int	i;
+
+	if (ec.code & 0x00FF) {
+		/* Set individual level-1 EC */
+		for (i = 0; i < table_len; ++i) {
+			if (table[i].code == ec.code) {
+				table[i].enable = to_on_off;
+				table[i].explicit_enable_val = 1;
+				break;
+			}
+		}
+	} else if (ec.code != 0) {
+		/*
+		  Simon: ToDo: Group activation; check occurences of
+		  EC-generation
+		*/
+		/* Set all ECs subordinate to level-2 EC */
+		for (i = 0; i < table_len; ++i) {
+			if ((table[i].code & 0xFF00) == ec.code) {
+				table[i].enable = to_on_off;
+				table[i].explicit_enable_val = 1;
+			}
+		}
+	} else {
+		/* EC-ALL; set all ECs */
+		for (i = 0; i < table_len; ++i) {
+			table[i].enable = to_on_off;
+			table[i].explicit_enable_val = 1;
+		}
+	}
+}
+
 
 static unsigned int
-cobc_turn_ec_io (void)
+turn_ec_io (struct cb_exception ec_to_turn,
+	    const cob_u32_t to_on_off,
+	    cb_tree loc,
+	    struct cb_text_list ** const ec_list)
 {
-	/* ec_file_ec = ec; */
-	/* for (ec_file = ec_file_ec->next; ec_file; ec_file = ec_file->next) { */
-	/* 	/\* Check entry for something else than a new exception *\/ */
-	/* 	if (strlen (ec_file->text) >= 3 && !strncasecmp (ec_file->text, "EC-", 3)) { */
-	/* 		break; */
-	/* 	} */
-	/* 	ec = ec_file; */
-	/* 	/\* Pending message for first entry only, elsewise duplicate check *\/ */
-	/* 	if (ec_file == ec_file_ec->next) { */
-	/* 		PENDING ("file specific exceptions"); */
-	/* 		ec_dupchk = ec_file; */
-	/* 	} else { */
-	/* 		for (ec_dupchk = ec_file_ec->next; ec_dupchk && ec_dupchk != ec_file; */
-	/* 		     ec_dupchk = ec_dupchk->next) { */
-	/* 			if (!strcasecmp(ec_file->text, ec_dupchk->text)) { */
-	/* 				cb_error (_("duplicate filename '%s' for exception '%s'"), */
-	/* 					  ec_dupchk->text, CB_EXCEPTION_NAME (ec_idx)); */
-	/* 				ec_dupchk = NULL; */
-	/* 				break; */
-							
-	/* 			} */
-	/* 		} */
-	/* 	} */
-	/* 	if (ec_dupchk) { */
-	/* 		cb_warning (COBC_WARN_FILLER, _("exception '%s' is turned on globally, not only for file '%s'"),  */
-	/* 			    CB_EXCEPTION_NAME (ec_idx), ec_file->text); */
-	/* 	} */
+	cb_tree	l;
+	struct cb_file	*f;
+	
+	if (!(*ec_list)->next
+	    || !strncmp ((*ec_list)->next->text, "EC-", 3)) {
+		/* This >>TURN applies globally */
+		turn_ec_for_table (cb_exception_table,
+				   cb_exception_table_len,
+				   ec_to_turn,
+				   to_on_off);
+		return 0;
+	}
 
-	/* } */
+	/* The >>TURN applies to a list of files */
+	do {
+		*ec_list = (*ec_list)->next;
+		/* Find file */
+		for (l = current_program->file_list; l; l = CB_CHAIN (l)) {
+			f = CB_FILE (CB_VALUE (l));
+			if (!strcmp (f->name, (*ec_list)->text)) {
+				break;
+			}
+		}
+		/* Error if no file */
+		if (!l) {
+			cb_error_x (loc, _("file '%s' does not exist"), (*ec_list)->text);
+			return 1;
+		}
+		
+		/* Apply to file's exception list */
+		turn_ec_for_table (f->exception_table, cb_io_exception_table_len,
+				   ec_to_turn, to_on_off);
+	} while ((*ec_list)->next && !strncmp ((*ec_list)->next->text, "EC-", 3));
+
 	return 0;
 }
 
 static unsigned int
-ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec, const cob_u32_t ec_idx)
+ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec,
+	  const cob_u32_t ec_idx, cb_tree loc)
 {
 	struct cb_text_list	*ec_dupchk;
-	
+
 	/* TO-DO: Is duplication a problem? */
 	/* TO-DO: Does this algo work? */
 	for (ec_dupchk = ec_list; ec_dupchk; ec_dupchk = ec_dupchk->next) {
 		if (ec_dupchk == ec) {
 			return 0;
 		}
-		if (!strcasecmp(ec->text, ec_dupchk->text)) {
-			cb_error (_("duplicate exception '%s'"), CB_EXCEPTION_NAME (ec_idx));
+		if (ec_dupchk->text
+		    && !strcasecmp(ec->text, ec_dupchk->text)) {
+			cb_error_x (loc, _("duplicate exception '%s'"),
+				    CB_EXCEPTION_NAME (ec_idx));
 			ec_dupchk = NULL;
 			return 1;
 		}
@@ -1684,7 +1738,7 @@ ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec, const cob_u32_t
   and restore (only if set) would be nice
 */
 unsigned int
-cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
+cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree loc)
 {
 	cob_u32_t ec_idx, i;
 	struct cb_text_list	*ec;
@@ -1713,48 +1767,38 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off)
 			for (i = 0; i < strlen(ec->text); ++i) {
 				upme[i] = (cob_u8_t)toupper (upme[i]);
 			}
-			cb_error (_("invalid exception-name: %s"), ec->text);
+			cb_error_x (loc, _("invalid exception-name: %s"),
+				    ec->text);
 			return 1;
 		}
 
-		if (ec_duped (ec_list, ec, ec_idx)) {
-			break;
+		if (ec_duped (ec_list, ec, ec_idx, loc)) {
+			return 1;
 		}
 
 		if (!strncmp(CB_EXCEPTION_NAME(ec_idx), "EC-I-O", 6)) {
-			cobc_turn_ec_io ();
-		} else if (CB_EXCEPTION_CODE (ec_idx) & 0x00FF) {
-			/* Set individual level-1 EC */
-			CB_EXCEPTION_ENABLE (ec_idx) = to_on_off;
-			CB_EXCEPTION_EXPLICIT (ec_idx) = 1;
-		} else if (CB_EXCEPTION_CODE (ec_idx) != 0) {
-			/*
-			  Simon: ToDo: Group activation; check occurences of
-			  EC-generation
-			*/
-			/* Set all ECs subordinate to level-2 EC */
-			for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
-				if ((CB_EXCEPTION_CODE (i) & 0xFF00)
-				    == CB_EXCEPTION_CODE (ec_idx)) {
-					CB_EXCEPTION_ENABLE (i) = to_on_off;
-					CB_EXCEPTION_EXPLICIT (i) = 1;
-				}
+			if (turn_ec_io (cb_exception_table[ec_idx], to_on_off,
+					loc, &ec)) {
+				return 1;
 			}
 		} else {
-			/* EC-ALL; set all ECs */
-			for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
-				CB_EXCEPTION_ENABLE (i) = to_on_off;
-				CB_EXCEPTION_EXPLICIT (i) = 1;
-			}
+			turn_ec_for_table (cb_exception_table,
+					   cb_exception_table_len,
+					   cb_exception_table[ec_idx], to_on_off);
 		}
 	}
-	
+
 	return 0;
 }
 
 void
 cobc_apply_turn_directives (void)
 {
+	struct cb_tree_common	loc;
+
+	loc.source_file = cb_source_file;
+	loc.source_column = 0;
+	
 	/* Apply all >>TURN directives the scanner has passed */
 	while (cb_turn_list
 	       && cb_turn_list->line <= cb_source_line
@@ -1762,7 +1806,8 @@ cobc_apply_turn_directives (void)
 		if (cb_turn_list->with_location) {
 			cb_flag_source_location = 1;
 		}
-		cobc_turn_ec (cb_turn_list->ec_names, cb_turn_list->enable);
+		loc.source_line = cb_turn_list->line;
+		cobc_turn_ec (cb_turn_list->ec_names, cb_turn_list->enable, &loc);
 
 		cb_turn_list = cb_turn_list->next;
 		/* CHECKME: Should head of cb_turn_list be freed? Why doesn't
@@ -1774,9 +1819,9 @@ static unsigned int
 cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
 {
 	struct cb_text_list	*cb_ec_list = NULL;
-
 	char	*p;
 	char	*q;
+	struct cb_tree_common	loc;
 
 	p = cobc_strdup (opt);
 	q = strtok (p, " ");
@@ -1786,7 +1831,10 @@ cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
 	}
 	cobc_free (p);
 
-	return cobc_turn_ec (cb_ec_list, to_on_off);
+	loc.source_file = cb_source_file;
+	loc.source_column = 0;
+	loc.source_line = 0;
+	return cobc_turn_ec (cb_ec_list, to_on_off, &loc);
 
 }
 
@@ -8640,7 +8688,7 @@ main (int argc, char **argv)
 			status = process_run (run_name);
 		}
 	}
-	
+
 	if (cb_compile_level < CB_LEVEL_LIBRARY
 	 || status || cb_flag_syntax_only) {
 		/* Finished */

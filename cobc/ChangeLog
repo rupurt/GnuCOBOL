@@ -1,4 +1,10 @@
 
+2020-06-26  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, cobc.h, tree.c: completed >>TURN EC-I-O file.
+	* cobc.c: fixed line reported in >>TURN syntax errors.
+	* pplex.l, ppparse.y: added SET BOUND and SET SSRANGE.
+
 2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
 
 	* cobc.c, cobc.h: completed initial implementation on disabling ECs.

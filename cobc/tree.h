@@ -1042,6 +1042,8 @@ struct cb_file {
 	unsigned int		flag_report	: 1;	/* Used by REPORT */
 	/* Implied RECORD VARYING limits need checking */
 	unsigned int		flag_check_record_varying_limits	: 1;
+	/* Exceptions enabled for file */
+	struct cb_exception	*exception_table;
 };
 
 #define CB_FILE(x)	(CB_TREE_CAST (CB_TAG_FILE, struct cb_file, x))
