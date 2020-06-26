@@ -1,4 +1,11 @@
 
+2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c (cob_fd_file_open, cob_file_open): removed duplicate code;
+	  ensure that the cob_file->fd and ->file are not set if open fails set some
+	  file attributes only if open works; set the cop_file->open_mode to CLOSED
+	  if locking via fcntl fails
+
 2020-06-20  Ron Norman <rjn@inglenet.com>
 
 	* common.h: add mapkey to cob_file
