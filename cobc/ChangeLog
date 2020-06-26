@@ -1,4 +1,8 @@
 
+2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pplex.l: allow more characters in $DISPLAY
+
 2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #193 work on TYPE TO / SAME AS, LIKE
