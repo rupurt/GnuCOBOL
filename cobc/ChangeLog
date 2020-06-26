@@ -28,8 +28,25 @@
 	* cobc.c (main, process_run): fix compile from stdin with job-run
 	* field.c (validate_any_length_item): allow ANY LENGTH for PIC 1
 
+2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (process_command_line) [_WIN32]: simplified code;
+	  only convert from /opt to -opt if POSIXLY_CORRECT is not set;
+	  added conversion from /? to --help
+
+2020-06-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	Bug #635 added checks for duplicate USING BY REFERENCE items
+	* parser.y (emit_entry), typeck.c (cb_emit_call): collect BY REFERENCE
+	  items and check for duplicates
+
 2020-06-09  Simon Sobisch <simonsobisch@gnu.org>
 
+	* cobc.c (call_system, output_return): new functions extracted from
+	  different places to have the nearly identical calls to system and the
+	  code handling verbosity and exit codes in one place
+	* cobc.c (call_system): don't raise SIGINT/SIGQUIT because of sub-process
+	* cobc.c (get_signal_name): copied from libcob/common.c
 	* cobc.c: don't do pointer arithemetic on string constant (fixing Bug #644
 	  warning on MacOS)
 
