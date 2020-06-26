@@ -4,6 +4,17 @@
 	* exception.def: split I/O exceptions into exception-io.def to control
 	  exceptions for specific files (>>TURN EC-I-O file).
 
+2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c (cob_fd_file_open, cob_file_open): removed duplicate code;
+	  ensure that the cob_file->fd and ->file are not set if open fails set some
+	  file attributes only if open works; set the cop_file->open_mode to CLOSED
+	  if locking via fcntl fails
+	* common.c (cob_sys_system): deactivated WEXITSTATUS for now as MicroFocus
+	  doesn't do this --> may be added later with a runtime configuration
+	* common.h, coblocal.h (cob_runtime_hint, cob_runtime_error,
+	  cob_runtime_warning): made runtime message functions available again
+
 2020-06-20  Ron Norman <rjn@inglenet.com>
 
 	* common.h: add mapkey to cob_file

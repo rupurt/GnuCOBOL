@@ -5,6 +5,10 @@
 	* cobc.c: fixed line reported in >>TURN syntax errors.
 	* pplex.l, ppparse.y: added SET BOUND and SET SSRANGE.
 
+2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pplex.l: allow more characters in $DISPLAY
+
 2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
 
 	* cobc.c, cobc.h: completed initial implementation on disabling ECs.
@@ -222,11 +226,27 @@
 	* codegen.c (output_function_prototypes, output_internal_function):
 	  generate module initialization function and invoke it
 
+2020-01-04  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.h, parser.y, tree.h, typeck.c: strengthened ASSIGN syntax checks
+	  (bug #553).
+	* config.def: added new options assign-variable, assign-using-variable,
+	  assign-ext-dyn and assign-disk-from.
+	* config.def: improved assign-clause help.
+
 2020-01-01  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y, field.c (copy_into_field), tree.h, config.def:
 	  FR #193 implementation of SAME AS
 	* cobc.c: Copyright year update
+
+2019-12-28  Edward Hart <edward.dan.hart@gmail.com>
+
+	* config.c, config.def, ppparse.y, pplex.l: added ASSIGN directive and new option
+	  implict-assign-dynamic-var (see bug #571).
+	* config.c: added options external (= ibm) and dynamic (= mf) to
+	  assign-clause.
+	* typeck.c (cb_build_assignment_name): refactored.
 
 2019-12-03  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -309,6 +329,7 @@
 
 	* codegen.c, field.c: Corrections to handling of COLUMN  (was off by +1);
 	  With OCCURS COLUMN + num is no longer an alternative for STEP
+	* flag.def: increased max-errors default to 128
 
 2019-09-15  Ron Norman <rjn@inglenet.com>
 

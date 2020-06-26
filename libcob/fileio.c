@@ -1299,40 +1299,15 @@ cob_file_write_opt (cob_file *f, const int opt)
 }
 
 static int
-cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing)
+cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing,
+	unsigned int	nonexistent)
 {
 	int		fd;
 	int		fdmode;
 	int		fperms;
-	unsigned int	nonexistent;
-
-	/* Note filename points to file_open_name */
-	/* cob_chk_file_mapping manipulates file_open_name directly */
-
-	COB_UNUSED (sharing);
-
-	cob_chk_file_mapping ();
-
-	nonexistent = 0;
-	errno = 0;
-	if (access (filename, F_OK)) {
-		if (errno == ENOENT) {
-			if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
-				return COB_STATUS_35_NOT_EXISTS;
-			}
-			nonexistent = 1;
-#if 0 /* CHECKME: how to handle stuff like ENOTDIR here ?*/
-		} else if (errno == ENOTDIR) {
-				return COB_STATUS_30_PERMANENT_ERROR;
-		} else {
-			...
-#endif
-		}
-	}
 
 	fdmode = O_BINARY;
 	fperms = 0;
-	f->fd = -1;
 	switch (mode) {
 	case COB_OPEN_INPUT:
 		fdmode |= O_RDONLY;
@@ -1375,7 +1350,6 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 
 	errno = 0;
 	fd = open (filename, fdmode, fperms);
-	f->fd = fd;
 
 	switch (errno) {
 	case 0:
@@ -1389,6 +1363,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 			return COB_STATUS_30_PERMANENT_ERROR;
 		}
 		if (f->flag_optional) {
+			f->fd = fd;
 			f->open_mode = mode;
 			f->flag_nonexistent = 1;
 			f->flag_end_of_file = 1;
@@ -1421,9 +1396,9 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 		lock.l_len = 0;
 		errno = 0;
 		if (fcntl (fd, F_SETLK, &lock) < 0) {
+			f->open_mode = COB_OPEN_CLOSED;
 			int		ret = errno;
 			close (fd);
-			f->fd = -1;
 			switch (ret) {
 			case EACCES:
 			case EAGAIN:
@@ -1437,6 +1412,7 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 		}
 	}
 #endif
+	f->fd = fd;
 	if (f->flag_optional && nonexistent) {
 		return COB_STATUS_05_SUCCESS_OPTIONAL;
 	}
@@ -1491,22 +1467,37 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 	cob_linage		*lingptr;
 	unsigned int		nonexistent;
 
-	if (f->organization != COB_ORG_LINE_SEQUENTIAL) {
-		return cob_fd_file_open (f, filename, mode, sharing);
-	}
+	/* Note filename points to file_open_name */
+	/* cob_chk_file_mapping manipulates file_open_name directly */
+
+	COB_UNUSED (sharing);
 
 	cob_chk_file_mapping ();
 
 	nonexistent = 0;
 	errno = 0;
-	if (access (filename, F_OK) && errno == ENOENT) {
-		nonexistent = 1;
-		if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
-			return COB_STATUS_35_NOT_EXISTS;
+	if (access (filename, F_OK)) {
+		if (errno == ENOENT) {
+			if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
+				return COB_STATUS_35_NOT_EXISTS;
+			}
+			nonexistent = 1;
+#if 0 /* CHECKME: how to handle stuff like ENOTDIR here ?*/
+		} else if (errno == ENOTDIR) {
+				return COB_STATUS_30_PERMANENT_ERROR;
+		} else {
+			...
+#endif
 		}
 	}
-
-	fp = NULL;
+	
+	f->file = NULL;
+	f->fd = -1;
+	
+	if (f->organization != COB_ORG_LINE_SEQUENTIAL) {
+		return cob_fd_file_open (f, filename, mode, sharing, nonexistent);
+	}
+	
 	fmode = NULL;
 	/* Open the file */
 	switch (mode) {
@@ -1525,6 +1516,7 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		}
 		break;
 	case COB_OPEN_I_O:
+		/* line sequential I-O, not merged yet */
 		return COB_STATUS_37_PERMISSION_DENIED;
 	case COB_OPEN_EXTEND:
 		/* Problem on WIN32 (tested _MSC_VER 1500 and GCC build) if file isn't there: */
@@ -1548,12 +1540,6 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 
 	errno = 0;
 	fp = fopen (filename, fmode);
-	f->file = fp;
-	if (fp) {
-		f->fd = fileno (fp);
-	} else {
-		f->fd = -1;
-	}
 	switch (errno) {
 	case 0:
 		f->open_mode = mode;
@@ -1570,6 +1556,8 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 			return COB_STATUS_30_PERMANENT_ERROR;
 		}
 		if (f->flag_optional) {
+			f->file = fp;
+			f->fd = fileno (fp);
 			f->open_mode = mode;
 			f->flag_nonexistent = 1;
 			f->flag_end_of_file = 1;
@@ -1592,13 +1580,17 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 			if (fp) {
 				fclose (fp);
 			}
-			f->file = NULL;
-			f->fd = -1;
 			return COB_STATUS_57_I_O_LINAGE;
 		}
 		f->flag_needs_top = 1;
 		lingptr = f->linorkeyptr;
 		cob_set_int (lingptr->linage_ctr, 1);
+	}
+
+	if (fp) {
+		f->fd = fileno (fp);
+	} else {
+		f->fd = -1;
 	}
 
 #ifdef	HAVE_FCNTL
@@ -1615,6 +1607,8 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		lock.l_start = 0;
 		lock.l_len = 0;
 		if (fcntl (f->fd, F_SETLK, &lock) < 0) {
+			f->open_mode = COB_OPEN_CLOSED;
+			f->fd = -1;
 			int ret = errno;
 			fclose (fp);
 			switch (ret) {
@@ -1630,6 +1624,7 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		}
 	}
 #endif
+	f->file = fp;
 	if (f->flag_optional && nonexistent) {
 		return COB_STATUS_05_SUCCESS_OPTIONAL;
 	}
@@ -5103,9 +5098,6 @@ cob_unlock_file (cob_file *f, cob_field *fnstatus)
 void
 cob_open (cob_file *f, const int mode, const int sharing, cob_field *fnstatus)
 {
-	f->flag_read_done = 0;
-	f->curkey = -1;
-	f->mapkey = -1;
 
 	/* File was previously closed with lock */
 	if (f->open_mode == COB_OPEN_LOCKED) {
@@ -5118,6 +5110,10 @@ cob_open (cob_file *f, const int mode, const int sharing, cob_field *fnstatus)
 		save_status (f, fnstatus, COB_STATUS_41_ALREADY_OPEN);
 		return;
 	}
+
+	f->flag_read_done = 0;
+	f->curkey = -1;
+	f->mapkey = -1;
 
 	f->last_open_mode = mode;
 	f->flag_nonexistent = 0;
@@ -5791,12 +5787,11 @@ open_cbl_file (unsigned char *file_name, unsigned char *file_access,
 	}
 	fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
 	fd = open (fn, flag, COB_FILE_MODE);
+	cob_free (fn);
 	if (fd < 0) {
-		cob_free (fn);
 		memset (file_handle, -1, (size_t)4);
 		return 35;
 	}
-	cob_free (fn);
 	memcpy (file_handle, &fd, (size_t)4);
 	return 0;
 }
@@ -6056,10 +6051,8 @@ cob_sys_check_file_exist (unsigned char *file_name, unsigned char *file_info)
 
 	COB_CHK_PARMS (CBL_CHECK_FILE_EXIST, 2);
 
-	if (!COB_MODULE_PTR->cob_procedure_params[0]) {
-		return -1;
-	}
-	if (!COB_MODULE_PTR->cob_procedure_params[1]) {
+	if (!COB_MODULE_PTR->cob_procedure_params[0]
+	 || !COB_MODULE_PTR->cob_procedure_params[1]) {
 		return -1;
 	}
 	if (COB_MODULE_PTR->cob_procedure_params[1]->size < 16U) {

@@ -991,6 +991,13 @@ struct cb_alt_key {
 	struct cb_key_component	*component_list;	/* List of fields making up key */
 };
 
+/* How to interpret identifiers in a file's ASSIGN clause */
+enum cb_assign_type {
+	CB_ASSIGN_VARIABLE_DEFAULT,		/* default to ASSIGN variable, where allowed by implicit-assign-dynamic-var */
+	CB_ASSIGN_VARIABLE_REQUIRED,		/* require ASSIGN variable */
+	CB_ASSIGN_EXT_FILE_NAME_REQUIRED	/* require ASSIGN external-file-name */
+};
+
 struct cb_file {
 	struct cb_tree_common	common;			/* Common values */
 	const char		*name;			/* Original name */
@@ -1031,6 +1038,7 @@ struct cb_file {
 	int			lock_mode;		/* LOCK MODE */
 	int			special;		/* Special file */
 	int			same_clause;		/* SAME clause */
+	enum cb_assign_type	assign_type;		/* How to interpret ASSIGN clause */
 	unsigned int		flag_finalized	: 1;	/* Is finalized */
 	unsigned int		flag_external	: 1;	/* Is EXTERNAL */
 	unsigned int		flag_ext_assign	: 1;	/* ASSIGN EXTERNAL */
@@ -1042,6 +1050,9 @@ struct cb_file {
 	unsigned int		flag_report	: 1;	/* Used by REPORT */
 	/* Implied RECORD VARYING limits need checking */
 	unsigned int		flag_check_record_varying_limits	: 1;
+	/* Whether the file's ASSIGN is like "ASSIGN word", not "ASSIGN
+           EXTERNAL/DYNAMIC/USING/... word" */
+	unsigned int		flag_assign_no_keyword : 1;
 	/* Exceptions enabled for file */
 	struct cb_exception	*exception_table;
 };

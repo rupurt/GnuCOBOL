@@ -207,11 +207,16 @@ enum cb_binary_byteorder_options {
 	CB_BYTEORDER_NATIVE
 };
 
-/* ASSIGN clause interpretation */
-enum cb_assign_clause_options {
-	CB_ASSIGN_MF = 0,	/* Micro Focus compatibility */
-	CB_ASSIGN_IBM,			/* IBM compatibility */
-	CB_ASSIGN_COBOL2002		/* COBOL 2002 standard */
+/* Type of device specified in ASSIGN clause */
+enum cb_assign_device {
+	CB_ASSIGN_NO_DEVICE,
+	CB_ASSIGN_GENERAL_DEVICE,
+	CB_ASSIGN_LINE_SEQ_DEVICE,
+	CB_ASSIGN_DISPLAY_DEVICE,
+	CB_ASSIGN_KEYBOARD_DEVICE,
+	CB_ASSIGN_PRINTER_DEVICE,
+	CB_ASSIGN_PRINTER_1_DEVICE,
+	CB_ASSIGN_PRINT_DEVICE
 };
 
 /* Clauses an elementary screen item is required to have */

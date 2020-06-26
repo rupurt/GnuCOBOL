@@ -615,6 +615,7 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %token SET_DIRECTIVE
 %token ADDRSV
 %token ADDSYN
+%token ASSIGN
 %token BOUND
 %token CALLFH
 %token COMP1
@@ -773,11 +774,29 @@ set_choice:
   }
 | ADDSYN alnum_equality
   {
-      struct cb_text_list	*l;
+	struct cb_text_list	*l;
+	
+	for (l = $2; l; l = l->next->next) {
+		fprintf (ppout, "#ADDSYN %s %s\n", l->text, l->next->text);
+	}
+  }
+| ASSIGN LITERAL
+  {
+	char	*p = $2;
+	size_t	size;
 
-      for (l = $2; l; l = l->next->next) {
-	      fprintf (ppout, "#ADDSYN %s %s\n", l->text, l->next->text);
-      }
+	/* Remove surrounding quotes/brackets */
+	++p;
+	size = strlen (p) - 1;
+	p[size] = '\0';
+
+	if (!strcasecmp (p, "EXTERNAL")) {
+		fprintf (ppout, "#ASSIGN %d\n", (int)CB_ASSIGN_EXT_FILE_NAME_REQUIRED);
+	} else if (!strcasecmp (p, "DYNAMIC")) {
+		fprintf (ppout, "#ASSIGN %d\n", (int)CB_ASSIGN_VARIABLE_DEFAULT);
+	} else {
+		ppp_error_invalid_option ("ASSIGN", p);
+	}	
   }
 | BOUND
   {

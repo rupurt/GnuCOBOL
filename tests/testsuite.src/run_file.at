@@ -4857,8 +4857,6 @@ AT_CLEANUP
 AT_SETUP([SEQUENTIAL file with SHARING READ ONLY])
 AT_KEYWORDS([runfile])
 
-AT_XFAIL_IF([true])
-
 AT_DATA([prog1.cob], [
        identification division.
        program-id. prog1.
