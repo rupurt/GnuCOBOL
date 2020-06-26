@@ -58,7 +58,7 @@ AT_CLEANUP
 
 
 AT_SETUP([LINAGE and LINAGE-COUNTER sample])
-AT_KEYWORDS([runfile optional file status READ WRITE END-OF-PAGE LINE SEQUENTIAL COB_CURRENT_DATE])
+AT_KEYWORDS([runfile optional file status READ WRITE END-OF-PAGE LINE SEQUENTIAL configuration COB_CURRENT_DATE])
 
 # modified version of GC-FAQ: Example of LINAGE File Descriptor
 # Author: Brian Tiffin, Date:   10-July-2008

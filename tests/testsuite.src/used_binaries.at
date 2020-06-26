@@ -558,7 +558,7 @@ AT_CHECK([$COBCRUN noprog], [1], [],
 [libcob: error: module 'noprog' not found
 ])
 AT_CHECK([$COBCRUN -q -M], [1], [],
-[cobcrun: option requires an argument -- M
+[cobcrun: option requires an argument -- 'M'
 ])
 # FIXME - The following doesn't seem to work correct,
 #         we expect an error about missing module name
