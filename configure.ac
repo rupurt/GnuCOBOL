@@ -253,7 +253,7 @@ rm -f confinc.* confmf.mk confprereq
 AC_MSG_RESULT([${_am_result}])
 AM_CONDITIONAL([MAKE_HAS_PREREQ_ONLY], [test "${_am_result}" = "yes"])
 
-save_libs="$LIBS"
+curr_libs="$LIBS"
 
 enable_cflags_setting=no
 AC_MSG_CHECKING([whether CFLAGS can be modified])
@@ -276,7 +276,7 @@ AC_USE_SYSTEM_EXTENSIONS
 
 # general flags for compiler and linker and tests for those
 AC_ARG_VAR([LIBCOB_CPPFLAGS], [see CPPFLAGS, but only applied during generation of libcob])
-if test "x$LIBCOB_CPPFLAGS" != "x"; then
+AS_IF([test "x$LIBCOB_CPPFLAGS" != "x"], [
 	AC_MSG_CHECKING([if compilation with LIBCOB_CPPFLAGS works])
 	curr_cppflags="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $LIBCOB_CPPFLAGS"
@@ -286,11 +286,11 @@ if test "x$LIBCOB_CPPFLAGS" != "x"; then
 		[AC_MSG_RESULT([no])
 		AC_MSG_ERROR([not possible to compile with LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS"])])
 	CPPFLAGS="$curr_cppflags"
-fi
+])
 
 curr_libs="$LIBS"
 AC_ARG_VAR([LIBCOB_LIBS], [see LIBS, but only applied during generation of libcob])
-if test "x$LIBCOB_LIBS" != "x"; then
+AS_IF([test "x$LIBCOB_LIBS" != "x"], [
 	AC_MSG_CHECKING([if linking with LIBCOB_LIBS works])
 	LIBS="$LIBS $LIBCOB_LIBS"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([],
@@ -298,18 +298,18 @@ if test "x$LIBCOB_LIBS" != "x"; then
 		  [AC_MSG_RESULT([yes])],
 		  [AC_MSG_RESULT([no])
 		   AC_MSG_ERROR([not possible to link with LIBCOB_LIBS="$LIBCOB_LIBS"])])
-fi
+])
 
-AC_ARG_VAR([COBC_LIBS], [see LIBS, but only applied during generation of cobc])
-if test "x$COBC_LIBS" != "x"; then
-	AC_MSG_CHECKING([if linking with COBC_LIBS works])
-	LIBS="$LIBS $COBC_LIBS"
+AC_ARG_VAR([PROGRAMS_LIBS], [see LIBS, but only applied during generation of programs: cobc, cobcrun])
+AS_IF([test "x$PROGRAMS_LIBS" != "x"], [
+	AC_MSG_CHECKING([if linking with PROGRAMS_LIBS works])
+	LIBS="$LIBS $PROGRAMS_LIBS"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([],
 		  [[return 0;]])],
 		  [AC_MSG_RESULT([yes])],
 		  [AC_MSG_RESULT([no])
-		   AC_MSG_ERROR([not possible to link with COBC_LIBS="$COBC_LIBS"])])
-fi
+		   AC_MSG_ERROR([not possible to link with PROGRAMS_LIBS="$PROGRAMS_LIBS"])])
+])
 LIBS="$curr_libs"
 
 
@@ -511,7 +511,11 @@ if test "$COB_USES_ICC_ONLY" = "yes"; then
 else
 	COMMON_LIBS="-lm"
 fi
-LIBCOB_LIBS="$COMMON_LIBS"
+if test "x$LIBCOB_LIBS" != "x"; then
+	LIBCOB_LIBS="$LIBCOB_LIBS $COMMON_LIBS"
+else
+	LIBCOB_LIBS="$COMMON_LIBS"
+fi
 
 # Add --enable-code-coverage and test for code-coverage tools if enabled
 AX_CODE_COVERAGE
@@ -551,8 +555,8 @@ AC_ARG_WITH([math],
   esac],
   [USE_MATH="check"])
 
-MYOLDLIBS=$LIBS
-MYOLDCPPFLAGS=$CPPFLAGS
+curr_libs=$LIBS
+curr_cppflags=$CPPFLAGS
 
 AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
@@ -688,8 +692,8 @@ else
 	AC_MSG_ERROR([Unable to use GMP - Please check config.log])
 fi
 
-LIBS="$MYOLDLIBS"
-CPPFLAGS="$MYOLDCPPFLAGS"
+LIBS="$curr_libs"
+CPPFLAGS="$curr_cppflags"
 
 AC_CHECK_LIB([$USE_MATH], [__gmp_get_memory_functions],
  [AC_DEFINE([HAVE_MP_GET_MEMORY_FUNCTIONS], [1])], [], [])
@@ -938,28 +942,6 @@ case $host_os in
 	;;
 esac
 
-# Simon: removed, use --disable-nls instead
-## Disable for Cygwin
-#AC_MSG_CHECKING([for __CYGWIN__])
-#AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-#	#ifndef __CYGWIN__
-#	# error macro not defined
-#	#endif]])],
-#	[enable_nls=no
-#	 AC_MSG_RESULT([yes])],
-#	[AC_MSG_RESULT([no])])
-
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.19.8])
-if test "x$LTLIBINTL" != "x"; then
-  COBC_LIBS="$COBC_LIBS $LTLIBINTL"
-  LIBCOB_LIBS="$LIBCOB_LIBS $LTLIBINTL"
-fi
-
-# Checks for internationalization stuff
-# AM_ICONV
-AM_LANGINFO_CODESET
-
 # Checks for ncurses/pdcurses/curses.
 AC_MSG_NOTICE([Checks for curses ...])
 
@@ -984,6 +966,7 @@ AC_ARG_WITH([curses],
   esac],
   [USE_CURSES="check"])
 
+curr_libs="$LIBS"
 if test "$USE_CURSES" = "ncursesw" -o "$USE_CURSES" = "check"; then
   AC_CHECK_LIB([ncursesw], [initscr], [], [], [])
   if test "x$ac_cv_lib_ncursesw_initscr" = "xyes"; then
@@ -1188,6 +1171,7 @@ if test "$USE_CURSES" != "no" -a "$USE_CURSES" != "not_found"; then
 	[AC_MSG_RESULT([no])],
 	[])
 fi
+LIBS="$curr_libs" # removing curses
 
 AC_ARG_WITH([seqra-extfh],
   [AS_HELP_STRING([--with-seqra-extfh],
@@ -1320,14 +1304,14 @@ if test "$with_db" = "yes"; then
 				AC_MSG_ERROR([Berkeley DB db.h has incompatible version])
 			fi
 		fi
-		MYOLDLIBS="$LIBS"
+		test_libs="$LIBS"
 		cob_got_db=no
 		AC_MSG_CHECKING([for Berkeley DB library with version $COB_BDB_HEADER])
 		# prefer library with version number included as some systems link against wrong version
 		# of the library and to not break when a newer BDB version is installed, see bug #100
 		for cobdb in db-$COB_BDB_HEADER db
 		do
-			LIBS="$MYOLDLIBS -l$cobdb"
+			LIBS="$test_libs -l$cobdb"
 			AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
 			#include <db.h>]], [[
 			int major, minor, patch;
@@ -1343,7 +1327,8 @@ if test "$with_db" = "yes"; then
 			[],
 			[])
 		done
-		LIBS="$MYOLDLIBS"
+		LIBS="$test_libs"
+		unset test_libs
 		if test "$cob_got_db" = "yes"; then
 			AC_MSG_RESULT([yes])
 			AC_MSG_NOTICE([BDB library version $COB_BDB_HEADER found as -l$cobdb])
@@ -1361,6 +1346,7 @@ if test "$with_db" = "yes"; then
 	unset cob_got_db
 	unset COB_BDB_HEADER
 fi
+LIBS="$curr_libs"	# removing INDEXED libraries
 
 # Checks for dl/ltdl.
 DEFINE_DL="no"
@@ -1498,27 +1484,27 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 	 AC_MSG_WARN([cannot run test program while cross-compiling])])
 
 #if test "$enable_debug" != "yes" -a "$COB_USES_GCC_NO_ICC" = "yes"; then
-#	MYOLDCFLAGS="$CFLAGS"
+#	curr_cflags="$CFLAGS"
 #	CFLAGS="$CFLAGS -fno-asynchronous-unwind-tables"
 #	AC_MSG_CHECKING([for gcc unwind tables option])
 #	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
 #		[AC_DEFINE([HAVE_UNWIND_OPT], [1]) AC_MSG_RESULT([yes])],
 #		[AC_MSG_RESULT([no])])
-#	CFLAGS="$MYOLDCFLAGS"
+#	CFLAGS="$curr_cflags"
 #fi
 
 # Check gcc wrapv option
 # We likely don't need this and remove it before 3.0 final release
 #if test "$COB_USES_GCC_NO_ICC" = "yes"; then
-#	MYOLDCFLAGS="$CFLAGS"
+#	curr_cflags="$CFLAGS"
 #	CFLAGS="$CFLAGS -fwrapv"
 #	AC_MSG_CHECKING([for gcc -fwrapv option])
 #	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
 #		[AC_DEFINE([HAVE_FWRAPV_OPT], [1]) AC_MSG_RESULT([yes])],
 #		[AC_MSG_RESULT([no])])
 #		[],
-#		[CFLAGS="$MYOLDCFLAGS"])
-#	CFLAGS="$MYOLDCFLAGS"
+#		[CFLAGS="$curr_cflags"])
+#	CFLAGS="$curr_cflags"
 #fi
 
 # Check if aligned attribute seems to work
@@ -1530,6 +1516,32 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]],
 	[AC_DEFINE([HAVE_ATTRIBUTE_ALIGNED], [1]) AC_MSG_RESULT([yes])
 	],
 	[AC_MSG_RESULT([no])])
+
+# Simon: removed, use --disable-nls instead
+## Disable for Cygwin
+#AC_MSG_CHECKING([for __CYGWIN__])
+#AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#	#ifndef __CYGWIN__
+#	# error macro not defined
+#	#endif]])],
+#	[enable_nls=no
+#	 AC_MSG_RESULT([yes])],
+#	[AC_MSG_RESULT([no])])
+
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.19.8])
+if test "x$LTLIBINTL" != "x"; then
+  if test "x$PROGRAMS_LIBS" != "x"; then
+    PROGRAMS_LIBS="$PROGRAMS_LIBS $LTLIBINTL"
+  else
+    PROGRAMS_LIBS="$LTLIBINTL"
+  fi
+  LIBCOB_LIBS="$LIBCOB_LIBS $LTLIBINTL"
+fi
+
+# Checks for internationalization stuff
+# AM_ICONV
+AM_LANGINFO_CODESET
 
 # GnuCOBOL Configuration
 
@@ -1558,7 +1570,7 @@ else
 	fi
 fi
 COB_OBJECT_EXT="$OBJEXT"
-LIBS="$save_libs"
+LIBS="$curr_libs"
 COB_EXPORT_DYN="`eval echo $export_dynamic_flag_spec`"
 # FIXME: lt_prog_compiler_pic is not always correct, for example with occ
 COB_PIC_FLAGS=`echo "$lt_prog_compiler_pic" | sed -e 's/^ //'`
@@ -1575,13 +1587,12 @@ if test "$enable_cflags_setting" = "yes"; then
 
 	# For debugging: add -g3 if using GCC.
 	if test "$enable_debug" = "yes" -a "$COB_USES_GCC" = "yes"; then
-		MYOLDCFLAGS="$CFLAGS"
+		curr_cflags="$CFLAGS"
 		CFLAGS="$CFLAGS -g3"
 		AC_MSG_CHECKING([for gcc -g3 option])
 		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
 			[AC_MSG_RESULT([yes])],
-			[CFLAGS="$MYOLDCFLAGS"; AC_MSG_RESULT([no])])
-		unset MYOLDCFLAGS
+			[CFLAGS="$curr_cflags"; AC_MSG_RESULT([no])])
 	fi
 fi
 
@@ -1644,13 +1655,13 @@ fi
 # Check gcc 4 pointer sign option (at least available with "recent" clang, too)
 #if test "$COB_USES_GCC_NO_ICC" = "yes"; then
 if test "$COB_USES_XLC_ONLY" != "yes"; then
-	MYOLDCFLAGS="$CFLAGS"
+	curr_cflags="$CFLAGS"
 	CFLAGS="$CFLAGS -Wno-pointer-sign"
 	AC_MSG_CHECKING([for gcc pointer sign option])
 	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
 		[COB_CFLAGS="$COB_CFLAGS -Wno-pointer-sign"; AC_MSG_RESULT([yes])],
 		[AC_MSG_RESULT([no])])
-	CFLAGS="$MYOLDCFLAGS"
+	CFLAGS="$curr_cflags"
 fi
 #fi
 
@@ -1794,14 +1805,14 @@ if test "$COB_USES_ICC_ONLY" = "yes"; then
 	fi
 	CFLAGS="$CFLAGS -Wall -wd1419 -vec-report0 -opt-report 0"
 elif test "$COB_USES_GCC" = "yes" && test "$with_gnu_ld" = "yes"; then
-	MYOLDLDFLAGS="$LDFLAGS"
+	curr_ldflags="$LDFLAGS"
 	LDFLAGS="$LDFLAGS -Wl,-z,relro,-z,now,-O1"
 	AC_MSG_CHECKING([for ld bind now option])
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
 		[AC_MSG_RESULT([yes])],
-		[LDFLAGS=$MYOLDLDFLAGS
+		[LDFLAGS=$curr_ldflags
 		 AC_MSG_RESULT([no])])
-	unset MYOLDLDFLAGS
+	unset curr_ldflags
 	if test "$enable_debug" != "yes"; then
 		CFLAGS="$CFLAGS -finline-functions"
 	fi
@@ -1855,9 +1866,9 @@ unset COB_USES_ICC_ONLY
 unset COB_USES_CLANG_ONLY
 unset COB_USES_XLC_ONLY
 unset COB_USES_WATCOM_ONLY
-unset MYOLDCFLAGS
-unset MYOLDLIBS
-unset MYOCLIBS
+unset curr_cflags
+unset curr_cppflags
+unset curr_libs
 
 # Generate the output
 
@@ -1884,7 +1895,7 @@ AC_SUBST([COB_LIBRARY_PATH])
 AC_SUBST([COB_OBJECT_EXT])
 AC_SUBST([COB_MODULE_EXT])
 AC_SUBST([COB_EXE_EXT])
-AC_SUBST([COBC_LIBS])
+AC_SUBST([PROGRAMS_LIBS])
 AC_SUBST([LIBCOB_LIBS])
 AC_SUBST([LIBCOB_CPPFLAGS])
 AC_SUBST([COB_EXPORT_DYN])
@@ -1915,8 +1926,8 @@ AC_MSG_NOTICE([GnuCOBOL Configuration:])
 AC_MSG_NOTICE([ CC                ${CC}])
 AC_MSG_NOTICE([ CFLAGS            ${CFLAGS}])
 AC_MSG_NOTICE([ LDFLAGS           ${LDFLAGS}])
-if test "x$COBC_LIBS" != "x"; then
-  AC_MSG_NOTICE([ COBC_LIBS         ${COBC_LIBS}])
+if test "x$PROGRAMS_LIBS" != "x"; then
+  AC_MSG_NOTICE([ PROGRAMS_LIBS         ${PROGRAMS_LIBS}])
 fi
 AC_MSG_NOTICE([ COB_CC            ${COB_CC}])
 AC_MSG_NOTICE([ COB_CFLAGS        ${COB_CFLAGS}])

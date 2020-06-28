@@ -28,8 +28,8 @@ COBCRUN = cobcrun$(EXEEXT)
 AM_LDFLAGS = $(COB_EXPORT_DYN)
 AM_CPPFLAGS = -I$(top_srcdir)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
-cobcrun_LDADD = $(top_builddir)/lib/libsupport.a $(top_builddir)/libcob/libcob.la \
-	$(CODE_COVERAGE_LIBS)
+cobcrun_LDADD = $(PROGRAMS_LIBS) $(top_builddir)/lib/libsupport.a \
+	$(top_builddir)/libcob/libcob.la $(CODE_COVERAGE_LIBS)
 
 # Add rules for code-coverage testing, as provided AX_CODE_COVERAGE
 @CODE_COVERAGE_RULES@

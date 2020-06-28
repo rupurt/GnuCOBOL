@@ -1,4 +1,13 @@
 
+2020-06-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: ensure that libraries for screenio and indexed access
+	  are only applied to LIBCOB_LIBS; gettext is checked and applied after
+	  any other external libraries; replaced COBC_LIBS by PROGRAM_LIBS as this
+	  also applies to cobcrun
+	* Makefile.am (vcs-update): new (maintainer-only) target to ease updating
+	  sourcedir in out-of-tree builds
+
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: fixed missing use of AS_IF

@@ -28,8 +28,8 @@ cobc_SOURCES = cobc.c cobc.h ppparse.y pplex.c parser.y scanner.c config.c \
 
 AM_CPPFLAGS = -I$(top_srcdir)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
-cobc_LDADD = $(COBC_LIBS) $(top_builddir)/libcob/libcob.la $(top_builddir)/lib/libsupport.a \
-	$(CODE_COVERAGE_LIBS)
+cobc_LDADD = $(PROGRAMS_LIBS) $(top_builddir)/lib/libsupport.a \
+	$(top_builddir)/libcob/libcob.la $(CODE_COVERAGE_LIBS)
 
 dist_man_MANS = cobc.1
 COBC = cobc$(EXEEXT)
