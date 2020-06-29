@@ -35,9 +35,11 @@ NEWS - user visible changes				-*- outline -*-
    using `CALL "EXTFH"`.
    ** Note: Not each flag contained in the FCD3 is handled already **
    
-** screen i/o: initial mouse support (for details see runtime.cfg),
+** Screen I/O: initial mouse support (for details see runtime.cfg),
    use of CURSOR clause in SPECIAL-NAMES for positioning on ACCEPT
 
+** >>TURN (COBOL 2002) directive implemented, allowing some -debug checks to be
+   turned on/off as desired.
 
 * Removed functions
 
