@@ -133,6 +133,7 @@ extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
+libcob/exception-io.def -text
 m4/ax_check_define.m4 -text
 m4/ax_code_coverage.m4 -text
 m4/codeset.m4 eol=lf

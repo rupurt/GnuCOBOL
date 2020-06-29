@@ -1,4 +1,9 @@
 
+2020-06-26  Edward Hart <edward.dan.hart@gmail.com>
+
+	* exception.def: split I/O exceptions into exception-io.def to control
+	  exceptions for specific files (>>TURN EC-I-O file).
+
 2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c (cob_fd_file_open, cob_file_open): removed duplicate code;

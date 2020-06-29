@@ -1,4 +1,4 @@
-## Copyright (C) 2003-2012, 2014-2019 Free Software Foundation, Inc.
+## Copyright (C) 2003-2012, 2014-2020 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart,
 ## Ron Norman
 ##
@@ -849,6 +849,43 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [OKOKOKOK])
+
+AT_CLEANUP
+
+
+AT_SETUP([TURN directive])
+AT_KEYWORDS([runmisc directives])
+
+AT_DATA([prog.cob], [
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  x.
+           03  y PIC X OCCURS 5 TIMES.
+           03  z PIC X VALUE "!".
+       01  idx PIC 99 VALUE 6.
+           
+       PROCEDURE DIVISION.
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
+           DISPLAY y (idx)
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
+       >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF    
+           DISPLAY y (idx)
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON           
+           DISPLAY y (idx)
+           .
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1],
+[!
+!
+], [libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
+	maximum subscript for 'y': 5
+])
 
 AT_CLEANUP
 

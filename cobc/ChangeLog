@@ -3,9 +3,26 @@
 
 	* Makefile.am: include PROGRAMS_LIBS
 
+2020-06-26  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, cobc.h, tree.c: completed >>TURN EC-I-O file.
+	* cobc.c: fixed line reported in >>TURN syntax errors.
+	* pplex.l, ppparse.y: added SET BOUND and SET SSRANGE.
+
 2020-06-26  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pplex.l: allow more characters in $DISPLAY
+
+2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, cobc.h: completed initial implementation on disabling ECs.
+	* cobc.c, cobc.h, parser.y, ppparse.y, scanner.l: completed initial
+	  implementation of >>TURN.
+
+2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h, flag.def, ppparse.y: draft work on >>TURN and
+	  disabling exceptions (FR #53).
 
 2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
 
