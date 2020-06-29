@@ -1,4 +1,13 @@
 
+2020-06-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_internal_function): fix bug #641 FUNCTION RETURNING
+	  with variable field size
+	* parser.y (_procedure_returning): work around for bug #650
+	  disabled PROCEDURE DIVISION USING for normal programs as pending
+	* codegen.c (output_call): use a temporary integer for CALL ... RETURNING
+	  to not pollute RETURN-CODE in this case, fixing bug #651
+
 2020-06-28  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am: include PROGRAMS_LIBS

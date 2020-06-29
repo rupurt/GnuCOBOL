@@ -6079,7 +6079,7 @@ AT_DATA([prog.cob], [
            READ f NEXT
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
-               DISPLAY "FAILED 1: status " f-status
+               DISPLAY "FAILED 1: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
@@ -6089,7 +6089,7 @@ AT_DATA([prog.cob], [
            READ f PREVIOUS
            IF (f-status <> "00") OR
                    (file1-serial <> 3)
-               DISPLAY "FAILED 2: status " f-status
+               DISPLAY "FAILED 2: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
@@ -6099,7 +6099,7 @@ AT_DATA([prog.cob], [
            READ f NEXT
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
-               DISPLAY "FAILED 3: status " f-status
+               DISPLAY "FAILED 3: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
@@ -6109,7 +6109,7 @@ AT_DATA([prog.cob], [
            READ f NEXT
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
-               DISPLAY "FAILED 4: status " f-status
+               DISPLAY "FAILED 4: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
@@ -6119,7 +6119,7 @@ AT_DATA([prog.cob], [
            READ f PREVIOUS
            IF (f-status <> "00") OR
                    (file1-serial <> 3)
-               DISPLAY "FAILED 5: status " f-status
+               DISPLAY "FAILED 5: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
@@ -6129,18 +6129,20 @@ AT_DATA([prog.cob], [
            READ f NEXT
            IF (f-status <> "00") OR
                    (file1-serial <> 4)
-               DISPLAY "FAILED 6: status " f-status
+               DISPLAY "FAILED 6: status " f-status "-"
                        "serial: " file1-serial
            END-IF
 
            MOVE "XX-" TO f-key3-1
            START f KEY > f-key3-1
            READ f NEXT
-      *    Not yet implemented: Return file-status "02" if duplicates exist
-      *    IF (f-status <> "02") OR
-           IF (f-status <> "00") OR
-                   (file1-serial <> 3)
-               DISPLAY "FAILED 7: status " f-status
+      *  CHECK: Return file-status "02" if duplicates exist
+           IF (f-status <> "02"
+      *    Depends on xISAM implementation and the way BDB is used (not yet
+      *    implemented in 3.x)
+            AND f-status <> "00"
+               ) OR file1-serial <> 3
+               DISPLAY "FAILED 7: status " f-status "-"
            END-IF
            CLOSE f
            STOP RUN

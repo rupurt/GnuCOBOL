@@ -9940,10 +9940,17 @@ _procedure_returning:
 				if (f->flag_any_length) {
 					cb_error (_("function RETURNING item may not be ANY LENGTH"));
 				}
-
 				f->flag_is_returning = 1;
 			}
+#if 0	/* doesn't work for programs, will be fixed with allocating in the source-unit */
 			current_program->returning = $2;
+#else
+			if (current_program->prog_type == COB_MODULE_TYPE_FUNCTION) {
+				current_program->returning = $2;
+			} else {
+				CB_PENDING ("program RETURNING");
+			}
+#endif
 		}
 	}
   }
