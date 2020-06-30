@@ -1,4 +1,28 @@
 
+2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	new functions in the C API for cob_field based access, see FR #383 FR #384
+	* common.c, common.h (cob_get_param_field, cob_get_field_size,
+	  cob_get_field_sign, cob_get_field_scale, cob_get_field_digits,
+	  cob_get_field_constant, cob_get_field_type, explain_field_type):
+	  new functions to get a cob_field or information about it
+	* common.c, common.h (cob_get_field_str, cob_get_field_str_buffered):
+	  new functions to get a field's value in "pretty-display" form
+	* common.c, common.h (cob_put_field_str): new function to set the field's
+	  data using the appropriate internal type, returns EINVAL if data is invalid
+	* common.c, common.h, coblocal.h (cob_runtime_warning_external): exported
+	  function, handle missing caller attribute
+
+	* common.c, common.h (cob_get_param_str, cob_get_param_str_bufffered,
+	  cob_put_field_str): string exchange functions for param based API
+	* common.c, common.h (cob_getenv_direct): new function similar to cob_getenv
+	  but without internal memory allocation
+	* termio.c, coblocal.h: renamed display_common to cob_display_common and made
+	  it internally available
+	* intrinsic.c, coblocal.h: made cob_check_numval_f internally available
+	* fileio.c, coblocal.h: renamed cob_srttmpfile to cob_create_tmpfile and made
+	  it internally available
+
 2020-06-26  Edward Hart <edward.dan.hart@gmail.com>
 
 	* exception.def: split I/O exceptions into exception-io.def to control

@@ -2136,7 +2136,7 @@ cob_field_to_string (const cob_field *f, void *str, const size_t maxsize)
 	size_t		i;
 
 	if (unlikely (f == NULL)) {
-		strncpy (str, _ ("NULL field"), maxsize);
+		strncpy (str, _("NULL field"), maxsize);
 		return;
 	}
 
@@ -2146,7 +2146,7 @@ cob_field_to_string (const cob_field *f, void *str, const size_t maxsize)
 	}
 	/* check if field has data assigned (may be a BASED / LINKAGE item) */
 	if (unlikely (f->data == NULL)) {
-		strncpy (str, _ ("field with NULL address"), maxsize);
+		strncpy (str, _("field with NULL address"), maxsize);
 		return;
 	}
 	i = f->size - 1;
@@ -3084,7 +3084,7 @@ cob_check_linkage (const unsigned char *x, const char *name, const int check_typ
 	}
 }
 
-static const char *
+const char *
 explain_field_type (const cob_field *f)
 {
 	switch (COB_FIELD_TYPE (f)) {
@@ -4093,6 +4093,7 @@ unsetenv (const char *name) {
 }
 #endif
 
+/* set entry into environment, with/without overwriting existing values */
 int
 cob_setenv (const char *name, const char *value, int overwrite) {
 #if defined (HAVE_SETENV) && HAVE_SETENV
@@ -4109,6 +4110,7 @@ cob_setenv (const char *name, const char *value, int overwrite) {
 #endif
 }
 
+/* remove entry from environment */
 int
 cob_unsetenv (const char *name) {
 #if defined(HAVE_SETENV) && HAVE_SETENV
@@ -4120,6 +4122,43 @@ cob_unsetenv (const char *name) {
 	sprintf (env, "%s=", name);
 	return putenv (env);
 #endif
+}
+
+/* resolve entry from environment */
+char *
+cob_getenv_direct (const char *name) {
+	return getenv (name);
+}
+
+/* resolve entry from environment and return an allocated string copy
+   --> call cob_free after use! */
+char *
+cob_getenv (const char *name)
+{
+	char	*p;
+
+	if (name) {
+		p = getenv (name);
+		if (p) {
+			return cob_strdup (p);
+		}
+	}
+	return NULL;
+}
+
+int
+cob_putenv (char *name)
+{
+	int	ret;
+
+	if (name && strchr (name, '=')) {
+		ret = putenv (cob_strdup (name));
+		if (!ret) {
+			cob_rescan_env_vals ();
+		}
+		return ret;
+	}
+	return -1;
 }
 
 void
@@ -4348,34 +4387,6 @@ cob_free_alloc (unsigned char **ptr1, unsigned char *ptr2)
 	}
 }
 
-char *
-cob_getenv (const char *name)
-{
-	char	*p;
-
-	if (name) {
-		p = getenv (name);
-		if (p) {
-			return cob_strdup (p);
-		}
-	}
-	return NULL;
-}
-
-int
-cob_putenv (char *name)
-{
-	int	ret;
-
-	if (name && strchr (name, '=')) {
-		ret = putenv (cob_strdup (name));
-		if (!ret) {
-			cob_rescan_env_vals ();
-		}
-		return ret;
-	}
-	return -1;
-}
 #if 0 /* debug only */
 void print_stat (const char *filename, struct stat sb)
 {
@@ -6904,6 +6915,7 @@ cob_runtime_warning_external (const char *caller_name, const int cob_reference, 
 	if (!cobsetptr->cob_display_warn) {
 		return;
 	}
+	if (!(caller_name && *caller_name)) caller_name = "unknown caller";
 
 	/* Prefix */
 	fprintf (stderr, "libcob: ");

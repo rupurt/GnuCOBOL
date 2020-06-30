@@ -1637,9 +1637,12 @@ COB_EXPIMP void	cob_cache_free			(void *);
 
 COB_EXPIMP void	cob_set_locale			(cob_field *, const int);
 
-COB_EXPIMP int 	cob_setenv	(const char *, const char *, int);
-COB_EXPIMP int 	cob_unsetenv	(const char *);
-COB_EXPIMP char	*cob_expand_env_string	(char *);
+COB_EXPIMP int 	cob_setenv		(const char *, const char *, int);
+COB_EXPIMP int 	cob_unsetenv		(const char *);
+COB_EXPIMP char	*cob_getenv_direct		(const char *);
+COB_EXPIMP char* cob_expand_env_string	(char*);
+COB_EXPIMP char	*cob_getenv			(const char *);
+COB_EXPIMP int	cob_putenv			(char *);
 
 COB_EXPIMP void	cob_check_version		(const char *, const char *,
 						 const int);
@@ -1677,8 +1680,6 @@ COB_EXPIMP int	cob_extern_init			(void);
 COB_EXPIMP int	cob_tidy			(void);
 COB_EXPIMP char	*cob_command_line		(int, int *, char ***,
 						 char ***, char **);
-COB_EXPIMP char	*cob_getenv			(const char *);
-COB_EXPIMP int	cob_putenv			(char *);
 
 COB_EXPIMP void	cob_incr_temp_iteration 	(void);
 COB_EXPIMP void	cob_temp_name			(char *, const char *);
@@ -1984,6 +1985,31 @@ COB_EXPIMP void		cob_put_s64_param  ( int num_param, cob_s64_t value );
 COB_EXPIMP void		cob_put_u64_param  ( int num_param, cob_u64_t value );
 COB_EXPIMP void 	cob_put_picx_param ( int num_param, void *charfld );
 COB_EXPIMP void  	cob_put_grp_param  ( int num_param, void *charfld, size_t charlen );
+
+COB_EXPIMP const char	*cob_get_param_str ( int num_param, char *buff, size_t size);
+COB_EXPIMP const char	*cob_get_param_str_buffered ( int num_param );
+COB_EXPIMP int		cob_put_param_str ( int num_param, const char *src );
+
+
+COB_EXPIMP void		cob_runtime_warning_external	(const char *, const int,
+						const char *, ...) COB_A_FORMAT34;
+
+/* get access to one of the fields (to only operate with libcob functions on it!) */
+COB_EXPIMP cob_field	*cob_get_param_field (int n, const char *caller_name);
+COB_EXPIMP int		cob_get_field_size (const cob_field *);
+COB_EXPIMP int		cob_get_field_type (const cob_field *);
+COB_EXPIMP int		cob_get_field_digits	(const cob_field *);
+COB_EXPIMP int		cob_get_field_scale	(const cob_field *);
+COB_EXPIMP int		cob_get_field_sign	(const cob_field *);
+COB_EXPIMP int		cob_get_field_constant (const cob_field *);
+COB_EXPIMP const char	*explain_field_type (const cob_field *);
+
+/* get the field's pretty-display value */
+COB_EXPIMP const char	*cob_get_field_str (const cob_field *, char *buff, size_t size);
+/* get the field's pretty-display value with an internal buffer for one-time access */
+COB_EXPIMP const char	*cob_get_field_str_buffered (const cob_field *);
+/* set the field's data using the appropriate internal type, returns EINVAL if data is invalid */
+COB_EXPIMP int		cob_put_field_str (const cob_field *, const char *);
 
 /*******************************/
 /* Functions in screenio.c */

@@ -366,6 +366,9 @@ COB_HIDDEN void		cob_exit_intrinsic	(void);
 COB_HIDDEN void		cob_exit_strings	(void);
 COB_HIDDEN void		cob_exit_mlio		(void);
 
+COB_HIDDEN FILE		*cob_create_tmpfile	(const char *);
+COB_HIDDEN int		cob_check_numval_f	(const cob_field *);
+
 COB_HIDDEN int		cob_real_get_sign	(cob_field *);
 COB_HIDDEN void		cob_real_put_sign	(cob_field *, const int);
 
@@ -375,6 +378,8 @@ COB_HIDDEN void		cob_decimal_init2	(cob_decimal *, const cob_uli_t);
 COB_HIDDEN void		cob_decimal_setget_fld	(cob_field *, cob_field *,
 						 const int);
 COB_HIDDEN void		cob_decimal_move_temp	(cob_field *, cob_field *);
+
+COB_HIDDEN void		cob_display_common	(const cob_field *, FILE *);
 COB_HIDDEN void		cob_print_ieeedec	(const cob_field *, FILE *);
 COB_HIDDEN void		cob_print_realbin	(const cob_field *, FILE *,
 						 const int);
@@ -388,8 +393,6 @@ COB_HIDDEN const char	*cob_get_last_exception_name	(void);
 COB_HIDDEN void		cob_field_to_string	(const cob_field *, void *,
 						 const size_t);
 COB_HIDDEN void		cob_parameter_check	(const char *, const int);
-COB_HIDDEN void		cob_runtime_warning_external	(const char *, const int,
-						const char *, ...) COB_A_FORMAT34;
 
 COB_HIDDEN cob_settings *cob_get_settings_ptr	(void);
 

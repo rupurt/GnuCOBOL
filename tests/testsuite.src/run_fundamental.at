@@ -1254,7 +1254,6 @@ AT_DATA([prog.cob], [
            GOBACK
            .
        END PROGRAM prog.
-
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])

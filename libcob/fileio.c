@@ -6496,15 +6496,15 @@ cob_new_item (struct cobsort *hp, const size_t size)
 	return q;
 }
 
-static FILE *
-cob_srttmpfile (void)
+FILE *
+cob_create_tmpfile (const char *ext)
 {
 	FILE		*fp;
 	char		*filename;
 	int		fd;
 
 	filename = cob_malloc ((size_t)COB_FILE_BUFF);
-	cob_temp_name (filename, NULL);
+	cob_temp_name (filename, ext);
 	cob_incr_temp_iteration ();
 #ifdef	_WIN32
 	fd = open (filename,
@@ -6530,7 +6530,7 @@ static int
 cob_get_sort_tempfile (struct cobsort *hp, const int n)
 {
 	if (hp->file[n].fp == NULL) {
-		hp->file[n].fp = cob_srttmpfile ();
+		hp->file[n].fp = cob_create_tmpfile (NULL);
 		if (hp->file[n].fp == NULL) {
 			cob_runtime_error (_("SORT is unable to acquire temporary file"));
 			cob_stop_run (1);
