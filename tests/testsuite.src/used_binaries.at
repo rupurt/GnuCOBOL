@@ -694,15 +694,20 @@ AT_DATA([prog.cob], [
            STOP RUN WITH NORMAL STATUS.
 ])
 
-AT_CHECK([cat prog.cob | $COMPILE -], [0], [], [])
-AT_CHECK([$COBCRUN_DIRECT ./a.out], [0], [], [])
-
 AT_CHECK([cat prog.cob | $COMPILE_MODULE -], [0], [], [],
 # Previous test failed run again with full verbose output
 # leading to an (expected) fail, but with decent messages
 [AT_CHECK([cat prog.cob | $COMPILE_MODULE -vv -], [0], [])]
 )
 AT_CHECK([$COBCRUN a], [0], [], [])
+
+AT_CHECK([cat prog.cob | $COMPILE -], [0], [], [],
+# more to debug ...
+[AT_CHECK([cat prog.cob | $COMPILE -vv -], [0], [])]
+)
+AT_CHECK([$COBCRUN_DIRECT ./a.out], [0], [], [])
+
+
 
 AT_CLEANUP
 
