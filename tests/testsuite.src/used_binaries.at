@@ -24,7 +24,7 @@
 ##  are tested via configuration.at
 
 
-AT_SETUP([Compiler help and information])
+AT_SETUP([compiler help and information])
 AT_KEYWORDS([runmisc cobc])
 
 # FIXME: check at least some parts of the output by using $GREP
@@ -43,7 +43,7 @@ AT_CHECK([$COBC --list-system], [0], [ignore], [])
 AT_CLEANUP
 
 
-AT_SETUP([Compiler warnings])
+AT_SETUP([compiler warnings])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob],[
@@ -101,7 +101,7 @@ AT_CHECK([$COBC -fsyntax-only -Werror=additional -Wno-error prog.cob], [1], [],
 AT_CLEANUP
 
 
-AT_SETUP([Compiler outputs (general)])
+AT_SETUP([compiler outputs (general)])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob],[
@@ -141,7 +141,7 @@ AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [bluBb], [])
 AT_CLEANUP
 
 
-AT_SETUP([Compiler outputs (file specified)])
+AT_SETUP([compiler outputs (file specified)])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob],[
@@ -169,7 +169,7 @@ AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [bluBb], [])
 AT_CLEANUP
 
 
-AT_SETUP([Compiler outputs (path specified)])
+AT_SETUP([compiler outputs (path specified)])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob],[
@@ -198,7 +198,7 @@ AT_CHECK([$COBCRUN_DIRECT ./sub/prog], [0], [bluBb], [])
 AT_CLEANUP
 
 
-AT_SETUP([Compiler outputs (assembler)])
+AT_SETUP([compiler outputs (assembler)])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob],[
@@ -233,7 +233,7 @@ AT_CHECK([test -f prog.s], [0], [], [],
 AT_CLEANUP
 
 
-AT_SETUP([Source file not found])
+AT_SETUP([source file not found])
 AT_KEYWORDS([cobc runmisc])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
@@ -243,7 +243,7 @@ AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 AT_CLEANUP
 
 
-AT_SETUP([Temporary path invalid])
+AT_SETUP([temporary path invalid])
 AT_KEYWORDS([cobc runmisc])
 
 # Note: may be either removed completely as there was a report about
@@ -278,7 +278,7 @@ AT_CHECK([TMPDIR="" TMP="" TEMP="./prog.cob" $COMPILE prog.cob], [0], [],
 AT_CLEANUP
 
 
-AT_SETUP([Using full path for cobc])
+AT_SETUP([use of full path for cobc])
 AT_KEYWORDS([runmisc])
 
 AT_DATA([prog.cob], [
@@ -333,7 +333,7 @@ AT_CHECK([$COBCRUN_DIRECT ./sub/prog],  [0], [OK], [])
 AT_CLEANUP
 
 
-AT_SETUP([Invalid cobc option])
+AT_SETUP([invalid cobc option])
 AT_KEYWORDS([runmisc cobc])
 
 AT_DATA([prog.cob], [
@@ -621,7 +621,7 @@ AT_CHECK([$COBCRUN -q -M], [1], [],
 AT_CLEANUP
 
 
-AT_SETUP([Run job after compilation])
+AT_SETUP([run job after compilation])
 AT_KEYWORDS([runmisc cobcrun])
 
 AT_DATA([prog.cob], [
@@ -640,7 +640,7 @@ AT_CHECK([$COMPILE_MODULE -jd prog.cob], [0], [job], [])
 AT_CLEANUP
 
 
-AT_SETUP([Run job after compilation (path specified)])
+AT_SETUP([run job after compilation (path specified)])
 AT_KEYWORDS([runmisc cobcrun])
 
 AT_DATA([prog.cob], [
@@ -660,7 +660,7 @@ AT_CHECK([$COMPILE -jd -o $(_return_path "sub/prog$COB_EXE_EXT") prog.cob], [0],
 AT_CLEANUP
 
 
-AT_SETUP([Run job with optional arguments])
+AT_SETUP([run job with optional arguments])
 AT_KEYWORDS([runmisc cobcrun])
 
 AT_DATA([prog.cob], [
@@ -682,8 +682,8 @@ AT_CHECK([$COMPILE_MODULE --job=job123 prog.cob], [0], [job123  ], [])
 AT_CLEANUP
 
 
-AT_SETUP([Compile from stdin])
-AT_KEYWORDS([runmisc cobcrun])
+AT_SETUP([compile from stdin])
+AT_KEYWORDS([runmisc cobc cobcrun])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -697,14 +697,18 @@ AT_DATA([prog.cob], [
 AT_CHECK([cat prog.cob | $COMPILE -], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./a.out], [0], [], [])
 
-AT_CHECK([cat prog.cob | $COMPILE_MODULE -], [0], [], [])
+AT_CHECK([cat prog.cob | $COMPILE_MODULE -], [0], [], [],
+# Previous test failed run again with full verbose output
+# leading to an (expected) fail, but with decent messages
+[AT_CHECK([cat prog.cob | $COMPILE_MODULE -vv -], [0], [])]
+)
 AT_CHECK([$COBCRUN a], [0], [], [])
 
 AT_CLEANUP
 
 
-AT_SETUP([Run job after compilation from stdin])
-AT_KEYWORDS([runmisc cobcrun])
+AT_SETUP([run job after compilation from stdin])
+AT_KEYWORDS([runmisc cobc cobcrun])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -716,7 +720,14 @@ AT_DATA([prog.cob], [
            STOP RUN WITH NORMAL STATUS.
 ])
 
-AT_CHECK([cat prog.cob | $COMPILE -j -], [0], [job], [])
-AT_CHECK([cat prog.cob | $COMPILE_MODULE -j -], [0], [job], [])
+AT_CHECK([cat prog.cob | $COMPILE -j -], [0], [job], [],
+# Previous test failed run again with full verbose output
+# leading to an (expected) fail, but with decent messages
+[AT_CHECK([cat prog.cob | $COMPILE -vv -j -], [0], [])]
+)
+AT_CHECK([cat prog.cob | $COMPILE_MODULE -j -], [0], [job], [],
+# more to debug ...
+[AT_CHECK([cat prog.cob | $COMPILE_MODULE -vv -j -], [0], [])]
+)
 
 AT_CLEANUP

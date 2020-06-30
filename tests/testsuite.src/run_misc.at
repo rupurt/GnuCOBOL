@@ -854,7 +854,11 @@ AT_CLEANUP
 
 
 AT_SETUP([TURN directive])
-AT_KEYWORDS([runmisc directives])
+AT_KEYWORDS([runmisc BOUND NOBOUND directives])
+
+# note: we only check here that the TURN directive applies
+#       for more general tests, including command line options
+#       and extension directives, see run_subscript.at, run_refmod.at
 
 AT_DATA([prog.cob], [
        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
@@ -863,31 +867,30 @@ AT_DATA([prog.cob], [
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  x.
+       01  x VALUE "12345!".
            03  y PIC X OCCURS 5 TIMES.
-           03  z PIC X VALUE "!".
+           03  z PIC X.
        01  idx PIC 99 VALUE 6.
-           
+
        PROCEDURE DIVISION.
        >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-           DISPLAY y (idx)
+           DISPLAY y (idx) WITH NO ADVANCING
        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-       >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF    
-           DISPLAY y (idx)
-       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON           
-           DISPLAY y (idx)
+       >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
+           DISPLAY y (idx) WITH NO ADVANCING
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
+           DISPLAY y (idx) WITH NO ADVANCING
            .
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [1],
-[!
-!
-], [libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [!!],
+[libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
 	maximum subscript for 'y': 5
 ])
 
 AT_CLEANUP
+
 
 ## OCCURS clause
 

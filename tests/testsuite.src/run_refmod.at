@@ -252,8 +252,9 @@ AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 AT_CLEANUP
 
 
-AT_SETUP([Disable ref mod check])
-AT_KEYWORDS([refmod debug])
+AT_SETUP([enable / disable ref-mod check])
+AT_KEYWORDS([refmod debug exception-name
+TURN SSRANGE NOSSRANGE])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
@@ -268,19 +269,15 @@ AT_DATA([prog.cob], [
 
        PROCEDURE DIVISION.
            DISPLAY y (3:len)
+                   WITH NO ADVANCING
            DISPLAY FUNCTION TRIM(FUNCTION EXCEPTION-STATUS)
+                   WITH NO ADVANCING
            .
 ])
 
-AT_CHECK([$COMPILE -fdisable-ec=EC-BOUND-REF-MOD prog.cob], [0], [], [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
-[cd
-
-])
-AT_CHECK([$COMPILE -fdisable-ec=EC-BOUND prog.cob], [0], [], [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
-[cd
-
-])
+AT_CHECK([$COMPILE -fno-ec=BOUND-REF-MOD prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [cd])
+AT_CHECK([$COMPILE -fno-ec=BOUND prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [cd])
 
 AT_CLEANUP

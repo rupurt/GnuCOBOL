@@ -1746,7 +1746,6 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 
 	if (to_on_off) {
 		/* TO-DO: Only if >>TURN ... ON WITH LOCATION found? */
-		/* TO-DO: Only if to_on_off = 1? */
 		cb_flag_source_location = 1;
 	}
 
@@ -1815,18 +1814,26 @@ cobc_apply_turn_directives (void)
 	}
 }
 
+/* set the specified exception-name to the given value,
+   note: exception-name may also specified without EC-prefix here */
 static unsigned int
 cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
 {
 	struct cb_text_list	*cb_ec_list = NULL;
 	char	*p;
 	char	*q;
+	char	wrk[COB_MAX_NAMELEN + 1];
 	struct cb_tree_common	loc;
 
 	p = cobc_strdup (opt);
 	q = strtok (p, " ");
 	while (q) {
-		CB_TEXT_LIST_ADD (cb_ec_list, q);
+		if (strncasecmp (q, "ec-", 3)) {
+			snprintf (wrk, COB_MAX_NAMELEN, "EC-%s", q);
+			CB_TEXT_LIST_ADD (cb_ec_list, wrk);
+		} else {
+			CB_TEXT_LIST_ADD (cb_ec_list, q);
+		}
 		q = strtok (NULL, " ");
 	}
 	cobc_free (p);
@@ -1835,7 +1842,6 @@ cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
 	loc.source_column = 0;
 	loc.source_line = 0;
 	return cobc_turn_ec (cb_ec_list, to_on_off, &loc);
-
 }
 
 /* Local functions */
@@ -3486,17 +3492,18 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 11:
-			/* -fenable-ec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW */
+			/* -fec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW,
+			               also allows to skip the prefix e.g. BOUND-OVERFLOW */
 			if (cobc_deciph_ec (cob_optarg, 1U)) {
-				cobc_err_exit (COBC_INV_PAR, "-fenable-ec");
-			};
+				cobc_err_exit (COBC_INV_PAR, "-fec");
+			}
 			break;
 
 		case 12:
-			/* -fdisable-ec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW */
+			/* -fno-ec=<xx> : COBOL exception-name, e.g. EC-BOUND-OVERFLOW */
 			if (cobc_deciph_ec (cob_optarg, 0)) {
-				cobc_err_exit (COBC_INV_PAR, "-fenable-ec");
-			};
+				cobc_err_exit (COBC_INV_PAR, "-fno-ec");
+			}
 			break;
 
 		case 'A':

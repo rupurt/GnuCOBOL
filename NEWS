@@ -2,8 +2,25 @@ NEWS - user visible changes				-*- outline -*-
 
  GnuCOBOL 3.1 final to be released (in Aug-Sept 2020)
 
+* Known issues in 3.1-rc1
  
- GnuCOBOL 3.1-rc1 to be released (in June 2020)
+** the documentation is not in the final state for the release
+
+** testsuite:
+  * if built with --vbisam some tests will lead to UNEXPECTED PASS,
+    depending on the actual version used some other may fail
+  * possibly failing tests:
+    * very long literal in error message
+  * possibly failing tests (false positives):
+    * temporary path invalid
+    * compiler outputs (assembler)
+    * function with variable-length RETURNING item
+
+** the recent additions of ">> TURN" and "variable LIKE variable" do not work
+   as expected in all cases
+
+ 
+ GnuCOBOL 3.1-rc1 (2020063)
 
 * New GnuCOBOL features
 
@@ -20,6 +37,9 @@ NEWS - user visible changes				-*- outline -*-
    
 ** TYPEDEF and SAME AS (COBOL 2002) implemented, including the MicroFocus
    and RM/COBOL variants
+
+** >>TURN (COBOL 2002) directive implemented, allowing some exception checks
+   to be turned on/off per source as desired
 
 ** Improved support for different compiler extensions (ACUCOBOL, IBM,
    Fujitsu, MicroFocus COBOL, Microsoft COBOL, RM/COBOL, CA Realia and more)
@@ -38,9 +58,6 @@ NEWS - user visible changes				-*- outline -*-
 ** Screen I/O: initial mouse support (for details see runtime.cfg),
    use of CURSOR clause in SPECIAL-NAMES for positioning on ACCEPT
 
-** >>TURN (COBOL 2002) directive implemented, allowing some -debug checks to be
-   turned on/off as desired.
-
 * Removed functions
 
 ** SCREEN SECTION, REPORT-WRITER module: removed non-standard extension
@@ -50,6 +67,12 @@ NEWS - user visible changes				-*- outline -*-
 
 
 * Changes to the COBOL compiler (cobc) options:
+
+** new options:
+   -f[no]-ec=exception-name to tune the exception checks similar to the >>TURN
+       directive, you may also leave out the "EC-" prefix here, example to
+       enable all checks but disable all bound checks but OCCURS DEPENDING ON:
+       cobc -debug -fno-ec=bound -fec=bound-odo
 
 ** adjustments to warning options:
    -Wextra "new" option to enable every possible warning that is not dialect

@@ -82,7 +82,14 @@ cobc_print_usage_common_options (void)
 	puts (_("  -fixed                use fixed source format (default)"));
 	puts (_("  -O, -O2, -O3, -Os     enable optimization"));
 	puts (_("  -O0                   disable optimization"));
-	puts (_("  -g                    enable C compiler debug / stack check / trace"));
+	puts (_("  -g                    enable C compiler debug and stack check"));
+	puts (_("  -d, -debug            enable all run-time error checking,\n"
+	        "                        equal to -fec=EC-ALL -fstack-check"));
+	/* duplicated here from flags.def to place it next to -debug */
+	puts (_("  -fec=<exception-name>\tenable code generation for <exception-name>,\n"
+	        "                        sets -fsource-location"));
+	puts (_("  -fno-ec=<exception-name>\tdisable code generation for <exception-name>"));
+	puts (_("  -d, -debug            enable all run-time error checking"));
 	puts (_("  -d, -debug            enable all run-time error checking"));
 	puts (_("  -o <file>             place the output into <file>"));
 	puts (_("  -b                    combine all input files into a single\n"
