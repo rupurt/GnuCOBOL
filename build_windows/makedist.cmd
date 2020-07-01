@@ -123,7 +123,7 @@ mkdir include
 mkdir include\libcob
 copy "%cob_source_path%libcob.h"		include\	1>nul
 copy "%cob_source_path%libcob\common.h"		include\libcob\	1>nul
-copy "%cob_source_path%libcob\exception.def"	include\libcob\	1>nul
+copy "%cob_source_path%libcob\exception*.def"	include\libcob\	1>nul
 
 echo Copying translations...
 mkdir po
