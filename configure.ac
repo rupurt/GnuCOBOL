@@ -560,7 +560,8 @@ curr_cppflags=$CPPFLAGS
 
 AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
-	PKG_CHECK_MODULES([GMP], [gmp], [], [#])
+	PKG_CHECK_MODULES([GMP], [gmp], [], [
+		PKG_CHECK_MODULES([GMP], [libgmp], [], [#])])
 	if test -n "$GMP_CFLAGS"; then
 	  CPPFLAGS="$CPPFLAGS $GMP_CFLAGS"
 	fi
@@ -574,7 +575,7 @@ AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <gmp.h>]],
 		  [[mpz_t integ; mpz_init (integ);]])],
 		  [AC_MSG_RESULT([yes])
-		   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $GMP_CFLAGS"
+		   curr_cppflags=$CPPFLAGS   # for the include in cobc generated modules
 		   LIBCOB_LIBS="$LIBCOB_LIBS $GMP_LIBS"
 		   USE_MATH=gmp],
 		  [AC_MSG_RESULT([no])
@@ -607,7 +608,7 @@ AS_IF([test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"], [
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <mpir.h>]],
 		  [[mpz_t integ; mpz_init (integ);]])],
 		  [AC_MSG_RESULT([yes])
-		   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $MPIR_CFLAGS"
+		   curr_cppflags=$CPPFLAGS   # for the include in cobc generated modules
 		   LIBCOB_LIBS="$LIBCOB_LIBS $MPIR_LIBS"
 		   USE_MATH=mpir],
 		  [AC_MSG_RESULT([no])

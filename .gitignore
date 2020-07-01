@@ -10,6 +10,7 @@
 /Makefile.in
 /_*
 /aclocal.m4
+/aminclude_static.am
 /atlocal
 /autom4te.cache
 bin/*.1
@@ -189,6 +190,7 @@ libcob/Makefile
 libcob/Makefile.in
 libcob/TAGS
 libcob/atlocal
+libcob/cJSON*
 /libtool
 m4/.deps
 m4/Makefile
