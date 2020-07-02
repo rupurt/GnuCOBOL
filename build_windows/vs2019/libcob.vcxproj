@@ -70,12 +70,13 @@
     <IntDir>$(Platform)\$(Configuration)\$(TargetName)\</IntDir>
     <IncludePath>$(SolutionDir)..;$(SolutionDir)..\..;$(SolutionDir)..\..\libcob;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(OutDir)..;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(TargetName)\</IntDir>
-    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <IncludePath>$(SolutionDir)..;$(SolutionDir)..\..;$(SolutionDir)..\..\libcob;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(OutDir)..;$(LibraryPath)</LibraryPath>
@@ -85,11 +86,12 @@
     <IntDir>$(Platform)\$(Configuration)\$(TargetName)\</IntDir>
     <IncludePath>$(SolutionDir)..;$(SolutionDir)..\..;$(SolutionDir)..\..\libcob;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(OutDir)..;$(LibraryPath)</LibraryPath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(TargetName)\</IntDir>
-    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <IncludePath>$(SolutionDir)..;$(SolutionDir)..\..;$(SolutionDir)..\..\libcob;$(IncludePath)</IncludePath>
     <LibraryPath>$(OutDir);$(OutDir)..;$(LibraryPath)</LibraryPath>
