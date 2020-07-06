@@ -6815,6 +6815,7 @@ LINE    PG/LN  A...B............................................................
 0 errors in compilation group
 ])
 
-AT_CHECK([gcdiff -IGnuCOBOL prog2.lst prog.lst], [0], [], [])
+AT_CHECK([$UNIFY_LISTING prog.lst prog.lis once], [0], [], [])
+AT_CHECK([diff prog2.lst prog.lis], [0], [], [])
 
 AT_CLEANUP
