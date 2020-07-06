@@ -3224,7 +3224,6 @@ validate_assign_name (struct cb_file * const f,
 	cb_tree	assign = f->assign;
 	cb_tree	x;
 	struct cb_field	*p;
-	unsigned char	*c;
 
 	if (!assign) {
 		return;
@@ -3245,8 +3244,8 @@ validate_assign_name (struct cb_file * const f,
 	/* If assign is a 78-level, change assign to the 78-level's literal. */
 	p = check_level_78 (CB_NAME (assign));
 	if (p) {
-		c = (unsigned char *)CB_LITERAL(CB_VALUE(p->values))->data;
-		assign = CB_TREE (build_literal (CB_CATEGORY_ALPHANUMERIC, c, strlen ((char *)c)));
+		char *c = (char *)CB_LITERAL(CB_VALUE(p->values))->data;
+		assign = CB_TREE (build_literal (CB_CATEGORY_ALPHANUMERIC, c, strlen (c)));
 		f->assign = assign;
 		return;
 	}

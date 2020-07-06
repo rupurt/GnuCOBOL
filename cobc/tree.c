@@ -1164,6 +1164,20 @@ cb_name (cb_tree x)
 	return s;
 }
 
+cb_tree
+cb_exhbit_literal (cb_tree x)
+{
+	char	*s;
+	char	tmp[COB_NORMAL_BUFF] = { 0 };
+	size_t	tlen;
+
+	tlen = cb_name_1 (tmp, x, COB_NORMAL_MAX);
+	s = cobc_parse_malloc (tlen + 4);
+	strcpy (s, tmp);
+	strcpy (s + tlen, " = ");
+	return CB_TREE (build_literal (CB_CATEGORY_ALPHANUMERIC, s, tlen + 3));
+}
+
 enum cb_category
 cb_tree_category (cb_tree x)
 {
