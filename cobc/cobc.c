@@ -1671,11 +1671,8 @@ turn_ec_io (struct cb_exception ec_to_turn,
 	    cb_tree loc,
 	    struct cb_text_list ** const ec_list)
 {
-	cb_tree	l;
-	struct cb_file	*f;
-	
 	if (!(*ec_list)->next
-	    || !strncmp ((*ec_list)->next->text, "EC-", 3)) {
+	 || !strncmp ((*ec_list)->next->text, "EC-", 3)) {
 		/* This >>TURN applies globally */
 		turn_ec_for_table (cb_exception_table,
 				   cb_exception_table_len,
@@ -1686,16 +1683,20 @@ turn_ec_io (struct cb_exception ec_to_turn,
 
 	/* The >>TURN applies to a list of files */
 	do {
+		struct cb_file	*f = NULL;
+		cb_tree	l = NULL;
 		*ec_list = (*ec_list)->next;
+
 		/* Find file */
 		for (l = current_program->file_list; l; l = CB_CHAIN (l)) {
 			f = CB_FILE (CB_VALUE (l));
-			if (!strcmp (f->name, (*ec_list)->text)) {
+			if (!strcasecmp (f->name, (*ec_list)->text)) {
 				break;
 			}
+			f = NULL;
 		}
 		/* Error if no file */
-		if (!l) {
+		if (!f) {
 			cb_error_x (loc, _("file '%s' does not exist"), (*ec_list)->text);
 			return 1;
 		}

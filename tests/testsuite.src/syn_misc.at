@@ -4566,7 +4566,7 @@ AT_DATA([prog.cob], [
        ENVIRONMENT      DIVISION.
        INPUT-OUTPUT     SECTION.
        FILE-CONTROL.
-           SELECT f ASSIGN "f.txt", SEQUENTIAL.
+           SELECT F ASSIGN "f.txt", SEQUENTIAL.
        DATA             DIVISION.
        FILE             SECTION.
        FD  f.
