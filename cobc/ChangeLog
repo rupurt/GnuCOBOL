@@ -1,4 +1,8 @@
 
+2020-07-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* scanner.l (scan_x): fixed #658 by building a national literal for nx''
+
 2020-07-07  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #53 TURN directive
