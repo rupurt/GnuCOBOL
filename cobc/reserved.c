@@ -4389,6 +4389,7 @@ get_aliases (const unsigned int key, struct list_reserved_line *line)
 int
 is_reserved_word (const char *word)
 {
+	initialize_reserved_words_if_needed ();
 	return !!find_reserved_word (word);
 }
 
