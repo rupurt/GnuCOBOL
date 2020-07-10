@@ -9,6 +9,10 @@
 
 	* scanner.l (scan_x): fixed #658 by building a national literal for nx''
 
+2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, scanner.l: fixed memory issues.
+
 2020-07-07  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #53 TURN directive
@@ -26,8 +30,14 @@
 	  config option.
 	* typeck.c: implement syntax rules for FILE STATUS (bug #656), with
 	  warning for PIC 99 status (FR #333).
+	* parser.y (file_control_entry): fixed bug #619: create dummy
+	 current_file for invalid SELECT.
 	* cobc.c (compare_prepare): fixed bug #569: stop copying into cmp_line
 	  when line length exceeds CB_LINE_LENGTH.
+
+2020-06-30  Edward Hart <edward.dan.hart@gmail.com>
+
+	* typeck.c: strengthened syntax checks on UNSTRING ... COUNT (bug #653).
 
 2020-06-29  Simon Sobisch <simonsobisch@gnu.org>
 
