@@ -1,4 +1,10 @@
 
+2020-07-15  Ron Norman <rjn@inglenet.com>
+
+	* call.c,common.h,common.c: Have cob_module_free in common.c 
+			clean up the list of modules used in call.c to avoid 
+			reference to freed memory
+
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
 	* mlio.c: fixed memory issue.
