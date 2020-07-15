@@ -2239,6 +2239,7 @@ cob_module_free (cob_module **module)
 {
 	struct cob_alloc_module	*ptr, *prv;
 	if (*module != NULL) {
+		cob_module_clean ( *module );
 		prv = NULL;
 		/* Remove from list of all modules activated */
 		for (ptr = cob_module_list; ptr; ptr = ptr->next) {

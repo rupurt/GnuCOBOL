@@ -1116,6 +1116,32 @@ cob_call_field (const cob_field *f, const struct cob_call_struct *cs,
 }
 
 void
+cob_module_clean (cob_module *m)
+{
+	const char		*entry;
+	struct call_hash	*p;
+	struct call_hash	**q;
+
+	if (unlikely(!cobglobptr)) {
+		cob_fatal_error (COB_FERROR_INITIALIZED);
+	}
+	entry = cob_chk_dirp (m->module_name);
+
+#ifdef	COB_ALT_HASH
+	q = &call_table;
+#else
+	q = &call_table[hash ((const unsigned char *)entry)];
+#endif
+	p = *q;
+	for (; p; p = p->next) {
+		if (p->module == m) {
+			p->module = NULL;
+			return;
+		}
+	}
+}
+
+void
 cob_cancel (const char *name)
 {
 	const char		*entry;
