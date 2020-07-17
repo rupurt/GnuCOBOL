@@ -3351,7 +3351,7 @@ validate_file_status (cb_tree fs)
 {
 	struct cb_field	*fs_field;
 	enum cb_category category;
-	
+
 	/* TO-DO: If not defined, implicitly define PIC XX */
 	if (fs == cb_error_node
 	    || cb_ref (fs) == cb_error_node) {
@@ -13193,6 +13193,7 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 		      cb_tree suppress_list)
 {
 	struct cb_ml_generate_tree	*tree;
+	unsigned char decimal_point;
 
 	if (current_statement->ex_handler == NULL
 	 && current_statement->not_ex_handler == NULL)
@@ -13223,15 +13224,22 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 	}
 
 	cb_emit (cb_build_ml_suppress_checks (tree));
+	if (cb_dpc_in_data == CB_DPC_IN_XML
+	    || cb_dpc_in_data == CB_DPC_IN_ALL) {
+		decimal_point = current_program->decimal_point;
+	} else {
+		decimal_point = '.';
+	}
 	if (namespace_and_prefix) {
-		cb_emit (CB_BUILD_FUNCALL_6 ("cob_xml_generate", out, CB_TREE (tree),
+		cb_emit (CB_BUILD_FUNCALL_7 ("cob_xml_generate", out, CB_TREE (tree),
 					     count, cb_int (with_xml_dec),
 					     CB_PAIR_X (namespace_and_prefix),
-					     CB_PAIR_Y (namespace_and_prefix)));
+					     CB_PAIR_Y (namespace_and_prefix),
+					     cb_int (decimal_point)));
 	} else {
-		cb_emit (CB_BUILD_FUNCALL_6 ("cob_xml_generate", out, CB_TREE (tree),
+		cb_emit (CB_BUILD_FUNCALL_7 ("cob_xml_generate", out, CB_TREE (tree),
 					     count, cb_int (with_xml_dec),
-					     NULL, NULL));
+					     NULL, NULL, cb_int (decimal_point)));
 	}
 }
 
@@ -13240,6 +13248,7 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 		       cb_tree name_list, cb_tree suppress_list)
 {
 	struct cb_ml_generate_tree	*tree;
+	unsigned char decimal_point;
 
 	if (current_statement->ex_handler == NULL
 	 && current_statement->not_ex_handler == NULL)
@@ -13265,5 +13274,13 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 	current_program->ml_trees = tree;
 
 	cb_emit (cb_build_ml_suppress_checks (tree));
-	cb_emit (CB_BUILD_FUNCALL_3 ("cob_json_generate", out, CB_TREE (tree), count));
+
+	if (cb_dpc_in_data == CB_DPC_IN_JSON
+	    || cb_dpc_in_data == CB_DPC_IN_ALL) {
+		decimal_point = current_program->decimal_point;
+	} else {
+		decimal_point = '.';
+	}
+	cb_emit (CB_BUILD_FUNCALL_4 ("cob_json_generate", out, CB_TREE (tree),
+				     count, cb_int (decimal_point)));
 }

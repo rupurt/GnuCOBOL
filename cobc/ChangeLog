@@ -1,4 +1,9 @@
 
+2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
+
+	* config.c, config.def, cobc.h, typeck.c: added dpc-in-data conf option.
+	* pplex.l, ppparse.y: added corresponding SET DPC-IN-DATA directive.
+
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
 	* cobc.c, scanner.l: fixed memory issues.

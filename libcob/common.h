@@ -2675,9 +2675,9 @@ COB_EXPIMP int	cob_is_xml_namestartchar	(const int);
 COB_EXPIMP int	cob_is_xml_namechar	(const int);
 COB_EXPIMP void	cob_xml_generate	(cob_field *, cob_ml_tree *,
 					 cob_field *, const int, cob_field *,
-					 cob_field *);
+					 cob_field *, const char);
 COB_EXPIMP void cob_json_generate	(cob_field *, cob_ml_tree *,
-					 cob_field *);
+					 cob_field *, const char);
 
 
 /****************************/
