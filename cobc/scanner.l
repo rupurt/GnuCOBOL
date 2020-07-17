@@ -610,7 +610,7 @@ H#[0-9A-Za-z]+ {
 	RETURN_TOK (RESET_TRACE);
 }
 
-"GREATER"[ ,;\n]+("THAN"[ ,;\n]+)?"OR"[ ,;\n]+"EQUAL"([ ,;\n]+"TO")?/[ .,;\n] {
+"GREATER"[ ,;\n]+("THAN"[ ,;\n]+)?"OR"[ ,;\n]+"EQUAL"("S")?([ ,;\n]+"TO")?/[ .,;\n] {
 	count_lines (yytext);
 	RETURN_TOK (GREATER_OR_EQUAL);
 }
@@ -620,7 +620,7 @@ H#[0-9A-Za-z]+ {
 	RETURN_TOK (GREATER);
 }
 
-"LESS"[ ,;\n]+("THAN"[ ,;\n]+)?"OR"[ ,;\n]+"EQUAL"([ ,;\n]+"TO")?/[ .,;\n] {
+"LESS"[ ,;\n]+("THAN"[ ,;\n]+)?"OR"[ ,;\n]+"EQUAL"("S")?([ ,;\n]+"TO")?/[ .,;\n] {
 	count_lines (yytext);
 	RETURN_TOK (LESS_OR_EQUAL);
 }
@@ -630,7 +630,7 @@ H#[0-9A-Za-z]+ {
 	RETURN_TOK (LESS);
 }
 
-"EQUAL"[ ,;\n]+"TO"/[ .,;\n] {
+"EQUAL"("S")?[ ,;\n]+"TO"/[ .,;\n] {
 	count_lines (yytext);
 	RETURN_TOK (EQUAL);
 }
