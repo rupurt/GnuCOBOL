@@ -4167,7 +4167,8 @@ cb_expr_shift (int token, cb_tree value)
 	case ')':
 		/* Enclosed by parentheses */
 		(void)expr_reduce (token);
-		if (CB_BINARY_OP_P (VALUE (-1))
+		if (VALUE (-1)
+		 && CB_BINARY_OP_P (VALUE (-1))
 		 && binary_op_is_relational (CB_BINARY_OP (VALUE (-1)))) {
 			/*
 			  If a relation is surrounded in parentheses, it cannot
@@ -4176,7 +4177,11 @@ cb_expr_shift (int token, cb_tree value)
 			expr_lh = NULL;
 		}
 		if (TOKEN (-2) == '(') {
-			value = CB_BUILD_PARENTHESES (VALUE (-1));
+			if (VALUE (-1)) {
+				value = CB_BUILD_PARENTHESES (VALUE (-1));
+			} else {
+				value = NULL;
+			}
 			expr_index -= 2;
 			cb_expr_shift ('x', value);
 			return;

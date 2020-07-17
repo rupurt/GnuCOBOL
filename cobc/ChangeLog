@@ -1,4 +1,9 @@
 
+2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
+
+	* scanner.l: add EQUALS as alias for EQUAL in conditions (bug #663).
+	* typeck.c: fixed segfault with parens around condition word (bug #663).
+
 2020-07-09  Edward Hart <edward.dan.hart@gmail.com>
 
 	* reserved.c (is_reserved_word): fixed division by zero when called
