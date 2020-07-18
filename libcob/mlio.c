@@ -934,7 +934,7 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 
 void
 cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
-		   const int decimal_point)
+		   const char decimal_point)
 {
 	COB_UNUSED (out);
 	COB_UNUSED (tree);
