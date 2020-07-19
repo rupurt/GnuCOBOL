@@ -1,4 +1,9 @@
 
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* atlocal.in, atlocal_valgrind, atlocal_win: replaced COB_HAS_CJSON with
+	  COB_HAS_JSON.
+
 2020-05-06  Simon Sobisch <simonsobisch@gnu.org>
 
 	* atlocal.in: allow COBC, COBCRUN, COBCRUN_DIRECT to override
