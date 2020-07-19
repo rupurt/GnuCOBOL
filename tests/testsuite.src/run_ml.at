@@ -739,6 +739,8 @@ AT_CLEANUP
 AT_SETUP([DPC-IN-DATA directive])
 AT_KEYWORDS([XML JSON extensions])
 
+AT_SKIP_IF([test "$COB_HAS_JSON" = "no"])
+
 AT_DATA([prog.cob], [
       $SET DPC-IN-DATA "JSON"
        IDENTIFICATION DIVISION.
@@ -774,6 +776,8 @@ AT_CLEANUP
 
 AT_SETUP([dpc-in-data config option])
 AT_KEYWORDS([XML JSON extensions])
+
+AT_SKIP_IF([test "$COB_HAS_JSON" = "no"])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
