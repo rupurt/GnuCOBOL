@@ -1197,6 +1197,8 @@ typedef cob_s64_t cob_flags_t;
 
 /* End Report attribute defines */
 
+#define COB_JSON_CJSON			1
+#define COB_JSON_JSON_C			2
 
 /* Structure/union declarations */
 

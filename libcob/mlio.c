@@ -53,6 +53,16 @@
 #endif
 #endif
 
+#ifdef WITH_JSON_C
+#if defined HAVE_JSON_C_JSON_H
+#include <json-c/json.h>
+#elif defined HAVE_JSON_H
+#include <json.h>
+#else
+#error JSON-C without necessary header
+#endif
+#endif
+
 
 /* Local variables */
 
@@ -75,7 +85,7 @@ static cob_global		*cobglobptr;
 
 /* Local functions */
 
-#if WITH_XML2 || WITH_CJSON
+#if WITH_XML2 || WITH_JSON
 
 static void *
 get_trimmed_data (const cob_field * const f, void * (*strndup_func)(const char *, size_t))
@@ -109,6 +119,8 @@ get_pic_for_num_field (const size_t num_int_digits, const size_t num_dec_digits)
 	++symbol;
 
 	if (num_dec_digits) {
+		/* TO-DO: Add config option for this - see MF's DP-IN-something */
+		/* Should probably default to always using '.'. */
 		symbol->symbol = COB_MODULE_PTR->decimal_point;
 		symbol->times_repeated = 1;
 		++symbol;
@@ -564,7 +576,7 @@ set_xml_exception (const unsigned int code)
 
 #endif
 
-#if WITH_CJSON
+#if WITH_JSON
 
 static void
 set_json_code (const unsigned int code)
@@ -604,14 +616,15 @@ get_json_num (cob_field * const f, const char decimal_point)
 	return (char *) get_num (f, &json_strndup, decimal_point);
 }
 
+#if WITH_CJSON
 static int
 generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, cJSON *out)
 {
 	cob_ml_tree	*child;
-	cJSON		*children_json = NULL;
 	char		*name = NULL;
 	char		*content = NULL;
 	int		status = 0;
+	cJSON		*children_json = NULL;
 
 	if (tree->is_suppressed) {
 		return 0;
@@ -663,6 +676,63 @@ generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, cJSON *out
 		cob_free (name);
 	}
 	return status;
+}
+#elif WITH_JSON_C
+static int
+generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, json_object *out)
+{
+	cob_ml_tree	*child;
+	char		*name = NULL;
+	char		*content = NULL;
+	int		status = 0;
+	json_object	*children_json = NULL;
+
+	if (tree->is_suppressed) {
+		return 0;
+	}
+
+	name = get_trimmed_json_data (tree->name);
+	if (tree->children) {
+		children_json = json_object_new_object ();
+		for (child = tree->children; child; child = child->sibling) {
+			status = generate_json_from_tree (child, decimal_point, children_json);
+			if (status < 0) {
+				json_object_put (children_json);
+				goto end;
+			}
+		}
+		json_object_object_add (out, name, children_json);
+	} else if (tree->content) {
+		if (COB_FIELD_IS_FP (tree->content)) {
+			/* TO-DO: Implement! */
+			/* TO-DO: Stop compilation if float in field */
+			cob_set_exception (COB_EC_IMP_FEATURE_MISSING);
+			cob_fatal_error (COB_FERROR_JSON);
+		} else if (COB_FIELD_IS_NUMERIC (tree->content)) {
+			content = get_json_num (tree->content, decimal_point);
+			/*
+			  Since we're only going to serialise the JSON, we don't
+			  care how JSON-C represents it internally. So, we tell
+			  C-JSON the number is 0.0f.
+			*/
+			json_object_object_add (out, name,
+						json_object_new_double_s (0.0, content));
+		} else {
+			content = get_trimmed_json_data (tree->content);
+			json_object_object_add (out, name,
+						json_object_new_string (content));
+		}
+	}
+
+ end:
+	if (content) {
+		cob_free (content);
+	}
+	if (name) {
+		cob_free (name);
+	}
+	return status;
+#endif
 }
 
 #endif
@@ -867,21 +937,26 @@ cob_xml_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 
 #endif
 
-#if WITH_CJSON
+#if WITH_JSON
 
 void
 cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 		   const char decimal_point)
 {
-	cJSON	*json;
-	int	status = 0;
-	char	*printed_json;
+	const char	*printed_json;
 	unsigned int	print_len = 0;
 	unsigned int	copy_len;
 	int	num_newlines = 0;
+	int	status = 0;
+#if WITH_CJSON
+	cJSON	*json;
+#elif WITH_JSON_C
+	json_object	*json = NULL;
+#endif
 
 	set_json_code (0);
 
+#if WITH_CJSON
 	json = cJSON_CreateObject ();
 	if (!json) {
 		set_json_exception (JSON_INTERNAL_ERROR);
@@ -895,7 +970,20 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 	}
 
 	/* TO-DO: Set cJSON to use cob_free in InitHook? */
-	printed_json = cJSON_PrintUnformatted (json);
+	printed_json = (const char *) cJSON_PrintUnformatted (json);
+
+#elif WITH_JSON_C
+
+	json = json_object_new_object ();
+	status = generate_json_from_tree (tree, decimal_point, json);
+	if (status < 0) {
+		set_json_exception (JSON_INTERNAL_ERROR);
+		goto end;
+	}
+
+	printed_json = json_object_to_json_string_ext (json, JSON_C_TO_STRING_PLAIN);
+#endif
+
 	if (!printed_json) {
 		set_json_exception (JSON_INTERNAL_ERROR);
 		goto end;
@@ -919,18 +1007,24 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 	}
 
  end:
+#if WITH_CJSON
 	if (printed_json) {
 		cJSON_free (printed_json);
 	}
 	if (json) {
 		cJSON_Delete (json);
 	}
+#elif WITH_JSON_C
+	if (json) {
+		json_object_put (json);
+	}
+#endif
 	if (count && print_len) {
 		cob_add_int (count, print_len, 0);
 	}
 }
 
-#else /* !WITH_CJSON */
+#else /* !WITH_JSON */
 
 void
 cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,

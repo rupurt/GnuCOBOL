@@ -1,4 +1,9 @@
 
+
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* mlio.c, common.h: added support for JSON-C as JSON handler.
+
 2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
 
 	* mlio.c, common.h: added decimal_point param to cob_xml/json_generate.
