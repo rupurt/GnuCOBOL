@@ -1,4 +1,8 @@
 
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: added support for JSON-C as JSON handler.
+
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: fixed missing use of AS_IF

@@ -103,7 +103,7 @@ struct cb_statement		*error_statement = NULL;
 #ifndef WITH_XML2
 static int			warn_xml_done = 0;
 #endif
-#ifndef WITH_CJSON
+#ifndef WITH_JSON
 static int			warn_json_done = 0;
 #endif
 #ifndef WITH_EXTENDED_SCREENIO
@@ -13258,7 +13258,7 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 	if (current_statement->ex_handler == NULL
 	 && current_statement->not_ex_handler == NULL)
 	  	current_statement->handler_type = NO_HANDLER;
-#ifndef WITH_CJSON
+#ifndef WITH_JSON
 	if (!warn_json_done) {
 		warn_json_done = 1;
 		cb_warning (cb_warn_unsupported,

@@ -2321,6 +2321,8 @@ cobc_print_info (void)
 
 #ifdef WITH_CJSON
 	cobc_var_print (_("JSON library"),		"cJSON", 0);
+#elif defined WITH_JSON_C
+	cobc_var_print (_("JSON library"),		"JSON-C", 0);
 #else
 	cobc_var_print (_("JSON library"),		_("disabled"), 0);
 #endif
