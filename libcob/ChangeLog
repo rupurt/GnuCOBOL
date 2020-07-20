@@ -1,4 +1,14 @@
 
+2020-07-20  Edward Hart <edward.dan.hart@gmail.com>
+
+	* screenio.c (cob_screen_get_all): improve number entry:
+	   1. prevent deletion, backspacing over or overwriting of decimal point;
+	   2. entering decimal point jumps to character after it;
+	   3. allow entry of sign;
+	   4. entering sign jumps to sign;
+	   5. create (hopefully) nice insert behaviour for numbers: cursor on
+	      integral digits inserts to right, cursor on decimal digits inserts
+              to left.
 
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 

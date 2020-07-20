@@ -1387,6 +1387,119 @@ mouse_to_exception_code (mmask_t mask) {
 }
 #endif
 
+static int
+is_number_with_pic_symbol (cob_field * const f, const char symbol)
+{
+	int	i;
+	
+	if (COB_FIELD_TYPE (f) != COB_TYPE_NUMERIC_EDITED) {
+		return 0;
+	}
+
+	for (i = 0; f->attr->pic[i].symbol; ++i) {
+		if (f->attr->pic[i].symbol == symbol) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+static int
+has_decimal_point (cob_field * const f)
+{
+	return is_number_with_pic_symbol (f, COB_MODULE_PTR->decimal_point);
+}
+
+static int
+get_pic_symbol_offset (cob_field * const f, const char symbol)
+{
+	int	offset = 0;
+	int	i = 0;
+	
+	do {
+		offset += f->attr->pic[i].times_repeated;
+	} while (f->attr->pic[i++].symbol != symbol);
+
+	return offset - 1;
+}
+
+static int
+get_decimal_point_offset (cob_field * const f)
+{
+	return get_pic_symbol_offset (f, COB_MODULE_PTR->decimal_point);
+}
+
+/*
+  Shift field on screen (for columns between scolumn and ccolumn inclusive)
+  over to the left by one character. This overwrites the leftmost character.
+*/
+static void
+shift_left (cob_screen * const s, const int cline, const int ccolumn,
+	     const int right_pos, const int scolumn)
+{
+	int		offset;
+	unsigned char	move_char;
+	
+	for (offset = 0; offset < ccolumn - scolumn; offset++) {
+		move_char = s->field->data[offset + 1];
+		s->field->data[offset] = move_char;
+		
+		cob_move_cursor (cline, offset + scolumn);
+		if (move_char != ' ') {
+			if (s->attr & COB_SCREEN_NO_ECHO) {
+				cob_addch (COB_CH_SP);
+			} else if (s->attr & COB_SCREEN_SECURE) {
+				cob_addch (COB_CH_AS);
+			} else {
+				cob_addch (move_char);
+			}
+		}
+	}
+
+	/* Restore cursor to original position */
+	cob_move_cursor (cline, ccolumn);
+}
+
+/*
+  Shift field on screen (for columns between ccolumn and right_pos inclusive)
+  over to the right by one character. This overwrites the rightmost character.
+*/
+static void
+shift_right (cob_screen * const s, const int cline, const int ccolumn,
+	     const int right_pos, const int scolumn)
+{
+	int		offset;
+	unsigned char	move_char;
+
+	for (offset = right_pos - scolumn; offset > ccolumn - scolumn; offset--) {
+		move_char = s->field->data[offset - 1];
+		s->field->data[offset] = move_char;
+
+		cob_move_cursor (cline, offset + scolumn);
+		if (move_char != ' ') {
+			if (s->attr & COB_SCREEN_NO_ECHO) {
+				cob_addch (COB_CH_SP);
+			} else if (s->attr & COB_SCREEN_SECURE) {
+				cob_addch (COB_CH_AS);
+			} else {
+				cob_addch (move_char);
+			}
+		}
+	}
+
+	/* Restore cursor to original position */
+	cob_move_cursor (cline, ccolumn);
+}
+
+static int
+at_offset_from_decimal_point (cob_field * const f, const int scolumn,
+			      const int ccolumn, const int offset)
+{
+	return has_decimal_point (f)
+		&& ccolumn == offset + scolumn + get_decimal_point_offset (f);
+}
+
 static void
 cob_screen_get_all (const int initial_curs, const int accept_timeout)
 {
@@ -1407,6 +1520,10 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 	int			status;
 	int			count;
 	chtype			default_prompt_char;
+	int			has_dp;
+	int			integer_part_end;
+	char			sign;
+	int			fix_position = 0;
 #ifdef NCURSES_MOUSE_VERSION
 	MEVENT		mevent;
 #endif
@@ -1581,7 +1698,9 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			continue;
 		case KEY_BACKSPACE:
 			/* Backspace key. */
-			if ((int) ccolumn > scolumn) {
+			/* Don't allow backspacing over a decimal point */
+			if (ccolumn > scolumn
+			    && !at_offset_from_decimal_point (s->field, scolumn, ccolumn, 1)) {
 				at_eof = 0;
 				/* Shift remainder left with cursor. */
 				for (count = ccolumn; count < right_pos + 1; count++) {
@@ -1654,6 +1773,11 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			continue;
 		case KEY_DC:
 			/* Delete key. */
+			/* Don't allow deletion of decimal point */
+			if (at_offset_from_decimal_point (s->field, scolumn, ccolumn, 0)) {
+				cob_beep ();
+				continue;
+			}
 			/* Delete character, move remainder left. */
 			for (count = ccolumn; count < right_pos; count++) {
 				/* Get character one position to right. */
@@ -1687,17 +1811,50 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 				cob_addch (COB_CH_SP);
 			} else if (s->attr & COB_SCREEN_SECURE) {
 				cob_addch (COB_CH_AS);
+			} else if (*p2 == ' ') {
+				cob_addch (default_prompt_char);
 			} else {
-				if (*p2 == ' ') {
-					cob_addch (default_prompt_char);
-				} else {
-					cob_addch (*p2);
-				}
+				cob_addch (*p2);
 			}
 			/* Put cursor back to original position. */
 			cob_move_cursor (cline, ccolumn);
 			continue;
 
+		case '.':
+		case ',':
+			if (keyp != COB_MODULE_PTR->decimal_point
+			    || !has_decimal_point (s->field)) {
+				break;
+			}
+
+			finalize_field_input (s);
+			/* Move cursor to character after decimal point */
+			ccolumn = scolumn + get_decimal_point_offset (s->field) + 1;
+			cob_move_cursor (cline, ccolumn);
+			p = s->field->data + ccolumn - scolumn;
+			continue;
+
+		case '+':
+		case '-':
+			if (is_number_with_pic_symbol (s->field, '+')) {
+				sign = '+';
+			} else if (is_number_with_pic_symbol (s->field, '-')) {
+				sign = '-';
+			} else if (is_number_with_pic_symbol (s->field, 'S')) {
+				sign = 'S';
+			} else {
+				break;
+			}
+			
+			finalize_field_input (s);
+			
+			/* Move cursor to sign */
+			ccolumn = scolumn + get_pic_symbol_offset (s->field, sign);
+			cob_move_cursor (cline, ccolumn);
+			p = s->field->data + ccolumn - scolumn;
+			/* Enter sign */
+			break;
+			
 #ifdef NCURSES_MOUSE_VERSION
 		case KEY_MOUSE:
 		{
@@ -1751,11 +1908,11 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 		if (keyp > 037 && keyp <= UCHAR_MAX) {
 #endif
 			/* Numeric field check. */
-			if (cob_field_is_numeric_or_numeric_edited (s->field)) {
-				if (keyp < '0' || keyp > '9') {
-					cob_beep ();
-					continue;
-				}
+			if (cob_field_is_numeric_or_numeric_edited (s->field)
+			    && ((keyp != '+' && keyp != '-' && (keyp < '0' || keyp > '9'))
+				|| at_offset_from_decimal_point (s->field, scolumn, ccolumn, 0))) {
+				cob_beep ();
+				continue;
 			}
 
 			/* Handle UPPER/LOWER. */
@@ -1771,41 +1928,67 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 
 			/* Insert character, if requested. */
 			if (COB_INSERT_MODE == 1) {
-				/* get last character in field */
-				/* check and beep if field is already full,
-				ignore numeric fields for now */
 				if (cob_field_is_numeric_or_numeric_edited (s->field)) {
-					p2 = (unsigned char *)" ";
-				} else {
-					p2 = s->field->data + right_pos - scolumn;
-				}
-				if (*p2 != ' ') {
-					cob_beep ();
-					continue;
-				}
-				/* Move remainder to the right. */
-				for (count = right_pos; count > ccolumn; count--) {
-					/* Get character */
-					p2 = s->field->data + count - scolumn - 1;
-					move_char = *p2;
-					/* Move character one right. */
-					p2 = s->field->data + count - scolumn;
-					*p2 = move_char;
-					/* Update screen with moved character. */
-					if ((int) count > scolumn) {
-						cob_move_cursor (cline, count);
-						if (move_char != ' ') {
-							if (s->attr & COB_SCREEN_NO_ECHO) {
-								cob_addch (COB_CH_SP);
-							} else if (s->attr & COB_SCREEN_SECURE) {
-								cob_addch (COB_CH_AS);
-							} else {
-								cob_addch (move_char);
-							}
-						}
+					has_dp = has_decimal_point (s->field);
+					if (has_dp) {
+						integer_part_end = scolumn + get_decimal_point_offset (s->field);
+					} else {
+						integer_part_end = right_pos;
 					}
+					if (!has_dp
+					    || ccolumn < integer_part_end) {
+						/*
+						  For non-decimal digits, insert
+						  digit to right of cursor - so
+						  01[2] becomes 12[3] after
+						  pressing 3 (where "[2]" means
+						  the cursor is over 2).
+
+						  Beep if leftmost character is
+						  significant.
+						*/
+						p2 = s->field->data;
+						if (*p2 != '0' && *p2 != ' ') {
+							cob_beep ();
+							continue;
+						}
+						shift_left (s, cline, ccolumn,
+							    integer_part_end,
+							    scolumn);
+						fix_position = 1;
+					} else if (ccolumn == integer_part_end) {
+						/* The cursor is at a decimal
+						   point - make user move to one
+						   side of it
+						*/
+						cob_beep ();
+						continue;
+					} else {
+						/*
+						  For decimal digits, insert
+						  digit to left of cursor - so
+						  0.[1]0 becomes 0.2[1] after
+						  pressing 2.
+
+						  Beep if rightmost character is
+						  significant.
+						*/
+						p2 = s->field->data + right_pos - scolumn;
+						if (*p2 != '0' && *p2 != ' ') {
+							cob_beep ();
+							continue;
+						}
+						shift_right (s, cline, ccolumn, right_pos, scolumn);
+					}
+				} else {
+					/* check and beep if field is already full */
+					p2 = s->field->data + right_pos - scolumn;
+					if (*p2 != ' ') {
+						cob_beep ();
+						continue;
+					}
+					shift_right (s, cline, ccolumn, right_pos, scolumn);
 				}
-				cob_move_cursor (cline, ccolumn);
 			}
 
 			/* actual storing the key */
@@ -1819,6 +2002,7 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			} else {
 				cob_addch ((const chtype)keyp);
 			}
+			
 			if (ccolumn == right_pos) {
 				/* Auto-skip at end of field. */
 				if (s->attr & COB_SCREEN_AUTO) {
@@ -1836,6 +2020,9 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 				} else {
 					at_eof = 1;
 				}
+			} else if (fix_position) {
+				cob_move_cursor (cline, ccolumn);
+				fix_position = 0;
 			} else {
 				p++;
 			}
