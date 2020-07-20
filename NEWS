@@ -444,7 +444,7 @@ NEWS - user visible changes				-*- outline -*-
 
   make test      downloads NIST testsuite if necessary
                  now usable with parallel builds (make -j4 test)
-  make checkall  runs both the internal an NIST testsuite
+  make checkall  runs both the internal and the NIST testsuite
 
 ** testsuite defaults to coloured output
 
@@ -471,7 +471,7 @@ NEWS - user visible changes				-*- outline -*-
 
 * Change unix package name to gnu-cobol, and project to GnuCOBOL
 * list of changes see
-  https://open-cobol.sourceforge.io/faq/
+  https://gnucobol.sourceforge.io/faq/
   #what-are-the-differences-between-opencobol-1-1-and-gnucobol-1-1
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
