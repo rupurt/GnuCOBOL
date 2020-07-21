@@ -732,8 +732,8 @@ generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, json_objec
 		cob_free (name);
 	}
 	return status;
-#endif
 }
+#endif
 
 #endif
 
