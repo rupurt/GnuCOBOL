@@ -119,8 +119,6 @@ get_pic_for_num_field (const size_t num_int_digits, const size_t num_dec_digits)
 	++symbol;
 
 	if (num_dec_digits) {
-		/* TO-DO: Add config option for this - see MF's DP-IN-something */
-		/* Should probably default to always using '.'. */
 		symbol->symbol = COB_MODULE_PTR->decimal_point;
 		symbol->times_repeated = 1;
 		++symbol;
