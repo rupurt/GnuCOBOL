@@ -88,7 +88,14 @@ ret=0
 #done
 
 # ensure the configure and Makefile parts are up-to-date:
-autoreconf --verbose --force --include=m4 $MAINPATH; ret=$?
+msgs=/tmp/autoreconf
+autoreconf --verbose --force --include=m4 $MAINPATH > $msgs 2>&1; ret=$?
+
+awk '/^aminclude_static[.]am:/ { msg = msg sep $0; sep = "\n"; next } 
+     /Makefile[.]am.+aminclude_static.am.+from here/ { 
+     					       msg = ""; sep = ""; next }
+     msg { print msg > "/dev/stderr"; msg = "" }
+     { print }' $msgs
 
 if test $ret -ne 0; then
   echo; echo "ERROR, autoreconf returned $ret - aborting bootstrap" && exit $ret
