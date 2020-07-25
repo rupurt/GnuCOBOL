@@ -1500,6 +1500,61 @@ at_offset_from_decimal_point (cob_field * const f, const int scolumn,
 		&& ccolumn == offset + scolumn + get_decimal_point_offset (f);
 }
 
+/* Move cursor and data pointer to initial position when entering a field */
+static int
+move_to_initial_field_pos (cob_field * const f, const int sline,
+			   const int scolumn, const int right_pos,
+			   const int to_right_side, unsigned char ** const data_ptr)
+{
+	int	offset;
+
+	*data_ptr = f->data;
+	
+	if (COB_INSERT_MODE && cob_field_is_numeric_or_numeric_edited (f)) {
+		if (has_decimal_point (f)) {
+			if (to_right_side) {
+				/* At leftmost decimal digit */
+				offset = get_decimal_point_offset (f) + 1;
+			} else {
+				/* At rightmost integer digit */
+				offset = get_decimal_point_offset (f) - 1;
+			}
+			*data_ptr += offset;
+			return cob_move_cursor (sline, scolumn + offset);
+		} else {
+			/* At rightmost integer digit */
+			*data_ptr += right_pos - scolumn;
+			return cob_move_cursor (sline, right_pos);
+		}
+	} else {
+		/* At start/end of field */
+		if (to_right_side) {
+			*data_ptr += right_pos - scolumn;
+			return cob_move_cursor (sline, right_pos);
+		} else {
+			return cob_move_cursor (sline, scolumn);
+		}
+	}
+}
+
+/* TO-DO: Unify with "Shift data to insert character" logic */
+static int
+can_insert_left (cob_field * const f, const unsigned char leftmost_char,
+		 const int ccolumn)
+{
+	if (cob_field_is_numeric_or_numeric_edited (f)) {
+		if (has_decimal_point (f) &&
+		    ccolumn > get_decimal_point_offset (f)) {
+			return 0;
+		} else {
+			return leftmost_char == '0'
+				|| leftmost_char == ' ';
+		}
+	} else {
+		return leftmost_char == ' ';
+	}
+}
+
 static void
 cob_screen_get_all (const int initial_curs, const int accept_timeout)
 {
@@ -1530,7 +1585,7 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 
 	SET_FLD_AND_DATA_REFS (curr_index, sptr, s, sline, scolumn, right_pos, p);
 
-	status = cob_move_cursor (sline, scolumn);
+	status = move_to_initial_field_pos (s->field, sline, scolumn, right_pos, 0, &p);
 	if (status != ERR) {
 		pending_accept = 0;
 	}
@@ -1637,7 +1692,7 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			}
 			SET_FLD_AND_DATA_REFS (curr_index, sptr, s, sline, scolumn, right_pos, p);
 			at_eof = 0;
-			cob_move_cursor (sline, scolumn);
+			move_to_initial_field_pos (s->field, sline, scolumn, right_pos, 0, &p);
 			cob_screen_attr (s->foreg, s->backg, s->attr, ACCEPT_STATEMENT);
 			continue;
 		case KEY_BTAB:
@@ -1650,14 +1705,8 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			}
 			SET_FLD_AND_DATA_REFS (curr_index, sptr, s, sline, scolumn, right_pos, p);
 			at_eof = 0;
-			if (ungetched) {
-				ungetched = 0;
-				p = s->field->data + right_pos;
-				cob_move_cursor (sline, right_pos);
-			} else {
-				p = s->field->data;
-				cob_move_cursor (sline, scolumn);
-			}
+			move_to_initial_field_pos (s->field, sline, scolumn, right_pos, ungetched, &p);
+			ungetched = 0;
 			cob_screen_attr (s->foreg, s->backg, s->attr, ACCEPT_STATEMENT);
 			continue;
 		case KEY_UP:
@@ -1666,7 +1715,7 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			curr_index = sptr->up_index;
 			SET_FLD_AND_DATA_REFS (curr_index, sptr, s, sline, scolumn, right_pos, p);
 			at_eof = 0;
-			cob_move_cursor (sline, scolumn);
+			move_to_initial_field_pos (s->field, sline, scolumn, right_pos, 0, &p);
 			cob_screen_attr (s->foreg, s->backg, s->attr, ACCEPT_STATEMENT);
 			continue;
 		case KEY_DOWN:
@@ -1675,7 +1724,7 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 			curr_index = sptr->down_index;
 			SET_FLD_AND_DATA_REFS (curr_index, sptr, s, sline, scolumn, right_pos, p);
 			at_eof = 0;
-			cob_move_cursor (sline, scolumn);
+			move_to_initial_field_pos (s->field, sline, scolumn, right_pos, 0, &p);
 			cob_screen_attr (s->foreg, s->backg, s->attr, ACCEPT_STATEMENT);
 			continue;
 		case KEY_HOME:
@@ -1926,8 +1975,8 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 				}
 			}
 
-			/* Insert character, if requested. */
-			if (COB_INSERT_MODE == 1) {
+			if (COB_INSERT_MODE) {
+				/* Shift data to insert character */
 				if (cob_field_is_numeric_or_numeric_edited (s->field)) {
 					has_dp = has_decimal_point (s->field);
 					if (has_dp) {
@@ -2013,12 +2062,19 @@ cob_screen_get_all (const int initial_curs, const int accept_timeout)
 					}
 				}
 				cob_move_cursor (cline, ccolumn);
+
 				/* check if we (still) are at last position and inform
 				   user with a beep (after having processed his key) */
+				/* TO-DO: Only beep if user has *just* entered a
+				   last char and tries to enter a new
+				   char. That is, don't beep after changing insert
+				   mode or navigating to last character and
+				   overwriting it. */
 				if (at_eof) {
 					cob_beep ();
 				} else {
-					at_eof = 1;
+					at_eof = !COB_INSERT_MODE
+						|| !can_insert_left (s->field, *s->field->data, ccolumn);
 				}
 			} else if (fix_position) {
 				cob_move_cursor (cline, ccolumn);
@@ -3110,8 +3166,7 @@ field_accept (cob_field *f, const int sline, const int scolumn, cob_field *fgc,
 			}
 
 			/* Insert character, if requested. */
-			if (COB_INSERT_MODE == 1
-			 && size_accept > 1) {
+			if (COB_INSERT_MODE && size_accept > 1) {
 				/* get last character in field */
 				/* check and beep if field is already full,
 				   ignore numeric fields for now */
