@@ -1,4 +1,12 @@
 
+2020-07-25  Edward Hart <edward.dan.hart@gmail.com>
+
+	* screenio.c (cob_screen_get_all): improve number entry:
+	   1. in insert mode, position cursor at rightmost integer digit upon
+	      entering a field;
+	   2. in insert mode, only beep at last character when no insertion is
+              possible.
+
 2020-07-20  Edward Hart <edward.dan.hart@gmail.com>
 
 	* screenio.c (cob_screen_get_all): improve number entry:
