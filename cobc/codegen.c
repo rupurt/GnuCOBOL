@@ -183,7 +183,7 @@ static FILE			*cb_local_file = NULL;
 static const char		*excp_current_program_id = NULL;
 static const char		*excp_current_section = NULL;
 static const char		*excp_current_paragraph = NULL;
-static struct cb_program	*current_prog = NULL;
+static struct cb_program	*current_prog = NULL;    /* program in codegen (only) */
 
 static struct cb_label		*last_section = NULL;
 static unsigned char		*litbuff = NULL;
@@ -260,6 +260,10 @@ static void output_func_1	(const char *, cb_tree);
 static void output_param	(cb_tree, int);
 static void output_funcall	(cb_tree);
 static void output_report_summed_field (struct cb_field *);
+
+static void codegen_init (struct cb_program *, const char *);
+static void codegen_internal (struct cb_program *, const int);
+static void codegen_finalize (void);
 
 /* Local functions */
 
@@ -1878,7 +1882,7 @@ output_local_storage_pointer (struct cb_program *prog)
 	if (prog->local_storage && local_mem) {
 		output_local ("\n/* LOCAL storage pointer */\n");
 		output_local ("unsigned char\t\t*cob_local_ptr = NULL;\n");
-		if (current_prog->flag_global_use) {
+		if (prog->flag_global_use) {
 			output_local ("static unsigned char\t*cob_local_save = NULL;\n");
 		}
 	}
@@ -1904,7 +1908,7 @@ static void
 output_frame_stack (struct cb_program *prog)
 {
 	output_local ("\n/* Perform frame stack */\n");
-	if (cb_perform_osvs && current_prog->prog_type == COB_MODULE_TYPE_PROGRAM) {
+	if (cb_perform_osvs && prog->prog_type == COB_MODULE_TYPE_PROGRAM) {
 		output_local ("struct cob_frame\t*temp_index;\n");
 	}
 	if (cb_flag_stack_check) {
@@ -2197,7 +2201,7 @@ output_local_field_cache (struct cb_program *prog)
 	}
 
 	/* Switch to local storage file */
-	output_target = current_prog->local_include->local_fp;
+	output_target = prog->local_include->local_fp;
 	if (prog->flag_recursive) {
 		output_local ("\n/* Fields for recursive routine */\n");
 	} else {
@@ -12135,15 +12139,126 @@ output_header (const char *locbuff, const struct cb_program *cp)
 }
 
 void
-codegen (struct cb_program *prog, const char *translate_name, const int subsequent_call)
+codegen (struct cb_program *prog, const char *translate_name)
+{
+	int subsequent_call = 0;
+
+	codegen_init (prog, translate_name);
+
+	for (;;) {
+		/* Temporarily disable cross-reference during C generation */
+		if (cb_listing_xref) {
+			cb_listing_xref = 0;
+			codegen_internal (current_program, subsequent_call);
+			cb_listing_xref = 1;
+		} else {
+			codegen_internal (current_program, subsequent_call);
+		}
+		if (!current_program->next_program) {
+			break;
+		}
+		if (!strcmp (prog->next_program->program_name, "J-SETNAMEDCOLORBG")) {
+			printf ("DBG: prog->next (in here): %s -> %s\n", prog->program_name, prog->next_program->program_name);
+		}
+		// printf ("DBG %d: prog->next: %s -> %s\n", ++num, prog->program_name, prog->next_program->program_name);
+		if (current_program->flag_file_global && current_program->next_program->nested_level) {
+			has_global_file = 1;
+		} else {
+			has_global_file = 0;
+		}
+		current_program = current_program->next_program;
+		subsequent_call = 1;
+	}
+	current_program = prog;
+
+	codegen_finalize ();
+}
+
+void
+codegen_init (struct cb_program *prog, const char *translate_name)
+{
+	struct tm* loctime;
+	time_t			sectime;
+
+	sectime = time (NULL);
+	loctime = localtime (&sectime);
+
+	current_program = prog;
+	current_section = NULL;
+	current_paragraph = NULL;
+	current_statement = NULL;
+	cb_source_line = 0;
+
+	output_line_number = 1;
+	output_name = (char*)translate_name;
+	if (strchr (output_name, '\\')) {
+		char buff[COB_MEDIUM_BUFF];
+		int pos = 0;
+		char* s;
+		for (s = output_name; *s; s++) {
+			if (*s == '\\') {
+				buff[pos++] = '\\';
+			}
+			buff[pos++] = *s;
+		}
+		buff[pos] = 0;
+		output_name = cobc_check_string (buff);
+	}
+	gen_alt_ebcdic = 0;
+	gen_ebcdic_ascii = 0;
+	gen_full_ebcdic = 0;
+	gen_native = 0;
+	gen_figurative = 0;
+	non_nested_count = 0;
+	working_mem = 0;
+	pic_cache = NULL;
+	base_cache = NULL;
+	globext_cache = NULL;
+	field_cache = NULL;
+	if (!string_buffer) {
+		string_buffer = cobc_main_malloc ((size_t)COB_MINI_BUFF);
+	}
+
+	if (loctime) {
+		/* Leap seconds ? */
+		if (loctime->tm_sec >= 60) {
+			loctime->tm_sec = 59;
+		}
+		strftime (string_buffer, (size_t)COB_MINI_MAX,
+			"%b %d %Y %H:%M:%S", loctime);
+	} else {
+		string_buffer[0] = 0;
+	}
+	output_header (string_buffer, NULL);
+	output_target = cb_storage_file;
+	output_header (string_buffer, NULL);
+	{
+		struct cb_program* cp;
+		for (cp = prog; cp; cp = cp->next_program) {
+			output_target = cp->local_include->local_fp;
+			output_header (string_buffer, cp);
+		}
+	}
+	output_target = yyout;
+
+	output_standard_includes (prog);
+	/* string_buffer has formatted date from above */
+	output_gnucobol_defines (string_buffer, loctime);
+
+	output_newline ();
+	output_line ("/* Global variables */");
+	output ("#include \"%s\"", cb_storage_file_name);
+	output_newline ();
+	output_newline ();
+
+	output_function_prototypes (prog);
+}
+
+void
+codegen_internal (struct cb_program *prog, const int subsequent_call)
 {
 	cb_tree			l;
-	struct literal_list	*m;
-	struct cb_program	*cp;
-	struct tm		*loctime;
 	int			i;
-	enum cb_optim		optidx;
-	time_t			sectime;
 
 	int	comment_gen;
 
@@ -12186,73 +12301,7 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 	memset ((void *)i_counters, 0, sizeof (i_counters));
 
 	output_target = yyout;
-	output_name = (char *)translate_name;
-	cb_local_file = current_prog->local_include->local_fp;
-
-	if (!subsequent_call) {
-		/* First iteration */
-		output_line_number = 1;
-		if (strchr (output_name, '\\')) {
-			char buff[COB_MEDIUM_BUFF];
-			int pos = 0;
-			char *s;
-			for (s = output_name; *s; s++) {
-				if (*s == '\\') {
-					buff[pos++] = '\\';
-				}
-				buff[pos++] = *s;
-			}
-			buff[pos] = 0;
-			output_name = cobc_check_string (buff);
-		}
-		gen_alt_ebcdic = 0;
-		gen_ebcdic_ascii = 0;
-		gen_full_ebcdic = 0;
-		gen_native = 0;
-		gen_figurative = 0;
-		non_nested_count = 0;
-		working_mem = 0;
-		pic_cache = NULL;
-		base_cache = NULL;
-		globext_cache = NULL;
-		field_cache = NULL;
-		if (!string_buffer) {
-			string_buffer = cobc_main_malloc ((size_t)COB_MINI_BUFF);
-		}
-
-		sectime = time (NULL);
-		loctime = localtime (&sectime);
-		if (loctime) {
-			/* Leap seconds ? */
-			if (loctime->tm_sec >= 60) {
-				loctime->tm_sec = 59;
-			}
-			strftime (string_buffer, (size_t)COB_MINI_MAX,
-				  "%b %d %Y %H:%M:%S", loctime);
-		} else {
-			string_buffer[0] = 0;
-		}
-		output_header (string_buffer, NULL);
-		output_target = cb_storage_file;
-		output_header (string_buffer, NULL);
-		for (cp = prog; cp; cp = cp->next_program) {
-			output_target = cp->local_include->local_fp;
-			output_header (string_buffer, cp);
-		}
-		output_target = yyout;
-
-		output_standard_includes (prog);
-		/* string_buffer has formatted date from above */
-		output_gnucobol_defines (string_buffer, loctime);
-
-		output_newline ();
-		output_line ("/* Global variables */");
-		output ("#include \"%s\"", cb_storage_file_name);
-		output_newline ();
-		output_newline ();
-
-		output_function_prototypes (prog);
-	}
+	cb_local_file = prog->local_include->local_fp;
 
 	output_class_names (prog);
 
@@ -12291,8 +12340,8 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 		output_newline ();
 	}
 
-	if (gen_native || gen_full_ebcdic ||
-	    gen_ebcdic_ascii || prog->alphabet_name_list) {
+	if (gen_native || gen_full_ebcdic
+	 || gen_ebcdic_ascii || prog->alphabet_name_list) {
 		(void)lookup_attr (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL, 0);
 	}
 
@@ -12326,7 +12375,7 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 	output_dynamic_field_function_id_pointers ();
 
 	if (prog->report_storage) {
-		output_target = current_prog->local_include->local_fp;
+		output_target = prog->local_include->local_fp;
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
 			if (!CB_VALUE (l)) {
 				continue;
@@ -12352,7 +12401,7 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 			if (rep) {
 				if (!comment_gen) {
 					comment_gen = 1;
-					output_target = current_prog->local_include->local_fp;
+					output_target = prog->local_include->local_fp;
 					output_local ("\n/* Report data fields */\n\n");
 				}
 				output_emit_field (rep->line_counter ,NULL);
@@ -12371,7 +12420,7 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 	/* Reports */
 	if (prog->report_list) {
 		/* Switch to local storage file */
-		output_target = current_prog->local_include->local_fp;
+		output_target = prog->local_include->local_fp;
 		optimize_defs[COB_SET_REPORT] = 1;
 		output_local ("\n/* Reports */\n");
 		output_report_list(prog->report_list, CB_CHAIN (prog->report_list));
@@ -12379,23 +12428,11 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 		/* Switch to main storage file */
 		output_target = cb_storage_file;
 	}
+}
 
-	/* Skip to next program contained in the source and
-	   adjust current_program used for error messages */
-
-	if (prog->next_program) {
-		cp = current_program;
-		current_program = prog->next_program;
-		if (cp->flag_file_global && current_program->nested_level) {
-			has_global_file = 1;
-		} else {
-			has_global_file = 0;
-		}
-		codegen (prog->next_program, output_name, 1);
-		current_program = cp;
-		return;
-	}
-
+void
+codegen_finalize (void)
+{
 	/* Finalize the main include file */
 
 	if (!cobc_flag_main && non_nested_count > 1) {
@@ -12420,27 +12457,34 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 	output_source_cache ();
 
 	/* Optimizer output */
-	for (optidx = COB_OPTIM_MIN; optidx < COB_OPTIM_MAX; ++optidx) {
-		if (optimize_defs[optidx]) {
-			cob_gen_optim (optidx);
-			output_storage ("\n");
+	{
+		enum cb_optim		optidx;
+		for (optidx = COB_OPTIM_MIN; optidx < COB_OPTIM_MAX; ++optidx) {
+			if (optimize_defs[optidx]) {
+				cob_gen_optim (optidx);
+				output_storage ("\n");
+			}
 		}
 	}
 
-	comment_gen = 0;
-	for (m = literal_cache; m; m = m->next) {
-		if (CB_TREE_CLASS (m->x) == CB_CLASS_NUMERIC
-		 && m->make_decimal) {
-			if (!comment_gen) {
-				comment_gen = 1;
-				output_storage ("\n/* Decimal constants */\n");
+	/* Decimal constants */
+	{
+		struct literal_list* m;
+		int comment_gen = 0;
+		for (m = literal_cache; m; m = m->next) {
+			if (CB_TREE_CLASS (m->x) == CB_CLASS_NUMERIC
+			 && m->make_decimal) {
+				if (!comment_gen) {
+					comment_gen = 1;
+					output_storage ("\n/* Decimal constants */\n");
+				}
+				output_storage ("static\tcob_decimal\t%s%d;\n", CB_PREFIX_DEC_FIELD, m->id);
+				output_storage ("static\tcob_decimal\t*%s%d = NULL;\n", CB_PREFIX_DEC_CONST, m->id);
 			}
-			output_storage ("static\tcob_decimal\t%s%d;\n", CB_PREFIX_DEC_FIELD,m->id);
-			output_storage ("static\tcob_decimal\t*%s%d = NULL;\n", CB_PREFIX_DEC_CONST,m->id);
 		}
-	}
-	if (comment_gen) {
-		output_storage ("\n");
+		if (comment_gen) {
+			output_storage ("\n");
+		}
 	}
 
 	/* Clean up by clearing these */

@@ -125,7 +125,7 @@ do { \
 
 /* Global variables */
 
-struct cb_program		*current_program = NULL;
+struct cb_program		*current_program = NULL;    /* program in parse/syntax check/codegen */
 struct cb_statement		*current_statement = NULL;
 struct cb_label			*current_section = NULL;
 struct cb_label			*current_paragraph = NULL;

@@ -898,8 +898,8 @@ cobc_err_msg (const char *fmt, ...)
 	vfprintf (stderr, fmt, ap);
 
 	if (cb_src_list_file
-		&& cb_listing_file_struct
-		&& cb_listing_file_struct->name) {
+	 && cb_listing_file_struct
+	 && cb_listing_file_struct->name) {
 
 		char			errmsg[BUFSIZ];
 		vsprintf (errmsg, fmt, ap);
@@ -2814,7 +2814,7 @@ process_command_line (const int argc, char **argv)
 		while (++argnum < argc) {
 			if (strrchr(argv[argnum], '/') == argv[argnum]) {
 				if (argv[argnum][1] == '?' && !argv[argnum][2]) {
-					argv[argnum] = "--help";
+					argv[argnum] = (char *) "--help";
 					continue;
 				}
 				argv[argnum][0] = '-';
@@ -7529,18 +7529,7 @@ process_translate (struct filename *fn)
 	}
 
 	/* Translate to C */
-	current_section = NULL;
-	current_paragraph = NULL;
-	current_statement = NULL;
-	cb_source_line = 0;
-	/* Temporarily disable cross-reference during C generation */
-	if (cb_listing_xref) {
-		cb_listing_xref = 0;
-		codegen (current_program, fn->translate, 0);
-		cb_listing_xref = 1;
-	} else {
-		codegen (current_program, fn->translate, 0);
-	}
+	codegen (current_program, fn->translate);
 
 	/* Close files */
 	if (unlikely(fclose (cb_storage_file) != 0)) {

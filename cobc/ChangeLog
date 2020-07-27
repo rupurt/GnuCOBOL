@@ -1,4 +1,13 @@
 
+2020-07-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	refactored codegen, now using a loop instead of a recursive call
+	fixing bug #666
+	* codegen.c, cobc.c, tree.h: split (codegen) into
+	  (codegen_init, codegen_internal, codegen_finalize);
+	  moved more initialization to codegen_init;
+	  limit variable scope and use of static variables
+
 2020-07-26  Edward Hart <edward.dan.hart@gmail.com>
 
 	* config.def: added possible values for assign-clause and

@@ -2267,7 +2267,7 @@ extern cb_tree		cobc_tree_cast_check (const cb_tree, const char *,
 
 
 /* codegen.c */
-extern void		codegen (struct cb_program *, const char *, const int);
+extern void		codegen (struct cb_program *, const char *);
 
 /* scanner.l */
 extern void		cb_unput_dot (void);
