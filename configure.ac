@@ -1672,38 +1672,26 @@ if test "$COB_USES_CLANG_ONLY" = "yes"; then
 fi
 
 
-# Include CFLAGS / CPPFLAGS in COB_CFLAGS without optimization/debug options.
+#
+# Add CFLAGS and CPPFLAGS to COB_CFLAGS, minus optimization/debug options.
+# 
+cob_temp_flags=`echo x$CFLAGS $CPPFLAGS |		\
+	 sed -e's/^x//'					\
+	     -e 's/-g[[ 3]]//g)\'			\
+	     -e 's/-g$//'				\
+	     -e 's/[[+-]]O[[0-9s]]*//g'			\
+ 	     -e 's/-O//g'				\
+ 	     -e 's/-fmessage-length=0//g'		\
+ 	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
+ 	     -e 's/-fstack-protector-strong//g'		\
+ 	     -e 's/-fstack-protector-all//g'		\
+ 	     -e 's/-fstack-protector//g'		\
+ 	     -e 's/-funwind-tables//g'			\
+ 	     -e 's/-fasynchronous-unwind-tables//g'	\
+	     `
 
-if test "x$CFLAGS" != "x"; then
-	cob_temp_flags="$CFLAGS"
-else
-	cob_temp_flags=""
-fi
-if test "x$CPPFLAGS" != "x"; then
-	if test "x$cob_temp_flags" != "x"; then
-		cob_temp_flags="$CPPFLAGS $cob_temp_flags"
-	else
-		cob_temp_flags="$CPPFLAGS"
-	fi
-fi
-if test "x$cob_temp_flags" != "x"; then
-	cob_temp_flags=`echo "$cob_temp_flags" \
-	| sed -e 's/-g3//g' -e 's/-g //g' -e 's/-g$//' -e 's/ $//' -e 's/^ //' \
-	      -e 's/@<:@+-@:>@O@<:@0-9s@:>@//g' -e 's/ $//' -e 's/^ //' \
-	      -e 's/-O//g' -e 's/ $//' -e 's/^ //'    \
-	      -e 's/-fmessage-length=0//g'            \
-	      -e 's/@<:@^ @:>@*-D_FORTIFY_SOURCE=.//g'      \
-	      -e 's/-fstack-protector-strong//g'      \
-	      -e 's/-fstack-protector-all//g'         \
-	      -e 's/-fstack-protector//g'             \
-	      -e 's/-funwind-tables//g'               \
-	      -e 's/-fasynchronous-unwind-tables//g'  \
-	      -e 's/  */ /g' -e 's/ $//' -e 's/^ //'`
-fi
+COB_CFLAGS="$COB_CFLAGS $cob_temp_flags"
 
-if test "x$cob_temp_flags" != "x"; then
-	COB_CFLAGS="$COB_CFLAGS $cob_temp_flags"
-fi
 unset cob_temp_flags
 
 
@@ -1818,9 +1806,6 @@ elif test "$COB_USES_GCC" = "yes" && test "$with_gnu_ld" = "yes"; then
 		CFLAGS="$CFLAGS -finline-functions"
 	fi
 	CFLAGS="$CFLAGS -fsigned-char -Wall -Wwrite-strings -Wmissing-prototypes -Wno-format-y2k"
-	if test "$enable_debug" != "yes"; then
-		CFLAGS="$CFLAGS -U_FORTIFY_SOURCE"
-	fi
 fi
 
 if test "x$lt_cv_dlopen_self" != "xyes"; then
