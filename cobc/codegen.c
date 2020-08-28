@@ -244,6 +244,7 @@ static const struct system_table	system_tab[] = {
 #undef	COB_SYSTEM_GEN
 
 /* Declarations */
+static void output_occurs (struct cb_field *);
 static void output (const char *, ...)		COB_A_FORMAT12;
 static void output_line (const char *, ...)	COB_A_FORMAT12;
 static void output_storage (const char *, ...)	COB_A_FORMAT12;
@@ -1206,7 +1207,7 @@ output_size (const cb_tree x)
 	struct cb_literal	*l;
 	struct cb_reference	*r;
 	struct cb_field		*f;
-	struct cb_field		*p;
+	struct cb_field		*p = NULL;
 	struct cb_field		*q;
 
 	switch (CB_TREE_TAG (x)) {
@@ -1224,6 +1225,7 @@ output_size (const cb_tree x)
 			output ("0");
 			break;
 		}
+		p = chk_field_variable_size (f);
 		if (r->length) {
 			output_integer (r->length);
 			break;
@@ -4762,8 +4764,9 @@ output_initialize_fp (cb_tree x, struct cb_field *f)
 static void
 output_initialize_uniform (cb_tree x, const int c, const int size)
 {
-	struct cb_field		*f;
+	struct cb_field		*f, *v;
 	f = cb_code_field (x);
+	v = chk_field_variable_size (f);
 	/* REPORT lines are cleared to SPACES */
 	if (f->storage == CB_STORAGE_REPORT
 	 && c == ' ')
@@ -4783,6 +4786,12 @@ output_initialize_uniform (cb_tree x, const int c, const int size)
 		} else if (CB_REFERENCE_P(x) && CB_REFERENCE(x)->length) {
 			output (", %d, ", c);
 			output_size (x);
+			output (");");
+		} else if (v 
+				&& !gen_init_working 
+				&& (f->flag_unbounded || !cb_complex_odo)) {
+			output (", %d, ", c);
+			out_odoslide_size (f);
 			output (");");
 		} else {
 			output (", %d, %d);", c, size);
@@ -5126,8 +5135,11 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				/* Begin occurs loop */
 				int		i = f->indexes;
 				i_counters[i] = 1;
-				output_line ("for (i%d = 1; i%d <= %d; i%d++)",
-					     i, i, f->occurs_max, i);
+				output_prefix ();
+				output ("for (i%d = 1; i%d <= ", i, i );
+				output_occurs (f);
+				output ("; i%d++)", i);
+				output_newline ();
 				output_block_open ();
 				CB_REFERENCE (c)->subs =
 				    CB_BUILD_CHAIN (cb_i[i], CB_REFERENCE (c)->subs);
@@ -5159,8 +5171,9 @@ output_initialize (struct cb_initialize *p)
 	f = cb_code_field (p->var);
 	type = deduce_initialize_type (p, f, 1);
 	/* Check for non-standard OCCURS */
-	if ((f->level == 1 || f->level == 77) &&
-	    f->flag_occurs && !p->flag_init_statement) {
+	if ((f->level == 1 || f->level == 77) 
+	 && f->flag_occurs 
+	 && !p->flag_init_statement) {
 		switch (type) {
 		case INITIALIZE_NONE:
 			return;
