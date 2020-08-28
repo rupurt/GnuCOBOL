@@ -10746,8 +10746,13 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 						lt = CB_LITERAL (CB_REFERENCE (x)->offset);
 						bgnpos = atoi((const char*)lt->data);
 					}
-					if (p->storage == CB_STORAGE_LINKAGE
-					 || p->flag_item_based) {
+					if (bgnpos >= 1
+					 && p->storage != CB_STORAGE_LINKAGE
+					 && !p->flag_item_based 
+					 && CB_LITERAL_P (src)
+					 && !cb_is_field_unbounded (p)) {
+						CB_REFERENCE (x)->length = cb_int (p->size - bgnpos + 1);
+					} else {
 						if (bgnpos >= p->offset
 						 && bgnpos < f->offset
 						 && p->offset < f->offset) {
@@ -10761,10 +10766,6 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 							CB_REFERENCE (x)->offset = svoff;
 							CB_REFERENCE (x)->length = NULL;
 							/* Then move the full field with ODO lengths set */
-						}
-					} else {
-						if (bgnpos >= 1) {
-							CB_REFERENCE (x)->length = cb_int (p->size - bgnpos + 1);
 						}
 					}
 				}
