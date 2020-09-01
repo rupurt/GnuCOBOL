@@ -1686,26 +1686,29 @@ if test "x$CPPFLAGS" != "x"; then
 		cob_temp_flags="$CPPFLAGS"
 	fi
 fi
-if test "x$cob_temp_flags" != "x"; then
-	cob_temp_flags=`echo "$cob_temp_flags" \
-	| sed -e 's/-g3//g' -e 's/-g //g' -e 's/-g$//' -e 's/ $//' -e 's/^ //' \
-	      -e 's/@<:@+-@:>@O@<:@0-9s@:>@//g' -e 's/ $//' -e 's/^ //' \
-	      -e 's/-O//g' -e 's/ $//' -e 's/^ //'    \
-	      -e 's/-fmessage-length=0//g'            \
-	      -e 's/@<:@^ @:>@*-D_FORTIFY_SOURCE=.//g'      \
-	      -e 's/-fstack-protector-strong//g'      \
-	      -e 's/-fstack-protector-all//g'         \
-	      -e 's/-fstack-protector//g'             \
-	      -e 's/-funwind-tables//g'               \
-	      -e 's/-fasynchronous-unwind-tables//g'  \
-	      -e 's/  */ /g' -e 's/ $//' -e 's/^ //'`
-fi
+
+#
+# Add CFLAGS and CPPFLAGS to COB_CFLAGS, minus optimization/debug options.
+# 
+cob_temp_flags=`echo x$CFLAGS $CPPFLAGS |		\
+	 sed -e 's/^x//'				\
+	     -e 's/-g[[ 3]]//g'				\
+	     -e 's/-g$//'				\
+	     -e 's/[[+-]]O[[0-9s]]*//g'			\
+ 	     -e 's/-O//g'				\
+ 	     -e 's/-fmessage-length=0//g'		\
+ 	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
+ 	     -e 's/-fstack-protector-strong//g'		\
+ 	     -e 's/-fstack-protector-all//g'		\
+ 	     -e 's/-fstack-protector//g'		\
+ 	     -e 's/-funwind-tables//g'			\
+ 	     -e 's/-fasynchronous-unwind-tables//g'	\
+	     `
 
 if test "x$cob_temp_flags" != "x"; then
 	COB_CFLAGS="$COB_CFLAGS $cob_temp_flags"
 fi
 unset cob_temp_flags
-
 
 # Special stuff
 

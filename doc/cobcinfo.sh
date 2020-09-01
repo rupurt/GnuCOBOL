@@ -248,18 +248,24 @@ _create_file () {
 	"cbconf.tex")
 		lines=2
 		$GREP -A9999 "https://www.gnu.org/licenses/" \
-		  "$confdir/default.conf" \
-		| $SED -e 's/\r//g'  \
-		       -e 's/# \?TO-\?DO.*//g'  \
+		      "$confdir/default.conf" \
+		| tr -d '\r' \
+		| $SED -e 's/# \?TO-\?DO.*//g'  \
 		| $TAIL_START$lines >$1
 		;;
 	"cbrunt.tex")
+	        set -x
+	        # First section, as it is formatted different
+	        $(dirname $0)/cbrunt-sect-1.awk "$confdir/runtime.cfg" > $1
+		;;
+	"do-not-use! cbrunt.tex")
+	    set -x
 		# First section, as it is formatted different
 		$GREP -A400 -m1 "##" "$confdir/runtime.cfg" | \
-			$GREP -B400 -m2 "##" | \
-			cut -b2- | \
-			$SED -e 's/\r//g'  \
-			     -e 's/^#$//g'  \
+			$GREP -B400 -m2 "##" | 
+			cut -b2- | 
+			tr -d '\r' |
+			$SED -e 's/^#$//g'  \
 			     -e 's/^#\( .*\)/@section\1\n/g' \
 			     -e 's/^ //g' \
 			     -e 's/{/@{/g' \
@@ -274,9 +280,9 @@ _create_file () {
 		# All other sections
 		echo "@verbatim"               >>$1
 		$TAIL_START$lines "$confdir/runtime.cfg" | \
-			cut -b2- | \
-			$SED -e 's/\r//g' \
-			     -e 's/# \?TO-\?DO.*$//g'  \
+			cut -b2- | 
+			tr -d '\r' |
+			$SED -e 's/# \?TO-\?DO.*$//g'  \
 			     -e 's/^#\( .*\)/@end verbatim\n@section\1\n@verbatim/g' \
 			     -e 's/^ //g'           >>$1
 		echo "@end verbatim"           >>$1
