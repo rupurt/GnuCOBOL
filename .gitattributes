@@ -126,6 +126,7 @@ config/rm.words -text
 /configure.ac eol=lf
 copy/Makefile.am eol=lf
 doc/Makefile.am eol=lf
+doc/cbrunt-sect-1.awk -text
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
 doc/gnucobol.texi eol=lf
