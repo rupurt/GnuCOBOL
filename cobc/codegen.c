@@ -534,9 +534,8 @@ increase_output_line ()
 static void
 output (const char *fmt, ...)
 {
-	va_list		ap;
-
 	if (output_target) {
+		va_list		ap;
 		va_start (ap, fmt);
 		vfprintf (output_target, fmt, ap);
 		va_end (ap);
@@ -572,9 +571,8 @@ output_prefix (void)
 static void
 output_line (const char *fmt, ...)
 {
-	va_list		ap;
-
 	if (output_target) {
+		va_list		ap;
 		output_prefix ();
 		va_start (ap, fmt);
 		vfprintf (output_target, fmt, ap);
@@ -3673,7 +3671,7 @@ output_param (cb_tree x, int id)
 
 		if (!r->subs
 		 && !r->offset
-		 && f->count > 0
+		 && f->count != 0
 		 && !chk_field_variable_size (f)
 		 && !chk_field_variable_address (f)) {
 			if (!f->flag_field) {
@@ -6064,11 +6062,13 @@ output_call (struct cb_call *p)
 		output_line ("cob_glob_ptr->cob_stmt_exception = 0;");
 	}
 
-	/* ensure that we don't have a program exception set already
-	   as this will be checked directly when returning from CALL */
-	output_line ("if (unlikely((cob_glob_ptr->cob_exception_code & 0x%04x) == 0x%04x)) "
-		"cob_glob_ptr->cob_exception_code = 0;",
-		CB_EXCEPTION_CODE(COB_EC_PROGRAM), CB_EXCEPTION_CODE(COB_EC_PROGRAM));
+	if (dynamic_link) {
+		/* ensure that we don't have a program exception set already
+		   as this will be checked directly when returning from CALL */
+		output_line ("if (unlikely((cob_glob_ptr->cob_exception_code & 0x%04x) == 0x%04x)) "
+			"cob_glob_ptr->cob_exception_code = 0;",
+			CB_EXCEPTION_CODE (COB_EC_PROGRAM), CB_EXCEPTION_CODE (COB_EC_PROGRAM));
+	}
 
 	/* Function name */
 	output_prefix ();
@@ -7298,7 +7298,6 @@ output_section_info (struct cb_label *lp)
 static void
 output_trace_info (cb_tree x, const char *name)
 {
-	if (!cb_flag_source_location) return;
 	if (cb_old_trace) {
 		output_prefix ();
 		output ("cob_set_location (%s%d, %d, ",
@@ -9730,8 +9729,9 @@ output_field_display (struct cb_field *f, int offset, int idx)
 	int	i, svlocal;
 	char	*fname = (char*)f->name;
 
-	if (strncmp(fname,"FILLER ",7) == 0)
+	if (strncmp(fname,"FILLER ",7) == 0) {
 		fname = (char*)"FILLER";
+	}
 	svlocal = f->flag_local;
 	f->flag_local = 0;
 	x = cb_build_field_reference (f, NULL);
@@ -9744,7 +9744,7 @@ output_field_display (struct cb_field *f, int offset, int idx)
 		output_data (x);
 		output (")");
 	} else
-	if (f->count > 0) {
+	if (f->count != 0) {
 		output_param (x, 0);
 	} else {
 		output ("COB_SET_FLD(%s, ", "f0");
@@ -9758,7 +9758,7 @@ output_field_display (struct cb_field *f, int offset, int idx)
 	output (", %d, %d", offset, idx);
 	if (idx > 0) {
 		p = f->parent;
-		for (i=0; i < idx; i++) {
+		for (i = 0; i < idx; i++) {
 			if (field_subscript[i] < 0) {
 				output (", i_%d, ",-field_subscript[i]);
 				if (cb_flag_odoslide
@@ -12057,14 +12057,17 @@ output_function_prototypes (struct cb_program *prog)
 		/* prototype for file specific EXTFH function */
 		for (l = prog->file_list; l; l = CB_CHAIN (l)) {
 			f =  CB_FILE (CB_VALUE (l));
-			/* FIXME: add to an external call chain instead, multiple files
-			          may use the same but not-default function */
-			if (f->extfh
-			 && strcmp (prog->extfh, CB_CONST (f->extfh)->val) != 0
-			 && strcmp ("EXTFH", CB_CONST (f->extfh)->val) != 0) {
-				output_line ("extern int %s (unsigned char *opcode, FCD3 *fcd);",
-					CB_CONST (f->extfh)->val);
+			if (f->extfh) {
+				const char *extfh_value = CB_CONST (f->extfh)->val;
+				/* FIXME: add to an external call chain instead, multiple files
+						  may use the same but not-default function */
+				if (strcmp (prog->extfh, extfh_value) != 0
+				 && strcmp ("EXTFH", extfh_value) != 0) {
+					output_line ("extern int %s (unsigned char *opcode, FCD3 *fcd);",
+						extfh_value);
+				}
 			}
+
 		}
 
 		/* prototype for module initialization */
@@ -12157,10 +12160,6 @@ codegen (struct cb_program *prog, const char *translate_name)
 		if (!current_program->next_program) {
 			break;
 		}
-		if (!strcmp (prog->next_program->program_name, "J-SETNAMEDCOLORBG")) {
-			printf ("DBG: prog->next (in here): %s -> %s\n", prog->program_name, prog->next_program->program_name);
-		}
-		// printf ("DBG %d: prog->next: %s -> %s\n", ++num, prog->program_name, prog->next_program->program_name);
 		if (current_program->flag_file_global && current_program->next_program->nested_level) {
 			has_global_file = 1;
 		} else {
@@ -12229,6 +12228,7 @@ codegen_init (struct cb_program *prog, const char *translate_name)
 	} else {
 		string_buffer[0] = 0;
 	}
+	output_target = yyout;
 	output_header (string_buffer, NULL);
 	output_target = cb_storage_file;
 	output_header (string_buffer, NULL);
@@ -12331,7 +12331,6 @@ codegen_internal (struct cb_program *prog, const int subsequent_call)
 			progid++;
 		}
 	}
-
 
 	output_internal_function (prog, prog->parameter_list);
 
