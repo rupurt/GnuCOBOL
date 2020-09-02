@@ -887,6 +887,8 @@ free_list_file (struct list_files *list_files_struct)
 
 /* Global functions */
 
+static	char errmsg[1024];
+
 /* Output a formatted message to stderr */
 void
 cobc_err_msg (const char *fmt, ...)
@@ -901,8 +903,7 @@ cobc_err_msg (const char *fmt, ...)
 	 && cb_listing_file_struct
 	 && cb_listing_file_struct->name) {
 
-		char			errmsg[BUFSIZ];
-		vsprintf (errmsg, fmt, ap);
+		vsnprintf (errmsg, sizeof(errmsg), fmt, ap);
 
 		cb_add_error_to_listing (NULL, 0,
 			"cobc: ", errmsg);
@@ -5678,7 +5679,6 @@ print_program_trailer (void)
 	int			print_names = 0;
 	int			print_break = 1;
 	int			found;
-	char			err_msg[BUFSIZ];
 
 	if (current_program != NULL) {
 
@@ -5813,21 +5813,21 @@ print_program_trailer (void)
 				if (err->file) {
 					if (err->line > 0) {
 						if (cb_msg_style == CB_MSG_STYLE_MSC) {
-							snprintf (err_msg, BUFSIZ, "%s(%d): %s%s",
+							snprintf (errmsg, sizeof(errmsg), "%s(%d): %s%s",
 								err->file, err->line, prefix, err->msg);
 						} else {
-							snprintf (err_msg, BUFSIZ, "%s:%d: %s%s",
+							snprintf (errmsg, sizeof(errmsg), "%s:%d: %s%s",
 								err->file, err->line, prefix, err->msg);
 						}
 					} else {
-						snprintf (err_msg, BUFSIZ, "%s: %s%s",
+						snprintf (errmsg, sizeof(errmsg), "%s: %s%s",
 							err->file, prefix, err->msg);
 					}
 				} else {
-					snprintf (err_msg, BUFSIZ, "%s%s",
+					snprintf (errmsg, sizeof(errmsg), "%s%s",
 						prefix, err->msg);
 				}
-				print_program_data (err_msg);
+				print_program_data (errmsg);
 				err = err->next;
 			} while (err);
 			print_program_data ("");

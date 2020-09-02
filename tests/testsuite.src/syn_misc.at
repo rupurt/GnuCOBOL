@@ -6956,7 +6956,7 @@ prog.cob:42: warning: OPEN LEAVE/REREAD/DISP is obsolete in GnuCOBOL
 AT_CLEANUP
 
 
-AT_SETUP([very long literal in error message])
+AT_SETUP([very long literal in error message, max 1024])
 AT_KEYWORDS([misc literals])
 
 AT_DATA([prog.cob], [
@@ -6964,86 +6964,47 @@ AT_DATA([prog.cob], [
        PROGRAM-ID.      tutorial.
        PROCEDURE DIVISION.
            move low-values to
-          'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-count'-
-           'vove length of ex-keydef to key2length'-
-           'move 1 to key-countaaaaaaaaaaaaaaaaaaa'-
-           'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	  ' 1  c d e f g h i j k l m n 0 q.'-
+	  ' 2  C D E F G H I J K L M N 0 Q.'-
+	  ' 3  c d e f g h i j k l m n 0 q.'-
+	  ' 4  C D E F G H I J K L M N 0 Q.'-
+	  ' 5  c d e f g h i j k l m n 0 q.'-
+	  ' 6  C D E F G H I J K L M N 0 Q.'-
+	  ' 7  c d e f g h i j k l m n 0 q.'-
+	  ' 8  C D E F G H I J K L M N 0 Q.'-
+	  ' 9  c d e f g h i j k l m n 0 q.'-
+	  '10  C D E F G H I J K L M N 0 Q.'-
+	  '11  c d e f g h i j k l m n 0 q.'-
+	  '12  C D E F G H I J K L M N 0 Q.'-
+	  '13  c d e f g h i j k l m n 0 q.'-
+	  '14  C D E F G H I J K L M N 0 Q.'-
+	  '15  c d e f g h i j k l m n 0 q.'-
+	  '16  C D E F G H I J K L M N 0 Q.'-
+	  '17  c d e f g h i j k l m n 0 q.'-
+	  '18  C D E F G H I J K L M N 0 Q.'-
+	  '19  c d e f g h i j k l m n 0 q.'-
+	  '20  C D E F G H I J K L M N 0 Q.'-
+	  '21  c d e f g h i j k l m n 0 q.'-
+	  '22  C D E F G H I J K L M N 0 Q.'-
+	  '23  c d e f g h i j k l m n 0 q.'-
+	  '24  C D E F G H I J K L M N 0 Q.'-
+	  '25  c d e f g h i j k l m n 0 q.'-
+	  '26  C D E F G H I J K L M N 0 Q.'-
+	  '27  c d e f g h i j k l m n 0 q.'-
+	  '28  C D E F G H I J K L M N 0 Q.'-
+	  '29  c d e f g h i j k l m n 0 q.'-
+	  '30  C D E F G H I J K L M N 0 Q.'-
+	  '31  c d e f g h i j k l m n 0 q.
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:5: error: invalid MOVE target: "vove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countvove length of ex-keydef to key2lengthmove 1 to key-countaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-prog.cob:76: error: syntax error, unexpected end of file
+[prog.cob:5: error: invalid MOVE target: " 1  c d e f g h i j k l m n 0 q. 2  C D E F G H I J K L M N 0 Q. 3  c d e f g h i j k l m n 0 q. 4  C D E F G H I J K L M N 0 Q. 5  c d e f g h i j k l m n 0 q. 6  C D E F G H I J K L M N 0 Q. 7  c d e f g h i j k l m n 0 q. 8  C D E F G H I J K L M N 0 Q. 9  c d e f g h i j k l m n 0 q.10  C D E F G H I J K L M N 0 Q.11  c d e f g h i j k l m n 0 q.12  C D E F G H I J K L M N 0 Q.13  c d e f g h i j k l m n 0 q.14  C D E F G H I J K L M N 0 Q.15  c d e f g h i j k l m n 0 q.16  C D E F G H I J K L M N 0 Q.17  c d e f g h i j k l m n 0 q.18  C D E F G H I J K L M N 0 Q.19  c d e f g h i j k l m n 0 q.20  C D E F G H I J K L M N 0 Q.21  c d e f g h i j k l m n 0 q.22  C D E F G H I J K L M N 0 Q.23  c d e f g h i j k l m n 0 q.24  C D E F G H I J K L M N 0 Q.25  c d e f g h i j k l m n 0 q.26  C D E F G H I J K L M N 0 Q.27  c d e f g h i j k l m n 0 q.28  C D E F G H I J K L M N 0 Q.29  c d e f g h i j k l m n 0 q.30  C D E F G H I J K L M N 0 Q.31 c d e f g h i j k l m n 0 q. 
+"
+prog.cob:36: error: syntax error, unexpected end of file
 ])
-#" <-- fix syntax highlighting
-AT_CLEANUP
 
+AT_CLEANUP
+#' <-- fix syntax highlighting
 
 AT_SETUP([EQUALS in expressions])
 AT_KEYWORDS([misc])

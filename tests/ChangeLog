@@ -1,3 +1,6 @@
+2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
+
+	* testsuite.src/syn_misc.at: attempted fix #336, still slightly borked
 
 2020-05-06  Simon Sobisch <simonsobisch@gnu.org>
 

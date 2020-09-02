@@ -69,7 +69,7 @@ static void
 print_error (const char *file, int line, const char *prefix,
 	     const char *fmt, va_list ap)
 {
-	char			errmsg[BUFSIZ];
+	static char errmsg[1024];
 
 	if (!file) {
 		file = cb_source_file;
@@ -102,15 +102,16 @@ print_error (const char *file, int line, const char *prefix,
 		last_paragraph = current_paragraph;
 	}
 
-	/* Print the error */
+	/* Print the error TODO: use cobc_err_msg*/
 	print_error_prefix (file, line, prefix);
-	vsprintf (errmsg, fmt, ap);
+	vsnprintf (errmsg, sizeof(errmsg), fmt, ap);
 	fprintf (stderr, "%s\n", errmsg);
 
 	if (cb_src_list_file) {
 		cb_add_error_to_listing (file, line, prefix, errmsg);
 	}
 }
+
 static void
 configuration_error_head (void)
 {

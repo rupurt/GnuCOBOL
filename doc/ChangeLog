@@ -1,3 +1,6 @@
+2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
+
+	* Makefile.am: add missing cbrunt-sect-1.awk for distfile
 
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 

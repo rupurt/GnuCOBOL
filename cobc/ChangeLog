@@ -1,3 +1,6 @@
+2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
+
+	* cobc.c, error.c: prevent messages from overflowing message buffer
 
 2020-09-01  Simon Sobisch <simonsobisch@gnu.org>
 
