@@ -378,3 +378,93 @@ TSTBIN10 is 825373492 vs '1234'
 
 AT_CLEANUP
 
+AT_SETUP([Offset Overflow])
+AT_KEYWORDS([refmod])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  G.
+           05  X   PIC X(4) VALUE "Abcd".  
+           05  I   PIC 9    VALUE 5.
+       PROCEDURE DIVISION.
+           DISPLAY "Test data: '" G "'"
+           DISPLAY "Reference out of bounds: '" X(I:1) "'"
+           STOP RUN.
+     
+])
+
+AT_CHECK([$COMPILE -std=cobol2014 -debug prog.cob ], [0], [], [])
+
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [Test data: 'Abcd5'
+], [libcob: prog.cob:11: error: offset of 'X' out of bounds: 5, maximum: 4
+])
+
+AT_CLEANUP
+
+
+AT_SETUP([Offset Overflow])
+AT_KEYWORDS([refmod])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  G.
+           05  X   PIC X(4) VALUE "Abcd".  
+           05  I   PIC 9    VALUE 4.
+       PROCEDURE DIVISION.
+           DISPLAY "Test data: '" G "'"
+           IF  I >= 1
+           AND I <= 4
+           AND X(I:1) <> SPACE
+               DISPLAY "Test one : True"
+           ELSE
+               DISPLAY "Test one : False"
+           END-IF.
+
+           IF  X(I:1) <> SPACE
+           AND I >= 1
+           AND I <= 4
+               DISPLAY "Test two : True"
+           ELSE
+               DISPLAY "Test two : False"
+           END-IF.
+
+           MOVE 5 TO I.
+           DISPLAY "Test data: '" G "'"
+           IF  I >= 1
+           AND I <= 4
+           AND X(I:1) <> SPACE
+               DISPLAY "Test one : Wrong"
+           ELSE
+               DISPLAY "Test one : OK"
+           END-IF.
+
+           IF  X(I:1) <> SPACE
+           AND I >= 1
+           AND I <= 4
+               DISPLAY "Test two : Wrong1"
+           ELSE
+               DISPLAY "Test two : Wrong2"
+           END-IF.
+           DISPLAY "Reference out of bounds: '" X(I:1) "'"
+           STOP RUN.
+     
+])
+
+AT_CHECK([$COMPILE -std=cobol2014 -debug prog.cob ], [0], [], [])
+
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [Test data: 'Abcd4'
+Test one : True
+Test two : True
+Test data: 'Abcd5'
+Test one : OK
+], [libcob: prog.cob:37: error: offset of 'X' out of bounds: 5, maximum: 4
+])
+
+AT_CLEANUP
+
