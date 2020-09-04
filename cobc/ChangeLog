@@ -1,4 +1,9 @@
 
+2020-09-04  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Emit runtime checks to IF conditions for 
+				reference modification being out of bounds 
+
 2020-08-28  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Changes for UNBOUNDED OCCURS

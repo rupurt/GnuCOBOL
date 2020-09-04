@@ -207,6 +207,8 @@ static int			odo_stop_now = 0;
 static int			gen_num_lit_big_end = 1;
 static unsigned int		nolitcast = 0;
 
+static unsigned int		in_func_call = 0;
+static unsigned int		in_cond = 0;
 static unsigned int		inside_check = 0;
 static unsigned int		inside_stack[COB_INSIDE_SIZE];
 
@@ -1090,6 +1092,7 @@ is_index_1 (cb_tree x)
 static void
 output_data (cb_tree x)
 {
+	int did_check = 0;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_LITERAL: {
 		struct cb_literal	*l = CB_LITERAL (x);
@@ -1113,6 +1116,33 @@ output_data (cb_tree x)
 	case CB_TAG_REFERENCE: {
 		struct cb_reference	*r = CB_REFERENCE (x);
 		struct cb_field		*f = CB_FIELD (r->value);
+
+		if (r->check 
+		 && !gen_init_working
+		 && in_cond
+		 && inside_check == 0
+		 && in_func_call == 0) {
+			int n, sav_stack_id;
+			struct cb_literal	*l;
+			inside_stack[inside_check++] = 0;
+			did_check = 1;
+			output_newline ();
+			output_prefix ();
+			output("(");
+			n = output_indent_level;
+			output_indent_level = 0;
+			for (l = r->check; l; l = CB_CHAIN (l)) {
+				sav_stack_id = stack_id;
+				output_stmt (CB_VALUE (l));
+				stack_id = sav_stack_id;
+				if (l == r->check) {
+					output_indent_level = n;
+				}
+			}
+			output ("), ");
+			output_newline ();
+			output_prefix ();
+		}
 
 		/* Base address */
 		output_base (f, 0);
@@ -1173,6 +1203,11 @@ output_data (cb_tree x)
 		if (r->offset) {
 			output (" + ");
 			output_index (r->offset);
+		}
+
+		if (r->check 
+		 && did_check) {
+			--inside_check;
 		}
 		break;
 	}
@@ -4320,6 +4355,7 @@ output_funcall (cb_tree x)
 		return;
 	}
 
+	in_func_call = 1;
 	screenptr = p->screenptr;
 	output ("%s (", p->name);
 	for (i = 0; i < p->argc; i++) {
@@ -4348,6 +4384,7 @@ output_funcall (cb_tree x)
 		}
 	}
 	output (")");
+	in_func_call = 0;
 	nolitcast = 0;
 	screenptr = 0;
 }
@@ -4355,9 +4392,11 @@ output_funcall (cb_tree x)
 static void
 output_func_1 (const char *name, cb_tree x)
 {
+	in_func_call = 1;
 	output ("%s (", name);
 	output_param (x, param_id);
 	output (")");
+	in_func_call = 0;
 }
 
 /* Condition */
@@ -4367,6 +4406,7 @@ output_cond (cb_tree x, const int save_flag)
 {
 	struct cb_binary_op	*p;
 
+	in_cond = 1;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		if (x == cb_true) {
@@ -4479,6 +4519,7 @@ output_cond (cb_tree x, const int save_flag)
 		COBC_ABORT ();
 	/* LCOV_EXCL_STOP */
 	}
+	in_cond = 0;
 }
 
 /* MOVE */
