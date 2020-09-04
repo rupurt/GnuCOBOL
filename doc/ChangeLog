@@ -1,3 +1,10 @@
+2020-09-04  James K. Lowden  <jklowden@symas.com>
+
+	* Makefile.am: generate documentation from build-tree versions.
+	* cobcinfo.sh: generate cbintr.tex using awk
+	* cbintr.awk: new script
+	* gnucobol.texi: cleanup formatting problems
+
 2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
 
 	* Makefile.am: add missing cbrunt-sect-1.awk for distfile

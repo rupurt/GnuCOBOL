@@ -1,3 +1,6 @@
+2020-09-04  James K. Lowden  <jklowden@symas.com>
+
+	* intrinsic.c: bugfix for cob_intr_seconds_from_formatted_time
 
 2020-07-26  Edward Hart <edward.dan.hart@gmail.com>
 

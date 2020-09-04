@@ -199,19 +199,7 @@ _create_file () {
 		echo "@end multitable" >>$1
 		;;
 	"cbintr.tex")
-		echo "@multitable @columnfractions .40 .20 .40"  >$1
-		$COBC -q --list-intrinsics | \
-			$SED -e 's/  \+/\t/g'   | \
-		while IFS='~' read -r name impl params; do
-			if test -z "$name"; then continue; fi
-			if test -z "$header_found"; then
-				header_found=1
-				echo "@headitem $name @tab $impl @tab $params"  >>$1
-			else
-				echo "@item @code{$name} @tab $impl @tab $params"  >>$1
-			fi
-		done
-		echo "@end multitable" >>$1
+	    $COBC -q --list-intrinsics | $(dirname $0)/cbintr.awk > $1
 		;;
 	"cbsyst.tex")
 		echo "@multitable @columnfractions .40 .20"  >$1
@@ -254,38 +242,8 @@ _create_file () {
 		| $TAIL_START$lines >$1
 		;;
 	"cbrunt.tex")
-	        set -x
 	        # First section, as it is formatted different
 	        $(dirname $0)/cbrunt-sect-1.awk "$confdir/runtime.cfg" > $1
-		;;
-	"do-not-use! cbrunt.tex")
-	    set -x
-		# First section, as it is formatted different
-		$GREP -A400 -m1 "##" "$confdir/runtime.cfg" | \
-			$GREP -B400 -m2 "##" | 
-			cut -b2- | 
-			tr -d '\r' |
-			$SED -e 's/^#$//g'  \
-			     -e 's/^#\( .*\)/@section\1\n/g' \
-			     -e 's/^ //g' \
-			     -e 's/{/@{/g' \
-			     -e 's/}/@}/g' \
-			     -e 's/\(Example:\)  \(.*\)$/\n\1 @code{\2}/g' \
-			     -e 's/  \([^ ][^(]*\)  \([,.]\)/ @code{\1}\2/g' \
-			     -e 's/  \([^ ][^(]*\)  / @code{\1} /g' \
-			     -e 's/  \([^ ][^(]*\)$/ @code{\1}/g' \
-			     -e 's/^$/@\*/g'          > $1
-		lines=`cat $1 | wc -l`
-		lines=`expr 20 + $lines`
-		# All other sections
-		echo "@verbatim"               >>$1
-		$TAIL_START$lines "$confdir/runtime.cfg" | \
-			cut -b2- | 
-			tr -d '\r' |
-			$SED -e 's/# \?TO-\?DO.*$//g'  \
-			     -e 's/^#\( .*\)/@end verbatim\n@section\1\n@verbatim/g' \
-			     -e 's/^ //g'           >>$1
-		echo "@end verbatim"           >>$1
 		;;
   esac
 }

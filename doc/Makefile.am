@@ -19,10 +19,24 @@
 # You should have received a copy of the GNU General Public License
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
-COBC = cobc$(EXEEXT)
-COBCRUN = cobcrun$(EXEEXT)
-PASSED_OPTIONS = GREP=$(GREP) SED=$(SED) COBC=$(COBC) COBCRUN=$(COBCRUN)
-COBCINFOSH = $(PASSED_OPTIONS) $(abs_top_builddir)/pre-inst-env \
+#
+# The texinfo input is derived from --help output of the programs just
+# built (cobc and cobcrun).  We refer to them in their in-tree built
+# locations, to make sure we're not deriving the documentation from an
+# installed version. Use LD_PRELOAD to make sure we have the matching
+# libcob.
+#
+COBC = $(top_builddir)/cobc/cobc$(EXEEXT)
+COBCRUN = $(top_builddir)/bin/.libs/cobcrun$(EXEEXT)
+LIBCOBDIR = $(abs_top_builddir)/libcob/.libs
+
+PASSED_OPTIONS = GREP=$(GREP) \
+		 SED=$(SED) \
+		 COBC=$(COBC) \
+		 COBCRUN=$(COBCRUN) \
+		 LD_PRELOAD=$(LIBCOBDIR)/libcob.so
+
+COBCINFOSH = $(PASSED_OPTIONS) $(top_builddir)/pre-inst-env \
 	$(top_srcdir)/doc/cobcinfo.sh
 
 info_TEXINFOS = gnucobol.texi
@@ -75,7 +89,7 @@ clean-tex:
 	rm -rf $(GENINCLUDES)
 
 EXTRA_DIST = gnucobol.pdf
-dist_noinst_SCRIPTS = cobcinfo.sh cbrunt-sect-1.awk
+dist_noinst_SCRIPTS = cobcinfo.sh cbrunt-sect-1.awk cbintr.awk
 
 AM_MAKEINFOHTMLFLAGS = --no-headers --no-split
 CLEANFILES = *.aux  *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.vrs
