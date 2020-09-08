@@ -1,3 +1,7 @@
+2020-09-08  James K. Lowden  <jklowden@symas.com>
+
+	* intrinsic.c (cob_intr_seconds_from_formatted_time): #886 passes
+
 2020-09-04  James K. Lowden  <jklowden@symas.com>
 
 	* intrinsic.c: bugfix for cob_intr_seconds_from_formatted_time

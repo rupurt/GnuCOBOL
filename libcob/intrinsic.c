@@ -5391,8 +5391,8 @@ cob_field *
 cob_intr_seconds_from_formatted_time (cob_field *format_field, cob_field *time_field)
 {
 	size_t		str_length;
-	char		     format_str[COB_DATETIMESTR_LEN] = { '\0' };
-	char		time_format_str[COB_DATETIMESTR_LEN] = { '\0' };
+	char		format_str[2 * COB_DATETIMESTR_LEN] = { '\0' };
+	char *		time_format_str = format_str;
 	const char	decimal_point = COB_MODULE_PTR->decimal_point;
 	int		is_datetime = 0;
 	char		time_str[COB_DATETIMESTR_LEN] = { '\0' };
@@ -5414,6 +5414,7 @@ cob_intr_seconds_from_formatted_time (cob_field *format_field, cob_field *time_f
 
 	/* Extract the time part of the strings */
 	if (is_datetime) {
+		time_format_str = format_str + sizeof(format_str) / 2;
 		split_around_t (format_str, NULL, time_format_str);
 		split_around_t ((char *) time_field->data, NULL, time_str);
 	} else {
