@@ -7751,6 +7751,9 @@ print_info_detailed (const int verbose)
 #else
 	var_print (_("JSON library"), 		_("disabled"), "", 0);
 #endif
+#ifdef COB_DEBUG_LOG
+	var_print (_("DEBUG_LOG "),		_("enabled"), "", 0);
+#endif
 }
 
 void
