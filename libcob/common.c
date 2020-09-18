@@ -240,6 +240,7 @@ static const char		*cob_source_statement = NULL;
 static unsigned int		cob_source_line = 0;
 
 #ifdef COB_DEBUG_LOG
+static int			cob_debug_check_open = 1;
 static int			cob_debug_log_time = 0;
 static FILE			*cob_debug_file = NULL;
 static int			cob_debug_level = 9;
@@ -3002,18 +3003,11 @@ cob_check_based (const unsigned char *x, const char *name)
 }
 
 void
-cob_check_linkage (const unsigned char *x, const char *name, const int check_type)
+cob_check_linkage (const unsigned char *x, const char *name)
 {
 	if (!x) {
 		/* name includes '' already and can be ... 'x' of 'y' */
-		switch (check_type) {
-		case 0: /* check for passed items and size on module entry */
-			cob_runtime_error (_("LINKAGE item %s not passed by caller"), name);
-			break;
-		case 1: /* check for passed OPTIONAL items on item use */
-			cob_runtime_error (_("LINKAGE item %s not passed by caller"), name);
-			break;
-		}
+		cob_runtime_error (_("LINKAGE item %s not passed by caller"), name);
 		cob_stop_run (1);
 	}
 }
@@ -5755,39 +5749,6 @@ cob_set_locale (cob_field *locale, const int category)
 }
 
 
-#if 0 /* currently not used */
-char *
-cob_int_to_string (int i, char *number)
-{
-	if (!number) return NULL;
-	sprintf (number, "%i", i);
-	return number;
-}
-
-char *
-cob_int_to_formatted_bytestring (int i, char *number)
-{
-	double		d;
-	char		*byte_unit;
-
-	if (!number) return NULL;
-
-	byte_unit = (char *) cob_fast_malloc (3);
-
-	if (i > (1024 * 1024)) {
-		d = i / 1024.0 / 1024.0;
-		byte_unit = (char *) "MB";
-	} else if (i > 1024) {
-		d = i / 1024.0;
-		byte_unit = (char *) "kB";
-	} else {
-		d = 0;
-		byte_unit = (char *) "B";
-	}
-	sprintf (number, "%3.2f %s", d, byte_unit);
-	return number;
-}
-#endif
 
 /* concatenate two strings allocating a new one
    and optionally free one of the strings
@@ -8504,6 +8465,7 @@ cob_debug_open (void)
 	char	log_opt;
 	char	logfile[COB_SMALL_BUFF];
 
+	cob_debug_check_open = 0;
 	logfile[0] = 0;
 
 	for (i=0; debug_env[i] != 0; i++) {
@@ -8614,6 +8576,11 @@ int
 cob_debug_logit (int level, char *module)
 {
 	int	i;
+	if (cob_debug_check_open) {
+		if (cobsetptr == NULL)
+			cob_init (0, NULL);
+		cob_debug_open ();
+	}
 	if (cob_debug_file == NULL) {
 		return 1;
 	}
