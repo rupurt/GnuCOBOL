@@ -43,6 +43,7 @@
 #include "cobc.h"
 #include "tree.h"
 #include <parser.h>
+#include "../libcob/cobinternal.h"
 
 #define PIC_ALPHABETIC		0x01
 #define PIC_NUMERIC		0x02
@@ -859,20 +860,6 @@ get_data_and_size_from_lit (cb_tree x, unsigned char **data, size_t *size)
 	return 0;
 }
 
-#if 0
-static void
-dump_literal( const char func[], int line, const void *tree ) {
-	if( 1 && tree && CB_LITERAL_P(tree) ) {
-		const struct cb_literal *lit = CB_LITERAL(tree);
-		printf( "%s:%d: %p: %.*s, size=%d\n", func, line, 
-			lit, lit->size, lit->data, lit->size );
-	}
-}
-# define dump_literal(t) dump_literal(__func__, __LINE__, (t))
-#else 
-# define dump_literal(t)
-#endif
-
 static struct cb_literal *
 concat_literals (const cb_tree left, const cb_tree right)
 {
@@ -896,7 +883,8 @@ concat_literals (const cb_tree left, const cb_tree right)
 	memcpy (p->data, ldata, lsize);
 	memcpy (p->data + lsize, rdata, rsize);
 
-	dump_literal(p);
+	lsize = lsize + rsize;
+	DEBUG_LOG ("gc",( "concat literal %d:'%.*s'\n", lsize, lsize < 80?lsize:80, p->data));
 	return p;
 }
 
@@ -1954,6 +1942,9 @@ cb_define (cb_tree name, cb_tree val)
 	w = CB_REFERENCE (name)->word;
 	w->items = cb_list_add (w->items, val);
 	w->count++;
+	if( CB_FIELD_P (val) ) {
+		CB_FIELD_PTR(val)->name = w->name;
+	}
 	SET_SOURCE(val, name->source_file, name->source_line);
 	CB_REFERENCE (name)->value = val;
 	return w->name;
@@ -1978,34 +1969,56 @@ add_contained_prog (struct nested_list *parent_list, struct cb_program *child_pr
 	return nlp;
 }
 
+#ifdef COB_DEBUG_LOG
 void
 cb_tree_source_set (const char func[], int line, cb_tree tree,
 		    const char source_file[], int source_line )
 {
+	char	extra[128], codeloc[128];
+
 	tree->source_file = source_file;
 	tree->source_line = source_line;
+	if (source_file != NULL
+	 && source_line != 0) {
+		sprintf(codeloc,"for %s:%d ",source_file,source_line);
+	} else {
+		strcpy(codeloc,"");
+	}
 
-	if(getenv("COBC_TRACE")) {
-		printf( "%s:%d: set tag %d for %s:%d ",
-			func, line, tree->tag,
-			tree->source_file, tree->source_line );
-		if( CB_LITERAL_P(tree) ) {
-			const struct cb_literal *p = CB_LITERAL(tree);
-			if( p->data ) {
-				printf( "(%p: %.*s, size=%d)",
-					p, p->size, p->data, p->size );
+	if( CB_LITERAL_P (tree) ) {
+		const struct cb_literal *p = CB_LITERAL(tree);
+		if( p->data ) {
+			if (CB_TREE_CLASS (tree) == CB_CLASS_NUMERIC) {
+				sprintf(extra,"(%p: '%.*s', size=%d)",
+					p, p->size<64?p->size:64, p->data, p->size );
+			} else {
+				sprintf(extra,"(%p: \"%.*s\", size=%d)",
+					p, p->size<64?p->size:64, p->data, p->size );
 			}
+		} else {
+			strcpy(extra,"?");
 		}
-		if( CB_FIELD_P(tree) ) {
-			const struct cb_field *p = CB_FIELD(tree);
-			if( p->name ) {
-				printf( "('%s' a/k/a '%s')",
-					p->name, p->ename );
-			}
+		DEBUG_LOG ("gc",( "%s:%d: %sliteral %s\n",
+				func, line, codeloc, extra ));
+	} else
+	if( CB_FIELD_P (tree) ) {
+		const struct cb_field *p = CB_FIELD_PTR(tree);
+		if( p->name ) {
+			if (memcmp(p->name,"FILLER ",7) == 0)
+				strcpy(extra,"FILLER");
+			else
+				sprintf(extra,"'%s'", p->name );
+		} else {
+			strcpy(extra,"?");
 		}
-		printf("\n");
+		DEBUG_LOG ("gc",( "%s:%d: %sfield %s\n",
+				func, line, codeloc, extra ));
+	} else {
+		DEBUG_LOG ("gc",( "%s:%d: set tag %d %s\n",
+				func, line, tree->tag, codeloc ));
 	}
 }
+#endif
 
 struct cb_program *
 cb_build_program (struct cb_program *last_program, const int nest_level)

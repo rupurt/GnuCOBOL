@@ -2032,12 +2032,11 @@ cb_build_identifier (cb_tree x, const int subchk)
 		if (CB_EXCEPTION_ENABLE (COB_EC_PROGRAM_ARG_OMITTED)
 		 && p->storage == CB_STORAGE_LINKAGE && p->flag_is_pdiv_parm) {
 #endif
-			current_statement->null_check = CB_BUILD_FUNCALL_3 (
+			current_statement->null_check = CB_BUILD_FUNCALL_2 (
 				"cob_check_linkage",
 				cb_build_address (cb_build_field_reference (p, NULL)),
 				CB_BUILD_STRING0 (
-					CB_REFERENCE(cb_build_name_reference (p, f))->word->name),
-				cb_int1);
+					CB_REFERENCE(cb_build_name_reference (p, f))->word->name));
 		} else
 		if (CB_EXCEPTION_ENABLE (COB_EC_DATA_PTR_NULL)
 		 && !current_statement->flag_no_based) {

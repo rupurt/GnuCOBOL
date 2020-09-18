@@ -22,21 +22,7 @@
 #ifndef CB_TREE_H
 #define CB_TREE_H
 
-#ifndef HAVE_ATOLL
-#ifdef  HAVE_STRTOLL
-#ifndef atoll
-#define atoll(x) strtoll(x, NULL, 10)
-#endif
-#endif
-#endif
-
-#ifndef HAVE_ATOL
-#ifdef  HAVE_STRTOL
-#ifndef atol
-#define atol(x) strtol(x, NULL, 10)
-#endif
-#endif
-#endif        
+#include "../libcob/cobinternal.h"
 
 #define CB_BEFORE		cb_int0
 #define CB_AFTER		cb_int1
@@ -569,12 +555,19 @@ struct cb_next_elem {
   #define CURRENT_FUNCTION __FILE__
 #endif
 
+#ifdef COB_DEBUG_LOG
 void
 cb_tree_source_set( const char func[], int line, cb_tree tree, 
 		    const char source_file[], int source_line );
 #define SET_SOURCE(t, s, l) cb_tree_source_set(CURRENT_FUNCTION, __LINE__, (t), (s), (l))
 #define SET_SOURCE_CB(t) cb_tree_source_set(CURRENT_FUNCTION, __LINE__,	(t), \
 					    cb_source_file, cb_source_line)
+#else
+#define SET_SOURCE(t, s, l) ((cb_tree)t)->source_file = s; \
+			((cb_tree)t)->source_line = l;
+#define SET_SOURCE_CB(t) ((cb_tree)t)->source_file = cb_source_file; \
+			((cb_tree)t)->source_line = cb_source_line;
+#endif
 
 /* xref entries */
 struct cb_xref_elem {

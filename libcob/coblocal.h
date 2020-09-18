@@ -36,22 +36,6 @@
 #define ISFINITE finite
 #endif
 
-#ifndef HAVE_ATOLL
-#ifdef  HAVE_STRTOLL
-#ifndef atoll
-#define atoll(x) strtoll(x, NULL, 10)
-#endif
-#endif
-#endif
-
-#ifndef HAVE_ATOL
-#ifdef  HAVE_STRTOL
-#ifndef atol
-#define atol(x) strtol(x, NULL, 10)
-#endif
-#endif
-#endif
-
 #if	defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__)
 
 #include <float.h>
@@ -70,19 +54,7 @@
 #endif
 
 
-#if	defined(_WIN32) || defined(__CYGWIN__) || defined(COB_NO_VISIBILITY_ATTRIBUTE)
-#define COB_HIDDEN	extern
-#elif	defined(__GNUC__) && \
-	(__GNUC__ > 4 ||  /* note: this check should be moved to configure... */ \
-	 (__GNUC__ == 4 && __GNUC_MINOR__ > 2))
-/* Also OK for icc which defines __GNUC__ */
-#define COB_HIDDEN	extern __attribute__ ((visibility("hidden")))
-#elif	defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
-/* Note - >= 0x590 supports gcc syntax */
-#define COB_HIDDEN	extern __hidden
-#else
-#define COB_HIDDEN	extern
-#endif
+#include <../libcob/cobinternal.h>
 
 #ifndef	F_OK
 #define	F_OK		0
@@ -439,36 +411,8 @@ COB_HIDDEN void		cob_runtime_warning_external	(const char *, const int,
 
 COB_HIDDEN cob_settings *cob_get_settings_ptr	(void);
 
-/* COB_DEBUG_LOG Macros and routines found in common.c */
-#ifdef COB_DEBUG_LOG
-COB_HIDDEN int	cob_debug_logit		(int level, char *module);
-COB_HIDDEN int	cob_debug_logger	(const char *fmt, ... );
-COB_HIDDEN int	cob_debug_dump		(void *mem, int len);
-#define DEBUG_TRACE(module, arglist)		cob_debug_logit(3, (char*)module) ? 0 : cob_debug_logger arglist
-#define DEBUG_WARN(module, arglist)			cob_debug_logit(2, (char*)module) ? 0 : cob_debug_logger arglist
-#define DEBUG_LOG(module, arglist)			cob_debug_logit(0, (char*)module) ? 0 : cob_debug_logger arglist
-#define DEBUG_DUMP_TRACE(module, mem, len)	cob_debug_logit(3, (char*)module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_DUMP_WARN(module, mem, len)	cob_debug_logit(2, (char*)module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_DUMP(module, mem, len)		cob_debug_logit(0, (char*)module) ? 0 : cob_debug_dump(mem, len)
-#define DEBUG_ISON_TRACE(module)			!cob_debug_logit(3, (char*)module)
-#define DEBUG_ISON_WARN(module)				!cob_debug_logit(2, (char*)module)
-#define DEBUG_ISON(module)					!cob_debug_logit(0, (char*)module)
-#else
-#define DEBUG_TRACE(module, arglist)
-#define DEBUG_WARN(module, arglist)
-#define DEBUG_LOG(module, arglist)
-#define DEBUG_DUMP_TRACE(module, mem, len)
-#define DEBUG_DUMP_WARN(module, mem, len)
-#define DEBUG_DUMP(module, mem, len)
-/* Note: no definition for DEBUG_ISON_TRACE, DEBUG_ISON_WARN, DEBUG_ISON
-         as these parts should be surrounded by #ifdef COB_DEBUG_LOG */
-#endif
 COB_HIDDEN FILE			*cob_get_dump_file	(void);
 
-#if 0 /* currently not used */
-COB_HIDDEN char		*cob_int_to_string		(int, char*);
-COB_HIDDEN char		*cob_int_to_formatted_bytestring	(int, char*);
-#endif
 COB_HIDDEN char		*cob_strcat		(char*, char*, int);
 COB_HIDDEN char		*cob_strjoin		(char**, int, char*);
 

@@ -2326,6 +2326,9 @@ cobc_print_info (void)
 #else
 	cobc_var_print (_("JSON library"),		_("disabled"), 0);
 #endif
+#ifdef COB_DEBUG_LOG
+	cobc_var_print (_("DEBUG_LOG "),		_("enabled"), 0);
+#endif
 }
 
 static void

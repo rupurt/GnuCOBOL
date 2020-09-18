@@ -1989,10 +1989,8 @@ COB_EXPIMP void	cob_table_sort		(cob_field *, const int);
 
 COB_EXPIMP void	cob_check_numeric	(const cob_field *, const char *);
 COB_EXPIMP void	cob_correct_numeric	(cob_field *);
-COB_EXPIMP void	cob_check_based		(const unsigned char *,
-					 const char *);
-COB_EXPIMP void	cob_check_linkage	(const unsigned char *,
-					 const char *, const int);
+COB_EXPIMP void	cob_check_based		(const unsigned char *, const char *);
+COB_EXPIMP void	cob_check_linkage	(const unsigned char *, const char *);
 COB_EXPIMP void	cob_check_odo		(const int, const int, const int,
 					 const char *, const char *);
 COB_EXPIMP void	cob_check_subscript	(const int, const int,

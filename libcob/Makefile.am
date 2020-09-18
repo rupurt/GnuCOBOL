@@ -61,7 +61,7 @@ libcob_la_LIBADD = $(LIBCOB_LIBS) $(CODE_COVERAGE_LIBS)
 libcob_la_LDFLAGS = $(COB_FIX_LIBTOOL) -version-info 5:0:0 -no-undefined
 AM_LDFLAGS = $(COB_FIX_LIB)
 
-EXTRA_DIST = coblocal.h system.def sysdefines.h fileio.h
+EXTRA_DIST = coblocal.h cobinternal.h system.def sysdefines.h fileio.h
 pkgincludedir = $(includedir)/libcob
 pkginclude_HEADERS = common.h cobgetopt.h exception.def
 
