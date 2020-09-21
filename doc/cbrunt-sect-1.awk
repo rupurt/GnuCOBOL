@@ -9,6 +9,9 @@
 !section && /^## /,/^##$/ {
     if( debug ) { print "input: ", NR, $0 }
     section = 1
+
+    if( /^##$/ ) { print "@c end of section 1"; next }
+
     sub(/^./, "")
 
     if( debug ) { print "inpu1: ", NR, $0 }
