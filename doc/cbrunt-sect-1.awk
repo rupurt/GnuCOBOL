@@ -7,13 +7,17 @@
 }
 
 !section && /^## /,/^##$/ {
+    if( debug ) { print "input: ", NR, $0 }
     section = 1
-    gsub(/^./, "")
+    sub(/^./, "")
+
+    if( debug ) { print "inpu1: ", NR, $0 }
+
     gsub(/\r/, "")
-    if( gsub(/^#/, "@section") ) {
+    if( sub(/^#/, "@section") ) {
 	$0 = $0 "\n"
     }
-    gsub(/^ /, "")
+    sub(/^ /, "")
     gsub(/[{}]/, "@&")
 
     # Wrap 1-line example in "code{...}"
@@ -33,8 +37,9 @@
     # s/  \([^ ][^(]*\)  / @code{\1} /g
     # s/  \([^ ][^(]*\)$/ @code{\1}/g
 
-    gsub(/^$/, "@*")
+    sub(/^$/, "@*")
 
+    if( debug ) { printf "output: " }
     print
     next
 }
@@ -44,7 +49,7 @@
 #
 
 section > 1 {
-    gsub(/^./, "")
+    sub(/^./, "")
     gsub(/\r/, "")
 
     # $SED -e 's/# \?TO-\?DO.*$//g'  
@@ -57,7 +62,7 @@ section > 1 {
     }
     
     # -e 's/^ //g'
-    gsub(/^ /, "")
+    sub(/^ /, "")
 
     print
 }
