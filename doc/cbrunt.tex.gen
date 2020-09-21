@@ -1,0 +1,96 @@
+#! /usr/bin/awk -f
+
+{
+    gsub(/\r/, "")
+}
+
+
+/^## General instructions/,/^##$/ {
+    
+    if( debug ) { print "@c input:", NR, $0 }
+    if( sub(/^## /, "@section ") ) {
+	$0 = $0 "\n"
+	print
+	next
+    }
+
+    sub(/^# |^#$/, "")
+    gsub(/[{}]/, "@&")  # escape literal square brackets. 
+
+    # mark up plain text references
+    gsub(/runtime.cfg/, "@file{&}")
+    gsub(/\$COB_CONFIG_DIR|COB_RUNTIME_CONFIG/, "@env{&}")
+    gsub(/cobcrun --info/, "@command{&}")
+    gsub(/\$@{envvar:-?default@}/, "@code{&}")
+    gsub(/reset parametername/, "@code{&}")
+    gsub(/prefix +COB_/, "prefix @code{COB_}")
+    gsub(/cobcrun --runtime-config/, "@command{&}")
+    gsub(/[*]slightly[*]/, "@i{slightly}")
+
+    gsub(/ setenv| unsetenv|include |includeif/, "@code{&}")
+    gsub(/{ /, "{")
+
+    if( /to (true|false):/ ) {
+	gsub(/[01YN],/, "@code{&}")
+	gsub(/,}/, "},");
+
+	gsub(/ON|OFF|YES|TRUE/, "@code{&}")
+
+	if( /OFF/ ) { sub(/$/, ".\n") }
+    }
+
+    if( sub(/'size'/, "@code{size}") ) {
+	gsub(/[KMG]/, "@samp{&}")
+	print
+	getline
+	sub(/^# /, "")
+	gsub(/kilo|mega|giga/, "@samp{&}")
+    }
+    
+    if( debug ) { print "@c marked up:", NR, $0 }
+
+    # Wrap 1-line examples in "code{...}"
+    if( sub(/^ *Example: */, "") ) {
+	print "@table @asis"
+	print "@item Example"
+	print "@code{" $0 "}"
+	print "@end table"
+	next
+    }
+    
+    if( /^##$/ ) {
+	section = 1
+    } else {
+	print
+    }
+    if( debug ) { print "@c output:", NR, $0 }
+    next
+}
+
+section == 0 { next }
+
+/# \?TO-\?DO.*/ { next } # Skip any TODO
+
+#
+# Other sections
+#
+
+/^## / {
+    sub( /^## /, "" )
+    if( section++ > 1 ) {
+	print "@end verbatim\n"
+    }
+    print "@section", $0
+    print "@verbatim"
+    next
+}
+
+{
+    sub(/^# |^#$/, "")
+    print
+}
+
+END {
+    print "@end verbatim"
+}
+

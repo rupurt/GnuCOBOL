@@ -243,7 +243,7 @@ _create_file () {
 		;;
 	"cbrunt.tex")
 	        # First section, as it is formatted different
-	        $(dirname $0)/cbrunt-sect-1.awk "$confdir/runtime.cfg" > $1
+	    $(dirname $0)/$1.gen "$confdir/runtime.cfg" > $1
 		;;
   esac
 }

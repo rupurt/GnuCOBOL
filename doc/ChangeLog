@@ -1,3 +1,9 @@
+2020-09-21  James K. Lowden  <jklowden@symas.com>
+
+	* cbrunt-sect-1.awk: remove
+	* cbrunt.tex.gen: add
+	* cobcinfo.sh: use cbrunt.tex.gen
+
 2020-09-04  James K. Lowden  <jklowden@symas.com>
 
 	* Makefile.am: generate documentation from build-tree versions.
