@@ -78,7 +78,15 @@ fi
 _create_file () {
   echo "$0: creating $1"
   case "$1" in
-	"cbhelp.tex")
+        "cbhelp.tex")
+		rm -rf $1
+		$COBC -q --help |
+		    $(dirname $0)/$1.gen |
+		    awk 'NR > 1 {sep = "\n"}  
+                         /^;/ { sep = "" } # remove newline when line starts with ";"
+                         { printf "%s%s", sep, $0; } END {print ""}' > $1
+	        ;;
+	"cbhelp.DNU")
 		rm -rf $1
 		$COBC -q --help | $GREP -E "ptions.*:" | cut -d: -f1 | \
 		while read section; do

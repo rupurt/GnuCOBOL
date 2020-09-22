@@ -1,3 +1,7 @@
+2020-09-22  James K. Lowden  <jklowden@symas.com>
+
+	* flag.def: remove extraneous newline in output
+
 2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
 
 	* cobc.c, error.c: prevent messages from overflowing message buffer

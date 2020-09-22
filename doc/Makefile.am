@@ -89,7 +89,7 @@ clean-tex:
 	rm -rf $(GENINCLUDES)
 
 EXTRA_DIST = gnucobol.pdf
-dist_noinst_SCRIPTS = cobcinfo.sh cbrunt-sect-1.awk cbintr.awk
+dist_noinst_SCRIPTS = cobcinfo.sh cbhelp.tex.gen cbrunt.tex.gen cbintr.awk
 
 AM_MAKEINFOHTMLFLAGS = --no-headers --no-split
 CLEANFILES = *.aux  *.cp *.fn *.ky *.log *.pg *.toc *.tp *.vr *.vrs

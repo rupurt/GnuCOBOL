@@ -1,3 +1,9 @@
+2020-09-22  James K. Lowden  <jklowden@symas.com>
+
+	* cbhelp.tex.gen: added
+	* cobcinfo.sh (_create_file): use cbhelp.tex.gen
+	* Makefile.am (dist_noinst_SCRIPTS): add *.tex.gen files
+
 2020-09-21  James K. Lowden  <jklowden@symas.com>
 
 	* cbrunt-sect-1.awk: remove
