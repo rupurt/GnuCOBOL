@@ -59,16 +59,3 @@ CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 #libcob.3: $(HELPSOURCES)
 #	"$(top_builddir)/pre-inst-env" $(HELP2MAN) --output=$@ $(HELP2MAN_OPTS) $(COBCRUN)
 #endif
-
-install-data-hook:
-	rm -f $(DESTDIR)$(includedir)/libcob/byteswap.h
-	rm -f $(DESTDIR)$(includedir)/libcob/call.h
-	rm -f $(DESTDIR)$(includedir)/libcob/fileio.h
-	rm -f $(DESTDIR)$(includedir)/libcob/termio.h
-	rm -f $(DESTDIR)$(includedir)/libcob/screenio.h
-	rm -f $(DESTDIR)$(includedir)/libcob/move.h
-	rm -f $(DESTDIR)$(includedir)/libcob/numeric.h
-	rm -f $(DESTDIR)$(includedir)/libcob/strings.h
-	rm -f $(DESTDIR)$(includedir)/libcob/intrinsic.h
-	rm -f $(DESTDIR)$(includedir)/libcob/codegen.h
-	rm -f $(DESTDIR)$(includedir)/libcob/system.def

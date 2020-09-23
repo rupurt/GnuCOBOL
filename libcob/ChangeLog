@@ -1,3 +1,9 @@
+
+2020-09-23  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am (install-data-hook): removed as per initial patch from
+	  Eric Gallager in bug #73, fixing bug #576
+
 2020-09-08  James K. Lowden  <jklowden@symas.com>
 
 	* intrinsic.c (cob_intr_seconds_from_formatted_time): #886 passes
@@ -871,7 +877,7 @@
 
 2017-12-10  Simon Sobisch <simonsobisch@gnu.org>
 
-	* fileio.c: aadjustments after merge of split/sparse keys from rw-branch
+	* fileio.c: adjustments after merge of split/sparse keys from rw-branch
 
 2017-12-06  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -2056,6 +2062,10 @@
 2014-06-14  Ron Norman <rjn@inglenet.com>
 
 	* parser.y: Fixes for LINE|COL 0 to get error message
+
+2014-06-04  Eric Gallager <cooljeanius@users.sourceforge.net>
+
+	Makefile.am (install-data-hook): removed  [merged 2020-09-23]
 
 2014-05-20  Philipp Böhme <phi.boehme@googlemail.com>
 
