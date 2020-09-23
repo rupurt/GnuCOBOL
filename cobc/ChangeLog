@@ -1,6 +1,23 @@
+
 2020-09-22  James K. Lowden  <jklowden@symas.com>
 
-	* flag.def: remove extraneous newline in output
+	* flag.def (fintrinsics): remove extraneous newline in output
+
+2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* ppparse.y: slightly improved directive errors, still much work to do
+
+2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pplex.l (ppinput): skip last line if it only contains spaces
+	* tree.c (literal_for_diagnostic), tree.h, scanner.l: extracted
+	  (literal_for_diagnostic) from scanner.l (error_literal), extended and
+	  used in tree.c to provide a single function to resolve literals
+
+2020-09-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* scanner.l (read_literal): catch and error  missing termination of literal
+
 
 2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
 

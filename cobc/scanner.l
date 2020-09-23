@@ -1176,22 +1176,18 @@ H#[0-9A-Za-z]+ {
 static void
 error_literal (const char *type, const char *literal)
 {
-	char		lit_out[39];
-
 	if (!literal_error) {
+		char		lit_out[CB_ERR_LITMAX + 1];
+		/* snip literal for output, if too long or,
+			unlikely error case, has a line break */
+		literal_for_diagnostic (lit_out, literal);
+
 #if 0 /* national literal, check for different truncation and wcslen
 		 or not show it at all */
 		if (strcmp (type, "national") == 0) {
 			cb_error (_("invalid national literal"), lit_out);
 		} else {
 #endif
-		/* snip literal for output, if too long */
-			strncpy (lit_out, literal, 38);
-			if (strlen (literal) > 38) {
-				strcpy (lit_out + 35, "...");
-			} else {
-				lit_out[38] = '\0';
-			}
 			if (strcmp (type, "") == 0) {
 				cb_error (_("invalid literal: '%s'"), lit_out);
 			} else if (strcmp (type, "hex") == 0) {
@@ -1257,6 +1253,16 @@ read_literal (const char mark, const char *type)
 			plex_buff[cb_lit_length] = 0; /* ensure valid C-string for error message */
 			error_literal ("", plex_buff);
 		}
+	}
+	if (c == EOF
+#if EOF != 0
+	 || c == 0 /* fixes unexpected error case */
+#endif
+		) {
+			snprintf (err_msg, COB_MINI_MAX,
+				_("missing terminating %c character"), mark);
+			plex_buff[cb_lit_length] = 0; /* ensure valid C-string for error message */
+			error_literal ("", plex_buff);
 	}
 
 	/* FIXME: Exact behavior should depend on level of support:

@@ -456,7 +456,11 @@ ppp_check_needs_quote (const char *envval)
 static void
 ppp_error_invalid_option (const char *directive, const char *option)
 {
-	cb_error (_("invalid %s directive option '%s'"), directive, option);
+	if (option) {
+		cb_error (_("invalid %s directive option '%s'"), directive, option);
+	} else {
+		cb_error (_("invalid %s directive option"), directive);
+	}
 }
 
 static void
@@ -916,6 +920,11 @@ set_choice:
 	if (cb_src_list_file) {
 		cb_current_file->source_format = cb_source_format;
 	}
+  }
+| SOURCEFORMAT _as error
+  {
+    /* FIXME: we should consume until end of line here! */
+	ppp_error_invalid_option ("SOURCEFORMAT", NULL);
   }
 | SSRANGE _literal
   {

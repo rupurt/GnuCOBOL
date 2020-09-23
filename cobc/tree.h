@@ -721,6 +721,9 @@ struct cb_literal {
 #define CB_NUMERIC_LITERAL_P(x) \
   (CB_LITERAL_P (x) && CB_TREE_CATEGORY (x) == CB_CATEGORY_NUMERIC)
 
+#define CB_ERR_LITMAX 38
+extern char		*literal_for_diagnostic (char *buff, const char *literal_data);
+
 /* Decimal */
 
 struct cb_decimal {

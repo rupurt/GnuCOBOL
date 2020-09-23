@@ -1430,8 +1430,13 @@ start:
 		ipchar = getc (ppin);
 		if (unlikely (ipchar == EOF)) {
 			if (n > 0) {
-				/* No end of line at end of file */
-				break;
+				/* No end of line at end of file
+				   ignore if all space,
+				   otherwise raise an error */
+				do {
+					if (buff[--n] != ' ') break;
+				} while (n != 0);
+				if (n != 0) break;
 			}
 			if (newline_count == 0) {
 				return YY_NULL;

@@ -439,6 +439,38 @@ make_constant_label (const char *name)
 	return CB_TREE (p);
 }
 
+/* snip literal for output, if too long or,
+   unlikely error case, has a line break;
+   'buff' to write into with a size of at least CB_ERR_LITMAX + 1
+   'literal_data' to get data from */
+char *
+literal_for_diagnostic (char *buff, const char *literal_data) {
+
+	char *bad_pos;
+
+	strncpy (buff, literal_data, CB_ERR_LITMAX);
+	buff[CB_ERR_LITMAX] = '\0';
+
+	/* this previously happened because of a bug in pplex.l,
+	   as this is a seldom-called function and only
+	   inspect CB_ERR_LITMAX chars max here we leave this in as
+	   initializer for 'bad_pos' and additional security net */
+	bad_pos = strchr (buff, '\n');
+
+	if (strlen (literal_data) > CB_ERR_LITMAX) {
+		char *long_pos = buff + CB_ERR_LITMAX - 4;
+		if (!bad_pos
+		 || bad_pos > long_pos) {
+			bad_pos = long_pos;
+		}
+	}
+
+	if (bad_pos) {
+		strcpy (bad_pos, " ...");
+	}
+	return buff;
+}
+
 /* Recursively find/generate a name for the object x. */
 static size_t
 cb_name_1 (char *s, cb_tree x, const int size)
@@ -485,12 +517,14 @@ cb_name_1 (char *s, cb_tree x, const int size)
 		break;
 
 	case CB_TAG_LITERAL:
-		/* TODO: for warning/error messages (do we use this for other parts?):
-		   use cb_word_length as max-length for the output */
+		/* should only be called for diagnostic messages,
+		   so limit as in scanner.l:  */
 		if (CB_TREE_CLASS (x) == CB_CLASS_NUMERIC) {
 			strncpy (s, (char *)CB_LITERAL (x)->data, size);
 		} else {
-			snprintf (s, size, "\"%s\"", (char *)CB_LITERAL (x)->data);
+			char lit_buff[CB_ERR_LITMAX + 1];
+			snprintf (s, size, "\"%s\"",
+				literal_for_diagnostic (lit_buff, (char *)CB_LITERAL (x)->data));
 		}
 		break;
 
