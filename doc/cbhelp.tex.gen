@@ -1,4 +1,24 @@
-#! /usr/bin/awk -f
+#!/usr/bin/awk -f
+# cbhelp.tex.gen gnucobol/doc
+#
+# Copyright (C) 2015-2020 Free Software Foundation, Inc.
+# Written by James K. Lowden, Simon Sobisch
+#
+# This file is part of GnuCOBOL.
+#
+# The GnuCOBOL compiler is free software: you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# GnuCOBOL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
+
 
 ##	$COBC -q --help               2>/dev/null | \
 ##		$GREP    -A2000 "$section" | \
@@ -23,10 +43,10 @@
 ##				echo "@item @code{$name}"  >>$1
 ##			fi
 ##			echo "$desc"      | \
-##			$SED -e 's/ \(-[Wfv][a-z-]*\)/ @option{\1}/g'       \
+##			$SED -e 's/ \(-[Wfv][a-zA-Z=-]*\)/ @option{\1}/g'       \
 ##			     -e 's/\([ (]\)\([A-Z][A-Z -]*[A-Z]\)/\1@code{\2}/g' \
 ##			     -e 's/^\([A-Z][A-Z -]*[A-Z]\)/@code{\1}/g' \
-##			     -e 's/@code{\(IBM\|ANSI\|ISO\|NIST\)}/\1/g'   >>$1
+##			     -e 's/@code{\(IBM\|ANSI\|ISO\|NIST\|COBOL\)}/\1/g'   >>$1
 ##		fi
 ##	done
 ##	echo "@end table"          >>$1
@@ -43,7 +63,7 @@
     # option heading introduce sections
     if( /[Oo]ptions:$/ ) {
 	if( /^Options:/ ) {
-	    $0 = "Help " $0
+	    $0 = "Common " $0
 	}
 	sub(/:$/, "")
 	if( nsection++ ) {

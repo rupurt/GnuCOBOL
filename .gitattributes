@@ -127,7 +127,7 @@ config/rm.words -text
 copy/Makefile.am eol=lf
 doc/Makefile.am eol=lf
 doc/cbhelp.tex.gen -text
-doc/cbintr.awk -text
+doc/cbintr.tex.gen -text
 doc/cbrunt.tex.gen -text
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
