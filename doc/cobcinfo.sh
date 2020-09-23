@@ -83,8 +83,8 @@ _create_file () {
 		$COBC -q --help |
 			$AWK -f "$docdir/$1.gen" |
 			$AWK 'NR > 1 {sep = "\n"}  
-					/^;/ { sep = "" } # remove newline when line starts with ";"
-					{ printf "%s%s", sep, $0; } END {print ""}' > $1
+			      /^;/ { sep = "" } # remove newline when line starts with ";"
+			      { printf "%s%s", sep, $0; } END {print ""}' > $1
 		;;
 	"cbhelp.DNU")
 		rm -rf $1

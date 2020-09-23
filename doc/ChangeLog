@@ -1,3 +1,7 @@
+2020-09-23  James K. Lowden  <jklowden@symas.com>
+
+	* cbrunt.tex.gen: restore new version, mistakenly overwritten
+	* cobcinfo.sh: whitespace
 
 2019-09-22  Simon Sobisch <simonsobisch@gnu.org>
 
