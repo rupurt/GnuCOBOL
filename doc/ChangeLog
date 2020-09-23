@@ -1,5 +1,6 @@
 2020-09-23  James K. Lowden  <jklowden@symas.com>
 
+	* cbhelp.tex.gen: formatting improvements
 	* cbrunt.tex.gen: restore new version, mistakenly overwritten
 	* cobcinfo.sh: whitespace
 

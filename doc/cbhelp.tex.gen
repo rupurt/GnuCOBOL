@@ -82,7 +82,9 @@
     gsub(/^ +/, "");
 
     # separate key from value
-    sub(/\t|  +/, "~")
+    if( /[[:graph:]]\t|  +/ ) {
+	sub(/\t|  +/, "~")
+    }
 
     # convert <word> to @var{word}
     while( match($0, /<[^>]+>/) ) {
@@ -102,14 +104,38 @@
 	#print "@c  made:", $0
     }
 
+    # special case: assign-clause
+    #
+    #   -fassign-clause=<value> how to interpret 'ASSIGN word': as
+    #   'ASSIGN EXTERNAL word' or 'ASSIGN DYNAMIC word', may be one
+    #   of: dynamic, external, ibm (= external), mf (= dynamic)
+    if( /^-fassign-clause=/ ) {
+	gsub(/word'/, "@var{word}'")
+	gsub(/dynamic, external, ibm/,
+	     "@code{dynamic}, @code{external}, @code{ibm}")
+	sub(/mf/, "@code{&}")
+	while( match($0, /'.+?'/) ) {
+	    #print "@c found:", $0
+	    $0 = substr($0, 1, RSTART-1) \
+		"@code{" substr($0, RSTART+1, RLENGTH-2) "}" \
+		substr($0, RSTART + RLENGTH, length($0))
+	    #print "@c  made:", $0
+	}
+
+	sub(/~/, "\n")
+	print sep "@item", $0
+	sep = "\n"
+	next
+    } 
+    
     # convert most WORD to @code{WORD}
-    if( /[A-Z][A-Z]+/ ) {
+    if( /[A-Z]{2,}/ ) {
 	n = split($0, a)
 	line = ""
 	for( i=1; i <= n; i++ ) {
 	    w = a[i]
 	    if( w !~ /IBM\|ANSI\|ISO\|NIST|COBOL/ ) {
-		gsub(/[A-Z'][A-Z0-9']+/, "@code{&}", w)
+		gsub(/[A-Z'[].+?[]A-Z0-9']+/, "@code{&}", w)
 	    }
 
 	    word = i > 1? " " w : w
@@ -126,6 +152,9 @@
 	sep = "\n"
 	next
     } 
+
+    # mark up any options mentioned in running text
+    gsub(/ --?[[:alnum:]=-]+/, " @option{&}")
 
     print
 }
