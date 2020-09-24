@@ -2,7 +2,7 @@
 # cobcinfo.sh gnucobol/doc
 #
 # Copyright (C) 2010,2012, 2015-2020 Free Software Foundation, Inc.
-# Written by Roger While, Simon Sobisch
+# Written by Roger While, Simon Sobisch, James K. Lowden
 #
 # This file is part of GnuCOBOL.
 #
@@ -85,45 +85,6 @@ _create_file () {
 			$AWK 'NR > 1 {sep = "\n"}  
 			      /^;/ { sep = "" } # remove newline when line starts with ";"
 			      { printf "%s%s", sep, $0; } END {print ""}' > $1
-		;;
-	"cbhelp.DNU")
-		rm -rf $1
-		$COBC -q --help | $GREP -E "ptions.*:" | cut -d: -f1 | \
-		while read section; do
-			header_found=""
-#			FIXME: re-adjust as this currently results in two SIGSEGV
-#			       which are just hidden here (and shouldn't)
-			$COBC -q --help               2>/dev/null | \
-				$GREP    -A2000 "$section" | \
-				$GREP -E -B2000 "^$" -m 1  | \
-				$SED -e 's/^\t/D~/g'            \
-				     -e 's/\t/~/g'              \
-				     -e 's/* NOT \(.\+\)/; @emph{not \1}/g' \
-				     -e 's/* ALWAYS \(.\+\)/; @emph{always \1}/g' \
-				     -e 's/* /; /g' \
-				     -e 's/^    \+/D~/g'         \
-				     -e 's/^ \+//g'                \
-				     -e 's/  \+/~/g'               \
-				     -e 's/<\([^>]\+\)>/@var{\1}/g'| \
-			while IFS='~' read -r name desc; do
-				if test -z "$name"; then continue; fi
-				if test -z "$header_found"; then
-					header_found=1
-					echo "@section $section"   >>$1
-					echo "@table @code"        >>$1
-				else
-					if test "$name" != "D"; then
-						echo "@item @code{$name}"  >>$1
-					fi
-					echo "$desc"      | \
-					$SED -e 's/ \(-[Wfv][a-zA-Z=-]*\)/ @option{\1}/g'       \
-					     -e 's/\([ (]\)\([A-Z][A-Z -]*[A-Z]\)/\1@code{\2}/g' \
-					     -e 's/^\([A-Z][A-Z -]*[A-Z]\)/@code{\1}/g' \
-					     -e 's/@code{\(IBM\|ANSI\|ISO\|NIST\|COBOL\)}/\1/g' >>$1
-				fi
-			done
-			echo "@end table"          >>$1
-		done
 		;;
 	"cbchelp.tex")
 		rm -rf $1
@@ -285,7 +246,6 @@ case "${1##*/}" in
 		_create_file "cbrunt.tex"
 		;;
 	"cbhelp.tex"|\
-	"cbhelp.DNU"|\
 	"cbchelp.tex"|\
 	"cbrese.tex" |\
 	"cbintr.tex" |\

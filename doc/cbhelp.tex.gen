@@ -152,7 +152,7 @@
 	line = ""
 	for( i=1; i <= n; i++ ) {
 	    w = a[i]
-	    if( w !~ /IBM|ANSI|ISO|NIST|COBOL/ ) {
+	    if( w !~ /IBM|ANSI|ISO|NIST|COBOL|EXTFH/ ) {
 		gsub(/[>A-Z'[].*?[]A-Z0-9']+/, "@code{&}", w)
 	    }
 
@@ -177,10 +177,7 @@
     } 
 
     # mark up any options mentioned in running text
-    if( /-debug\/-g\/-ftraceall\/-fec/ ) {
-	gsub( /-[a-z]+/, "@option{&}")
-    }
-    gsub(/ --?[A-Za-z0-9=-]+/, " @option{&}")
+    gsub( /-[Wfvdg][a-zA-Z0-9=-]*/, "@option{&}")
 
     print
 }
