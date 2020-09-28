@@ -1,4 +1,8 @@
 
+2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* vs2005: removed support for VC older than VC 2008
+
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 
 	* config.h.in, defaults.h.in: updated

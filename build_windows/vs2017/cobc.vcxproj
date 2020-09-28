@@ -297,6 +297,7 @@
     <None Include="..\..\libcob\system.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\libcob\sysdefines.h" />
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob.h" />

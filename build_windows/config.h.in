@@ -1,5 +1,5 @@
 
-/* config.h, tested with x86/x64 VS2005-2019
+/* config.h, tested with x86/x64 VS2008-2019
    and OrangeC 6.0.43.1 (which ignores the lib comments) */
 
 #define NOISAM       0

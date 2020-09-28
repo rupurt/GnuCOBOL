@@ -43,16 +43,6 @@ build_windows/ocide/*.l
 build_windows/ocide/*.obr
 build_windows/ocide/*.ods
 build_windows/ocide/*.user
-build_windows/vs2005/*.bak
-build_windows/vs2005/*.ncb
-build_windows/vs2005/*.sdf
-build_windows/vs2005/*.suo
-build_windows/vs2005/*.user
-build_windows/vs2005/Win32
-build_windows/vs2005/dist
-build_windows/vs2005/ia64
-build_windows/vs2005/ipch
-build_windows/vs2005/x64
 build_windows/vs2008/*.bak
 build_windows/vs2008/*.ncb
 build_windows/vs2008/*.sdf

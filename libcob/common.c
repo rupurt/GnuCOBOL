@@ -275,7 +275,7 @@ static volatile sig_atomic_t	sig_is_handled = 0;
 /* Function Pointer for external signal handling */
 static void		(*cob_ext_sighdl) (int) = NULL;
 
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 static VOID		(WINAPI *time_as_filetime_func) (LPFILETIME) = NULL;
 #endif
 
@@ -1545,7 +1545,7 @@ one_indexed_day_of_week_from_monday (int zero_indexed_from_sunday)
 	return ((zero_indexed_from_sunday + 6) % 7) + 1;
 }
 
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 static void
 set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time)
 {
@@ -3215,7 +3215,7 @@ cob_external_addr (const char *exname, const int exlength)
 	return eptr->ext_alloc;
 }
 
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 
 /* Get function pointer for most precise time function
    GetSystemTimePreciseAsFileTime is available since OS-version Windows 2000
@@ -3305,7 +3305,7 @@ static struct cob_time
 cob_get_current_date_and_time_from_os (void)
 {
 	SYSTEMTIME	local_time;
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 	FILETIME	filetime;
 	SYSTEMTIME	utc_time;
 #endif
@@ -3317,7 +3317,7 @@ cob_get_current_date_and_time_from_os (void)
 	set_cob_time_from_localtime (curtime, &cb_time);
 
 	/* Get nanoseconds with highest precision possible */
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 	if (!time_as_filetime_func) {
 		get_function_ptr_for_precise_time ();
 	}
@@ -8157,7 +8157,7 @@ cob_init (const int argc, char **argv)
 #endif
 	}
 
-#if defined(_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined(_MSC_VER)
 	get_function_ptr_for_precise_time ();
 #endif
 
