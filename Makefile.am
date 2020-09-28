@@ -39,8 +39,12 @@ noinst_SCRIPTS = pre-inst-env
 EXTRA_DIST = gnucobol.spec DEPENDENCIES HACKING
 
 # add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
+include $(top_srcdir)/aminclude_static.am
+
+clean-local: code-coverage-clean
+dist-clean-local: code-coverage-dist-clean
+
 CODE_COVERAGE_BRANCH_COVERAGE=1
-@CODE_COVERAGE_RULES@
 
 # files shipped with the package that should be 755'ed:
 FILES_TO_BE_EXECUTABLE = $(dist_noinst_SCRIPTS) \
@@ -122,9 +126,14 @@ $(tarstamps):
 	  echo "#define COB_NUM_TAR_TIME ` LC_ALL=C date -u +'%H%M%S'`"; \
 	} > $@
 
+# TODO: possibly disable / adjust depending on what
+#       configure.ac founds (currently not checked there)
+vcs-update:
+	svn update $(srcdir)
+
 
 # targets that are only logical targets and should always be executed
-.PHONY: test checkall checkmanual
+.PHONY: test checkall checkmanual vcs-update
 
 test: all
 	cd tests && $(MAKE) $(AM_MAKEFLAGS) test

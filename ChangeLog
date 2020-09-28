@@ -2,6 +2,27 @@
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
 	* configure.ac: added support for JSON-C as JSON handler.
+	* configure.ac: PKG_CHECK_MODULES for gmp both with the official name "gmp"
+	  and with the version found on different environments "libgmp":
+	  fixed its includes to end in the general CPPFLAGS,
+	  not only in LIBCOB_CPPFLAGS (also needed for cobc generated modules)
+
+	update code-coverage setup from autoconf archive -> raises a bunch of
+	compatibility warnings during autoconf, but now runs also on different UNIX
+	machines
+	* m4/ax_code_coverage.m4: updated
+	* m4/ax_ac_append_to_file.m4, m4/ax_ac_print_to_file.m4,
+	  m4/ax_add_am_macro_static.m4, m4/ax_am_macros_static.m4,
+	  m4/ax_check_gnu_make.m4, m4/ax_file_escapes.m4 installed as dependencies
+
+2020-06-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: ensure that libraries for screenio and indexed access
+	  are only applied to LIBCOB_LIBS; gettext is checked and applied after
+	  any other external libraries; replaced COBC_LIBS by PROGRAM_LIBS as this
+	  also applies to cobcrun
+	* Makefile.am (vcs-update): new (maintainer-only) target to ease updating
+	  sourcedir in out-of-tree builds
 
 2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -56,6 +77,7 @@
 	* Makefile.am (dist_noinst_SCRIPTS): moved doc/cobcinfo.sh here
 	* extras/Makefile.am: use of return_path instead of atlocal
 	* removed support for Bison < 3
+	* configure.ac: adjusted generation of built-in COB_LDFLAGS
 
 2020-01-03  Simon Sobisch <simonsobisch@gnu.org>
 

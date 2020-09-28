@@ -204,6 +204,7 @@ $(MODULES_ALL): newcob.val EXEC85$(EXEEXT) $(srcdir)/EXEC85.conf.in Makefile.mod
 	@export CBL_LIST="`ls $@/*.CBL | cut -b4- | tr "\n" " "`"  && \
 	 $(SED) -e 's/##MODULE##/'"$@"'/'            \
 	        -e 's|##COB85DIR##|'"$(COB85DIR)"'|' \
+	        -e 's|##DIFF_FLAGS##|'"$(DIFF_FLAGS)"'|' \
 	        -e 's|##TESTS##|'"` echo $$CBL_LIST | $(SED) -e 's/\.CBL//g'`"'|' \
 	        -e 's|##TESTS_LOCAL##|'"`echo $$CBL_LIST | $(SED) -e 's/\.CBL/-local/g'`"'|' \
 	    $(srcdir)/Makefile.module.in > $@/Makefile

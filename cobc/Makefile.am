@@ -29,8 +29,8 @@ cobc_SOURCES = cobc.c cobc.h ppparse.y pplex.c parser.y scanner.c config.c \
 
 AM_CPPFLAGS = -I$(top_srcdir)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
-cobc_LDADD = $(COBC_LIBS) $(top_builddir)/libcob/libcob.la $(top_builddir)/lib/libsupport.a \
-	$(CODE_COVERAGE_LIBS)
+cobc_LDADD = $(PROGRAMS_LIBS) $(top_builddir)/lib/libsupport.a \
+	$(top_builddir)/libcob/libcob.la $(CODE_COVERAGE_LIBS)
 
 dist_man_MANS = cobc.1
 COBC = cobc$(EXEEXT)
@@ -44,7 +44,11 @@ MAINTAINERCLEANFILES = pplex.c scanner.c ppparse.h parser.h cobc.1
 CLEANFILES = parser.output ppparse.output
 
 # Add rules for code-coverage testing, as provided by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
+
+clean-local: code-coverage-clean
+dist-clean-local: code-coverage-dist-clean
+
 CODE_COVERAGE_BRANCH_COVERAGE=1
 CODE_COVERAGE_LCOV_OPTIONS =  --no-external
 

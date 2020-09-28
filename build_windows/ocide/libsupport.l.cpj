@@ -1,6 +1,6 @@
 <CC386PROJECT>
 	<VERSION ID="5"/>
-	<WORKAREA NAME="D:\Programme\Entwicklung\GnuCOBOL\trunk\build_windows\ocide\GnuCOBOL.cwa"/>
+	<WORKAREA NAME=".\GnuCOBOL.cwa"/>
 	<TARGET TITLE="libsupport">
 		<PROPERTIES>
 			<PROFILE NAME="WIN32" TYPE="DEBUG">

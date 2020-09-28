@@ -77,6 +77,12 @@
 	* common.c: Accept COB_MF_LS_INSTAB/mf_ls_instab in runtime.cfg
 	* fileio.c: Handle "ls_instab" option similar to MF INSERTTAB
 
+2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
+
+	* screenio.c (cob_screen_init) [HAVE_LIBPDCURSES]: fixed possible endless
+	  loop when COLOR_PAIRS (an integer) extends SHRT_MAX (which seems to be
+	  a PDCurses 4 CHTYPE_64 bug)
+
 2020-06-16  Ron Norman <rjn@inglenet.com>
 
 	* call.c: added cob_get_dbl_param & cob_put_dbl_param
