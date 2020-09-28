@@ -92,8 +92,8 @@
 
 2020-06-12  Ron Norman <rjn@inglenet.com>
 
-	* fileio.c: Fixed problem with updating key definitions
-				from BDB data dictionary file
+	* fileio.c (cob_key_def): Fixed bug #645 problem with updating
+	  key definitions from data dictionary file (BDB, old VBISAM)
 				
 2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
 

@@ -5908,16 +5908,16 @@ cob_sys_read_file (unsigned char *file_handle, unsigned char *file_offset,
 	struct stat	st;
 	cob_u8_ptr	p_flags;
 
-	COB_UNUSED (file_len);
-	COB_UNUSED (flags);
-	COB_UNUSED (file_offset);
 	COB_CHK_PARMS (CBL_READ_FILE, 5);
 
-	rc = 0;
 	memcpy (&fd, file_handle, (size_t)4);
+	COB_UNUSED (file_offset);
+	COB_UNUSED (file_len);
+	COB_UNUSED (flags);
 	off = cob_get_s64_param (2);
 	len = (size_t)cob_get_s64_param (3);
 	p_flags = cob_get_param_data (4);
+
 	if (lseek (fd, (off_t)off, SEEK_SET) == (off_t)-1) {
 		return -1;
 	}
@@ -5930,6 +5930,8 @@ cob_sys_read_file (unsigned char *file_handle, unsigned char *file_offset,
 		} else {
 			rc = 0;
 		}
+	} else {
+		rc = 0;
 	}
 	if ((*p_flags & 0x80) != 0) {
 		if (fstat (fd, &st) < 0) {
