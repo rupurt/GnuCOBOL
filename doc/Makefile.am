@@ -23,7 +23,7 @@
 # The texinfo input is derived from --help output of the programs just
 # built (cobc and cobcrun).  We refer to them in their in-tree built
 # locations, to make sure we're not deriving the documentation from an
-# installed version. 
+# installed version.
 #
 COBC = $(top_builddir)/cobc/cobc$(EXEEXT)
 COBCRUN = $(top_builddir)/bin/cobcrun$(EXEEXT)

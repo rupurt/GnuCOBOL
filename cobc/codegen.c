@@ -7218,7 +7218,15 @@ output_c_info (void)
 static void
 output_cobol_info (cb_tree x)
 {
-	output ("#line %d \"%s\"", x->source_line, x->source_file);
+	output ("#line %d \"", x->source_line);
+	const char *p = x->source_file;
+	while(*p){
+		if( *p == '\\' ){
+			output("%c",'\\');
+		}
+	output("%c",*p++);
+	}
+	output("\"");
 	output_newline ();
 }
 

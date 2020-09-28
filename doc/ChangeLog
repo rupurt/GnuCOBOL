@@ -1,6 +1,5 @@
 2020-09-28  James K. Lowden  <jklowden@symas.com>
 
-	* Makefile.am (PASSED_OPTIONS): remove LD_PRELOAD because not needed. 
 	* cbrunt.tex.gen: Adjust for changed runtime.cfg. 
 
 2020-09-23  James K. Lowden  <jklowden@symas.com>
