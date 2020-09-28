@@ -1,4 +1,8 @@
 
+2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c, common.h: removed support for VC older than VC 2008
+
 2020-07-25  Edward Hart <edward.dan.hart@gmail.com>
 
 	* screenio.c (cob_screen_get_all): improve number entry:

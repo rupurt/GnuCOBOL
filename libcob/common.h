@@ -126,13 +126,8 @@ Note: also defined together with __clang__ in both frontends:
    __c2__   Clang C2 frontend with MS CodeGen (via clang.exe [original clang build options])
 */
 
-#if _MSC_VER >= 1500
-#define COB_USE_VC2008_OR_GREATER 1
-#else
-#define COB_USE_VC2008_OR_GREATER 0
-#if _MSC_VER < 1400
-#error Support for Visual Studio 2003 and older Visual C++ compilers dropped with GnuCOBOL 2.0
-#endif
+#if _MSC_VER < 1500
+#error Support for Visual Studio 2005 and older Visual C++ compilers dropped with GnuCOBOL 4.0
 #endif
 
 #if _MSC_VER >= 1700
@@ -146,7 +141,14 @@ Note: also defined together with __clang__ in both frontends:
 #else
 #define COB_USE_VC2013_OR_GREATER 0
 #endif
+
+#if _MSC_VER >= 1900
+#define COB_USE_VC2015_OR_GREATER 1
+#else
+#define COB_USE_VC2015_OR_GREATER 0
 #endif
+
+#endif /* _MSC_VER */
 
 /* Byte swap functions */
 
@@ -570,7 +572,7 @@ only usable with COB_USE_VC2013_OR_GREATER */
 /* End compiler stuff */
 
 /* Macro to prevent compiler warning "conditional expression is constant" */
-#if defined (_MSC_VER) && COB_USE_VC2008_OR_GREATER
+#if defined (_MSC_VER)
 #define ONCE_COB \
 	__pragma( warning(push) )		\
 	__pragma( warning(disable:4127) )	\

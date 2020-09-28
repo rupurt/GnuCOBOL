@@ -197,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\libcob.h" />
     <ClInclude Include="..\..\libcob\fileio.h" />
+    <ClInclude Include="..\..\libcob\sysdefines.h" />
     <ClInclude Include="..\config.h" />
     <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob\cobgetopt.h" />

@@ -188,7 +188,7 @@
 
 #endif
 
-#if defined (COB_NON_ALIGNED)	
+#if defined (COB_NON_ALIGNED)
 	/* allow explicit check of generated code 
 	 * and to skip this part in checks of undefined behavior */
 	/* Some DEC Alphas can only load shorts at 4-byte aligned addresses */
