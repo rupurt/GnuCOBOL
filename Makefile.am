@@ -29,9 +29,9 @@ ACLOCAL_AMFLAGS = -I m4 --install
 BUILT_SOURCES = defaults.h
 DISTCLEANFILES = $(BUILT_SOURCES)
 # CLEANFILES = $(bin_SCRIPTS)
-dist_noinst_SCRIPTS = autogen.sh build_aux/bootstrap po/update_linguas.sh \
-	build_aux/create_win_dist.sh build_aux/create_mingw_bindist.sh \
-	doc/cobcinfo.sh
+dist_noinst_SCRIPTS = autogen.sh po/update_linguas.sh \
+	build_aux/bootstrap \
+	build_aux/create_win_dist.sh build_aux/create_mingw_bindist.sh
 
 # wrapper for the build environment
 noinst_SCRIPTS = pre-inst-env
