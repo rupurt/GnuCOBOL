@@ -23,6 +23,7 @@ extrasdir = @COB_LIBRARY_PATH@
 if COB_MAKE_RUN_BINARIES
 extras_DATA = CBL_OC_DUMP.$(COB_MODULE_EXT)
 endif
+COBC = cobc$(EXEEXT)
 
 EXTRA_DIST = CBL_OC_DUMP.cob
 CLEANFILES = $(extras_DATA)
@@ -30,7 +31,6 @@ CLEANFILES = $(extras_DATA)
 SUFFIXES = .cob .$(COB_MODULE_EXT)
 .cob.$(COB_MODULE_EXT):
 	@echo "building $@ from $<" && \
-	. $(top_builddir)/tests/atconfig && . $(top_builddir)/tests/atlocal \
-		&& ("$(top_builddir)/pre-inst-env" cobc$(EXEEXT) -m -Wall -O2 -o "$@" "$$(_return_path "$<")" || \
-		    "$(top_builddir)/pre-inst-env" cobc$(EXEEXT) -m -Wall -O2 -o "$@" "$<" || \
-		    "$(top_builddir)/pre-inst-env" cobc$(EXEEXT) -m -Wall -vv -o "$@" "$$(_return_path "$<")")
+	("$(top_builddir)/pre-inst-env" $(COBC) -m -Wall -O2 -o "$@" "$<" || \
+	 "$(top_builddir)/pre-inst-env" $(COBC) -m -Wall     -o "$@" "$<" || \
+	 "$(top_builddir)/pre-inst-env" $(COBC) -m -Wall -vv -o "$@" "$<")

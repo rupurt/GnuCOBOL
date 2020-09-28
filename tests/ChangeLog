@@ -2,7 +2,7 @@
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
 	* atlocal.in, atlocal_valgrind, atlocal_win: replaced COB_HAS_CJSON with
-	  COB_HAS_JSON.
+	  COB_HAS_JSON
 
 2020-05-06  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -26,6 +26,11 @@
 
 	* atlocal_win: use intermediate info.out instead of calling
 	  cobc --info multiple times
+
+2020-03-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* atlocal.in: COB_LIBS during test be based on built-in COB_LIBS, not
+	  on built-in LIBCOB_LIBS
 
 2020-02-02  Simon Sobisch <simonsobisch@gnu.org>
 

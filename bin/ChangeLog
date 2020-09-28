@@ -1,4 +1,8 @@
 
+2020-06-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am: include PROGRAMS_LIBS
+
 2020-06-12  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobcrun.c (process_command_line) [_WIN32]: simplified code;
