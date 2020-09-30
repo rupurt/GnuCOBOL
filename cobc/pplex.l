@@ -1138,7 +1138,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 	/* Find the file */
 
 	/* try name as is + extensions ... */
-	filename = ppcopy_try_open (NULL, name);
+	filename = ppcopy_try_open (NULL, s);
 	/* ... if not found, try in copybook directories  */
 	if (!filename
 	 && *s != SLASH_CHAR
@@ -1148,7 +1148,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 #endif
 	) {
 		for (il = cb_include_list; il; il = il->next) {
-			filename = ppcopy_try_open (il->text, name);
+			filename = ppcopy_try_open (il->text, s);
 			if (filename) {
 				break;
 			}
