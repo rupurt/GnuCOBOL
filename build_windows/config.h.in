@@ -20,6 +20,7 @@
 #define NOJSON       0
 #define CJSON        1
 #define CJSON_CJSON  2	/* cJSON with header in CJSON_CJSON */
+#define JSON_C       3
 
 #define MATHLIB_MPIR 1
 #define MATHLIB_GMP  2
@@ -94,7 +95,7 @@
 #elif CONFIGURED_ISAM == DISAM
 #pragma comment(lib, "libdisam72")
 #elif CONFIGURED_ISAM == BDB
-#if defined _DEBUG
+#if defined (_DEBUG)
 #pragma comment(lib, "libdb48d")
 //#pragma comment(lib, "libdb62d")
 #else
@@ -102,7 +103,7 @@
 //#pragma comment(lib, "libdb62")
 #endif
 #elif CONFIGURED_ISAM == LMDB
-#if defined _DEBUG
+#if defined (_DEBUG)
 #pragma comment(lib, "liblmdbd")
 //#pragma comment(lib, "lmdb")
 #else
@@ -128,10 +129,10 @@
 
 #ifdef LIB_JSON
 #pragma comment(lib, LIB_JSON)
-#else
-#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+#elif CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
 #pragma comment(lib, "cjson")
-#endif
+#elif CONFIGURED_JSON == JSON_C
+#pragma comment(lib, "json-c")
 #endif
 
 #endif /* WITHIN_LIBCOB */
@@ -357,7 +358,7 @@
 /* #undef HAVE_HAS_MOUSE */
 
 /* Define if you have the iconv() function and it works. */
-#if CONFIGURED_XML == XML2
+#if CONFIGURED_XML == XML2	/* necessary, assume available */
 #define HAVE_ICONV 1
 #else
 /* #undef HAVE_ICONV */
@@ -408,27 +409,6 @@
 
 /* Define to 1 if you have the `rt' library (-lrt). */
 /* #undef HAVE_LIBRT */
-
-/* Define to 1 if you have the <libxml/uri.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_URI_H 1
-#else
-/* #undef HAVE_LIBXML_URI_H */
-#endif
-
-/* Define to 1 if you have the <libxml/xmlversion.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_XMLVERSION_H 1
-#else
-/* #undef HAVE_LIBXML_XMLVERSION_H */
-#endif
-
-/* Define to 1 if you have the <libxml/xmlwriter.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_XMLWRITER_H 1
-#else
-/* #undef HAVE_LIBXML_XMLWRITER_H */
-#endif
 
 /* Define to 1 if you have the `localeconv' function. */
 #define HAVE_LOCALECONV 1
@@ -483,6 +463,9 @@
 /* Define to 1 if you have the <ncurses/ncurses.h> header file. */
 /* #undef HAVE_NCURSES_NCURSES_H */
 
+/* Define to 1 if you have the <oci.h> header file. */
+/* #undef HAVE_OCI_H */
+
 /* Define to 1 if you have the <pdcurses.h> header file. */
 /* #undef HAVE_PDCURSES_H */
 
@@ -526,6 +509,12 @@
 
 /* Define to 1 if the system has the type `sig_atomic_t'. */
 #define HAVE_SIG_ATOMIC_T 1
+
+/* Define to 1 if you have the <sqlext.h> header file. */
+/* #undef HAVE_SQLEXT_H */
+
+/* Define to 1 if you have the <sql.h> header file. */
+/* #undef HAVE_SQL_H */
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #define HAVE_STDDEF_H 1
@@ -703,7 +692,7 @@
 /* #undef WITH_CISAM */
 #endif
 
-/* Use cJSON as JSON handler */
+/* Use cJSON library/source as JSON handler */
 #if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
 #define WITH_CJSON 1
 #else
@@ -731,6 +720,9 @@
 /* #undef WITH_DISAM */
 #endif
 
+/* Compile with obsolete external INDEXED handler */
+/* #undef WITH_INDEX_EXTFH */
+
 /* Default INDEXED file handler */
 #if CONFIGURED_ISAM == VBISAM
 #define WITH_IXDFLT  "VB-ISAM"
@@ -755,21 +747,34 @@
 /* #undef WITH_INDEXED */
 #endif /* CONFIGURED_ISAM */
 
-/* Math multiple precision library */
-#if USED_MATHLIB == MATHLIB_MPIR
-#define WITH_MATH "mpir"
+/* JSON handler */
+#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+#define WITH_JSON "cJSON"
+#elif CONFIGURED_JSON == JSON_C
+#define WITH_JSON "json-c"
 #else
-#define WITH_MATH "gmp"
+#define WITH_JSON "disabled"
 #endif
 
-/* Compile with obsolete external INDEXED handler */
-/* #undef WITH_INDEX_EXTFH */
+/* Use JSON-C library as JSON handler */
+#if CONFIGURED_JSON == JSON_C
+#define WITH_JSON_C 1
+#else
+/* #undef WITH_JSON_C */
+#endif
 
 /* Use Lightning Memory-Mapped Database as INDEXED handler */
 #if CONFIGURED_ISAM == LMDB
 #define WITH_LMDB 1
 #else
 /* #undef WITH_LMDB */
+#endif
+
+/* Math multiple precision library */
+#if USED_MATHLIB == MATHLIB_MPIR
+#define WITH_MATH "mpir"
+#else
+#define WITH_MATH "gmp"
 #endif
 
 /* Using more than 1 of C/D/VB-ISAM */
@@ -868,6 +873,7 @@
 #undef NOJSON
 #undef CJSON
 #undef CJSON_CJSON
+#undef JSON_C
 #undef CONFIGURED_JSON
 #undef MATHLIB_MPIR
 #undef MATHLIB_GMP
