@@ -45,7 +45,7 @@
 
 
 #ifdef ENABLE_NLS
-#include "lib/gettext.h"
+#include "gettext.h"	/* from lib/ */
 #define _(s)		gettext(s)
 #define N_(s)		gettext_noop(s)
 #else

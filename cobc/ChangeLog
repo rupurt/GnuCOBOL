@@ -1,4 +1,9 @@
 
+2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am: fixed inclusion of libsupport
+	* cobc.h: include gettext without lib prefix
+
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR

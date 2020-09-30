@@ -1,4 +1,10 @@
 
+2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am [LOCAL_CJSON]: moved to "lib"
+	* Makefile.am: fixed inclusion of libsupport
+	* coblocal.h: include gettext without lib prefix
+
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c [WITH_JSON_C]: added version output
