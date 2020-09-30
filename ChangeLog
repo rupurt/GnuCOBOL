@@ -1,7 +1,19 @@
 
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: replaced --with-cjson and --with-json-c by
+	  --with-json which takes options similar to --with-curses;
+	  dropped support for includes of json-c header via subdirectory
+	  as its documentation specify to explicit include via -I dstdir/json-c
+	* NEWS, DEPENDENCIES: updated
+
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
-	* configure.ac: added support for JSON-C as JSON handler.
+	* configure.ac: added support for JSON-C as JSON handler
+
+2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: check for (optional) fmemopen -> HAVE_FMEMOPEN
 	* configure.ac: PKG_CHECK_MODULES for gmp both with the official name "gmp"
 	  and with the version found on different environments "libgmp":
 	  fixed its includes to end in the general CPPFLAGS,

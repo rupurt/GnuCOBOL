@@ -1,4 +1,10 @@
 
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c [WITH_JSON_C]: added version output
+	* mlio.c: adjusted check of defines for XML/JSON,
+	  include json-c according to its docs
+
 2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c, common.h: removed support for VC older than VC 2008

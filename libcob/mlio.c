@@ -31,36 +31,22 @@
 #include "libcob.h"
 #include "coblocal.h"
 
-/* note: checked library instead of headers as those may not be usable! */
-#ifdef WITH_XML2
-#if !defined (HAVE_LIBXML_XMLVERSION_H) || \
-    !defined (HAVE_LIBXML_XMLWRITER_H) || \
-	!defined (HAVE_LIBXML_URI_H)
-#error XML2 without necessary headers
-#endif
+#if defined (WITH_XML2)
 #include <libxml/xmlversion.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/uri.h>
 #endif
 
-#ifdef WITH_CJSON
-#if defined HAVE_CJSON_CJSON_H
+#if defined (WITH_CJSON)
+#if defined (HAVE_CJSON_CJSON_H)
 #include <cjson/cJSON.h>
-#elif defined HAVE_CJSON_H
+#elif defined (HAVE_CJSON_H)
 #include <cJSON.h>
 #else
 #error CJSON without necessary header
 #endif
-#endif
-
-#ifdef WITH_JSON_C
-#if defined HAVE_JSON_C_JSON_H
-#include <json-c/json.h>
-#elif defined HAVE_JSON_H
+#elif defined (WITH_JSON_C)
 #include <json.h>
-#else
-#error JSON-C without necessary header
-#endif
 #endif
 
 
@@ -85,7 +71,7 @@ static cob_global		*cobglobptr;
 
 /* Local functions */
 
-#if WITH_XML2 || WITH_JSON
+#if defined (WITH_XML2) || defined (WITH_CJSON) || defined (WITH_JSON_C)
 
 static void *
 get_trimmed_data (const cob_field * const f, void * (*strndup_func)(const char *, size_t))
@@ -574,7 +560,7 @@ set_xml_exception (const unsigned int code)
 
 #endif
 
-#if WITH_JSON
+#if defined (WITH_CJSON) || defined (WITH_JSON_C)
 
 static void
 set_json_code (const unsigned int code)
@@ -614,7 +600,7 @@ get_json_num (cob_field * const f, const char decimal_point)
 	return (char *) get_num (f, &json_strndup, decimal_point);
 }
 
-#if WITH_CJSON
+#if defined (WITH_CJSON)
 static int
 generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, cJSON *out)
 {
@@ -675,7 +661,7 @@ generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, cJSON *out
 	}
 	return status;
 }
-#elif WITH_JSON_C
+#elif defined (WITH_JSON_C)
 static int
 generate_json_from_tree (cob_ml_tree *tree, const char decimal_point, json_object *out)
 {
@@ -935,26 +921,26 @@ cob_xml_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 
 #endif
 
-#if WITH_JSON
+#if defined (WITH_CJSON) || defined (WITH_JSON_C)
 
 void
 cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 		   const char decimal_point)
 {
-	const char	*printed_json;
+	const char	*printed_json = NULL;
 	unsigned int	print_len = 0;
 	unsigned int	copy_len;
 	int	num_newlines = 0;
 	int	status = 0;
-#if WITH_CJSON
+#if defined (WITH_CJSON)
 	cJSON	*json;
-#elif WITH_JSON_C
+#elif defined (WITH_JSON_C)
 	json_object	*json = NULL;
 #endif
 
 	set_json_code (0);
 
-#if WITH_CJSON
+#if defined (WITH_CJSON)
 	json = cJSON_CreateObject ();
 	if (!json) {
 		set_json_exception (JSON_INTERNAL_ERROR);
@@ -970,7 +956,7 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 	/* TO-DO: Set cJSON to use cob_free in InitHook? */
 	printed_json = (const char *) cJSON_PrintUnformatted (json);
 
-#elif WITH_JSON_C
+#elif defined (WITH_JSON_C)
 
 	json = json_object_new_object ();
 	status = generate_json_from_tree (tree, decimal_point, json);
@@ -1005,14 +991,14 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 	}
 
  end:
-#if WITH_CJSON
+#if defined (WITH_CJSON)
 	if (printed_json) {
-		cJSON_free (printed_json);
+		cJSON_free ((void *)printed_json);
 	}
 	if (json) {
 		cJSON_Delete (json);
 	}
-#elif WITH_JSON_C
+#elif defined (WITH_JSON_C)
 	if (json) {
 		json_object_put (json);
 	}
@@ -1022,7 +1008,7 @@ cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,
 	}
 }
 
-#else /* !WITH_JSON */
+#else /* no JSON */
 
 void
 cob_json_generate (cob_field *out, cob_ml_tree *tree, cob_field *count,

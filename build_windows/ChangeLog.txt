@@ -1,4 +1,9 @@
 
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.h.in: included JSON-C option, removed obsolete HAVE_... for
+	  XML and JSON
+
 2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* vs2005: removed support for VC older than VC 2008

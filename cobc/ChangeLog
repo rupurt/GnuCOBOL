@@ -1,4 +1,9 @@
 
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR
+	* typeck.c: adjusted check of defines for JSON
+
 2020-09-04  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: emit runtime checks to IF conditions for
