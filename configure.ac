@@ -795,7 +795,7 @@ AC_ARG_WITH([json],
 		AC_MSG_ERROR([invalid value "$with_json" for --with-json,
   must be one of the following:
   cjson, json-c  (use only the specified library)
-  local  (use cjson source included in lib)
+  local  (use cjson source included in libcob)
   check  (use whatever json library is usable, disable if no one usable)
   no  (disable json usage)])
 		;;
@@ -807,26 +807,26 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	AC_MSG_NOTICE([Checks for local cJSON ...])
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
 	with_cjson_local=no
-	AC_CHECK_FILE([./lib/cJSON.c],
-	  [AC_MSG_CHECKING([if linking of ./lib/cJSON.c works])
-	   CPPFLAGS="$curr_cppflags -I./lib"
+	AC_CHECK_FILE([./libcob/cJSON.c],
+	  [AC_MSG_CHECKING([if linking of ./libcob/cJSON.c works])
+	   CPPFLAGS="$curr_cppflags -I./libcob"
 	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	    [[cJSON_CreateNull ();]])],
 	   [AC_MSG_RESULT([yes])
 	    AC_DEFINE([WITH_CJSON], [1])
-	    with_cjson_local="yes (in ./lib)"],
+	    with_cjson_local="yes (in ./libcob)"],
 	   [AC_MSG_RESULT([no])]
 	   )]
 	)
 	if test "$with_cjson_local" = "no"; then
-	  AC_CHECK_FILE([$srcdir/lib/cJSON.c],
-	    [AC_MSG_CHECKING([if linking of $srcdir/lib/cJSON.c works])
-	     CPPFLAGS="$curr_cppflags -I$srcdir/lib"
+	  AC_CHECK_FILE([$srcdir/libcob/cJSON.c],
+	    [AC_MSG_CHECKING([if linking of $srcdir/libcob/cJSON.c works])
+	     CPPFLAGS="$curr_cppflags -I$srcdir/libcob"
 	     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	      [[cJSON_CreateNull ();]])],
 	     [AC_MSG_RESULT([yes])
 	      AC_DEFINE([WITH_CJSON], [1])
-	      with_cjson_local="yes (in $srcdir/lib)"],
+	      with_cjson_local="yes (in $srcdir/libcob)"],
 	     [AC_MSG_RESULT([no])]
 	     )]
 	  )
@@ -835,7 +835,7 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	AS_IF([test "$with_cjson_local" = "no"], [
 		AC_MSG_NOTICE([using local cJSON: no])
 		if test "$with_json" = "local"; then
-		  AC_MSG_ERROR([[cJSON source is required in directory "lib" for --with-json=local]])
+		  AC_MSG_ERROR([[cJSON source is required in directory "libcob" for --with-json=local]])
 		fi
 		PKG_CHECK_MODULES([CJSON], [libcjson], [], [#
 		])
@@ -851,7 +851,7 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 			[if test "$with_json" = "cjson"; then
 			    AC_MSG_ERROR([Headers for libcjson are required for --with-json, you may adjust CJSON_CFLAGS])
 			 else
-				AC_MSG_WARN([Headers for libcjson missing, you may adjust CJSON_CFLAGS or put cJSON sources in "lib"])
+				AC_MSG_WARN([Headers for libcjson missing, you may adjust CJSON_CFLAGS or put cJSON sources in "libcob"])
 			 fi]
 		)])
 		if test "x$ac_cv_header_cJSON_h" = "xyes" -o "x$ac_cv_header_cjson_cJSON_h" = "xyes"; then

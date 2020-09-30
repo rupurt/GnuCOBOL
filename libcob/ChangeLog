@@ -3,8 +3,6 @@
 
 	* mlio.c, common.h: duplicated cob_xml/json_generate to allow
 	  for new decimal_point param without breaking API from 2018
-	* Makefile.am [LOCAL_CJSON]: moved to "lib"
-	* Makefile.am: fixed inclusion of libsupport, now libtoolized
 	* coblocal.h: include gettext without lib prefix
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>

@@ -23,6 +23,12 @@ lib_LTLIBRARIES = libcob.la
 libcob_la_SOURCES = common.c move.c numeric.c strings.c \
 	fileio.c call.c intrinsic.c termio.c screenio.c reportio.c cobgetopt.c \
 	mlio.c
+
+if LOCAL_CJSON
+nodist_libcob_la_SOURCES = cJSON.c
+DISTCLEANFILES = cJSON.c cJSON.h
+endif
+
 #ToDo Man Page
 #dist_man_MANS = libcob.3
 #COBCRUN = cobcrun$(EXEEXT)
@@ -30,8 +36,8 @@ libcob_la_SOURCES = common.c move.c numeric.c strings.c \
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)/lib -I$(top_srcdir)/lib \
 	$(LIBCOB_CPPFLAGS)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
-libcob_la_LIBADD = $(LIBCOB_LIBS) $(top_builddir)/lib/libsupport.la \
-	$(CODE_COVERAGE_LIBS)
+# note: currently misses libsupport...
+libcob_la_LIBADD = $(LIBCOB_LIBS) $(CODE_COVERAGE_LIBS)
 libcob_la_LDFLAGS = $(COB_FIX_LIBTOOL) -version-info 4:0:0 -no-undefined
 AM_LDFLAGS = $(COB_FIX_LIB)
 

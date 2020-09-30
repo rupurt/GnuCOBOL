@@ -26,8 +26,3 @@ AM_CPPFLAGS = -I$(top_srcdir)
 libsupport_la_SOURCES = dummymac.c
 libsupport_la_LDFLAGS = -static
 libsupport_la_LIBADD = @LIBOBJS@
-
-if LOCAL_CJSON
-nodist_libsupport_la_SOURCES = cJSON.c
-DISTCLEANFILES = cJSON.c cJSON.h
-endif
