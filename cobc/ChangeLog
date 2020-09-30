@@ -5,6 +5,10 @@
 	  for new decimal_point param without breaking API from 2018
 	* Makefile.am: fixed inclusion of libsupport, now libtoolized
 	* cobc.h: include gettext without lib prefix
+	* pplex.l: extracted (ppcopy_try_open) from (ppcopy) to split file search
+	  from actual processing and removing duplicate code
+	* cobc.c: adjusted handling of output file name (especially with COB_DASH),
+	  fixing errors in MinGW + CYGWIN
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
