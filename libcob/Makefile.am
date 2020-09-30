@@ -30,7 +30,7 @@ libcob_la_SOURCES = common.c move.c numeric.c strings.c \
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)/lib -I$(top_srcdir)/lib \
 	$(LIBCOB_CPPFLAGS)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
-libcob_la_LIBADD = $(LIBCOB_LIBS) $(top_builddir)/lib/libsupport.a \
+libcob_la_LIBADD = $(LIBCOB_LIBS) $(top_builddir)/lib/libsupport.la \
 	$(CODE_COVERAGE_LIBS)
 libcob_la_LDFLAGS = $(COB_FIX_LIBTOOL) -version-info 4:0:0 -no-undefined
 AM_LDFLAGS = $(COB_FIX_LIB)

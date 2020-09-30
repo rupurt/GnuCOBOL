@@ -1,7 +1,7 @@
 
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
-	* Makefile.am: fixed inclusion of libsupport
+	* Makefile.am: fixed inclusion of libsupport, now libtoolized
 	* cobcrun.c: include gettext without lib prefix
 
 2020-06-28  Simon Sobisch <simonsobisch@gnu.org>

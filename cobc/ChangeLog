@@ -3,7 +3,7 @@
 
 	* typeck.c (cb_emit_json_generate, cb_emit_xml_generate): adjusted to allow
 	  for new decimal_point param without breaking API from 2018
-	* Makefile.am: fixed inclusion of libsupport
+	* Makefile.am: fixed inclusion of libsupport, now libtoolized
 	* cobc.h: include gettext without lib prefix
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
