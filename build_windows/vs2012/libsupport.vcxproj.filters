@@ -9,10 +9,16 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="External Source Files">
+      <UniqueIdentifier>{6ab91244-18f0-4779-9fc8-9930923ab7c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\lib\dummymac.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\cJSON.c">
+      <Filter>External Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

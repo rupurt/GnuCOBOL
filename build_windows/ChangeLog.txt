@@ -1,4 +1,10 @@
 
+2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.h.in: included CJSON_LOCAL option
+	* general: always build static libsupport and link it,
+	  included option to integrate cJSON in it
+
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* config.h.in: included JSON-C option, removed obsolete HAVE_... for

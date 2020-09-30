@@ -20,7 +20,8 @@
 #define NOJSON       0
 #define CJSON        1
 #define CJSON_CJSON  2	/* cJSON with header in CJSON_CJSON */
-#define JSON_C       3
+#define CJSON_LOCAL  3	/* cJSON in libsupport, activate external source */
+#define JSON_C       4
 
 #define MATHLIB_MPIR 1
 #define MATHLIB_GMP  2
@@ -243,7 +244,8 @@
 #endif
 
 /* Define to 1 if you have the <cJSON.h> header file. */
-#if CONFIGURED_JSON == CJSON
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
 #define HAVE_CJSON_H 1
 #else
 /* #undef HAVE_CJSON_H */
@@ -693,7 +695,9 @@
 #endif
 
 /* Use cJSON library/source as JSON handler */
-#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
 #define WITH_CJSON 1
 #else
 /* #undef WITH_CJSON */
@@ -748,7 +752,9 @@
 #endif /* CONFIGURED_ISAM */
 
 /* JSON handler */
-#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
 #define WITH_JSON "cJSON"
 #elif CONFIGURED_JSON == JSON_C
 #define WITH_JSON "json-c"
@@ -873,6 +879,7 @@
 #undef NOJSON
 #undef CJSON
 #undef CJSON_CJSON
+#undef CJSON_LOCAL
 #undef JSON_C
 #undef CONFIGURED_JSON
 #undef MATHLIB_MPIR

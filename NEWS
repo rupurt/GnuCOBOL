@@ -117,7 +117,7 @@ NEWS - user visible changes				-*- outline -*-
 ** new configure option --with-json / -without-json to explicit force/disable
    JSON runtime support, otherwise it will be included if found as working
    Note: As a special case you may built-in cJSON by placing its source in
-   the folder "libcob". If it is included there, this version will be compiled
+   the folder "lib". If it is included there, this version will be compiled
    into libcob. It may be enforced with --with-json=local, like --with-json==cjson
    and --with-json==json-c enforce the given library.
 

@@ -51,7 +51,7 @@
 
 #if	defined(ENABLE_NLS) && defined(COB_NLS_RUNTIME)
 #include	"defaults.h" /* get LOCALEDIR */
-#include	"lib/gettext.h"
+#include "gettext.h"	/* from lib/ */
 #define _(s)		gettext(s)
 #define N_(s)		gettext_noop(s)
 #else
