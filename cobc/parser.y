@@ -7830,6 +7830,8 @@ _local_storage_section:
 	current_storage = CB_STORAGE_LOCAL;
 	if (current_program->nested_level) {
 		cb_error (_("%s not allowed in nested programs"), "LOCAL-STORAGE");
+	} else if (cb_local_implies_recursive) {
+		current_program->flag_recursive = 1;
 	}
   }
   _record_description_list
@@ -11117,8 +11119,8 @@ call_body:
 	int call_conv_local = 0;
 
 	if (current_program->prog_type == COB_MODULE_TYPE_PROGRAM
-	    && !current_program->flag_recursive
-	    && is_recursive_call ($3)) {
+	 && !current_program->flag_recursive
+	 && is_recursive_call ($3)) {
 		cb_warning_x (COBC_WARN_FILLER, $3,
 			_("recursive program call - assuming RECURSIVE attribute"));
 		current_program->flag_recursive = 1;

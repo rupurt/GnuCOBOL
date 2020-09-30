@@ -1,7 +1,16 @@
 
+2020-08-18  Simon Sobisch <simonsobisch@gnu.org>
+
+	* bs2000-strict.conf, cobol85.conf, cobol2002.conf, cobol2014.conf:
+	  changed assign-clause to 'external'
+
+2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: added option local-implies-recursive
+
 2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
 
-	* general: added option dpc-in-data.
+	* general: added option dpc-in-data
 
 2020-05-11  Simon Sobisch <simonsobisch@gnu.org>
 

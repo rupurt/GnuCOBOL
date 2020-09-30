@@ -21,7 +21,7 @@
 
 2020-09-22  James K. Lowden  <jklowden@symas.com>
 
-	* flag.def (fintrinsics): remove extraneous newline in output
+	* flag.def (intrinsics): remove extraneous newline in output
 
 2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -47,6 +47,11 @@
 
 	* codegen.c (codegen_init): fixed broken codegen for multi-source compiles
 	  introduced when fixing bug #666
+
+2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.def, parser.y: added cb_local_implies_recursive to cater for MF's
+	  strange extension
 
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 
