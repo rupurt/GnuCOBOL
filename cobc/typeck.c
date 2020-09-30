@@ -99,6 +99,17 @@ static const char		*inspect_func;
 static cb_tree			inspect_data;
 struct cb_statement		*error_statement = NULL;
 
+#if 0 /* pending merge of cb_warn_unsupported */
+#ifndef WITH_XML2
+static int			warn_xml_done = 0;
+#endif
+#if	!defined (WITH_CJSON) && !defined (WITH_JSON_C)
+static int			warn_json_done = 0;
+#endif
+#ifndef WITH_EXTENDED_SCREENIO
+static int			warn_screen_done = 0;
+#endif
+#endif
 static int			expr_op;		/* Last operator */
 static cb_tree			expr_lh;		/* Last left hand */
 static int			expr_dmax = -1;		/* Max scale for expression result */
@@ -3102,7 +3113,7 @@ validate_file_status (cb_tree fs)
 {
 	struct cb_field	*fs_field;
 	enum cb_category category;
-	
+
 	/* TO-DO: If not defined, implicitly define PIC XX */
 	if (fs == cb_error_node
 	    || cb_ref (fs) == cb_error_node) {
@@ -12502,6 +12513,7 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 		      cb_tree suppress_list)
 {
 	struct cb_ml_generate_tree	*tree;
+	unsigned char decimal_point;
 
 	if (syntax_check_ml_generate (out, from, count, encoding,
 				       namespace_and_prefix, name_list,
@@ -12522,15 +12534,22 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 	}
 
 	cb_emit (cb_build_ml_suppress_checks (tree));
+	if (cb_dpc_in_data == CB_DPC_IN_XML
+	    || cb_dpc_in_data == CB_DPC_IN_ALL) {
+		decimal_point = current_program->decimal_point;
+	} else {
+		decimal_point = '.';
+	}
 	if (namespace_and_prefix) {
-		cb_emit (CB_BUILD_FUNCALL_6 ("cob_xml_generate", out, CB_TREE (tree),
+		cb_emit (CB_BUILD_FUNCALL_7 ("cob_xml_generate_new", out, CB_TREE (tree),
 					     count, cb_int (with_xml_dec),
 					     CB_PAIR_X (namespace_and_prefix),
-					     CB_PAIR_Y (namespace_and_prefix)));
+					     CB_PAIR_Y (namespace_and_prefix),
+					     cb_int (decimal_point)));
 	} else {
-		cb_emit (CB_BUILD_FUNCALL_6 ("cob_xml_generate", out, CB_TREE (tree),
+		cb_emit (CB_BUILD_FUNCALL_7 ("cob_xml_generate_new", out, CB_TREE (tree),
 					     count, cb_int (with_xml_dec),
-					     NULL, NULL));
+					     NULL, NULL, cb_int (decimal_point)));
 	}
 }
 
@@ -12539,20 +12558,41 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 		       cb_tree name_list, cb_tree suppress_list)
 {
 	struct cb_ml_generate_tree	*tree;
+	unsigned char decimal_point;
 
+#if 0 /* pending merge of cb_warn_unsupported */
+	if (current_statement->ex_handler == NULL
+	 && current_statement->not_ex_handler == NULL)
+	  	current_statement->handler_type = NO_HANDLER;
+#if	!defined (WITH_CJSON) && !defined (WITH_JSON_C)
+	if (!warn_json_done) {
+		warn_json_done = 1;
+		cb_warning (cb_warn_unsupported,
+			_("compiler is not configured to support %s"), "JSON");
+	}
+#endif
+#endif
 	if (syntax_check_ml_generate (out, from, count, NULL,
 				      NULL, name_list, NULL,
 				      suppress_list)) {
 		return;
 	}
 
-        tree = CB_ML_TREE (cb_build_ml_tree (CB_FIELD (cb_ref (from)),
-					     0, 0, name_list,
-					     NULL, suppress_list));
+	tree = CB_ML_TREE (cb_build_ml_tree (CB_FIELD (cb_ref (from)),
+						0, 0, name_list,
+						NULL, suppress_list));
 
 	tree->sibling = current_program->ml_trees;
 	current_program->ml_trees = tree;
 
 	cb_emit (cb_build_ml_suppress_checks (tree));
-	cb_emit (CB_BUILD_FUNCALL_3 ("cob_json_generate", out, CB_TREE (tree), count));
+
+	if (cb_dpc_in_data == CB_DPC_IN_JSON
+	    || cb_dpc_in_data == CB_DPC_IN_ALL) {
+		decimal_point = current_program->decimal_point;
+	} else {
+		decimal_point = '.';
+	}
+	cb_emit (CB_BUILD_FUNCALL_4 ("cob_json_generate_new", out, CB_TREE (tree),
+				     count, cb_int (decimal_point)));
 }

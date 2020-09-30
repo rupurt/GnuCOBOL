@@ -1,4 +1,18 @@
 
+2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* mlio.c, common.h: duplicated cob_xml/json_generate to allow
+	  for new decimal_point param without breaking API from 2018
+	* Makefile.am [LOCAL_CJSON]: moved to "lib"
+	* Makefile.am: fixed inclusion of libsupport
+	* coblocal.h: include gettext without lib prefix
+
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c [WITH_JSON_C]: added version output
+	* mlio.c: adjusted check of defines for XML/JSON,
+	  include json-c according to its docs
+
 2020-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am (install-data-hook): removed as per initial patch from
@@ -17,9 +31,18 @@
 	* screenio.c (cob_screen_puts): fixed bug #665, where spaces where
 	  replaced with underscores in DISPLAY.
 
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* mlio.c, common.h: added support for JSON-C as JSON handler
+
+2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
+
+	* mlio.c, common.h: added decimal_point param to cob_xml/json_generate
+	  --> changed with merge to separate function
+
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
-	* mlio.c: fixed memory issue.
+	* mlio.c: fixed memory issue
 
 2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
 

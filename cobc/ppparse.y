@@ -624,9 +624,11 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %token CALLFH
 %token COMP1
 %token CONSTANT
+%token DPC_IN_DATA	"DPC-IN-DATA"
 %token FOLDCOPYNAME
 %token MAKESYN
 %token NOBOUND
+%token NODPC_IN_DATA	"NODPC-IN-DATA"
 %token NOFOLDCOPYNAME
 %token NOSSRANGE
 /* OVERRIDE token defined above. */
@@ -840,6 +842,26 @@ set_choice:
 		ppp_error_invalid_option ("COMP1", p);
 	}
   }
+| DPC_IN_DATA LITERAL
+  {
+	char	*p = $2;
+	size_t	size;
+
+	/* Remove surrounding quotes/brackets */
+	++p;
+	size = strlen (p) - 1;
+	p[size] = '\0';
+
+	if (!strcasecmp (p, "XML")) {
+		cb_dpc_in_data = CB_DPC_IN_XML;
+	} else if (!strcasecmp (p, "JSON")) {
+		cb_dpc_in_data = CB_DPC_IN_JSON;
+	} else if (!strcasecmp (p, "ALL")) {
+		cb_dpc_in_data = CB_DPC_IN_ALL;
+	} else {
+		ppp_error_invalid_option ("DPC-IN-DATA", p);
+	}
+  }
 | FOLDCOPYNAME _as LITERAL
   {
 	char	*p = $3;
@@ -866,6 +888,10 @@ set_choice:
   {
 	/* Disable EC-BOUND-SUBSCRIPT checking */
 	append_to_turn_list (ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT"), 0, 0);
+  }
+| NODPC_IN_DATA
+  {
+	cb_dpc_in_data = CB_DPC_IN_NONE;
   }
 | NOFOLDCOPYNAME
   {

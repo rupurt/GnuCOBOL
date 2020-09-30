@@ -34,7 +34,7 @@
 #include "libcob.h"
 
 #ifdef	ENABLE_NLS
-#include "lib/gettext.h"
+#include "gettext.h"	/* from lib/ */
 #define _(s)		gettext(s)
 #define N_(s)		gettext_noop(s)
 #else
@@ -228,6 +228,14 @@ enum cb_screen_clauses_rules {
 	CB_RM_SCREEN_RULES,
 	CB_STD_SCREEN_RULES,
 	CB_XOPEN_SCREEN_RULES
+};
+
+/* DECIMAL-POINT IS COMMA effect in XML/JSON GENERATE statements */
+enum cb_dpc_in_data_options {
+	CB_DPC_IN_NONE,
+	CB_DPC_IN_XML,
+	CB_DPC_IN_JSON,
+	CB_DPC_IN_ALL
 };
 
 /* Generic text list structure */

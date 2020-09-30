@@ -1,6 +1,17 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.1 final to be released (in Aug-Sept 2020)
+ GnuCOBOL 3.1 final to be released (in Oct 2020)
+
+ GnuCOBOL 3.1 rc2 to be released (in Sept 2020)
+
+* Changes since 3.1-rc1
+
+  ** the option --with-cjson was replaced by --with-json with arguments,
+     allowing new JSON-C handler to be used
+
+  ** previously cJSON.c and cJSON.h could have been placed into "libcob"
+     to statically link it - this is still supported but the files
+     must be placed in "lib" now
 
 * Known issues in 3.1-rc1
  
@@ -28,7 +39,7 @@ NEWS - user visible changes				-*- outline -*-
    (note: runtime support needs additional library libxml2)
 
 ** JSON GENERATE statement
-   (note: runtime support needs additional library cJSON)
+   (note: runtime support needs additional library cJSON or JSON-C)
    
 ** CONTINUE AFTER statement (COBOL 202x) implemented, also handle fractions
    of seconds in C$SLEEP now
@@ -110,11 +121,12 @@ NEWS - user visible changes				-*- outline -*-
 ** new configure options --with-xml2 / -without-xml2 to explicit force/disable
    XML runtime support, otherwise it will be included if found as working
 
-** new configure options --with-cjson / -without-cjson to explicit force/disable
+** new configure option --with-json / -without-json to explicit force/disable
    JSON runtime support, otherwise it will be included if found as working
    Note: As a special case you may built-in cJSON by placing its source in
-   the folder "libcob". If there is no working cJSON in the system or explicit
-   specified by --with-cjson=local this version will be compiled into libcob.
+   the folder "lib". If it is included there, this version will be compiled
+   into libcob. It may be enforced with --with-json=local, like --with-json==cjson
+   and --with-json==json-c enforce the given library.
 
 ** To adjust the build system for GMP/MPIR you may use the new variables
    GMP_CFLAGS / MPIR_CFLAGS and GMP_LIBS / MPIR_LIBS.
@@ -124,7 +136,8 @@ NEWS - user visible changes				-*- outline -*-
    and XML2_LIBS. If unset configure will use pkg-config / xml2-config.
 
 ** To adjust configure to use libcjson you may use the new variables CJSON_CFLAGS
-   and CJSON_LIBS. If unset configure will use pkg-config.
+   and CJSON_LIBS, similar JSON_C_CFLAGS and JSON_C_LIBS for libjson-c.
+   If unset configure will use pkg-config.
 
 ** Any time after `make` you can call `pre-inst-env` script to use the still-
    uninstalled binaries. Samples:

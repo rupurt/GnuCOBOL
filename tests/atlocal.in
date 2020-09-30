@@ -133,7 +133,7 @@ if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
 	COB_BIGENDIAN="@COB_BIGENDIAN@"
 	COB_HAS_ISAM="@COB_HAS_ISAM@"
 	COB_HAS_XML2="@COB_HAS_XML2@"
-	COB_HAS_CJSON="@COB_HAS_CJSON@"
+	COB_HAS_JSON="@COB_HAS_JSON@"
 	COB_HAS_CURSES="@COB_HAS_CURSES@"
 	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
 else
@@ -156,9 +156,9 @@ else
 		COB_HAS_XML2="no"
 	fi
 	if test $(grep -i -c "JSON library.*disabled" info.out) = 0; then
-		COB_HAS_CJSON="yes"
+		COB_HAS_JSON="yes"
 	else
-		COB_HAS_CJSON="no"
+		COB_HAS_JSON="no"
 	fi
 fi
 if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
@@ -167,7 +167,7 @@ if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 	# --> disabling the tests for this feature
 	COB_HAS_CURSES="no"
 fi
-export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_CJSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
+export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT
 

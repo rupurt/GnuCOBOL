@@ -733,6 +733,21 @@ cb_config_entry (char *buff, const char *fname, const int line)
 			}
 			break;
 		/* for enums without a string value: set max_value and fall through to CB_INT */
+		} else if (strcmp (name, "dpc-in-data") == 0) {
+			if (strcmp (val, "none") == 0) {
+				cb_dpc_in_data = CB_DPC_IN_NONE;
+			} else if (strcmp (val, "xml") == 0) {
+				cb_dpc_in_data = CB_DPC_IN_XML;
+			} else if (strcmp (val, "json") == 0) {
+				cb_dpc_in_data = CB_DPC_IN_JSON;
+			} else if (strcmp (val, "all") == 0) {
+				cb_dpc_in_data = CB_DPC_IN_ALL;
+			} else {
+				invalid_value (fname, line, name, val, "none, xml, json, all", 0, 0);
+				return -1;
+			}
+			break;
+		/* for enums without a string value: set max_value and fall through to CB_INT */
 		} else if (strcmp (name, "standard-define") == 0) {
 			config_table[i].max_value = CB_STD_MAX - 1;
 			/* fall through */

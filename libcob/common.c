@@ -111,25 +111,23 @@
 #endif
 #endif
 
-/* note: checked library instead of headers as those may not be usable! */
-#ifdef WITH_XML2
-#if !defined (HAVE_LIBXML_XMLVERSION_H) || \
-    !defined (HAVE_LIBXML_XMLWRITER_H)
-#error XML2 without necessary headers
-#endif
+#if defined (WITH_XML2)
 #include <libxml/xmlversion.h>
 #include <libxml/xmlwriter.h>
 #endif
 
-#ifdef WITH_CJSON
-#if defined HAVE_CJSON_CJSON_H
+#if defined (WITH_CJSON)
+#if defined (HAVE_CJSON_CJSON_H)
 #include <cjson/cJSON.h>
-#elif defined HAVE_CJSON_H
+#elif defined (HAVE_CJSON_H)
 #include <cJSON.h>
 #else
 #error CJSON without necessary header
 #endif
+#elif defined (WITH_JSON_C)
+#include <json_c_version.h>
 #endif
+
 /* end of library headers */
 
 #include "lib/gettext.h"
@@ -7731,15 +7729,14 @@ print_info_detailed (const int verbose)
 			"libxml2", major, minor, patch);
 		var_print (_("XML library"), 		buff, "", 0);
 		LIBXML_TEST_VERSION
-#if defined (HAVE_LIBXML_XMLWRITER_H) && HAVE_LIBXML_XMLWRITER_H
 		xmlCleanupParser ();
-#endif
 	}
 #else
 	var_print (_("XML library"), 		_("disabled"), "", 0);
 #endif
 
-#ifdef WITH_CJSON
+
+#if defined (WITH_CJSON)
 	{
 		int	major, minor, patch;
 		major = 0, minor = 0, patch = 0;
@@ -7753,8 +7750,27 @@ print_info_detailed (const int verbose)
 		}
 	}
 	var_print (_("JSON library"), 		buff, "", 0);
+
+#elif defined (WITH_JSON_C)
+	{
+		int	major, minor, patch;
+		major = 0, minor = 0, patch = 0;
+		(void)sscanf (json_c_version (), "%d.%d.%d", &major, &minor, &patch);
+		if (major == JSON_C_MAJOR_VERSION && minor == JSON_C_MINOR_VERSION) {
+			snprintf (buff, 55, _("%s, version %d.%d.%d"),
+				"json-c", major, minor, patch);
+		} else {
+			snprintf (buff, 55, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+				"json-c", major, minor, patch, JSON_C_MAJOR_VERSION, JSON_C_MINOR_VERSION);
+		}
+	}
+	var_print (_("JSON library"), 		buff, "", 0);
 #else
 	var_print (_("JSON library"), 		_("disabled"), "", 0);
+#endif
+
+#ifdef COB_DEBUG_LOG
+	var_print ("DEBUG_LOG",		_("enabled"), "", 0);
 #endif
 }
 

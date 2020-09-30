@@ -1,7 +1,21 @@
+
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac: replaced --with-cjson and --with-json-c by
+	  --with-json which takes options similar to --with-curses;
+	  dropped support for includes of json-c header via subdirectory
+	  as its documentation specify to explicit include via -I dstdir/json-c
+	* NEWS, DEPENDENCIES: updated
+
 2020-07-24  James K. Lowden  <jklowden@symas.com>
 
 	* build_aux/bootstrap: suppress portability warning stemming from
-	AMINCLUDE_STATIC
+	  AMINCLUDE_STATIC
+
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* configure.ac: added support for JSON-C as JSON handler as --with-json-c
+	  --> adjusted later to --with-json
 
 2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
 

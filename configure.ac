@@ -84,8 +84,11 @@ AH_TEMPLATE([WITH_DB], [Use Berkeley DB library as emulation of ISAM handler])
 AH_TEMPLATE([WITH_CISAM], [Use CISAM as ISAM handler])
 AH_TEMPLATE([WITH_DISAM], [Use DISAM as ISAM handler])
 AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as ISAM handler])
+
 AH_TEMPLATE([WITH_XML2], [Use libxml2 as XML handler])
-AH_TEMPLATE([WITH_CJSON], [Use cJSON as JSON handler])
+AH_TEMPLATE([WITH_JSON], [JSON handler])
+AH_TEMPLATE([WITH_CJSON], [Use cJSON library/source as JSON handler])
+AH_TEMPLATE([WITH_JSON_C], [Use JSON-C library as JSON handler])
 
 AH_TEMPLATE([COB_EXPORT_DYN], [Compile/link option for exporting symbols])
 AH_TEMPLATE([COB_PIC_FLAGS], [Compile/link option for PIC code])
@@ -233,7 +236,7 @@ AC_MSG_CHECKING([whether ${MAKE} supports order-only prerequisites])
 rm -f confinc.* confprereq
 cat > confmf.mk << 'END'
 PREREQ := confprereq
-am__doit:  am__prereq | $(PREREQ) 
+am__doit:  am__prereq | $(PREREQ)
 	@echo target am__doit. >>confinc.out
 am__prereq:
 	@echo target am__prereq. >>confinc.out
@@ -325,7 +328,7 @@ AC_PROG_YACC
 # note: that breaks old Bison versions which we still support,
 #       if that changes the test may be obsolete
 AC_MSG_CHECKING([how to disable yacc compatibility warnings])
-case "$YACC $YFLAGS $AM_YFLAGS" in 
+case "$YACC $YFLAGS $AM_YFLAGS" in
   *-Wno-yacc*)
    AC_MSG_RESULT([already specified])
   ;;
@@ -349,7 +352,7 @@ esac
 
 AC_ARG_VAR(DIFF_FLAGS, arguments passed to diff)
 AC_MSG_CHECKING([for diff arguments])
-case "$DIFF_FLAGS" in 
+case "$DIFF_FLAGS" in
   *--strip-trailing-cr*)
    AC_MSG_RESULT([specified as $DIFF_FLAGS])
   ;;
@@ -561,16 +564,17 @@ curr_cppflags=$CPPFLAGS
 AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
 	PKG_CHECK_MODULES([GMP], [gmp], [], [
-		PKG_CHECK_MODULES([GMP], [libgmp], [], [#])])
+		PKG_CHECK_MODULES([GMP], [libgmp], [], [#
+		])
+	])
 	if test -n "$GMP_CFLAGS"; then
 	  CPPFLAGS="$CPPFLAGS $GMP_CFLAGS"
 	fi
-	if test -z "$GMP_LIBS"; then
+	if test -z "${GMP_LIBS+x}"; then
 	  GMP_LIBS="-lgmp"
 	fi
 	LIBS="$LIBS $GMP_LIBS"
-	AC_CHECK_HEADERS([gmp.h],
-		[AC_CHECK_HEADERS([gmp.h], [
+	AC_CHECK_HEADERS([gmp.h], [
 		AC_MSG_CHECKING([if linking against libgmp with "$GMP_LIBS" works])
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <gmp.h>]],
 		  [[mpz_t integ; mpz_init (integ);]])],
@@ -579,31 +583,31 @@ AS_IF([test "$USE_MATH" = "gmp" -o "$USE_MATH" = "check"], [
 		   LIBCOB_LIBS="$LIBCOB_LIBS $GMP_LIBS"
 		   USE_MATH=gmp],
 		  [AC_MSG_RESULT([no])
-		   if test "$USE_MATH" = "gmp"; then 
+		   if test "$USE_MATH" = "gmp"; then
 		     AC_MSG_ERROR([[GMP is required for --with-math=gmp, you may adjust GMP_LIBS]])
 		   fi
-		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"])
-		],
-		[if test "$USE_MATH" = "gmp"; then 
+		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
+		)
+	], [if test "$USE_MATH" = "gmp"; then
 		    AC_MSG_ERROR([gmp.h is required for --with-math=gmp, you may adjust GMP_CFLAGS])
 		 fi
-		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
-	)])
+		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
+	])
 ])
 
 AS_IF([test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"], [
 	# note: currently MPIR does not ship a .pc file, but is expected to follow GMP
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
-	PKG_CHECK_MODULES([MPIR], [mpir], [], [#])
+	PKG_CHECK_MODULES([MPIR], [mpir], [], [#
+	])
 	if test -n "$MPIR_CFLAGS"; then
 	  CPPFLAGS="$CPPFLAGS $MPIR_CFLAGS"
 	fi
-	if test -z "$MPIR_LIBS"; then
+	if test -z "${MPIR_LIBS+x}"; then
 	  GMP_LIBS="-lmpir"
 	fi
 	LIBS="$LIBS $MPIR_LIBS"
-	AC_CHECK_HEADERS([mpir.h],
-		[AC_CHECK_HEADERS([mpir.h], [
+	AC_CHECK_HEADERS([mpir.h], [
 		AC_MSG_CHECKING([if linking against libmpir with "$MPIR_LIBS" works])
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <mpir.h>]],
 		  [[mpz_t integ; mpz_init (integ);]])],
@@ -612,16 +616,16 @@ AS_IF([test "$USE_MATH" = "mpir" -o "$USE_MATH" = "check"], [
 		   LIBCOB_LIBS="$LIBCOB_LIBS $MPIR_LIBS"
 		   USE_MATH=mpir],
 		  [AC_MSG_RESULT([no])
-		   if test "$USE_MATH" = "mpir"; then 
+		   if test "$USE_MATH" = "mpir"; then
 		     AC_MSG_ERROR([[MPIR is required for --with-math=mpir, you may adjust GMP_LIBS]])
 		   fi
-		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"])
-		],
-		[if test "$USE_MATH" = "mpir"; then 
+		   LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
+		)
+	], [if test "$USE_MATH" = "mpir"; then
 		    AC_MSG_ERROR([mpir.h is required for --with-math=mpir, you may adjust GMP_CFLAGS])
 		 fi
-		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"]
-	)])
+		 LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
+	])
 ])
 
 if test "$USE_MATH" = "check"; then
@@ -709,13 +713,13 @@ AC_ARG_WITH([xml2],
 
 AS_IF([test "$with_xml2" = "yes" -o "$with_xml2" = "check"], [
 	PKG_CHECK_MODULES([XML2], [libxml-2.0], [], [
-	if test -z "$XML2_CFLAGS" -o -z "$XML2_LIBS"; then
+	if test -z "${XML2_CFLAGS+x}" -o -z "${XML2_LIBS+x}"; then
 	  AC_CHECK_PROG(xml2_config_found, xml2-config, "yes")
 	  if test "$xml2_config_found" = "yes"; then
-	    if test -z "$XML2_CFLAGS"; then
+	    if test -z "${XML2_CFLAGS+x}"; then
 	      XML2_CFLAGS="`xml2-config --cflags`"
 	    fi
-	    if test -z "$XML2_LIBS"; then
+	    if test -z "${XML2_LIBS+x}"; then
 	      XML2_LIBS="`xml2-config --libs`"
 	    fi
 	  fi
@@ -724,25 +728,32 @@ AS_IF([test "$with_xml2" = "yes" -o "$with_xml2" = "check"], [
 	if test -n "$XML2_CFLAGS"; then
 	  CPPFLAGS="$CPPFLAGS $XML2_CFLAGS"
 	fi
-	if test -z "$XML2_LIBS"; then
+	if test -z "${XML2_LIBS+x}"; then
 	  XML2_LIBS="-lxml2"
 	fi
 	LIBS="$LIBS $XML2_LIBS"
-	AC_CHECK_HEADERS([libxml/xmlversion.h libxml/uri.h libxml/xmlwriter.h],
-		[AX_CHECK_DEFINE([libxml/xmlwriter.h], [LIBXML_WRITER_ENABLED], [],
+	for header in xmlversion uri xmlwriter
+	do
+		AC_CHECK_HEADER([libxml/$header.h], [],
+			[if test "$with_xml2" = "yes"; then
+			   AC_MSG_ERROR([Headers for libxml2 are required for --with-xml2, you may adjust XML2_CFLAGS])
+			else
+			   with_xml2=not_found
+			   break
+			fi]
+		)
+	done
+	if test "$with_xml2" != "not_found"; then
+		AX_CHECK_DEFINE([libxml/xmlwriter.h], [LIBXML_WRITER_ENABLED], [],
 		   [if test "$with_xml2" = "yes"; then
 		      AC_MSG_ERROR([libxml2 is required to be configured with xmlWriter])
-		   else
+		    else
 		      AC_MSG_WARN([libxml2 is required to be configured with xmlWriter])
-		      with_xml2=no
-		   fi])
-		],
-		[if test "$with_xml2" = "yes"; then 
-		   AC_MSG_ERROR([Headers for libxml2 are required for --with-xml2, you may adjust XML2_CFLAGS])
-		else
-		   with_xml2=no
-		fi])
-	if test "$with_xml2" != "no"; then
+		      with_xml2=not_found
+		    fi]
+		)
+	fi
+	if test "$with_xml2" != "not_found"; then
 		AC_MSG_CHECKING([if linking against libxml2 with "$XML2_LIBS" works])
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <libxml/xmlwriter.h>]],
 		  [[xmlNewTextWriterFilename (NULL, 0);]])],
@@ -755,44 +766,67 @@ AS_IF([test "$with_xml2" = "yes" -o "$with_xml2" = "check"], [
 		     AC_MSG_ERROR([[xml library is required for --with-xml2, you may adjust XML2_LIBS]])
 		   else
 		     AC_MSG_WARN([xml library not found, you may adjust XML2_LIBS])
-		     with_xml2=no
+		     with_xml2=not_found
 		   fi])
 	else
 		AC_MSG_WARN([Headers for libxml2 missing, you may adjust XML2_CFLAGS])
-		with_xml2=no
+		with_xml2=not_found
 	fi
 	LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
 ])
 
 
-AC_ARG_WITH([cjson],
-  [AS_HELP_STRING([--with-cjson],
-    [(GnuCOBOL) Use cJSON as JSON handler (default)])],
-  [],
-  [with_cjson=check])
 
-AS_IF([test "$with_cjson" = "yes" -o "$with_cjson" = "local" -o "$with_cjson" = "check"], [
+# Checks for cjson/json-c.
+AC_MSG_NOTICE([Checks for JSON handler])
+
+AC_ARG_WITH([json],
+  [AS_HELP_STRING([[--with-json[=ARG]]],
+    [(GnuCOBOL) Use json library/source for JSON GENERATE, where ARG may be:
+     check (default), cjson, local, json-c, no])],
+  [case "$with_json" in
+	cjson | local | "json-c" | check | no )
+		USE_JSON="$with_json"
+		;;
+	yes)
+		USE_JSON="check"
+		;;
+    *)
+		AC_MSG_ERROR([invalid value "$with_json" for --with-json,
+  must be one of the following:
+  cjson, json-c  (use only the specified library)
+  local  (use cjson source included in lib)
+  check  (use whatever json library is usable, disable if no one usable)
+  no  (disable json usage)])
+		;;
+  esac],
+  [USE_JSON="check"])
+
+curr_libs="$LIBS"
+AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "check"], [
 	AC_MSG_NOTICE([Checks for local cJSON ...])
 	curr_libs="$LIBS"; curr_cppflags="$CPPFLAGS"
 	with_cjson_local=no
-	AC_CHECK_FILE([./libcob/cJSON.c],
-	  [AC_MSG_CHECKING([if linking of ./libcob/cJSON.c works])
-	   CPPFLAGS="$curr_cppflags -I./libcob"
+	AC_CHECK_FILE([./lib/cJSON.c],
+	  [AC_MSG_CHECKING([if linking of ./lib/cJSON.c works])
+	   CPPFLAGS="$curr_cppflags -I./lib"
 	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	    [[cJSON_CreateNull ();]])],
 	   [AC_MSG_RESULT([yes])
-	    with_cjson_local="yes (in ./libcob)"],
+	    AC_DEFINE([WITH_CJSON], [1])
+	    with_cjson_local="yes (in ./lib)"],
 	   [AC_MSG_RESULT([no])]
 	   )]
 	)
 	if test "$with_cjson_local" = "no"; then
-	  AC_CHECK_FILE([$srcdir/libcob/cJSON.c],
-	    [AC_MSG_CHECKING([if linking of $srcdir/libcob/cJSON.c works])
-	     CPPFLAGS="$curr_cppflags -I$srcdir/libcob"
+	  AC_CHECK_FILE([$srcdir/lib/cJSON.c],
+	    [AC_MSG_CHECKING([if linking of $srcdir/lib/cJSON.c works])
+	     CPPFLAGS="$curr_cppflags -I$srcdir/lib"
 	     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	      [[cJSON_CreateNull ();]])],
 	     [AC_MSG_RESULT([yes])
-	      with_cjson_local="yes (in $srcdir/libcob)"],
+	      AC_DEFINE([WITH_CJSON], [1])
+	      with_cjson_local="yes (in $srcdir/lib)"],
 	     [AC_MSG_RESULT([no])]
 	     )]
 	  )
@@ -800,55 +834,111 @@ AS_IF([test "$with_cjson" = "yes" -o "$with_cjson" = "local" -o "$with_cjson" = 
 	CPPFLAGS="$curr_cppflags"
 	AS_IF([test "$with_cjson_local" = "no"], [
 		AC_MSG_NOTICE([using local cJSON: no])
-		if test "$with_cjson" = "local"; then 
-		  AC_MSG_ERROR([[cJSON source is required in directory "libcob" for --with-cjson=local]])
+		if test "$with_json" = "local"; then
+		  AC_MSG_ERROR([[cJSON source is required in directory "lib" for --with-json=local]])
 		fi
-		PKG_CHECK_MODULES([CJSON], [libcjson], [], [#])
+		PKG_CHECK_MODULES([CJSON], [libcjson], [], [#
+		])
 		if test -n "$CJSON_CFLAGS"; then
 		  CPPFLAGS="$CPPFLAGS $CJSON_CFLAGS"
 		fi
-		if test -z "$CJSON_LIBS"; then
+		if test -z "${CJSON_LIBS+x}"; then
 		  CJSON_LIBS="-lcjson"
 		fi
 		LIBS="$LIBS $CJSON_LIBS"
 		AC_CHECK_HEADERS([cJSON.h], [],
 			[AC_CHECK_HEADERS([cjson/cJSON.h], [],
-			[if test "$with_cjson" = "yes"; then 
-			    AC_MSG_ERROR([Headers for libcjson are required for --with-cjson, you may adjust CJSON_CFLAGS])
+			[if test "$with_json" = "cjson"; then
+			    AC_MSG_ERROR([Headers for libcjson are required for --with-json, you may adjust CJSON_CFLAGS])
 			 else
-				AC_MSG_WARN([Headers for libcjson missing, you may adjust CJSON_CFLAGS or put cJSON sources in "libcob"])
-			    with_cjson=no
+				AC_MSG_WARN([Headers for libcjson missing, you may adjust CJSON_CFLAGS or put cJSON sources in "lib"])
 			 fi]
 		)])
-		if test "$with_cjson" != "no"; then
-		 AC_MSG_CHECKING([if linking against libcjson with "$CJSON_LIBS" works])
-		 AC_LINK_IFELSE([AC_LANG_PROGRAM([
-		 [#if defined HAVE_CJSON_CJSON_H
-		  #include <cjson/cJSON.h>
-		  #elif defined HAVE_CJSON_H
-		  #include <cJSON.h>
-		  #endif]],
-		  [[cJSON_CreateNull ();]])],
-		  [AC_DEFINE([WITH_CJSON], [1]) AC_MSG_RESULT([yes])
-		   with_cjson=yes
-		   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $CJSON_CFLAGS"
-		   LIBCOB_LIBS="$LIBCOB_LIBS $CJSON_LIBS"],
-		  [AC_MSG_RESULT([no])
-		   if test "$with_cjson" = "yes"; then
-		     AC_MSG_ERROR([[cJSON library is required for --with-cjson, you may adjust CJSON_LIBS]])
-		   else
-		     AC_MSG_WARN([xml library not found, you may adjust CJSON_LIBS])
-		     with_cjson=no
-		   fi])
+		if test "x$ac_cv_header_cJSON_h" = "xyes" -o "x$ac_cv_header_cjson_cJSON_h" = "xyes"; then
+			AC_MSG_CHECKING([if linking against libcjson with "$CJSON_LIBS" works])
+			AC_LINK_IFELSE([AC_LANG_PROGRAM([
+			 [#if defined HAVE_CJSON_CJSON_H
+			  #include <cjson/cJSON.h>
+			  #elif defined HAVE_CJSON_H
+			  #include <cJSON.h>
+			  #endif]],
+			  [[cJSON_CreateNull ();]])],
+			  [AC_MSG_RESULT([yes])
+			   AC_DEFINE([WITH_CJSON], [1])
+			   USE_JSON=cjson
+			   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $CJSON_CFLAGS"
+			   LIBCOB_LIBS="$LIBCOB_LIBS $CJSON_LIBS"],
+			  [AC_MSG_RESULT([no])
+			   if test "$with_json" = "cjson"; then
+			     AC_MSG_ERROR([[cJSON library is required for --with-json=cjson, you may adjust CJSON_LIBS]])
+			   else
+			     AC_MSG_WARN([cJSON library not found, you may adjust CJSON_LIBS])
+			   fi])
 		fi
 	], [
 		AC_MSG_NOTICE([using local cJSON: $with_cjson_local])
-		with_cjson="local"
-		AC_DEFINE([WITH_CJSON], [1])
+		USE_JSON="local"
 		AC_DEFINE([HAVE_CJSON_H], [1])
 	])
 	LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
 ])
+
+AS_IF([test "$USE_JSON" = "json-c" -o "$USE_JSON" = "check"],  [
+	CPPFLAGS="$curr_cppflags"
+	PKG_CHECK_MODULES([JSON_C], [json-c], [], [#
+	])
+	# possibly set JSON_C_CFLAGS with $includedir/json-c;
+	# (has to consider user-setprefix --includir, ... -> left out for now)
+	if test -n "$JSON_C_CFLAGS"; then
+	  CPPFLAGS="$CPPFLAGS $JSON_C_CFLAGS"
+	fi
+	if test -z "${JSON_C_LIBS+x}"; then
+	  JSON_C_LIBS="-ljson-c"
+	fi
+	LIBS="$LIBS $JSON_C_LIBS"
+	AC_CHECK_HEADER([json.h], [
+	 AC_MSG_CHECKING([if linking against libjson-c with "$JSON_C_LIBS" works])
+	 AC_LINK_IFELSE([AC_LANG_PROGRAM([
+	 [#include <json.h>]],
+	  [[json_c_version ();]])],
+	  [AC_MSG_RESULT([yes])
+	   AC_DEFINE([WITH_JSON_C], [1])
+	   USE_JSON=json-c
+	   LIBCOB_CPPFLAGS="$LIBCOB_CPPFLAGS $JSON_C_CFLAGS"
+	   LIBCOB_LIBS="$LIBCOB_LIBS $JSON_C_LIBS"],
+	  [AC_MSG_RESULT([no])
+	   if test "$USE_JSON" = "json-c"; then
+	     AC_MSG_ERROR([[JSON-C library is required for --with-json-c, you may adjust JSON_C_LIBS]])
+	   else
+	     AC_MSG_WARN([JSON-C not found, you may adjust JSON_C_LIBS])
+	   fi])
+	],
+	[if test "$USE_JSON" = "json-c"; then
+		AC_MSG_ERROR([Headers for libjson-c are required for --with-json-c, you may adjust JSON_C_CFLAGS])
+	 else
+		AC_MSG_WARN([Headers for libjson-c missing, you may adjust JSON_C_CFLAGS"])
+	 fi])
+	LIBS="$curr_libs"; CPPFLAGS="$curr_cppflags"
+])
+
+case "$USE_JSON" in
+  check)
+	if test "$with_json" = yes; then
+		AC_MSG_ERROR([[No applicable handler for JSON found]])
+	fi
+	USE_JSON="not_found"
+	AC_DEFINE([WITH_JSON], ["not found"])
+	;;
+  no)
+	AC_DEFINE([WITH_JSON], ["disabled"])
+	;;
+  cjson | local)
+	AC_DEFINE([WITH_JSON], ["cjson"])
+	;;
+  "json-c")
+	AC_DEFINE([WITH_JSON], ["json-c"])
+	;;
+esac
 
 
 AC_ARG_WITH([dl],
@@ -1044,7 +1134,7 @@ fi
 case "$USE_CURSES" in
   check)
 	USE_CURSES="not_found"
-	AC_DEFINE([WITH_CURSES], ["no curses found"])
+	AC_DEFINE([WITH_CURSES], ["not found"])
 	;;
   no)
 	AC_DEFINE([WITH_CURSES], ["disabled"])
@@ -1852,17 +1942,20 @@ fi
 
 if test "$with_xml2" = "yes"; then
 	COB_HAS_XML2=yes
+	with_xml2=libxml2
 else
 	COB_HAS_XML2=no
 fi
 
-AM_CONDITIONAL([LOCAL_CJSON],[test "$with_cjson" = "local"])
-if test "$with_cjson" = "yes" -o "$with_cjson" = "local"; then
-	COB_HAS_CJSON=yes
+if test "$USE_JSON" = "local"; then
+	COB_HAS_JSON=cjson
+elif test "$USE_JSON" = "not_found"; then
+	COB_HAS_JSON=no
 else
-	COB_HAS_CJSON=no
-	with_cjson=no
+	COB_HAS_JSON=$USE_JSON
 fi
+
+AM_CONDITIONAL([LOCAL_CJSON],[test "$USE_JSON" = "local"])
 
 unset COB_USES_GCC
 unset COB_USES_GCC_NO_ICC
@@ -1913,7 +2006,7 @@ AC_SUBST([COB_KEYWORD_INLINE])
 AC_SUBST([COB_HAS_ISAM])
 AC_SUBST([COB_HAS_CURSES])
 AC_SUBST([COB_HAS_XML2])
-AC_SUBST([COB_HAS_CJSON])
+AC_SUBST([COB_HAS_JSON])
 AC_SUBST([COB_HAS_64_BIT_POINTER])
 AC_SUBST([COB_PATCH_LEVEL], [$with_patch_level]) # needed for bin/cob-config
 
@@ -1987,6 +2080,28 @@ elif test "$with_db" = "yes"; then
 else
   AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
 fi
-AC_MSG_NOTICE([ Use libxml2 for XML I/O:                     ${COB_HAS_XML2}])
-AC_MSG_NOTICE([ Use cJSON for JSON I/O:                      $with_cjson])  
+
+case "$with_xml2" in
+  not_found)
+    AC_MSG_NOTICE([ XML I/O (no handler found):                  NO])
+	;;
+  no)
+    AC_MSG_NOTICE([ XML I/O (disabled):                          NO])
+	;;
+  *)
+    AC_MSG_NOTICE([ Used for XML I/O:                            ${with_xml2}])
+	;;
+esac
+case "$USE_JSON" in
+  not_found)
+    AC_MSG_NOTICE([ JSON I/O (no handler found):                 NO])
+	;;
+  no)
+    AC_MSG_NOTICE([ JSON I/O (disabled):                         NO])
+	;;
+  *)
+    AC_MSG_NOTICE([ Used for JSON I/O:                           ${USE_JSON}])
+	;;
+esac
+
 unset DEFINE_DL

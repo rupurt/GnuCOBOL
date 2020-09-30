@@ -2540,7 +2540,7 @@ cobc_print_info (void)
 	cobc_var_print (_("native EBCDIC"),	_("no"), 0);
 #endif
 
-	cobc_var_print (_("extended screen I/O"),	WITH_CURSES, 0);
+	cobc_var_print (_("extended screen I/O"),	_(WITH_CURSES), 0);
 
 	snprintf (buff, sizeof(buff), "%d", WITH_VARSEQ);
 	cobc_var_print (_("variable file format"),	buff, 0);
@@ -2573,7 +2573,11 @@ cobc_print_info (void)
 #endif
 
 #if defined(__MPIR_VERSION)
+#if defined(HAVE_MPIR_H)
+	cobc_var_print (_("mathematical library"),	"MPIR", 0);
+#else
 	cobc_var_print (_("mathematical library"),	"MPIR - GMP", 0);
+#endif
 #else
 	cobc_var_print (_("mathematical library"),	"GMP", 0);
 #endif
@@ -2584,10 +2588,10 @@ cobc_print_info (void)
 	cobc_var_print (_("XML library"),		_("disabled"), 0);
 #endif
 
-#ifdef WITH_CJSON
-	cobc_var_print (_("JSON library"),		"cJSON", 0);
-#else
-	cobc_var_print (_("JSON library"),		_("disabled"), 0);
+	cobc_var_print (_("JSON library"),		_(WITH_JSON), 0);
+
+#ifdef COB_DEBUG_LOG
+	cobc_var_print ("DEBUG_LOG",		_("enabled"), 0);
 #endif
 }
 

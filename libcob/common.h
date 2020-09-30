@@ -1094,6 +1094,8 @@ typedef cob_s64_t cob_flags_t;
 
 /* End Report attribute defines */
 
+#define COB_JSON_CJSON			1
+#define COB_JSON_JSON_C			2
 
 /* Structure/union declarations */
 
@@ -2480,6 +2482,11 @@ COB_EXPIMP void	cob_xml_generate	(cob_field *, cob_ml_tree *,
 					 cob_field *);
 COB_EXPIMP void cob_json_generate	(cob_field *, cob_ml_tree *,
 					 cob_field *);
+COB_EXPIMP void	cob_xml_generate_new	(cob_field *, cob_ml_tree *,
+					 cob_field *, const int, cob_field *,
+					 cob_field *, const char);
+COB_EXPIMP void cob_json_generate_new	(cob_field *, cob_ml_tree *,
+					 cob_field *, const char);
 
 
 /****************************/

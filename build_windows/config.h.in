@@ -17,6 +17,8 @@
 #define NOJSON       0
 #define CJSON        1
 #define CJSON_CJSON  2	/* cJSON with header in CJSON_CJSON */
+#define CJSON_LOCAL  3	/* cJSON in libsupport, activate external source */
+#define JSON_C       4
 
 #define MATHLIB_MPIR 1
 #define MATHLIB_GMP  2
@@ -91,7 +93,7 @@
 #elif CONFIGURED_ISAM == DISAM
 #pragma comment(lib, "libdisam72")
 #elif CONFIGURED_ISAM == BDB
-//#if defined _DEBUG
+//#ifdef _DEBUG
 //#pragma comment(lib, "libdb48d")
 //#pragma comment(lib, "libdb62d")
 //#else
@@ -121,10 +123,10 @@
 
 #ifdef LIB_JSON
 #pragma comment(lib, LIB_JSON)
-#else
-#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+#elif CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
 #pragma comment(lib, "cjson")
-#endif
+#elif CONFIGURED_JSON == JSON_C
+#pragma comment(lib, "json-c")
 #endif
 
 #endif /* WITHIN_LIBCOB */
@@ -227,7 +229,8 @@
 #endif
 
 /* Define to 1 if you have the <cJSON.h> header file. */
-#if CONFIGURED_JSON == CJSON
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
 #define HAVE_CJSON_H 1
 #else
 /* #undef HAVE_CJSON_H */
@@ -345,7 +348,7 @@
 /* #undef HAVE_HAS_MOUSE */
 
 /* Define if you have the iconv() function and it works. */
-#if CONFIGURED_XML == XML2
+#if CONFIGURED_XML == XML2	/* necessary, assume available */
 #define HAVE_ICONV 1
 #else
 /* #undef HAVE_ICONV */
@@ -396,27 +399,6 @@
 
 /* Define to 1 if you have the `rt' library (-lrt). */
 /* #undef HAVE_LIBRT */
-
-/* Define to 1 if you have the <libxml/uri.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_URI_H 1
-#else
-/* #undef HAVE_LIBXML_URI_H */
-#endif
-
-/* Define to 1 if you have the <libxml/xmlversion.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_XMLVERSION_H 1
-#else
-/* #undef HAVE_LIBXML_XMLVERSION_H */
-#endif
-
-/* Define to 1 if you have the <libxml/xmlwriter.h> header file. */
-#if CONFIGURED_XML == XML2
-#define HAVE_LIBXML_XMLWRITER_H 1
-#else
-/* #undef HAVE_LIBXML_XMLWRITER_H */
-#endif
 
 /* Define to 1 if you have the `localeconv' function. */
 #define HAVE_LOCALECONV 1
@@ -681,8 +663,10 @@
 /* #undef WITH_CISAM */
 #endif
 
-/* Use cJSON as JSON handler */
-#if CONFIGURED_JSON == CJSON || CONFIGURED_JSON == CJSON_CJSON
+/* Use cJSON library/source as JSON handler */
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
 #define WITH_CJSON 1
 #else
 /* #undef WITH_CJSON */
@@ -711,6 +695,24 @@
 
 /* Compile with an external ISAM handler */
 /* #undef WITH_INDEX_EXTFH */
+
+/* JSON handler */
+#if CONFIGURED_JSON == CJSON \
+ || CONFIGURED_JSON == CJSON_CJSON \
+ || CONFIGURED_JSON == CJSON_LOCAL
+#define WITH_JSON "cJSON"
+#elif CONFIGURED_JSON == JSON_C
+#define WITH_JSON "json-c"
+#else
+#define WITH_JSON "disabled"
+#endif
+
+/* Use JSON-C library as JSON handler */
+#if CONFIGURED_JSON == JSON_C
+#define WITH_JSON_C 1
+#else
+/* #undef WITH_JSON_C */
+#endif
 
 /* Math multiple precision library */
 #if USED_MATHLIB == MATHLIB_MPIR
@@ -795,6 +797,8 @@
 #undef NOJSON
 #undef CJSON
 #undef CJSON_CJSON
+#undef CJSON_LOCAL
+#undef JSON_C
 #undef CONFIGURED_JSON
 #undef MATHLIB_MPIR
 #undef MATHLIB_GMP

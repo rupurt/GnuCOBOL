@@ -1,7 +1,7 @@
 #
 # Makefile gnucobol/lib
 #
-# Copyright (C) 2002-2012, 2017 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012, 2017, 2020 Free Software Foundation, Inc.
 # Written by Keisuke Nishida, Roger While, Simon Sobisch
 #
 # This file is part of GnuCOBOL.
@@ -25,3 +25,8 @@ noinst_LIBRARIES = libsupport.a
 AM_CPPFLAGS = -I$(top_srcdir)
 libsupport_a_SOURCES = dummymac.c
 libsupport_a_LIBADD = @LIBOBJS@
+
+if LOCAL_CJSON
+nodist_libsupport_a_SOURCES = cJSON.c
+DISTCLEANFILES = cJSON.c cJSON.h
+endif

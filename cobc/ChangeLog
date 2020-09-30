@@ -1,4 +1,16 @@
 
+2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* typeck.c (cb_emit_json_generate, cb_emit_xml_generate): adjusted to allow
+	  for new decimal_point param without breaking API from 2018
+	* Makefile.am: fixed inclusion of libsupport
+	* cobc.h: include gettext without lib prefix
+
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR
+	* typeck.c: adjusted check of defines for JSON
+
 2020-09-27  Robert Dubner <rdubner-s@users.sf.net>
 
 	* codegen.c (output_cobol_info): emit doubled backslashes for source file
@@ -50,10 +62,18 @@
 	* config.def: added possible values for assign-clause and
 	  screen-section-rules.
 
+2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
+
+	* cobc.c, typeck.c: added support for JSON-C as JSON handler
+
 2020-07-17  Edward Hart <edward.dan.hart@gmail.com>
 
-	* scanner.l: add EQUALS as alias for EQUAL in conditions (bug #663).
-	* typeck.c: fixed segfault with parens around condition word (bug #663).
+	fixed bug #663
+	* scanner.l: add EQUALS as alias for EQUAL in conditions
+	* typeck.c: fixed segfault with parens around condition word
+
+	* config.c, config.def, cobc.h, typeck.c: added dpc-in-data conf option
+	* pplex.l, ppparse.y: added corresponding SET DPC-IN-DATA directive
 
 2020-07-09  Edward Hart <edward.dan.hart@gmail.com>
 

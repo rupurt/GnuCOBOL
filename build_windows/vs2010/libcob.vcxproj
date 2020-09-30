@@ -194,6 +194,11 @@
   <ItemGroup>
     <ResourceCompile Include="..\version_libcob.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="libsupport.vcxproj">
+      <Project>{6d310774-fce5-447b-93e3-bb8fad3da946}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
