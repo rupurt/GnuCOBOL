@@ -7724,9 +7724,7 @@ print_info_detailed (const int verbose)
 			"libxml2", major, minor, patch);
 		var_print (_("XML library"), 		buff, "", 0);
 		LIBXML_TEST_VERSION
-#if defined (HAVE_LIBXML_XMLWRITER_H) && HAVE_LIBXML_XMLWRITER_H
-		xmlCleanupParser ();
-#endif
+		xmlCleanupParser ()
 	}
 #else
 	var_print (_("XML library"), 		_("disabled"), "", 0);
@@ -7767,7 +7765,7 @@ print_info_detailed (const int verbose)
 #endif
 
 #ifdef COB_DEBUG_LOG
-	var_print (_("DEBUG_LOG "),		_("enabled"), "", 0);
+	var_print (_("DEBUG_LOG"),		_("enabled"), "", 0);
 #endif
 }
 
