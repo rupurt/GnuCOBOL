@@ -1421,6 +1421,9 @@ cob_check_trace_file (void)
 	if (cobsetptr->cob_trace_filename) {
 		cobsetptr->cob_trace_file = cob_open_logfile (cobsetptr->cob_trace_filename);
 		if (!cobsetptr->cob_trace_file) {
+			/* could not open the file
+			   unset the filename for not referencing it later */
+			cobsetptr->cob_trace_filename = NULL;
 			cobsetptr->cob_trace_file = stderr;
 		}
 	} else {
@@ -3059,7 +3062,7 @@ void
 cob_check_based (const unsigned char *x, const char *name)
 {
 	if (!x) {
-		/* name includes '' already and can be ... 'x' (addressed by 'y'= */
+		/* name includes '' already and can be ... 'x' (addressed by 'y') */
 		cob_runtime_error (_("BASED/LINKAGE item %s has NULL address"), name);
 		cob_stop_run (1);
 	}
@@ -6301,7 +6304,8 @@ set_config_val (char *value, int pos)
 		}
 
 		/* call internal routines that do post-processing */
-		if (strcmp (gc_conf[pos].env_name, "COB_TRACE_FILE") == 0) {
+		if (strcmp (gc_conf[pos].env_name, "COB_TRACE_FILE") == 0
+		 && cobsetptr->cob_trace_file != NULL) {
 			cob_new_trace_file ();
 		}
 
@@ -7156,7 +7160,7 @@ cob_fatal_error (const enum cob_fatal_error fatal_error)
 	case COB_FERROR_RECURSIVE:
 		/* LCOV_EXCL_LINE */
 		if (cob_module_err) {
-			cob_runtime_error (_("recursive CALL from %s to %s which is NOT RECURSIVE"),
+			cob_runtime_error (_("recursive CALL from '%s' to '%s' which is NOT RECURSIVE"),
 					COB_MODULE_PTR->module_name, cob_module_err->module_name);
 			cob_module_err = NULL;
 		/* LCOV_EXCL_START */
@@ -7526,7 +7530,7 @@ get_math_info (char *version_buffer, size_t size, const int verbose)
 	(void)sscanf (mpir_version, "%d.%d.%d", &major, &minor, &patch);
 	curr_size = strlen (version_buffer);
 	{
-		char *deli = " - ";
+		const char *deli = " - ";
 		snprintf (version_buffer + curr_size, size - curr_size, "%s", deli);
 		curr_size += strlen (deli);
 	}
@@ -7667,10 +7671,6 @@ print_info_detailed (const int verbose)
 	var_print (_("native EBCDIC"),		_("no"), "", 0);
 #endif
 
-	var_print (_("extended screen I/O"), (char*)&screenio_info, "", 0);
-
-	var_print (_("mouse support"), 	mouse_support, "", 0);
-
 	snprintf (buff, sizeof (buff), "%d", WITH_VARSEQ);
 	var_print (_("variable file format"), buff, "", 0);
 	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
@@ -7768,6 +7768,9 @@ print_info_detailed (const int verbose)
 #else
 	var_print (_("JSON library"), 		_("disabled"), "", 0);
 #endif
+
+	var_print (_("extended screen I/O"),	(char*)&screenio_info, "", 0);
+	var_print (_("mouse support"),		mouse_support, "", 0);
 
 #ifdef COB_DEBUG_LOG
 	var_print ("DEBUG_LOG",		_("enabled"), "", 0);

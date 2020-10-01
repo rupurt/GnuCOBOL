@@ -34,10 +34,13 @@
 	  (literal_for_diagnostic) from scanner.l (error_literal), extended and
 	  used in tree.c to provide a single function to resolve literals
 
+2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* typeck.c (cb_validate_program_body): verify ANY LENGTH as formal parameter
+
 2020-09-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* scanner.l (read_literal): catch and error  missing termination of literal
-
 
 2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
 
@@ -56,6 +59,9 @@
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_call): don't setup exceptions for static CALLs
+	* help.c: adjusted help output;
+	  including fix for bug #670 "multiple listing of -debug"
+	* flag.def: removed dummy variables cb_def_dump, cb_def_callfh
 
 2020-07-27  Simon Sobisch <simonsobisch@gnu.org>
 

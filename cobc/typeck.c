@@ -3715,6 +3715,34 @@ cb_validate_program_body (struct cb_program *prog)
 	struct cb_label		*l2;
 	struct cb_field		*f, *ret_fld;
 
+	/* Check reference to ANY LENGTH items */
+	if (prog->linkage_storage) {
+		for (f = prog->linkage_storage; f; f = f->sister) {
+
+			/* only check fields with ANY LENGTH;
+			   RETURNING is already a valid reference */
+			if (!f->flag_any_length
+			 || f->flag_is_returning) {
+				continue;
+			}
+
+			/* ignore fields that are part of main entry USING */
+			for (l = CB_VALUE (CB_VALUE (prog->entry_list)); l; l = CB_CHAIN (l)) {
+				x = CB_VALUE (l);
+				if (CB_VALID_TREE (x) && cb_ref (x) != cb_error_node) {
+					if (f == CB_FIELD (cb_ref (x))) {
+						break;
+					}
+				}
+			}
+			if (!l) {
+				cb_error_x (CB_TREE (f),
+					_("'%s' ANY LENGTH item must be a formal parameter"),
+					f->name);
+			}
+		}
+	}
+
 	/* Validate entry points */
 
 	/* Check dangling LINKAGE items */

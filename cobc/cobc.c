@@ -2807,7 +2807,7 @@ process_command_line (const int argc, char **argv)
 	int			list_system_routines = 0;
 	enum cob_exception_id	i;
 	char			ext[COB_MINI_BUFF];
-	char			*conf_label;	/* we want a dynamic address for erroc.c, not a static one */
+	char			*conf_label;	/* we want a dynamic address for error.c, not a static one */
 	char			*conf_entry;
 	const char		*copt = NULL;	/* C optimization options */
 
@@ -8476,8 +8476,8 @@ process_file (struct filename *fn, int status)
 		set_listing_header_code ();
 	}
 
-	if (cb_compile_level >= CB_LEVEL_PREPROCESS &&
-	    fn->need_preprocess) {
+	if (cb_compile_level >= CB_LEVEL_PREPROCESS
+	 && fn->need_preprocess) {
 		/* Preprocess */
 		fn->has_error = preprocess (fn);
 		status |= fn->has_error;
@@ -8607,8 +8607,9 @@ main (int argc, char **argv)
 		cobc_flag_library = 0;
 	}
 
-	if (output_name && cb_compile_level < CB_LEVEL_LIBRARY &&
-	    (argc - iargs) > 1) {
+	if (output_name
+	 && cb_compile_level < CB_LEVEL_LIBRARY
+	 && (argc - iargs) > 1) {
 		cobc_err_exit (_("%s option invalid in this combination"), "-o");
 	}
 

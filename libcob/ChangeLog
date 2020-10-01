@@ -18,11 +18,21 @@
 
 2020-09-08  James K. Lowden  <jklowden@symas.com>
 
-	* intrinsic.c (cob_intr_seconds_from_formatted_time): #886 passes
+	* intrinsic.c (cob_intr_seconds_from_formatted_time): fix bug #886
 
-2020-09-04  James K. Lowden  <jklowden@symas.com>
+2020-08-31  Simon Sobisch <simonsobisch@gnu.org>
 
-	* intrinsic.c: bugfix for cob_intr_seconds_from_formatted_time
+	* strings.c: huge performance improvements for INSPECT by splitting
+	  the internal pseudo-marker into separate marker+replacement
+
+2020-08-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (set_config_val): only create a new trace file if we already
+	  have one open before
+
+2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c: minimal adjustments to --info output
 
 2020-07-26  Edward Hart <edward.dan.hart@gmail.com>
 
