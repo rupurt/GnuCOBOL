@@ -1,3 +1,7 @@
+2020-10-01  James K. Lowden  <jklowden@symas.com>
+
+	* screenio.c: quell unused-result warning when compiled with
+	_FORTIFY_SOURCE. 
 
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
