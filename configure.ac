@@ -1787,7 +1787,7 @@ cob_temp_flags=`echo x$CFLAGS $CPPFLAGS |		\
 	     -e 's/-gdb//'				\
 	     -e 's/[[+-]]O[[0-9s]]*//g'			\
  	     -e 's/-O//g'				\
- 	     -e 's/-WP,-D_FORTIFY_SOURCE=.//g'		\
+ 	     -e 's/-Wp,-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-fmessage-length=0//g'		\
  	     -e 's/-fstack-protector-strong//g'		\
