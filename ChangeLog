@@ -1,6 +1,16 @@
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
+	* configure.ac (COB_CFLAGS): more cleanup of debugging options from CFLAGS
+	  when creating COB_CFLAGS
+
+2020-10-01  Bob Dubner <rdubner@symas.com>
+
+	* configure.ac (COB_CFLAGS): remove "-Wp,-D_FORTIFY_SOURCE=.'" from CFLAGS
+	  when creating COB_CFLAGS
+
+2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
+
 	* configure.ac: replaced --with-cjson and --with-json-c by
 	  --with-json which takes options similar to --with-curses;
 	  dropped support for includes of json-c header via subdirectory

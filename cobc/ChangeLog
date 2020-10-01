@@ -15,7 +15,7 @@
 	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR
 	* typeck.c: adjusted check of defines for JSON
 
-2020-09-27  Robert Dubner <rdubner-s@users.sf.net>
+2020-09-27  Bob Dubner <rdubner@symas.com>
 
 	* codegen.c (output_cobol_info): emit doubled backslashes for source file
 

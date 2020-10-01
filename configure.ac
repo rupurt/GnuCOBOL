@@ -1782,17 +1782,20 @@ fi
 # 
 cob_temp_flags=`echo x$CFLAGS $CPPFLAGS |		\
 	 sed -e 's/^x//'				\
-	     -e 's/-g[[ 3]]//g'				\
+	     -e 's/-g[[0-9 ]]//g'				\
 	     -e 's/-g$//'				\
+	     -e 's/-gdb//'				\
 	     -e 's/[[+-]]O[[0-9s]]*//g'			\
  	     -e 's/-O//g'				\
- 	     -e 's/-fmessage-length=0//g'		\
+ 	     -e 's/-WP,-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
+ 	     -e 's/-fmessage-length=0//g'		\
  	     -e 's/-fstack-protector-strong//g'		\
  	     -e 's/-fstack-protector-all//g'		\
  	     -e 's/-fstack-protector//g'		\
  	     -e 's/-funwind-tables//g'			\
  	     -e 's/-fasynchronous-unwind-tables//g'	\
+ 	     -e 's/ +/ /g'	\
 	     `
 
 if test "x$cob_temp_flags" != "x"; then
