@@ -1,4 +1,8 @@
 
+2020-10-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am: removed bashism allowing NIST tests to run on AIX
+
 2020-07-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am, Makefile.module.in: pass DIFF_FLAGS down,
