@@ -37,6 +37,14 @@
 #ifdef	HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#ifdef HAVE_FMEMOPEN
+#if defined(HAVE_DECL_FMEMOPEN) && HAVE_DECL_FMEMOPEN == 0
+/* function available and working, declaration missing on AIX... */
+FILE *fmemopen (void *buf, size_t size, const char *mode);
+#endif
+#endif
+
 #include <errno.h>
 
 /*	NOTE - The following variable should be uncommented when

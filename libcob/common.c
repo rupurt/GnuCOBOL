@@ -4488,7 +4488,7 @@ cob_gettmpdir (void)
 		 && (tmpdir = check_valid_env_tmpdir ("USERPROFILE")) == NULL) {
 #else
 		if ((tmpdir = check_valid_env_tmpdir ("TMP")) == NULL
-			&& (tmpdir = check_valid_env_tmpdir ("TEMP")) == NULL) {
+		 && (tmpdir = check_valid_env_tmpdir ("TEMP")) == NULL) {
 			if (!check_valid_dir ("/tmp")) {
 				tmp = cob_fast_malloc (5U);
 				strcpy (tmp, "/tmp");

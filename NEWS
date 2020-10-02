@@ -2,26 +2,24 @@ NEWS - user visible changes				-*- outline -*-
 
  GnuCOBOL 3.1 final to be released (in Oct 2020)
 
- GnuCOBOL 3.1 rc2 to be released (in Sept 2020)
+ GnuCOBOL 3.1 rc2 to be released (in the next days...)
 
 * Changes since 3.1-rc1
 
-  ** the option --with-cjson was replaced by --with-json with arguments,
-     allowing new JSON-C handler to be used
+  ** new configure option --enable-hardening new option to enable GNU C's
+     hardening options or leave as-is or disable (which previous versions
+     effectively did)
 
-  ** previously cJSON.c and cJSON.h could have been placed into "libcob"
-     to statically link it - this is still supported but the files
-     must be placed in "lib" now
+  ** the configure option --with-cjson was replaced by
+     --with-json with arguments, allowing new JSON-C handler to be used
 
 * Known issues in 3.1-rc1
  
 ** the documentation is not in the final state for the release
 
 ** testsuite:
-  * if built with --vbisam some tests will lead to UNEXPECTED PASS,
+  * if built with vbisam, cisam or disam some tests will lead to UNEXPECTED PASS,
     depending on the actual version used some other may fail
-  * possibly failing tests:
-    * very long literal in error message
   * possibly failing tests (false positives):
     * temporary path invalid
     * compiler outputs (assembler)

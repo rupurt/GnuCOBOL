@@ -131,9 +131,16 @@ AC_ARG_PROGRAM
 
 AC_ARG_ENABLE([debug],
   [AS_HELP_STRING([--enable-debug],
-    [(GnuCOBOL) Enable -g C compiler debug option])],
+    [(GnuCOBOL) Enable -g C compiler debug option for cobc + libcob])],
   [],
   [enable_debug=no])
+
+AC_ARG_ENABLE([hardening],
+  [AS_HELP_STRING([--enable-hardening, --disable-hardening],
+    [Enable GNU C "hardening" options: define _FORTIFY_SOURCE and use -fstack-protector.
+	If disabled, these are explicit removed from CFLAGS for building GnuCOBOL.
+	Defaults to "defined by CFLAGS".])],,
+  [enable_hardening="unset"])
 
 AC_ARG_ENABLE([experimental],
   [AS_HELP_STRING([--enable-experimental],
@@ -259,7 +266,7 @@ AM_CONDITIONAL([MAKE_HAS_PREREQ_ONLY], [test "${_am_result}" = "yes"])
 curr_libs="$LIBS"
 
 enable_cflags_setting=no
-AC_MSG_CHECKING([whether CFLAGS can be modified])
+AC_MSG_CHECKING([whether CFLAGS -O can be modified])
 # Enable setting if the user has not specified the optimisation in CFLAGS.
 echo "$CFLAGS" | grep "\-O.*\( \|$\)" 1>/dev/null 2>/dev/null
 if test $? != 0; then
@@ -518,6 +525,22 @@ if test "x$LIBCOB_LIBS" != "x"; then
 	LIBCOB_LIBS="$LIBCOB_LIBS $COMMON_LIBS"
 else
 	LIBCOB_LIBS="$COMMON_LIBS"
+fi
+
+COB_LIBS="-L$libdir -lcob"
+if test "x$COMMON_LIBS" != "x"; then
+	if test "x$COB_LIBS" != "x"; then
+		COB_LIBS="$COB_LIBS $COMMON_LIBS"
+	else
+		COB_LIBS="$COMMON_LIBS"
+	fi
+fi
+if test "x$LDFLAGS" != "x"; then
+	if test "x$COB_LDFLAGS" != "x"; then
+		COB_LDFLAGS="$COB_LDFLAGS $LDFLAGS"
+	else
+		COB_LDFLAGS="$LDFLAGS"
+	fi
 fi
 
 # Add --enable-code-coverage and test for code-coverage tools if enabled
@@ -782,7 +805,7 @@ AC_MSG_NOTICE([Checks for JSON handler])
 
 AC_ARG_WITH([json],
   [AS_HELP_STRING([[--with-json[=ARG]]],
-    [(GnuCOBOL) Use json library/source for JSON GENERATE, where ARG may be:
+    [(GnuCOBOL) Use json library/source as JSON handler, where ARG may be:
      check (default), cjson, local, json-c, no])],
   [case "$with_json" in
 	cjson | local | "json-c" | check | no )
@@ -810,25 +833,29 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	AC_CHECK_FILE([./libcob/cJSON.c],
 	  [AC_MSG_CHECKING([if linking of ./libcob/cJSON.c works])
 	   CPPFLAGS="$curr_cppflags -I./libcob"
+	   LIBS="$LIBS $COMMON_LIBS"
 	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	    [[cJSON_CreateNull ();]])],
 	   [AC_MSG_RESULT([yes])
 	    AC_DEFINE([WITH_CJSON], [1])
 	    with_cjson_local="yes (in ./libcob)"],
 	   [AC_MSG_RESULT([no])]
-	   )]
+	   )
+	   LIBS="$curr_libs"]
 	)
 	if test "$with_cjson_local" = "no"; then
 	  AC_CHECK_FILE([$srcdir/libcob/cJSON.c],
 	    [AC_MSG_CHECKING([if linking of $srcdir/libcob/cJSON.c works])
 	     CPPFLAGS="$curr_cppflags -I$srcdir/libcob"
+	     LIBS="$LIBS $COMMON_LIBS"
 	     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
 	      [[cJSON_CreateNull ();]])],
 	     [AC_MSG_RESULT([yes])
 	      AC_DEFINE([WITH_CJSON], [1])
 	      with_cjson_local="yes (in $srcdir/libcob)"],
 	     [AC_MSG_RESULT([no])]
-	     )]
+	     )
+	     LIBS="$curr_libs"]
 	  )
 	fi
 	CPPFLAGS="$curr_cppflags"
@@ -1021,6 +1048,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <math.h>]],
 
 AC_CHECK_FUNCS([fdatasync sigaction fmemopen])
 AC_CHECK_DECLS([fdatasync])	# also check for declaration, missing on MacOS...
+AC_CHECK_DECLS([fmemopen])	# also check for declaration, missing on AIX...
 
 # Checks for gettext.
 
@@ -1636,16 +1664,6 @@ AM_LANGINFO_CODESET
 
 # GnuCOBOL Configuration
 
-COB_LIBS="-L$libdir -lcob"
-if test "x$COMMON_LIBS" != "x"; then
-	COB_LIBS="$COB_LIBS $COMMON_LIBS"
-fi
-if test "x$LDFLAGS" != "x"; then
-	COB_LDFLAGS="$LDFLAGS"
-else
-	COB_LDFLAGS=""
-fi
-
 COB_CONFIG_DIR="$datadir/$PACKAGE_TARNAME/config"
 COB_COPY_DIR="$datadir/$PACKAGE_TARNAME/copy"
 COB_LIBRARY_PATH="$libdir/$PACKAGE_TARNAME"
@@ -1668,11 +1686,13 @@ COB_PIC_FLAGS=`echo "$lt_prog_compiler_pic" | sed -e 's/^ //'`
 
 if test "$enable_cflags_setting" = "yes"; then
 
-	# Remove -O2 option added by AC_PROG_CC and add -O0
-	if test "$enable_debug" = "yes" -o "$enable_code_coverage" = "yes"; then
-		CFLAGS=`echo "$CFLAGS" | sed -e 's/ *-O@<:@0-9a-zA-Z@:>@* */ /g' -e 's/ $//' -e 's/^ //'`
-		if test "$COB_USES_GCC" = "yes"; then
-			CFLAGS="$CFLAGS -O0"
+	if test "$enable_hardening" != "yes"; then
+		# Remove -O2 option added by AC_PROG_CC and add -O0
+		if test "$enable_debug" = "yes" -o "$enable_code_coverage" = "yes"; then
+			CFLAGS=`echo "$CFLAGS" | sed -e 's/ *-O@<:@0-9a-zA-Z@:>@* */ /g' -e 's/ $//' -e 's/^ //'`
+			if test "$COB_USES_GCC" = "yes"; then
+				CFLAGS="$CFLAGS -O0"
+			fi
 		fi
 	fi
 
@@ -1688,6 +1708,38 @@ if test "$enable_cflags_setting" = "yes"; then
 fi
 
 unset enable_cflags_setting
+
+if test "$enable_hardening" = "yes"; then
+	AC_MSG_NOTICE([Compile with hardening options])
+	# needs optimization
+	#if test "$enable_debug" = "yes"; then
+	#   CFLAGS="$CFLAGS -O"
+	#fi
+	CPPFLAGS="$CPPFLAGS -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+
+	curr_cflags="$CFLAGS"
+	cob_temp_flags="-fstack-protector-all"
+	CFLAGS="$curr_cflags $cob_temp_flags"
+	AC_MSG_CHECKING([for $cob_temp_flags option])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+		[AC_MSG_RESULT([yes])],
+		[AC_MSG_RESULT([no])
+		cob_temp_flags="-fstack-protector"
+		CFLAGS="$curr_cflags $cob_temp_flags"
+		AC_MSG_CHECKING([for $cob_temp_flags option])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+			[AC_MSG_RESULT([yes])],
+			[CFLAGS="$curr_cflags"; cob_temp_flags=""; AC_MSG_RESULT([no])])
+		 ])
+	if test "x$cob_temp_flags" != "x"; then
+	   if test "x$COB_LDFLAGS" != "x"; then
+	      COB_LDFLAGS="$COB_LDFLAGS $cob_temp_flags"
+	   else
+	      COB_LDFLAGS="$cob_temp_flags"
+	   fi
+	fi
+	unset cob_temp_flags
+fi
 
 if test "$COB_USES_GCC" = "yes"; then
 	if test "x$CFLAGS" != "x"; then
@@ -1779,27 +1831,40 @@ fi
 
 #
 # Add CFLAGS and CPPFLAGS to COB_CFLAGS, minus optimization/debug options.
-# 
-cob_temp_flags=`echo x$CFLAGS $CPPFLAGS |		\
+
+cob_temp_flags="$CFLAGS $CPPFLAGS"
+
+if test "$enable_hardening" = no; then
+	cob_temp_flags=`echo x$cob_temp_flags |		\
 	 sed -e 's/^x//'				\
-	     -e 's/-g[[0-9 ]]//g'				\
-	     -e 's/-g$//'				\
-	     -e 's/-gdb//'				\
-	     -e 's/[[+-]]O[[0-9s]]*//g'			\
- 	     -e 's/-O//g'				\
  	     -e 's/-Wp,-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-fmessage-length=0//g'		\
  	     -e 's/-fstack-protector-strong//g'		\
  	     -e 's/-fstack-protector-all//g'		\
  	     -e 's/-fstack-protector//g'		\
+	     `
+fi
+
+cob_temp_flags=`echo x$cob_temp_flags |		\
+	 sed -e 's/^x//'				\
+	     -e 's/-g[[0-9 ]]//g'				\
+	     -e 's/-g$//'				\
+	     -e 's/-gdb//'				\
+	     -e 's/[[+-]]O[[0-9s]]*//g'			\
+ 	     -e 's/-O//g'				\
  	     -e 's/-funwind-tables//g'			\
  	     -e 's/-fasynchronous-unwind-tables//g'	\
- 	     -e 's/ +/ /g'	\
+ 	     -e 's/  / /g'	\
+ 	     -e 's/ $//g'	\
 	     `
 
 if test "x$cob_temp_flags" != "x"; then
-	COB_CFLAGS="$COB_CFLAGS $cob_temp_flags"
+	COB_CFLAGS="$cob_temp_flags $COB_CFLAGS"
+fi
+if test "$enable_hardening" = "yes"; then
+	# needs optimization
+	COB_CFLAGS="$COB_CFLAGS -O"
 fi
 unset cob_temp_flags
 
@@ -1914,9 +1979,6 @@ elif test "$COB_USES_GCC" = "yes" && test "$with_gnu_ld" = "yes"; then
 		CFLAGS="$CFLAGS -finline-functions"
 	fi
 	CFLAGS="$CFLAGS -fsigned-char -Wall -Wwrite-strings -Wmissing-prototypes -Wno-format-y2k"
-	if test "$enable_debug" != "yes"; then
-		CFLAGS="$CFLAGS -U_FORTIFY_SOURCE"
-	fi
 fi
 
 if test "x$lt_cv_dlopen_self" != "xyes"; then
