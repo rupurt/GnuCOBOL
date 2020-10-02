@@ -103,7 +103,7 @@ struct cb_statement		*error_statement = NULL;
 #ifndef WITH_XML2
 static int			warn_xml_done = 0;
 #endif
-#if	!defined (WITH_CJSON) && !defined (WITH_JSON_C)
+#if   !defined (WITH_CJSON) && !defined (WITH_JSON_C)
 static int			warn_json_done = 0;
 #endif
 #ifndef WITH_EXTENDED_SCREENIO
@@ -476,8 +476,158 @@ static const struct optim_table	align_bin_sub_funcs[] = {
 #endif
 
 /* Functions */
+static cb_tree cb_build_name_reference (struct cb_field *f1, struct cb_field *f2);
 static void cb_walk_cond (cb_tree x);
 static cb_tree cb_build_length_1 (cb_tree x);
+static struct cb_field	*check_base_p = NULL;
+static struct cb_field	*check_odo_p = NULL;
+static struct cb_field	*check_subscript_p = NULL;
+static struct cb_field	*check_sub = NULL;
+/* Left undefined until a better testcase for this exists */
+/* #define OPT_CHECKS 1 */
+
+static struct cb_field *
+cb_code_field (cb_tree x)
+{
+	if (likely(CB_REFERENCE_P (x))) {
+		cb_tree f = CB_REFERENCE (x)->value;
+		if (unlikely(!f)) {
+			f = cb_ref (x);
+		}
+		return CB_FIELD (f);
+	}
+	if (CB_LIST_P (x)) {
+		return cb_code_field (CB_VALUE (x));
+	}
+	return CB_FIELD (x);
+}
+
+static void
+cb_check_optim (struct cb_field *p)
+{
+	if (p == NULL)
+		return;
+	if (p == check_subscript_p
+	 || p == check_odo_p
+	 || p == check_sub) {
+		check_subscript_p = NULL;
+		check_odo_p = NULL;
+		check_sub = NULL;
+	} else
+	if (p == check_base_p) {
+		check_subscript_p = NULL;
+		check_base_p = NULL;
+		check_odo_p = NULL;
+		check_sub = NULL;
+	}
+	if (check_subscript_p != NULL
+	 && check_subscript_p->depending
+	 && cb_code_field (check_subscript_p->depending) == p) {
+		check_subscript_p = NULL;
+		check_base_p = NULL;
+		check_odo_p = NULL;
+		check_sub = NULL;
+	}
+}
+
+static void
+cb_check_list (cb_tree vars)
+{
+	cb_tree	x, y, l;
+	struct cb_field *f;
+	struct cb_assign *ap;
+
+	for (l = vars; l; l = CB_CHAIN (l)) {
+		x = CB_VALUE(l);
+		f = NULL;
+		if (CB_FIELD_P (x)) {
+			f = CB_FIELD_PTR(x);
+		} else if (CB_ASSIGN_P (x)) {
+			ap = CB_ASSIGN(x);
+			if (CB_REF_OR_FIELD_P (ap->var)) {
+				f = CB_FIELD_PTR(ap->var);
+			}
+		} else if (CB_CAST_P (x)) {
+			f = cb_code_field (CB_CAST(x)->val);
+		} else if (CB_REFERENCE_P (x)) {
+			y = cb_ref (x);
+			if (y == cb_error_node) 
+				continue;
+			if (CB_FIELD_P (y))
+				f = CB_FIELD_PTR (y);
+		}
+		if (f)
+			cb_check_optim (f);
+	}
+}
+
+static void
+cb_add_null_check (const char *routine, struct cb_field *p, struct cb_field *f)
+{
+#ifdef OPT_CHECKS
+	if (p == check_base_p)
+		return;
+#endif
+	check_base_p = p;
+	current_statement->null_check = CB_BUILD_FUNCALL_2 (
+		routine, 
+		cb_build_address (cb_build_field_reference (p, NULL)),
+		CB_BUILD_STRING0 (
+			CB_REFERENCE(cb_build_name_reference (p, f))->word->name));
+}
+
+static cb_tree
+cb_add_check_odo ( struct cb_field *p )
+{
+#ifdef OPT_CHECKS
+	if (check_odo_p == p)
+		return NULL;
+#endif
+	check_odo_p = p;
+	return CB_BUILD_FUNCALL_5 ("cob_check_odo",
+			 cb_build_cast_int (p->depending),
+			 cb_int (p->occurs_min),
+			 cb_int (p->occurs_max),
+			 CB_BUILD_STRING0 (p->name),
+			 CB_BUILD_STRING0 (CB_FIELD_PTR (p->depending)->name));
+}
+
+static cb_tree
+cb_add_check_subscript ( struct cb_field *p, cb_tree sub, const char *name, const int opt )
+{
+	struct cb_field *sub_p;
+	cb_tree	y;
+
+	sub_p = NULL;
+	if (CB_REFERENCE_P (sub)) {
+		y = cb_ref (sub);
+		if (y != cb_error_node
+		 && CB_FIELD_P (y))
+			sub_p = CB_FIELD_PTR (y);
+	} else if (CB_FIELD_P (sub)) {
+		sub_p = CB_FIELD_PTR (sub);
+	}
+#ifdef OPT_CHECKS
+	if (check_subscript_p == p
+	 && check_sub == sub_p)
+		return NULL;
+#endif
+	check_subscript_p = p;
+	check_sub = sub_p;
+	if (opt == 1) {
+		return CB_BUILD_FUNCALL_4 ("cob_check_subscript",
+			 cb_build_cast_int (sub),
+			 cb_build_cast_int (p->depending),
+			 CB_BUILD_STRING0 (name),
+			 cb_int1);
+	} else {
+		return CB_BUILD_FUNCALL_4 ("cob_check_subscript",
+			 cb_build_cast_int (sub),
+			 cb_int (p->occurs_max),
+			 CB_BUILD_STRING0 (name),
+			 cb_int0);
+	}
+}
 
 /*
  * Is the field 'native' binary (short/int/long)
@@ -2030,24 +2180,18 @@ cb_build_identifier (cb_tree x, const int subchk)
 		 && !(p->flag_is_pdiv_opt && CB_EXCEPTION_ENABLE (COB_EC_PROGRAM_ARG_MISMATCH)) {
 #else
 		if (CB_EXCEPTION_ENABLE (COB_EC_PROGRAM_ARG_OMITTED)
-		 && p->storage == CB_STORAGE_LINKAGE && p->flag_is_pdiv_parm) {
+		 && p->storage == CB_STORAGE_LINKAGE 
+		 && p->flag_is_pdiv_parm) {
 #endif
-			current_statement->null_check = CB_BUILD_FUNCALL_2 (
-				"cob_check_linkage",
-				cb_build_address (cb_build_field_reference (p, NULL)),
-				CB_BUILD_STRING0 (
-					CB_REFERENCE(cb_build_name_reference (p, f))->word->name));
+			cb_add_null_check ("cob_check_linkage", p, f);
 		} else
 		if (CB_EXCEPTION_ENABLE (COB_EC_DATA_PTR_NULL)
 		 && !current_statement->flag_no_based) {
 			if (p->flag_item_based
-			 || (p->storage == CB_STORAGE_LINKAGE &&
-				!(p->flag_is_pdiv_parm || p->flag_is_returning))) {
-				current_statement->null_check = CB_BUILD_FUNCALL_2 (
-					"cob_check_based",
-					cb_build_address (cb_build_field_reference (p, NULL)),
-					CB_BUILD_STRING0 (
-						CB_REFERENCE(cb_build_name_reference (p, f))->word->name));
+			 || (p->storage == CB_STORAGE_LINKAGE 
+			  && !(p->flag_is_pdiv_parm 
+			    || p->flag_is_returning))) {
+				cb_add_null_check ("cob_check_based", p, f);
 			}
 		}
 	}
@@ -2093,13 +2237,9 @@ cb_build_identifier (cb_tree x, const int subchk)
 		if (CB_EXCEPTION_ENABLE (COB_EC_BOUND_SUBSCRIPT) && f->odo_level != 0) {
 			for (p = f; p; p = p->children) {
 				if (p->depending && p->depending != cb_error_node) {
-					e1 = CB_BUILD_FUNCALL_5 ("cob_check_odo",
-						 cb_build_cast_int (p->depending),
-						 cb_int (p->occurs_min),
-						 cb_int (p->occurs_max),
-						 CB_BUILD_STRING0 (p->name),
-						 CB_BUILD_STRING0 (CB_FIELD_PTR (p->depending)->name));
-					r->check = cb_list_add (r->check, e1);
+					e1 = cb_add_check_odo (p);
+					if (e1)
+						r->check = cb_list_add (r->check, e1);
 				}
 			}
 		}
@@ -2129,20 +2269,14 @@ cb_build_identifier (cb_tree x, const int subchk)
 				/* Run-time check for all non-literals */
 				if (CB_EXCEPTION_ENABLE (COB_EC_BOUND_SUBSCRIPT)) {
 					if (p->depending && p->depending != cb_error_node) {
-						e1 = CB_BUILD_FUNCALL_4 ("cob_check_subscript",
-							 cb_build_cast_int (sub),
-							 cb_build_cast_int (p->depending),
-							 CB_BUILD_STRING0 (name),
-							 cb_int1);
-						r->check = cb_list_add (r->check, e1);
+						e1 = cb_add_check_subscript (p, sub, name, 1);
+						if (e1)
+							r->check = cb_list_add (r->check, e1);
 					} else {
 						if (!CB_LITERAL_P (sub)) {
-							e1 = CB_BUILD_FUNCALL_4 ("cob_check_subscript",
-								 cb_build_cast_int (sub),
-								 cb_int (p->occurs_max),
-								 CB_BUILD_STRING0 (name),
-								cb_int0);
-							r->check = cb_list_add (r->check, e1);
+							e1 = cb_add_check_subscript (p, sub, name, 0);
+							if (e1)
+								r->check = cb_list_add (r->check, e1);
 						}
 					}
 				}
@@ -5270,6 +5404,7 @@ cb_emit_arithmetic (cb_tree vars, const int op, cb_tree val)
 				}
 			}
 			cb_emit_list (vars);
+			cb_check_list (vars);
 			return;
 		}
 	}
@@ -5277,6 +5412,7 @@ cb_emit_arithmetic (cb_tree vars, const int op, cb_tree val)
 		return;
 	}
 
+	cb_check_list (vars);
 	if (op == 0
 	 && vars
 	 && CB_CHAIN(vars) == NULL
@@ -10714,6 +10850,7 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 		}
 	}
 
+	cb_check_list (dsts);
 	for (l = dsts; l; l = CB_CHAIN (l)) {
 		x = CB_VALUE (l);
 		if (CB_REFERENCE_P (x)) {
@@ -11458,6 +11595,7 @@ cb_emit_set_to (cb_tree vars, cb_tree x)
 		}
 	}
 
+	cb_check_list (vars);
 	/* Check ADDRESS OF targets can be modified. */
 	for (l = vars; l; l = CB_CHAIN (l)) {
 		v = CB_VALUE (l);
@@ -11651,6 +11789,7 @@ cb_emit_set_up_down (cb_tree l, cb_tree flag, cb_tree x)
 	 || cb_validate_list (l)) {
 		return;
 	}
+	cb_check_list (l);
 	for (; l; l = CB_CHAIN (l)) {
 		if (flag == cb_int0) {
 			cb_emit (cb_build_add (CB_VALUE (l), x, cb_int0));
@@ -13258,7 +13397,7 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 	if (current_statement->ex_handler == NULL
 	 && current_statement->not_ex_handler == NULL)
 	  	current_statement->handler_type = NO_HANDLER;
-#if	!defined (WITH_CJSON) && !defined (WITH_JSON_C)
+#if   !defined (WITH_CJSON) && !defined (WITH_JSON_C)
 	if (!warn_json_done) {
 		warn_json_done = 1;
 		cb_warning (cb_warn_unsupported,
@@ -13271,9 +13410,9 @@ cb_emit_json_generate (cb_tree out, cb_tree from, cb_tree count,
 		return;
 	}
 
-	tree = CB_ML_TREE (cb_build_ml_tree (CB_FIELD (cb_ref (from)),
-						0, 0, name_list,
-						NULL, suppress_list));
+        tree = CB_ML_TREE (cb_build_ml_tree (CB_FIELD (cb_ref (from)),
+					     0, 0, name_list,
+					     NULL, suppress_list));
 
 	tree->sibling = current_program->ml_trees;
 	current_program->ml_trees = tree;
