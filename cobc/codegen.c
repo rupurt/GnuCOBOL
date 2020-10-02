@@ -1123,7 +1123,8 @@ output_data (cb_tree x)
 		 && inside_check == 0
 		 && in_func_call == 0) {
 			int n, sav_stack_id;
-			struct cb_literal	*l;
+			cb_tree	l;
+
 			inside_stack[inside_check++] = 0;
 			did_check = 1;
 			output_newline ();
