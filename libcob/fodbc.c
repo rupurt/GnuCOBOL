@@ -903,6 +903,7 @@ join_environment (cob_file_api *a)
 {
 	char	*env, tmp[256];
 	SQLSMALLINT		len;
+	int		sts;
 
 	db_join = -1;
 	memset(db,0,sizeof(struct db_state));
@@ -1123,7 +1124,12 @@ join_environment (cob_file_api *a)
 	db->autocommit = FALSE;
 	db_join = 0;			/* All connect steps completed */
 	DEBUG_LOG("db",("%s successful connection\n",db->dbType));
-	if(odbcStmt(db,(char*)"SELECT @@version")) {
+	sts = odbcStmt(db,(char*)"SELECT @@version");
+	if (sts) {
+		/* Try PostgeSQL version() */
+		sts = odbcStmt(db,(char*)"SELECT version()");
+	}
+	if (sts) {
 		return;
 	} else {
 		if (strcasestr(varFetch,"MariaDB")) {
@@ -1158,6 +1164,13 @@ join_environment (cob_file_api *a)
 			} else if (db->dbVer < 2012) {
 				db->mssqlnfu = TRUE;
 			}
+		} else if (strcasestr(varFetch,"PostgreSQL")) {
+			db->mssql = FALSE;
+			db->db2 = FALSE;
+			db->mysql = FALSE;
+			db->mariadb = FALSE;
+			db->postgres = FALSE;
+			strcpy(db->dbType,"ODBC PostgreSQL");
 		} else if (strcasestr(varFetch,"DB2")) {
 			db->mssql = FALSE;
 			db->db2 = TRUE;
@@ -1306,11 +1319,13 @@ odbc_open (cob_file_api *a, cob_file *f, char *filename, const int mode, const i
 		break;
 	}
 
-	snprintf(buff,sizeof(buff),"SELECT MAX(rid_%s) FROM %s",fx->tablename,fx->tablename);
-	strcpy(varFetch,"0");
-	if (mode != COB_OPEN_OUTPUT
-	 && !odbcStmt(db,(char*)buff)) {
-		f->max_rec_num = atol (varFetch);
+	if (fx->fileorg == COB_ORG_RELATIVE) {
+		snprintf(buff,sizeof(buff),"SELECT MAX(rid_%s) FROM %s",fx->tablename,fx->tablename);
+		strcpy(varFetch,"0");
+		if (mode != COB_OPEN_OUTPUT
+		 && !odbcStmt(db,(char*)buff)) {
+			f->max_rec_num = atol (varFetch);
+		}
 	}
 
 	if ((f->share_mode & COB_SHARE_NO_OTHER)

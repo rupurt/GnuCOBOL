@@ -1,4 +1,8 @@
 
+2020-10-02  Ron Norman <rjn@inglenet.com>
+	* fileio.h, fodbc.c:
+		Tested using PostgreSQL
+
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am [LOCAL_CJSON]: moved to "lib"
