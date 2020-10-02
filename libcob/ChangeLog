@@ -1,7 +1,8 @@
-2020-10-01  James K. Lowden  <jklowden@symas.com>
+
+2020-10-02  James K. Lowden  <jklowden@symas.com>
 
 	* screenio.c: quell unused-result warning when compiled with
-	_FORTIFY_SOURCE. 
+	  _FORTIFY_SOURCE, providing a draft for GCC_PRAGMA and GCC_POP
 
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 

@@ -119,7 +119,7 @@ static int			global_return;
 static int			cob_current_y;
 static int			cob_current_x;
 static short			fore_color	/* "const" default foreground (pair 0 on init) */;
-static short			back_color	/* "const" default background (pair 0 on init) */;;
+static short			back_color	/* "const" default background (pair 0 on init) */;
 static int			origin_y;
 static int			origin_x;
 static int			display_cursor_y;
@@ -152,16 +152,15 @@ static void cob_screen_init	(void);
  * The ICC guard is there because ICC, clang and many others
  * "helpfully" define __GNUC__, but often leave out some extensions.
  */
-#if defined(__GNUC__) && ! defined(__ICC)
-# if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+#if defined(__GNUC__) && ! defined(__ICC) && \
+ (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))
 #  define GCC_PRAGMA(w)				\
    _Pragma ("GCC diagnostic push")		\
    _Pragma (#w)
 #  define GCC_POP()   _Pragma ("GCC diagnostic pop") 
-# else 
+#else 
 #  define  GCC_PRAGMA(w)
 #  define  GCC_POP()
-# endif
 #endif
 
 GCC_PRAGMA( GCC diagnostic ignored "-Wunused-result" )
