@@ -256,7 +256,7 @@ process_command_line (int argc, char *argv[])
 		while (++argnum < argc) {
 			if (strrchr(argv[argnum], '/') == argv[argnum]) {
 				if (argv[argnum][1] == '?' && !argv[argnum][2]) {
-					argv[argnum] = "--help";
+					argv[argnum] = (char *)"--help";
 					continue;
 				}
 				argv[argnum][0] = '-';

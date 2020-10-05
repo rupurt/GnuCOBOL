@@ -754,9 +754,7 @@ bdb_savekey (cob_file *f, unsigned char *keyarea, unsigned char *record, int idx
 		}
 		return totlen;
 	}
-	memcpy (keyarea,
-		record + (f->keys[idx].field->data - f->record->data),
-		f->keys[idx].field->size);
+	memcpy (keyarea, record + f->keys[idx].offset, f->keys[idx].field->size);
 	return f->keys[idx].field->size;
 }
 
@@ -805,9 +803,7 @@ bdb_cmpkey (cob_file *f, unsigned char *keyarea, unsigned char *record, int idx,
 		return 0;
 	}
 	cl = partlen > f->keys[idx].field->size ? f->keys[idx].field->size : partlen;
-	return memcmp (keyarea,
-			record  + (f->keys[idx].field->data - f->record->data),
-			cl);
+	return memcmp (keyarea, record  + f->keys[idx].offset, cl);
 }
 
 /* Is given key data all SUPPRESS char,
@@ -7236,15 +7232,15 @@ cob_init_fileio (cob_global *lptr, cob_settings *sptr)
 #endif
 }
 
-/************************************************************************************/
-/* Following routines are for the Micro Focus style External File Handler interface */
-/************************************************************************************/
+/********************************************************************************/
+/* Following routines are for the External File Handler interface commonly used */
+/********************************************************************************/
 static struct fcd_file {
 	struct fcd_file	*next;
 	FCD3		*fcd;
 	cob_file	*f;
-	int		sts;
-	int		free_fcd;
+	int			sts;
+	int			free_fcd;
 } *fcd_file_list = NULL;
 static const cob_field_attr alnum_attr = {COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
 
@@ -7551,7 +7547,7 @@ copy_fcd_to_file (FCD3* fcd, cob_file *f)
 	}
 	if (f->keys == NULL) {
 		if (fcd->kdbPtr != NULL
-		 && fcd->kdbPtr->nkeys > 0) {
+		 && LDCOMPX2(fcd->kdbPtr->nkeys) > 0) {
 			/* Copy Key information from FCD to cob_file,
 			   CHECKME: possibly only for ORG_DETERMINE ? */
 			f->nkeys = LDCOMPX2(fcd->kdbPtr->nkeys);
