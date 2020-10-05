@@ -232,6 +232,7 @@ if (!defined $single_test) {
 	print LOG_TIME "--------    --------\n";
 } else {
 	*LOG_FH = *STDERR;
+	open (LOG_TIME, "> /dev/null") or die;
 }
 my $global_start = time;
 
