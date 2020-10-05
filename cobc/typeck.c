@@ -502,6 +502,21 @@ cb_code_field (cb_tree x)
 	return CB_FIELD (x);
 }
 
+/*
+ * Forced reset of all check optimization
+ */
+static void
+cb_check_reset ()
+{
+	check_subscript_p = NULL;
+	check_base_p = NULL;
+	check_odo_p = NULL;
+	check_sub = NULL;
+}
+
+/*
+ * Does a change to the given field invalidate any optimization
+ */
 static void
 cb_check_optim (struct cb_field *p)
 {
@@ -1914,6 +1929,7 @@ cb_build_section_name (cb_tree name, const int sect_or_para)
 		return cb_error_node;
 	}
 
+	cb_check_reset ();
 	/* Check word length
 	needed here for numeric-only words that bypass the checks
 	in scanner.l */
@@ -2238,7 +2254,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 			for (p = f; p; p = p->children) {
 				if (p->depending && p->depending != cb_error_node) {
 					e1 = cb_add_check_odo (p);
-					if (e1)
+					if (e1 != NULL)
 						r->check = cb_list_add (r->check, e1);
 				}
 			}
@@ -2270,12 +2286,12 @@ cb_build_identifier (cb_tree x, const int subchk)
 				if (CB_EXCEPTION_ENABLE (COB_EC_BOUND_SUBSCRIPT)) {
 					if (p->depending && p->depending != cb_error_node) {
 						e1 = cb_add_check_subscript (p, sub, name, 1);
-						if (e1)
+						if (e1 != NULL)
 							r->check = cb_list_add (r->check, e1);
 					} else {
 						if (!CB_LITERAL_P (sub)) {
 							e1 = cb_add_check_subscript (p, sub, name, 0);
-							if (e1)
+							if (e1 != NULL)
 								r->check = cb_list_add (r->check, e1);
 						}
 					}
@@ -5977,6 +5993,7 @@ cb_false_side (void)
 void
 cb_terminate_cond (void)
 {
+	cb_check_reset ();
 	if (if_stop)
 		return;
 	if_nest--;
@@ -8500,6 +8517,7 @@ cb_emit_goto (cb_tree target, cb_tree depending)
 	if (target == cb_error_node) {
 		return;
 	}
+	cb_check_reset ();
 	if (target == NULL) {
 		cb_verify (cb_goto_statement_without_name, _("GO TO without procedure-name"));
 	} else if (depending) {
@@ -10978,6 +10996,7 @@ cb_emit_perform (cb_tree perform, cb_tree body, cb_tree newthread, cb_tree handl
 	if (perform == cb_error_node) {
 		return;
 	}
+	cb_check_reset ();
 	if (handle && !usage_is_thread_handle (handle)) {
 		cb_error_x (handle, _("HANDLE must be either a generic or a THREAD HANDLE"));
 		return;
