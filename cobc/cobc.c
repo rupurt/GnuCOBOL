@@ -1923,7 +1923,7 @@ cobc_err_exit (const char *fmt, ...)
 	va_end (ap);
 	putc ('\n', stderr);
 	fflush (stderr);
-	cobc_early_exit (1);
+	cobc_early_exit (EXIT_FAILURE);
 }
 
 static struct cb_define_struct *
@@ -2247,7 +2247,7 @@ cobc_terminate (const char *str)
 		print_program_trailer ();
 	}
 	cobc_clean_up (1);
-	exit (1);
+	exit (EXIT_FAILURE);
 }
 
 static void
@@ -2840,7 +2840,7 @@ process_command_line (const int argc, char **argv)
 
 		case '?':
 			/* Unknown option or ambiguous */
-			cobc_early_exit (1);
+			cobc_early_exit (EXIT_FAILURE);
 
 		case 'h':
 			/* --help */
@@ -2868,7 +2868,7 @@ process_command_line (const int argc, char **argv)
 				cobc_buffer = NULL;
 #endif
 			}
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		case 'V':
 			/* --version */
@@ -2898,12 +2898,12 @@ process_command_line (const int argc, char **argv)
 				cobc_buffer = NULL;
 #endif
 			}
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		case 'i':
 			/* --info */
 			cobc_print_info ();
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		/*
 			The following list options are postponed until
@@ -3011,7 +3011,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit for configuration errors resulting from -std/-conf/default.conf */
 	if (conf_ret != 0) {
-		cobc_early_exit (1);
+		cobc_early_exit (EXIT_FAILURE);
 	}
 
 	cob_optind = 1;
@@ -3635,7 +3635,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit for configuration errors resulting from -f<conf-tag>[=<value>] */
 	if (conf_ret != 0) {
-		cobc_early_exit (1);
+		cobc_early_exit (EXIT_FAILURE);
 	}
 
 	/* handling of list options */
@@ -3657,7 +3657,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit if list options were specified */
 	if (exit_option) {
-		cobc_early_exit (0);
+		cobc_early_exit (EXIT_SUCCESS);
 	}
 
 	/* Exit on missing options */

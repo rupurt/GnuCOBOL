@@ -9,6 +9,7 @@
 	  from actual processing and removing duplicate code
 	* cobc.c: adjusted handling of output file name (especially with COB_DASH),
 	  fixing errors in MinGW + CYGWIN
+	* cobc.c: use EXIT_SUCCESS and EXIT_FAILURE instead of exit(0/1)
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
