@@ -547,13 +547,6 @@ struct cb_next_elem {
   #define CURRENT_FUNCTION __FILE__
 #endif
 
-void
-cb_tree_source_set( const char func[], int line, cb_tree tree, 
-		    const char source_file[], int source_line );
-#define SET_SOURCE(t, s, l) cb_tree_source_set(CURRENT_FUNCTION, __LINE__, (t), (s), (l))
-#define SET_SOURCE_CB(t) cb_tree_source_set(CURRENT_FUNCTION, __LINE__,	(t), \
-					    cb_source_file, cb_source_line)
-
 /* xref entries */
 struct cb_xref_elem {
 	struct cb_xref_elem	*next;
@@ -1018,6 +1011,7 @@ struct cb_file {
 	cb_tree			collating_sequence_n;	/* COLLATING FOR NATIONAL*/
 	cb_tree			collating_sequence_keys;	/* list of postponed COLLATING OF */
 	/* FD/SD */
+	cb_tree			description_entry;	/* FD / SD entry rerference for warnings + errors */
 	struct cb_field		*record;		/* Record descriptions */
 	cb_tree			record_depending;	/* RECORD DEPENDING */
 	cb_tree			reports;		/* REPORTS */
@@ -1988,8 +1982,10 @@ extern void			cb_list_system_routines (void);
 extern int			cb_list_map (cb_tree (*) (cb_tree), cb_tree);
 
 /* error.c */
-extern void		cb_warning_x (int, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_warning_x (const enum cb_warn_opt, cb_tree, const char *, ...) COB_A_FORMAT34;
 extern void		cb_warning_dialect_x (const enum cb_support, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_note_x (const enum cb_warn_opt, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_inclusion_note (const char *, int);
 extern void		cb_error_x (cb_tree, const char *, ...) COB_A_FORMAT23;
 extern unsigned int	cb_verify (const enum cb_support, const char *);
 extern unsigned int	cb_verify_x (cb_tree, const enum cb_support,

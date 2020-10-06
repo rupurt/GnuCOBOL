@@ -2226,7 +2226,10 @@ set_record_size (cb_tree min, cb_tree max)
 	} else {
 		record_min = 0;
 	}
-	if (!max) return;
+	if (!max) {
+		return;
+	}
+
 	record_max = cb_get_int (max);
 	if (record_max < 0) {
 		/* already handled by integer check */
@@ -5436,6 +5439,7 @@ record_delimiter_option:
 	if (current_file->organization != COB_ORG_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with SEQUENTIAL files"),
 			  "STANDARD-1");
+		current_file->flag_delimiter = 0;
 	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
 		cb_warning (cb_warn_additional,
 			    _("%s ignored"), "RECORD DELIMITER STANDARD-1");
@@ -5444,13 +5448,14 @@ record_delimiter_option:
 | LINE_SEQUENTIAL
   {
 	if (current_file->organization != COB_ORG_SEQUENTIAL
-	    && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
+	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with (LINE) SEQUENTIAL files"),
 			  "LINE-SEQUENTIAL");
+		current_file->flag_delimiter = 0;
 	}
 
 	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))
-	    && cb_verify (cb_sequential_delimiters, _("LINE-SEQUENTIAL phrase"))) {
+	 && cb_verify (cb_sequential_delimiters, _("LINE-SEQUENTIAL phrase"))) {
 		current_file->organization = COB_ORG_LINE_SEQUENTIAL;
 	}
   }
@@ -5459,10 +5464,11 @@ record_delimiter_option:
 	if (current_file->organization != COB_ORG_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER %s only allowed with SEQUENTIAL files"),
 			  "BINARY-SEQUENTIAL");
+		current_file->flag_delimiter = 0;
 	}
 
 	if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))
-	    && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
+	 && cb_verify (cb_sequential_delimiters, _("BINARY-SEQUENTIAL phrase"))) {
 		current_file->organization = COB_ORG_SEQUENTIAL;
 	}
   }
@@ -5471,6 +5477,7 @@ record_delimiter_option:
 	if (current_file->organization != COB_ORG_SEQUENTIAL
 	 && current_file->organization != COB_ORG_LINE_SEQUENTIAL) {
 		cb_error (_("RECORD DELIMITER clause only allowed with (LINE) SEQUENTIAL files"));
+		current_file->flag_delimiter = 0;
 	} else if (cb_verify (cb_record_delimiter, _("RECORD DELIMITER clause"))) {
 		cb_warning (cb_warn_additional,
 			    _("RECORD DELIMITER %s not recognized; will be ignored"), cb_name ($1));
@@ -5890,6 +5897,7 @@ file_description_entry:
 		YYERROR;
 	}
 	current_file = CB_FILE (cb_ref ($2));
+	current_file->description_entry = $2;
 	if (CB_VALID_TREE (current_file)) {
 		if ($1 == cb_int1) {
 			current_file->organization = COB_ORG_SORT;
@@ -13871,7 +13879,7 @@ open_option_sequential:
 	/* FIXME: only allow for sequential / line-sequential files */
 	/* FIXME: only allow with INPUT */
 	/* FIXME: add actual compiler configuration */
-	if (cb_warn_obsolete == COBC_WARN_AS_ERROR) {
+	if (cb_warn_opt_val[cb_warn_obsolete] == COBC_WARN_AS_ERROR) {
 		(void)cb_verify (CB_OBSOLETE, "OPEN REVERSED");
 	} else {
 		/* FIXME: set file attribute */
@@ -16919,7 +16927,7 @@ table_name:
 	} else if (!CB_FIELD (x)->index_list) {
 		cb_error_x ($1, _("'%s' not indexed"), cb_name ($1));
 		listprint_suppress ();
-		cb_error_x (x, _("'%s' defined here"), cb_name (x));
+		cb_note_x (COB_WARNOPT_NONE, x, _("'%s' defined here"), cb_name (x));
 		listprint_restore ();
 		$$ = cb_error_node;
 	} else {

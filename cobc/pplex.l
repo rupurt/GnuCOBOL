@@ -100,7 +100,8 @@ static int ppwrap (void) {
 
 struct copy_info {
 	struct copy_info	*next;
-	struct list_files       *containing_files;
+	struct copy_info	*prev;
+	struct list_files	*containing_files;
 	const char		*file;
 	char			*dname;
 	struct cb_replace_list	*replacing;
@@ -986,17 +987,19 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 			//        ideally open first, then check if we have thy physical same file
 			//        (could also fix symlinked files)
 			if (!strcmp (name, current_copy_info->dname)) {
+				for (current_copy_info = current_copy_info->next; current_copy_info; current_copy_info = current_copy_info->prev) {
+					int		line;
+					if (current_copy_info->prev) {
+						line = current_copy_info->prev->line;
+					} else {
+						line = cb_source_line;
+					}
+					cb_inclusion_note (current_copy_info->dname, line);
+				}
 				x = cobc_malloc (sizeof (struct cb_tree_common));
 				x->source_file = name;
 				x->source_line = -1;
-				/* TODO: add an explain_error option instead of the forced warnings */
 				cb_error_x (x, _("recursive inclusion"));
-				x->source_line = 0;
-				for (current_copy_info = copy_stack; current_copy_info; current_copy_info = current_copy_info->next) {
-					x->source_file = current_copy_info->dname;
-					cb_warning_x (COBC_WARN_ENABLED, x, _("file was included here"));
-					x->source_line = current_copy_info->line;
-				}
 				cobc_free (x);
 				break;
 			}
@@ -1048,6 +1051,9 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 
 	current_copy_info->next = copy_stack;
 	current_copy_info->containing_files = old_list_file;
+	if (copy_stack) {
+		copy_stack->prev = current_copy_info;
+	}
 	copy_stack = current_copy_info;
 
 	if (cb_current_file) {
@@ -1581,7 +1587,7 @@ start:
 
 		/* Check if text is longer than cb_text_column */
 		if (cb_source_format == CB_FORMAT_FIXED
-		    && n > cb_text_column + 1) {
+		 && n > cb_text_column + 1) {
 			/* Show warning if it is not whitespace
 			   (postponed after checking for comments by setting
 			    line_overflow to first column that leads to
@@ -1636,7 +1642,7 @@ start:
 		}
 	}
 	if (ipchar && (!plex_skip_input
-		       || is_condition_directive_clause (bp))) {
+		        || is_condition_directive_clause (bp))) {
 		/* Directive - pass complete line with NL to ppparse */
 		if (newline_count) {
 			/* Move including NL and NULL byte */
@@ -1878,7 +1884,7 @@ start:
 	/* Show warning if text is longer than cb_text_column
 	   and not whitespace (postponed here) */
 	if (line_overflow != 0) {
-		cb_plex_warning (COBC_WARN_FILLER, newline_count,
+		cb_plex_warning (cb_warn_source_after_code, newline_count,
 				 _("source text after program-text area (column %d)"),
 				cb_text_column);
 	}

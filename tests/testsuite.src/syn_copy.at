@@ -297,11 +297,11 @@ AT_DATA([copy3.CPY],
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[copy1.CPY: error: recursive inclusion
-copy3.CPY:1: warning: file was included here
-copy2.CPY:3: warning: file was included here
-copy1.CPY:2: warning: file was included here
-prog.cob:6: warning: file was included here
+[in file included from prog.cob:6:
+in file included from copy1.CPY:2:
+in file included from copy2.CPY:3:
+in file included from copy3.CPY:1:
+copy1.CPY: error: recursive inclusion
 ])
 
 AT_CLEANUP

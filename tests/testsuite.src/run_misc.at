@@ -6425,11 +6425,11 @@ dump (unsigned char *data)
 AT_CHECK([$COMPILE -std=mf -fno-move-non-numeric-lit-to-numeric-is-zero prog.cob cmod.c], [0], [],
 [prog.cob: in paragraph 'MAIN-1':
 prog.cob:28: warning: numeric value is expected
-prog.cob:6: warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob:6: note: 'MYFLD' defined here as PIC 9(4)
 prog.cob:34: warning: numeric value is expected
-prog.cob:6: warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob:6: note: 'MYFLD' defined here as PIC 9(4)
 prog.cob:52: warning: numeric value is expected
-prog.cob:7: warning: 'BIGFLT' defined here as USAGE FLOAT
+prog.cob:7: note: 'BIGFLT' defined here as USAGE FLOAT
 ])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
@@ -9652,8 +9652,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
 [prog.cob:10: warning: value size exceeds data size
-prog.cob:10: warning: value is 30000
-prog.cob:7: warning: 'x' defined here as PIC 9(4)
+prog.cob:10: note: value is 30000
+prog.cob:7: note: 'x' defined here as PIC 9(4)
 ])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [x IS ZERO
@@ -9717,20 +9717,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob:11: warning: value size exceeds data size
-prog.cob:11: warning: value size is 4
-prog.cob:7: warning: 'x-left' defined here as PIC X(03)
-prog.cob:11: warning: value size exceeds data size
-prog.cob:11: warning: value size is 4
-prog.cob:8: warning: 'x-right' defined here as PIC X(03)
-prog.cob:21: warning: value size exceeds data size
-prog.cob:21: warning: value size is 4
-prog.cob:7: warning: 'x-left' defined here as PIC X(03)
-prog.cob:31: warning: value size exceeds data size
-prog.cob:31: warning: value size is 4
-prog.cob:8: warning: 'x-right' defined here as PIC X(03)
-])
+AT_CHECK([$COMPILE -Wno-truncate prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CLEANUP
 
@@ -11855,10 +11842,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob -w], [0], [],
-[prog.cob: in paragraph 'MAIN-10':
-prog.cob:20: error (ignored): offset of 'VAR' out of bounds: -99
-])
+AT_CHECK([$COMPILE prog.cob -w], [0], [], [])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [A: OK VAR-LEN > 16 AND VAR-LEN < 200

@@ -4293,6 +4293,16 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	
 	/* Validate and set max and min record size */
 	for (p = records; p; p = p->sister) {
+		if (f->organization == COB_ORG_INDEXED
+		 && p->size > MAX_FD_RECORD_IDX) {
+			cb_error_x (CB_TREE (p),
+				_("RECORD size (IDX) exceeds maximum allowed (%d)"), MAX_FD_RECORD_IDX);
+			p->size = MAX_FD_RECORD_IDX;
+		} else if (p->size > MAX_FD_RECORD) {
+			cb_error_x (CB_TREE (p),
+				_("RECORD size exceeds maximum allowed (%d)"), MAX_FD_RECORD);
+			p->size = MAX_FD_RECORD;
+		}
 		if (f->record_min > 0) {
 			if (p->size < f->record_min) {
 				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
@@ -4318,26 +4328,15 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 				 && cb_records_mismatch_record_clause != CB_OK) {
 					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
 				}
-				if (f->organization == COB_ORG_INDEXED
-				 && p->size > MAX_FD_RECORD_IDX) {
-					cb_error (_("RECORD size (IDX) exceeds maximum allowed (%d)"), MAX_FD_RECORD_IDX);
-					p->size = MAX_FD_RECORD_IDX;
-				} else if (p->size > MAX_FD_RECORD) {
-					cb_error (_("RECORD size exceeds maximum allowed (%d)"), MAX_FD_RECORD);
-					p->size = MAX_FD_RECORD;
-				}
 				f->record_max = p->size;
 			}
 		}
 	}
 
 	/* Compute the record size */
-	if (f->record_min == 0) {
-		if (records) {
-			f->record_min = records->size;
-		} else {
-			f->record_min = 0;
-		}
+	if (f->record_min == 0
+	 && records) {
+		f->record_min = records->size;
 	}
 	for (p = records; p; p = p->sister) {
 		v = cb_field_variable_size (p);
@@ -4353,26 +4352,21 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	}
 
 	if (f->flag_check_record_varying_limits
-	    && f->record_min == f->record_max) {
-		cb_error (_("file '%s': RECORD VARYING specified without limits, but implied limits are equal"),
-			  f->name);
-	}
-
-	if (f->organization == COB_ORG_INDEXED) {
-		if (f->record_max > MAX_FD_RECORD_IDX) {
-			f->record_max = MAX_FD_RECORD_IDX;
-			cb_error (_("file '%s': record size (IDX) %d exceeds maximum allowed (%d)"),
-				f->name, f->record_max, MAX_FD_RECORD_IDX);
-		}
-	} else if (f->record_max > MAX_FD_RECORD)  {
-		cb_error (_("file '%s': record size %d exceeds maximum allowed (%d)"),
-			f->name, f->record_max, MAX_FD_RECORD);
+	 && f->record_min == f->record_max) {
+		cb_warning_x (cb_warn_additional, f->description_entry,
+			_("RECORD VARYING specified without limits, but implied limits are equal"));
+#if 0	/* CHECKME: Do we want this warning, possibly with a separate flag? */
+		cb_warning (cb_warn_additional, _("%s clause ignored"), "RECORD VARYING");
+#endif
+		f->flag_check_record_varying_limits = 0;
 	}
 
 	if (f->flag_delimiter && f->record_min > 0
-	    && f->record_min == f->record_max) {
-		cb_verify (cb_record_delim_with_fixed_recs,
-			   _("RECORD DELIMITER clause on file with fixed-length records"));
+	 && f->record_min == f->record_max) {
+		/* we have both SELECT (RECORD DELIMITER) and FD (records), first one
+		   may contain much more entries so using the position of the second */
+		cb_verify_x (f->description_entry, cb_record_delim_with_fixed_recs,
+			_("RECORD DELIMITER clause on file with fixed-length records"));
 	}
 
 	/* Apply SAME clause */

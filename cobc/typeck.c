@@ -3010,9 +3010,9 @@ validate_record_depending (cb_tree x)
 		{
 			enum cb_support	missing_compiler_config;
 			if (!cb_relaxed_syntax_checks
-			 || cb_warn_additional == COBC_WARN_AS_ERROR) {
+			 || cb_warn_opt_val[cb_warn_additional] == COBC_WARN_AS_ERROR) {
 				missing_compiler_config = CB_ERROR;
-			} else if (cb_warn_additional == COBC_WARN_ENABLED) {
+			} else if (cb_warn_opt_val[cb_warn_additional] == COBC_WARN_ENABLED) {
 				missing_compiler_config = CB_WARNING;
 			} else {
 				missing_compiler_config = CB_OK;
@@ -3180,12 +3180,12 @@ create_implicit_assign_dynamic_var (struct cb_program * const prog,
 	cb_tree	x;
 	struct cb_field	*p;
 
-	if (cb_warn_implicit_define) {
-		cb_warning (cb_warn_implicit_define,
-			    _("variable '%s' will be implicitly defined"), CB_NAME (assign));
-	}
-	x = cb_build_implicit_field (assign, COB_SMALL_BUFF);
+	cb_warning (cb_warn_implicit_define,
+		    _("variable '%s' will be implicitly defined"), CB_NAME (assign));
+	x = cb_build_implicit_field (assign, COB_FILE_MAX);
+#if 0
 	CB_FIELD (x)->count++;
+#endif
 	p = prog->working_storage;
 	if (p) {
 		while (p->sister) {
@@ -8435,7 +8435,7 @@ cb_build_inspect_region_start (void)
 /* MOVE statement */
 
 static void
-warning_destination (cb_tree x)
+warning_destination (const enum cb_warn_opt warning_opt, cb_tree x)
 {
 	struct cb_field		*f;
 	const char *usage;
@@ -8481,27 +8481,27 @@ warning_destination (cb_tree x)
 	} else if (f->usage == CB_USAGE_FP_DEC128) {
 		usage = "FLOAT-DECIMAL-34";
 	} else if (f->pic) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as PIC %s"),
-			      cb_name (x), f->pic->orig);
+		cb_note_x (warning_opt, x, _("'%s' defined here as PIC %s"),
+			cb_name (x), f->pic->orig);
 		return;
 	} else {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as a group of length %d"),
-			      cb_name (x), f->size);
+		cb_note_x (warning_opt, x, _("'%s' defined here as a group of length %d"),
+			cb_name (x), f->size);
 		return;
 	}
 
 	if (f->flag_internal_register) {
-		cb_warning (COBC_WARN_FILLER, _("internal register '%s' defined as USAGE %s"),
-			    f->name, usage);
+		cb_note_x (warning_opt, x, _("internal register '%s' defined as USAGE %s"),
+			f->name, usage);
 	} else {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, usage);
+		cb_note_x (warning_opt, x, _("'%s' defined here as USAGE %s"),
+			f->name, usage);
 	}
 }
 
 static void
 move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
-	      const int warning_flag, const int src_flag, const char *msg)
+	      const enum cb_warn_opt warning_opt, const int src_flag, const char *msg)
 {
 	cb_tree		loc;
 
@@ -8522,25 +8522,25 @@ move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
 		cb_warning_x (COBC_WARN_FILLER, loc, "%s", msg);
 	} else {
 		/* MOVE statement */
-		if (warning_flag) {
-			cb_warning_x (warning_flag, loc, "%s", msg);
+		if (cb_warn_opt_val[warning_opt] != COBC_WARN_DISABLED) {
+			cb_warning_x (warning_opt, loc, "%s", msg);
 			listprint_suppress ();
 			if (src_flag) {
 				/* note: src_flag is -1 for numeric literals,
 				   contains literal size otherwise */
 				if (!CB_LITERAL_P (src)) {
-					warning_destination (src);
+					warning_destination (warning_opt, src);
 				} else if (src_flag == -1) {
 					if (CB_LITERAL_P (src)) {
-						cb_warning_x (warning_flag, dst,
+						cb_note_x (warning_opt, dst,
 							_("value is %s"), CB_LITERAL (src)->data);
 					}
 				} else {
-					cb_warning_x (warning_flag, dst,
+					cb_note_x (warning_opt, dst,
 						_("value size is %d"), src_flag);
 				}
 			}
-			warning_destination (dst);
+			warning_destination (warning_opt, dst);
 			listprint_restore ();
 		}
 	}
@@ -9298,14 +9298,14 @@ validate_move (cb_tree src, cb_tree dst, const unsigned int is_value, int *move_
 			case 2:
 				loc = src->source_line ? src : dst;
 				if (cb_warn_pos_overlap && !suppress_warn) {
-					cb_warning_x(COBC_WARN_FILLER, loc,
+					cb_warning_x(cb_warn_pos_overlap, loc,
 						_("overlapping MOVE may occur and produce unpredictable results"));
 				}
 				break;
 			case 3:
 				loc = src->source_line ? src : dst;
-				if ((cb_warn_overlap || cb_warn_pos_overlap) && !suppress_warn) {
-					cb_warning_x (COBC_WARN_FILLER, loc,
+				if ((cb_warn_overlap) && !suppress_warn) {
+					cb_warning_x (cb_warn_overlap, loc,
 						_("overlapping MOVE may produce unpredictable results"));
 				}
 				break;

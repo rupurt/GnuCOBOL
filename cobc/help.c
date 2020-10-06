@@ -135,13 +135,13 @@ cobc_print_usage_warnings (void)
 	puts (_("  -Wall                 enable most warnings (all except as noted below)"));
 	puts (_("  -Wextra               like -Wall but enable some extra warning flags"));
 	puts (_("  -Wno-<warning>        disable warning enabled by default, -Wall or -Wextra"));
-#define	CB_WARNDEF(var,name,doc)		\
+#define	CB_WARNDEF(opt,name,doc)		\
 	puts (doc);
-#define	CB_ONWARNDEF(var,name,doc)		\
+#define	CB_ONWARNDEF(opt,name,doc)		\
 	puts (doc);							\
 	/* TRANSLATORS: This msgid is appended to msgid for -Wno-pending and others */ \
 	puts (_("                        * ALWAYS active"));
-#define	CB_NOWARNDEF(var,name,doc)		\
+#define	CB_NOWARNDEF(opt,name,doc)		\
 	puts (doc);							\
 	/* TRANSLATORS: This msgid is appended to msgid for -Wpossible-truncate and others */ \
 	puts (_("                        * NOT set with -Wall"));
