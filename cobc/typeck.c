@@ -1969,7 +1969,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 							cb_warning_x (COBC_WARN_FILLER, x,
 								_("subscript of '%s' out of bounds: %d"),
 								name, n);
-							continue;	/* *skip runtime check , as MF does /
+							continue;	/* *skip runtime check, as MF does */
 						}
 						cb_error_x (x, _("subscript of '%s' out of bounds: %d"),
 								name, n);
