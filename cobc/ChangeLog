@@ -42,6 +42,8 @@
 2020-09-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* scanner.l (read_literal): catch and error  missing termination of literal
+	* typeck.c (cb_build_identifier): allow bad subscripts with -frelax-syntax,
+	  don't generate odo-check for UNBOUNDED items
 
 2020-09-02  James K. Lowden  <jklowden@fig.schemamania.org>
 

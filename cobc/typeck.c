@@ -1935,7 +1935,8 @@ cb_build_identifier (cb_tree x, const int subchk)
 		/* Run-time check for ODO (including all the fields subordinate items) */
 		if (CB_EXCEPTION_ENABLE (COB_EC_BOUND_SUBSCRIPT) && f->odo_level != 0) {
 			for (p = f; p; p = p->children) {
-				if (p->depending && p->depending != cb_error_node) {
+				if (p->depending && p->depending != cb_error_node
+				 && !p->flag_unbounded) {
 					e1 = CB_BUILD_FUNCALL_5 ("cob_check_odo",
 						 cb_build_cast_int (p->depending),
 						 cb_int (p->occurs_min),
@@ -1964,6 +1965,12 @@ cb_build_identifier (cb_tree x, const int subchk)
 				if (CB_LITERAL_P (sub)) {
 					n = cb_get_int (sub);
 					if (n < 1 || (!p->flag_unbounded && n > p->occurs_max)) {
+						if (cb_relaxed_syntax_checks) {
+							cb_warning_x (COBC_WARN_FILLER, x,
+								_("subscript of '%s' out of bounds: %d"),
+								name, n);
+							continue;	/* *skip runtime check , as MF does /
+						}
 						cb_error_x (x, _("subscript of '%s' out of bounds: %d"),
 								name, n);
 					}
@@ -3258,8 +3265,7 @@ validate_assign_name (struct cb_file * const f,
 	p = check_level_78 (CB_NAME (assign));
 	if (p) {
 		char *c = (char *)CB_LITERAL(CB_VALUE(p->values))->data;
-		assign = CB_TREE (build_literal (CB_CATEGORY_ALPHANUMERIC, c, strlen (c)));
-		f->assign = assign;
+		f->assign = CB_TREE (build_literal (CB_CATEGORY_ALPHANUMERIC, c, strlen (c)));
 		return;
 	}
 
@@ -3289,7 +3295,6 @@ cb_validate_program_data (struct cb_program *prog)
 	struct cb_field		*p;
 	struct cb_field		*q;
 	struct cb_field		*field;
-	struct cb_file		*file;
 	char			buff[COB_MINI_BUFF];
 
 	prog->report_list = cb_list_reverse (prog->report_list);
@@ -3324,6 +3329,7 @@ cb_validate_program_data (struct cb_program *prog)
 	prog->file_list = cb_list_reverse (prog->file_list);
 
 	for (l = prog->file_list; l; l = CB_CHAIN (l)) {
+		struct cb_file		*file;
 		file = CB_FILE (CB_VALUE (l));
 		if (!file->flag_finalized) {
 			finalize_file (file, NULL);
@@ -3440,7 +3446,7 @@ cb_validate_program_data (struct cb_program *prog)
 
 	/* file definition checks */
 	for (l = prog->file_list; l; l = CB_CHAIN (l)) {
-		file = CB_FILE (CB_VALUE (l));
+		struct cb_file	*file = CB_FILE (CB_VALUE (l));
 		if (file->flag_external) {
 			if (CB_VALID_TREE (file->password)
 				&& !CB_FIELD (cb_ref(file->password))->flag_external) {
@@ -3493,7 +3499,7 @@ cb_validate_program_data (struct cb_program *prog)
 				continue;
 			}
 			if (CB_FILE_P (x)) {
-				file = CB_FILE (x);
+				struct cb_file	*file = CB_FILE (x);
 				if (file->organization == COB_ORG_SORT) {
 					cb_error_x (l,
 						_("APPLY COMMIT statement invalid for SORT file"));
