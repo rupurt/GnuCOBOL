@@ -13,6 +13,7 @@
 	* mlio.c, common.h: duplicated cob_xml/json_generate to allow
 	  for new decimal_point param without breaking API from 2018
 	* coblocal.h: include gettext without lib prefix
+	* call.c, common.c: use EXIT_SUCCESS and EXIT_FAILURE instead of exit(0/1)
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 

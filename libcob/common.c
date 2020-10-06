@@ -2177,7 +2177,7 @@ cob_stop_run (const int status)
 	struct exit_handlerlist	*h;
 
 	if (!cob_initialized) {
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 
 	if (exit_hdlrs != NULL) {
@@ -4723,7 +4723,7 @@ cob_sys_system (const void *cmdline)
 			/* LCOV_EXCL_STOP */
 #ifdef _WIN32
 			/* All known _WIN32 implementations use MSVCRT's system()
-			   which passes the given commandline as paramter to "cmd /k".
+			   which passes the given commandline as parameter to "cmd /k".
 			   Because "of compatibility" this checks if you have a
 			   leading and trailing " and if yes simply removes them (!).
 			   Check if this is the case and if it is handled already

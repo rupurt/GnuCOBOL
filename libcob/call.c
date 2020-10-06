@@ -953,7 +953,7 @@ void
 cob_call_error (void)
 {
 	cob_runtime_error ("%s", cob_resolve_error ());
-	cob_stop_run (1);
+	cob_stop_run (EXIT_FAILURE);
 }
 
 void
@@ -1023,7 +1023,7 @@ cob_resolve_func (const char *name)
 	p = cob_resolve_internal (name, NULL, 0);
 	if (unlikely(!p)) {
 		cob_runtime_error (_("user-defined FUNCTION '%s' not found"), name);
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	return p;
 }
@@ -1113,7 +1113,7 @@ cob_cancel (const char *name)
 	}
 	if (unlikely(!name)) {
 		cob_runtime_error (_("NULL parameter passed to '%s'"), "cob_cancel");
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	/* LCOV_EXCL_STOP */
 	entry = cob_chk_dirp (name);
@@ -1188,11 +1188,11 @@ cob_call (const char *name, const int argc, void **argv)
 	}
 	if (argc < 0 || argc > MAX_CALL_FIELD_PARAMS) {
 		cob_runtime_error (_("invalid number of arguments passed to '%s'"), "cob_call");
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	if (unlikely(!name)) {
 		cob_runtime_error (_("NULL parameter passed to '%s'"), "cob_call");
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	/* LCOV_EXCL_STOP */
 	unifunc.funcvoid = cob_resolve_cobol (name, 0, 1);
@@ -1308,11 +1308,11 @@ cob_savenv (struct cobjmp_buf *jbuf)
 	}
 	if (unlikely(!jbuf)) {
 		cob_runtime_error (_("NULL parameter passed to '%s'"), "cob_savenv");
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	if (cob_jmp_primed) {
 		cob_runtime_error (_("multiple call to 'cob_setjmp'"));
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	/* LCOV_EXCL_STOP */
 	cob_jmp_primed = 1;
@@ -1336,11 +1336,11 @@ cob_longjmp (struct cobjmp_buf *jbuf)
 	}
 	if (unlikely(!jbuf)) {
 		cob_runtime_error (_("NULL parameter passed to '%s'"), "cob_longjmp");
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	if (!cob_jmp_primed) {
 		cob_runtime_error (_("call to 'cob_longjmp' with no prior 'cob_setjmp'"));
-		cob_stop_run (1);
+		cob_stop_run (EXIT_FAILURE);
 	}
 	/* LCOV_EXCL_STOP */
 	cob_jmp_primed = 0;
