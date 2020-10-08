@@ -483,8 +483,6 @@ static struct cb_field	*check_base_p = NULL;
 static struct cb_field	*check_odo_p = NULL;
 static struct cb_field	*check_subscript_p = NULL;
 static struct cb_field	*check_sub = NULL;
-/* Left undefined until a better testcase for this exists */
-/* #define OPT_CHECKS 1 */
 
 static struct cb_field *
 cb_code_field (cb_tree x)
@@ -503,7 +501,7 @@ cb_code_field (cb_tree x)
 }
 
 /*
- * Forced reset of all check optimization
+ * Force reset of all check optimization
  */
 static void
 cb_check_reset ()
@@ -520,7 +518,8 @@ cb_check_reset ()
 static void
 cb_check_optim (struct cb_field *p)
 {
-	if (p == NULL)
+	if (!cb_flag_optimize_check
+	 || p == NULL)
 		return;
 	if (p == check_subscript_p
 	 || p == check_odo_p
@@ -552,6 +551,8 @@ cb_check_list (cb_tree vars)
 	struct cb_field *f;
 	struct cb_assign *ap;
 
+	if (!cb_flag_optimize_check)
+		return;
 	for (l = vars; l; l = CB_CHAIN (l)) {
 		x = CB_VALUE(l);
 		f = NULL;
@@ -579,10 +580,9 @@ cb_check_list (cb_tree vars)
 static void
 cb_add_null_check (const char *routine, struct cb_field *p, struct cb_field *f)
 {
-#ifdef OPT_CHECKS
-	if (p == check_base_p)
+	if (cb_flag_optimize_check
+	 && p == check_base_p)
 		return;
-#endif
 	check_base_p = p;
 	current_statement->null_check = CB_BUILD_FUNCALL_2 (
 		routine, 
@@ -594,10 +594,9 @@ cb_add_null_check (const char *routine, struct cb_field *p, struct cb_field *f)
 static cb_tree
 cb_add_check_odo ( struct cb_field *p )
 {
-#ifdef OPT_CHECKS
-	if (check_odo_p == p)
+	if (cb_flag_optimize_check
+	 && check_odo_p == p)
 		return NULL;
-#endif
 	check_odo_p = p;
 	return CB_BUILD_FUNCALL_5 ("cob_check_odo",
 			 cb_build_cast_int (p->depending),
@@ -613,22 +612,22 @@ cb_add_check_subscript ( struct cb_field *p, cb_tree sub, const char *name, cons
 	struct cb_field *sub_p;
 	cb_tree	y;
 
-	sub_p = NULL;
-	if (CB_REFERENCE_P (sub)) {
-		y = cb_ref (sub);
-		if (y != cb_error_node
-		 && CB_FIELD_P (y))
-			sub_p = CB_FIELD_PTR (y);
-	} else if (CB_FIELD_P (sub)) {
-		sub_p = CB_FIELD_PTR (sub);
+	if (cb_flag_optimize_check) {
+		sub_p = NULL;
+		if (CB_REFERENCE_P (sub)) {
+			y = cb_ref (sub);
+			if (y != cb_error_node
+			 && CB_FIELD_P (y))
+				sub_p = CB_FIELD_PTR (y);
+		} else if (CB_FIELD_P (sub)) {
+			sub_p = CB_FIELD_PTR (sub);
+		}
+		if (check_subscript_p == p
+		 && check_sub == sub_p)
+			return NULL;
+		check_subscript_p = p;
+		check_sub = sub_p;
 	}
-#ifdef OPT_CHECKS
-	if (check_subscript_p == p
-	 && check_sub == sub_p)
-		return NULL;
-#endif
-	check_subscript_p = p;
-	check_sub = sub_p;
 	if (opt == 1) {
 		return CB_BUILD_FUNCALL_4 ("cob_check_subscript",
 			 cb_build_cast_int (sub),
