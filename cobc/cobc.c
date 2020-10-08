@@ -199,6 +199,7 @@ int			cobc_flag_main = 0;
 int			cb_flag_main = 0;
 int			cobc_wants_debug = 0;
 int			cb_flag_functions_all = 0;
+int			cb_flag_optimize_check = 0;
 int			cb_flag_dump = 0;
 int			cobc_seen_stdin = 0;
 int			cb_unix_lf = 0;
@@ -307,7 +308,6 @@ static size_t		save_temps = 0;
 static size_t		save_all_src = 0;
 static size_t		save_c_src = 0;
 static signed int	verbose_output = 0;
-static size_t		cob_optimize = 0;
 
 static unsigned int		cb_listing_linecount;
 static int		cb_listing_eject = 0;
@@ -2885,7 +2885,7 @@ process_command_line (const int argc, char **argv)
 
 		case '0':
 			/* -O0 : disable optimizations (or at least minimize them) */
-			cob_optimize = 0;
+			cb_flag_optimize_check = 0;
 			strip_output = 0;
 			cb_constant_folding = 0;
 			copt = CB_COPT_0;
@@ -2893,27 +2893,27 @@ process_command_line (const int argc, char **argv)
 
 		case 'O':
 			/* -O : Optimize */
-			cob_optimize = 1;
+			cb_flag_optimize_check = 1;
 			copt = CB_COPT_1;
 			break;
 
 		case '2':
 			/* -O2 : Optimize */
-			cob_optimize = 1;
+			cb_flag_optimize_check = 1;
 			strip_output = 1;
 			copt = CB_COPT_2;
 			break;
 
 		case '3':
 			/* -O3 : Optimize */
-			cob_optimize = 1;
+			cb_flag_optimize_check = 1;
 			strip_output = 1;
 			copt = CB_COPT_3;
 			break;
 
 		case 's':
 			/* -Os : Optimize */
-			cob_optimize = 1;
+			cb_flag_optimize_check = 1;
 			strip_output = 1;
 			copt = CB_COPT_S;
 			break;

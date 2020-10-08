@@ -411,6 +411,7 @@ extern int			cb_literal_id;
 extern int			cb_field_id;
 extern int			cb_ml_attr_id;
 extern int			cb_ml_tree_id;
+extern int			cb_flag_optimize_check;
 extern int			cb_flag_functions_all;
 
 extern int			cb_flag_dump;

@@ -1,4 +1,9 @@
 
+2020-10-08  Ron Norman <rjn@inglenet.com>
+
+	* cobc.c,cobc.h,typeck.c: When -debug -O compile options 
+	   are used then optimize the subscript checks.
+
 2020-10-02  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c: Partial work on optimizing when to check
