@@ -96,13 +96,13 @@
 #elif CONFIGURED_ISAM == DISAM
 #pragma comment(lib, "libdisam72")
 #elif CONFIGURED_ISAM == BDB
-#if defined (_DEBUG)
-#pragma comment(lib, "libdb48d")
+//#if defined (_DEBUG)
+//#pragma comment(lib, "libdb48d")
 //#pragma comment(lib, "libdb62d")
-#else
+//#else
 #pragma comment(lib, "libdb48")
 //#pragma comment(lib, "libdb62")
-#endif
+//#endif
 #elif CONFIGURED_ISAM == LMDB
 #if defined (_DEBUG)
 #pragma comment(lib, "liblmdbd")
@@ -124,7 +124,11 @@
 #pragma comment(lib, "libxml2")
 #pragma comment(lib, "libcharset")
 #pragma comment(lib, "libiconv")
+#ifdef _DEBUG
+#pragma comment(lib, "zlibd")
+#else
 #pragma comment(lib, "zlib")
+#endif
 #endif
 #endif
 
