@@ -1,4 +1,10 @@
 
+2020-10-12  Ron Norman <rjn@inglenet.com>
+
+	* intrinsic.c, move.c, numeric.c, termio.c: updates to process
+	  COB_TYPE_NUMERIC_COMP5 the same as COB_TYPE_NUMERIC_BINARY
+	  except for DISPLAY then only display for f->attr->digits
+
 2020-10-02  Ron Norman <rjn@inglenet.com>
 
 	* fileio.h, fodbc.c: tested using PostgreSQL

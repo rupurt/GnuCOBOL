@@ -1249,6 +1249,7 @@ cob_move (cob_field *src, cob_field *dst)
 			cob_move_display_to_packed (src, dst);
 			return;
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_move_display_to_binary (src, dst);
 			return;
 		case COB_TYPE_NUMERIC_EDITED:
@@ -1277,6 +1278,7 @@ cob_move (cob_field *src, cob_field *dst)
 			cob_move_packed_to_display (src, dst);
 			return;
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_decimal_setget_fld (src, dst, opt);
 			return;
 		case COB_TYPE_NUMERIC_PACKED:
@@ -1298,8 +1300,10 @@ cob_move (cob_field *src, cob_field *dst)
 		}
 
 	case COB_TYPE_NUMERIC_BINARY:
+	case COB_TYPE_NUMERIC_COMP5:
 		switch (COB_FIELD_TYPE (dst)) {
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			if (COB_FIELD_SCALE(src) == COB_FIELD_SCALE(dst)) {
 				cob_move_binary_to_binary (src, dst);
 				return;
@@ -1339,6 +1343,7 @@ cob_move (cob_field *src, cob_field *dst)
 			return;
 		case COB_TYPE_NUMERIC_PACKED:
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 		case COB_TYPE_NUMERIC_EDITED:
 		case COB_TYPE_NUMERIC_FLOAT:
 		case COB_TYPE_NUMERIC_DOUBLE:
@@ -1369,6 +1374,7 @@ cob_move (cob_field *src, cob_field *dst)
 			cob_move_fp_to_fp (src, dst);
 			return;
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_decimal_setget_fld (src, dst, opt);
 			return;
 		case COB_TYPE_NUMERIC_PACKED:
@@ -1395,6 +1401,7 @@ cob_move (cob_field *src, cob_field *dst)
 			cob_move_fp_to_fp (src, dst);
 			return;
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_decimal_setget_fld (src, dst, opt);
 			return;
 		case COB_TYPE_NUMERIC_PACKED:
@@ -1415,6 +1422,7 @@ cob_move (cob_field *src, cob_field *dst)
 	case COB_TYPE_NUMERIC_FP_DEC64:
 		switch (COB_FIELD_TYPE (dst)) {
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_decimal_setget_fld (src, dst, opt);
 			return;
 		case COB_TYPE_NUMERIC_FP_DEC64:
@@ -1437,6 +1445,7 @@ cob_move (cob_field *src, cob_field *dst)
 	case COB_TYPE_NUMERIC_FP_DEC128:
 		switch (COB_FIELD_TYPE (dst)) {
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 			cob_decimal_setget_fld (src, dst, opt);
 			return;
 		case COB_TYPE_NUMERIC_FP_DEC128:
@@ -1464,6 +1473,7 @@ cob_move (cob_field *src, cob_field *dst)
 			return;
 		case COB_TYPE_NUMERIC_PACKED:
 		case COB_TYPE_NUMERIC_BINARY:
+		case COB_TYPE_NUMERIC_COMP5:
 		case COB_TYPE_NUMERIC_EDITED:
 		case COB_TYPE_NUMERIC_FLOAT:
 		case COB_TYPE_NUMERIC_DOUBLE:
@@ -1763,6 +1773,7 @@ cob_get_int (cob_field *f)
 	case COB_TYPE_NUMERIC_PACKED:
 		return cob_packed_get_int (f);
 	case COB_TYPE_NUMERIC_BINARY:
+	case COB_TYPE_NUMERIC_COMP5:
 		val = cob_binary_mget_sint64 (f);
 		for (n = COB_FIELD_SCALE (f); n > 0 && val; --n) {
 			val /= 10;
@@ -1792,6 +1803,7 @@ cob_get_llint (cob_field *f)
 	case COB_TYPE_NUMERIC_PACKED:
 		return cob_packed_get_long_long (f);
 	case COB_TYPE_NUMERIC_BINARY:
+	case COB_TYPE_NUMERIC_COMP5:
 		n = cob_binary_mget_sint64 (f);
 		for (inc = COB_FIELD_SCALE (f); inc > 0 && n; --inc) {
 			n /= 10;

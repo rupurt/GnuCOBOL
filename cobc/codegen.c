@@ -1605,6 +1605,16 @@ output_attr (const cb_tree x)
 					flags |= COB_FLAG_BINARY_TRUNC;
 				}
 
+				if (type == COB_TYPE_NUMERIC_BINARY
+				 && f->usage == CB_USAGE_INDEX) {
+					flags |= COB_FLAG_REAL_BINARY;
+					type = COB_TYPE_NUMERIC_COMP5;
+				} else
+				if (type == COB_TYPE_NUMERIC_BINARY
+				 && (f->flag_binary_swap || f->flag_real_binary)
+				 && (f->flag_indexed_by || f->index_type || f->flag_internal_register)) {
+					type = COB_TYPE_NUMERIC_COMP5;
+				}
 				switch (f->usage) {
 				case CB_USAGE_COMP_6:
 					flags |= COB_FLAG_NO_SIGN_NIBBLE;
