@@ -431,7 +431,7 @@ chkSts(
 		&& db->intRecWait > 1000
 		&& db->nMaxRetry > 0) {
 			db->nRecWaitTry++;
-			sleep(db->intRecWait/1000);				/* Pause a while */
+			cob_sleep_msec(db->intRecWait);			/* Pause a while */
 			return 1;								/* Skip logging error message */
 		}
 		if(db->dbStatus == 3114
@@ -1132,46 +1132,46 @@ join_environment (cob_file_api *a)
 	if (sts) {
 		return;
 	} else {
-		if (strcasestr(varFetch,"MariaDB")) {
+		if (cob_str_case_str (varFetch,"MariaDB")) {
 			db->mssql = FALSE;
 			db->db2 = FALSE;
 			db->mysql = TRUE;
 			db->mariadb = TRUE;
 			strcpy(db->dbType,"ODBC MariaDB");
-		} else if (strcasestr(varFetch,"MySQL")) {
+		} else if (cob_str_case_str (varFetch,"MySQL")) {
 			db->mssql = FALSE;
 			db->db2 = FALSE;
 			db->mysql = TRUE;
 			db->mariadb = FALSE;
 			strcpy(db->dbType,"ODBC MySQL");
-		} else if (strcasestr(varFetch,"Microsoft SQL")) {
+		} else if (cob_str_case_str (varFetch,"Microsoft SQL")) {
 			db->mssql = TRUE;
 			db->db2 = FALSE;
 			db->mysql = FALSE;
 			db->mariadb = FALSE;
 			db->dbStsNoTable = 4701;
 			db->dbVer = 2008;
-			if ((env = strcasestr(varFetch,"Server")) != NULL) {
+			if ((env = cob_str_case_str (varFetch,"Server")) != NULL) {
 				env += 7;
 				if (isdigit(*env))
 					db->dbVer = atoi(env);
 			}
 			snprintf(db->dbType,sizeof(db->dbType),"ODBC MSSQL %d",db->dbVer);
 			if (db->dbVer == 2012) {
-				if ((env = strcasestr(varFetch,"SQL Server 2012 (SP1)")) != NULL) {
+				if ((env = cob_str_case_str (varFetch,"SQL Server 2012 (SP1)")) != NULL) {
 					db->mssqlnfu = TRUE;
 				}
 			} else if (db->dbVer < 2012) {
 				db->mssqlnfu = TRUE;
 			}
-		} else if (strcasestr(varFetch,"PostgreSQL")) {
+		} else if (cob_str_case_str (varFetch,"PostgreSQL")) {
 			db->mssql = FALSE;
 			db->db2 = FALSE;
 			db->mysql = FALSE;
 			db->mariadb = FALSE;
 			db->postgres = FALSE;
 			strcpy(db->dbType,"ODBC PostgreSQL");
-		} else if (strcasestr(varFetch,"DB2")) {
+		} else if (cob_str_case_str (varFetch,"DB2")) {
 			db->mssql = FALSE;
 			db->db2 = TRUE;
 			db->mysql = FALSE;

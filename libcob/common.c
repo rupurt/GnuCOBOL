@@ -1558,6 +1558,44 @@ set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time
 
 /* Global functions */
 
+int 
+cob_ncase_cmp (char *str1, char *str2, unsigned len)	/* Like strncasecmp */
+{
+	if (len == 0)
+		return(0);
+
+	while(*str1 && *str2 && --len) {
+		if (toupper(*str1) != toupper(*str2))
+			break;
+		str1++;
+		str2++;
+	}
+	return(toupper(*str1)-toupper(*str2));
+}
+
+char *
+cob_str_case_str (char *str1, char *str2)					/* Like  strcasestr  */
+{
+	unsigned len;
+	int ch1 = toupper(*str2);
+
+	if(ch1 == 0)
+		return NULL;
+	len = (unsigned)strlen(str2);
+
+	while(*str1) {
+		if(toupper(*str1) != ch1) {
+			str1++;
+			continue;
+		}
+		if (cob_ncase_cmp(str1, str2, len) == 0)
+			return str1;
+		str1++;
+	}
+
+	return NULL;
+}
+
 /* get last exception (or 0 if not active) */
 int
 cob_get_last_exception_code (void)

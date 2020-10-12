@@ -193,7 +193,7 @@ chkSts(
 		&& db->intRecWait > 1000
 		&& db->nMaxRetry > 0) {
 			db->nRecWaitTry++;
-			sleep(db->intRecWait/1000);				/* Pause a while */
+			cob_sleep_msec(db->intRecWait);			/* Pause a while */
 			return 1;								/* Skip logging error message */
 		}
 		if (db->dbStatus == 3114
@@ -900,7 +900,7 @@ join_environment (cob_file_api *a)
 		return;
 	}
 	DEBUG_LOG("db",("%s\n",tmp));
-	if ((env = strcasestr (tmp,"Release")) != NULL) {
+	if ((env = cob_str_case_str (tmp,"Release")) != NULL) {
 		int	num = 0;
 		env += 8;
 		while(*env == ' ') env++;
