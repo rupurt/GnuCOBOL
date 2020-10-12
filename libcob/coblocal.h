@@ -418,6 +418,8 @@ COB_HIDDEN char		*cob_strcat		(char*, char*, int);
 COB_HIDDEN char		*cob_strjoin		(char**, int, char*);
 
 COB_HIDDEN void	cob_set_field_to_uint	(cob_field *, const cob_u32_t);
+COB_HIDDEN int cob_ncase_cmp (char *, char *, unsigned );
+COB_HIDDEN char * cob_str_case_str (char *, char *);
 
 /* static inline of smaller helpers */
 
