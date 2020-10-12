@@ -1118,16 +1118,16 @@ cob_call_field (const cob_field *f, const struct cob_call_struct *cs,
 void
 cob_module_clean (cob_module *m)
 {
-	const char		*entry;
 	struct call_hash	*p;
 	struct call_hash	**q;
+	
+#ifndef	COB_ALT_HASH
+	const char		*entry;
 
 	entry = cob_chk_dirp (m->module_name);
-
-#ifdef	COB_ALT_HASH
-	q = &call_table;
-#else
 	q = &call_table[hash ((const unsigned char *)entry)];
+#else
+	q = &call_table;
 #endif
 	p = *q;
 	for (; p; p = p->next) {
