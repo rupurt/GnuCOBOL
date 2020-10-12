@@ -25,16 +25,17 @@ TESTS_LOCAL = ##TESTS_LOCAL##
 RM = rm -rf
 DIFF_FLAGS = ##DIFF_FLAGS##
 
-# targets that are only logical targets instead of files
-.PHONY: test test-local diff test-O test-O-local lib lib-local $\
-        (TESTS) $(TESTS_LOCAL)
-
 all:
 	@$(MAKE) test
 	@$(MAKE) diff
 #	@$(MAKE) test-O
 #	@$(MAKE) diff
 	@echo
+
+# targets that are only logical targets instead of files
+# note: this special target is not mandated by POSIX
+.PHONY: test test-local diff test-O test-O-local libs libs-local \
+        $(TESTS) $(TESTS_LOCAL)
 
 test:
 	@. ../../atconfig && . ../../atlocal NIST_$@ && $(MAKE) $@-local
@@ -57,20 +58,22 @@ test-O-local:
 	@echo "Performing tests (optimized) for module directory ##MODULE##"
 	@perl ##COB85DIR##/report.pl -O
 
-lib:
-	@. ../../atconfig && . ../../atlocal NIST-##MODULE##_lib && $(MAKE) $@-local
-
-lib-local:
-	@echo ""
-	@if test -d lib; then                                     \
-	 echo "Compiling libs for module directory ##MODULE##..."; \
-	 perl ##COB85DIR##/report.pl lib                         ;  \
+libs:
+	@if test -d lib; then                                                        \
+	 . ../../atconfig && . ../../atlocal NIST-##MODULE##_lib && $(MAKE) $@-local; \
 	fi
 
-$(TESTS): lib
+libs-local:
+	@if test -d lib; then                                     \
+	 echo ""                                                 ; \
+	 echo "Compiling libs for module directory ##MODULE##...";  \
+	 perl ##COB85DIR##/report.pl lib                         ;   \
+	fi
+
+$(TESTS): libs
 	@. ../../atconfig && . ../../atlocal NIST_$@ && $(MAKE) $@-local
 
-$(TESTS_LOCAL): lib-local
+$(TESTS_LOCAL): libs-local
 	@echo "Running single test `echo $@ | sed -e 's|-.*||g'`"
 	@perl ##COB85DIR##/report.pl `echo $@ | sed -e 's|-.*||g'` 2>$@.log
 	@grep `echo $@ | sed -e 's|-.*||g'` ##COB85DIR##/##MODULE##.txt | diff - $@.log
