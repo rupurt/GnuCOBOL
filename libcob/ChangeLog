@@ -1,7 +1,7 @@
 
 2020-10-02  Ron Norman <rjn@inglenet.com>
-	* fileio.h, fodbc.c:
-		Tested using PostgreSQL
+
+	* fileio.h, fodbc.c: tested using PostgreSQL
 
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -14,6 +14,7 @@
 	* common.c [WITH_JSON_C]: added version output
 	* mlio.c: adjusted check of defines for XML/JSON,
 	  include json-c according to its docs
+	* common.h, coblocal.h: moved definition of cob_module_free to stay local
 
 2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -25,7 +26,7 @@
 	   1. in insert mode, position cursor at rightmost integer digit upon
 	      entering a field;
 	   2. in insert mode, only beep at last character when no insertion is
-              possible.
+          possible
 
 2020-07-20  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -36,7 +37,7 @@
 	   4. entering sign jumps to sign;
 	   5. create (hopefully) nice insert behaviour for numbers: cursor on
 	      integral digits inserts to right, cursor on decimal digits inserts
-              to left.
+          to left
 
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -48,9 +49,9 @@
 
 2020-07-15  Ron Norman <rjn@inglenet.com>
 
-	* call.c,common.h,common.c: Have cob_module_free in common.c
-			clean up the list of modules used in call.c to avoid
-			reference to freed memory
+	* call.c, common.h, common.c: new function (cob_module_free) in common.c
+	  to clean up the list of modules used in call.c to avoid reference
+	  to freed memory
 
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -62,9 +63,9 @@
 
 2020-07-07  Ron Norman <rjn@inglenet.com>
 
-	* call.c,common.h: Add new functions cob_call_cobol and cob_call_entry
-			for C modules to call COBOL modules using 'stdarg' type of
-				parameter passing.
+	* call.c, common.h: add new functions cob_call_cobol and cob_call_entry
+	  for C modules to call COBOL modules using 'stdarg' type of
+	  parameter passing
 
 2020-06-25  Simon Sobisch <simonsobisch@gnu.org>
 

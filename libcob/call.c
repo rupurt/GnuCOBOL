@@ -1122,9 +1122,6 @@ cob_module_clean (cob_module *m)
 	struct call_hash	*p;
 	struct call_hash	**q;
 
-	if (unlikely(!cobglobptr)) {
-		cob_fatal_error (COB_FERROR_INITIALIZED);
-	}
 	entry = cob_chk_dirp (m->module_name);
 
 #ifdef	COB_ALT_HASH
