@@ -1408,6 +1408,7 @@ cb_build_register_return_code (const char *name, const char *definition)
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->index_type = CB_STATIC_INT_INDEX;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_return_code = field;
 }
 
@@ -1427,6 +1428,7 @@ cb_build_register_sort_return (const char *name, const char *definition)
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->flag_no_init = 1;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_sort_return = field;
 }
 
@@ -1448,6 +1450,7 @@ cb_build_register_number_parameters (const char *name, const char *definition)
 	CB_FIELD_PTR (field)->flag_local = 1;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
 	CB_FIELD_PTR (field)->index_type = CB_INT_INDEX;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_call_params = field;
 }
 
@@ -2043,6 +2046,8 @@ cb_build_index (cb_tree x, cb_tree values, const unsigned int indexed_by,
 		f->index_qual = qual;
 	}
 	f->flag_indexed_by = !!indexed_by;
+	if (f->flag_indexed_by)
+		f->flag_real_binary = 1;
 	CB_FIELD_ADD (current_program->working_storage, f);
 	return x;
 }

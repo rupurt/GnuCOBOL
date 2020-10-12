@@ -1,4 +1,10 @@
 
+2020-10-12  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c: Flag internal variables with 'flag_real_binary'
+	* codegen.c: Emit USAGE INDEX and internal binary variables 
+	  as COB_TYPE_NUMERIC_COMP5
+
 2020-10-08  Ron Norman <rjn@inglenet.com>
 
 	* cobc.c,cobc.h,typeck.c: When -debug -O compile options 

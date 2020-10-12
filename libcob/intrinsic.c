@@ -5901,12 +5901,13 @@ cob_intr_lowest_algebraic (cob_field *srcfield)
 		break;
 
 	case COB_TYPE_NUMERIC_BINARY:
+	case COB_TYPE_NUMERIC_COMP5:
 		if (!COB_FIELD_HAVE_SIGN (srcfield)) {
 			cob_alloc_set_field_uint (0);
 			break;
 		}
-		if (COB_FIELD_REAL_BINARY (srcfield) ||
-		    !COB_FIELD_BINARY_TRUNC (srcfield)) {
+		if (COB_FIELD_REAL_BINARY (srcfield) 
+		|| !COB_FIELD_BINARY_TRUNC (srcfield)) {
 			expo = (cob_uli_t)((COB_FIELD_SIZE (srcfield) * 8U) - 1U);
 			mpz_ui_pow_ui (d1.value, 2UL, expo);
 			mpz_neg (d1.value, d1.value);
@@ -5978,8 +5979,9 @@ cob_intr_highest_algebraic (cob_field *srcfield)
 		break;
 
 	case COB_TYPE_NUMERIC_BINARY:
-		if (COB_FIELD_REAL_BINARY (srcfield) ||
-		    !COB_FIELD_BINARY_TRUNC (srcfield)) {
+	case COB_TYPE_NUMERIC_COMP5:
+		if (COB_FIELD_REAL_BINARY (srcfield) 
+		|| !COB_FIELD_BINARY_TRUNC (srcfield)) {
 			expo = COB_FIELD_SIZE (srcfield) * 8U;
 			if (COB_FIELD_HAVE_SIGN (srcfield)) {
 				expo--;
