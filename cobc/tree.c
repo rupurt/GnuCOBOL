@@ -522,8 +522,8 @@ cb_name_1 (char *s, cb_tree x, const int size)
 		if (CB_TREE_CLASS (x) == CB_CLASS_NUMERIC) {
 			strncpy (s, (char *)CB_LITERAL (x)->data, size);
 		} else {
-			char lit_buff[CB_ERR_LITMAX + 1];
-			snprintf (s, size, "\"%s\"",
+			char	lit_buff[CB_ERR_LITMAX + 1];
+			snprintf (s, size, _("literal \"%s\""),
 				literal_for_diagnostic (lit_buff, (char *)CB_LITERAL (x)->data));
 		}
 		break;
@@ -1188,10 +1188,10 @@ char *
 cb_name (cb_tree x)
 {
 	char	*s;
-	char	tmp[COB_NORMAL_BUFF] = { 0 };
+	char	tmp[COB_SMALL_BUFF] = { 0 };
 	size_t	tlen;
 
-	tlen = cb_name_1 (tmp, x, COB_NORMAL_MAX);
+	tlen = cb_name_1 (tmp, x, COB_SMALL_MAX);
 	s = cobc_parse_malloc (tlen + 1);
 	strncpy (s, tmp, tlen);
 
@@ -1222,6 +1222,14 @@ cb_tree_category (cb_tree x)
 	if (x == cb_error_node) {
 		return (enum cb_category)0;
 	}
+
+	/* LCOV_EXCL_START */
+	if (x->category >= CB_CATEGORY_ERROR) {
+		cobc_err_msg (_("call to '%s' with invalid parameter '%s'"),
+			"cb_tree_category", "x");
+		COBC_ABORT ();
+	}
+	/* LCOV_EXCL_STOP */
 	if (x->category != CB_CATEGORY_UNKNOWN) {
 		return x->category;
 	}
@@ -3652,7 +3660,8 @@ cb_field_add (struct cb_field *f, struct cb_field *p)
 }
 
 /* get size of given field/literal (or its reference),
-   returns -1 if size isn't known at compile time */
+   returns FIELD_SIZE_UNKNOWN (-1) if size isn't known
+   at compile time */
 int
 cb_field_size (const cb_tree x)
 {
@@ -3667,18 +3676,17 @@ cb_field_size (const cb_tree x)
 	case CB_TAG_REFERENCE:
 		r = CB_REFERENCE (x);
 		f = CB_FIELD (r->value);
-
 		if (r->length) {
 			if (CB_LITERAL_P (r->length)) {
 				return cb_get_int (r->length);
 			} else {
-				return -1;
+				return FIELD_SIZE_UNKNOWN;
 			}
 		} else if (r->offset) {
 			if (CB_LITERAL_P (r->offset)) {
 				return f->size - cb_get_int (r->offset) + 1;
 			} else {
-				return -1;
+				return FIELD_SIZE_UNKNOWN;
 			}
 		} else if (f->flag_any_length) {
 			return -1;

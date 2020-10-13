@@ -511,7 +511,7 @@ prog.cob: in paragraph 'MAIN':
 prog.cob:15: error: invalid MOVE target: MAIN
 prog.cob:16: error: invalid MOVE target: repo-prog
 prog.cob:17: error: invalid MOVE target: QUOTE
-prog.cob:18: error: invalid MOVE target: "A"
+prog.cob:18: error: invalid MOVE target: literal "A"
 ])
 
 AT_CLEANUP

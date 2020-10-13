@@ -69,7 +69,7 @@ static void
 print_error (const char *file, int line, const char *prefix,
 	     const char *fmt, va_list ap, const char *diagnostic_option)
 {
-	static char errmsg[COB_SMALL_BUFF];
+	static char	errmsg[COB_SMALL_BUFF];
 
 	if (!file) {
 		file = cb_source_file;

@@ -7032,7 +7032,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:5: error: invalid MOVE target: " 1  c d e f g h i j k l m n 0 q. 2 ..."
+[prog.cob:5: error: invalid MOVE target: literal " 1  c d e f g h i j k l m n 0 q. 2 ..."
 ])
 
 AT_CLEANUP
