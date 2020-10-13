@@ -1240,28 +1240,22 @@ output_data (cb_tree x)
 static void
 output_size (const cb_tree x)
 {
-	struct cb_literal	*l;
-	struct cb_reference	*r;
-	struct cb_field		*f;
-	struct cb_field		*p = NULL;
-	struct cb_field		*q;
-
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		output ("1");
 		break;
-	case CB_TAG_LITERAL:
-		l = CB_LITERAL (x);
+	case CB_TAG_LITERAL: {
+		struct cb_literal	*l = CB_LITERAL (x);
 		output ("%d", (int)(l->size + (l->sign != 0)));
 		break;
-	case CB_TAG_REFERENCE:
-		r = CB_REFERENCE (x);
-		f = CB_FIELD (r->value);
+	}
+	case CB_TAG_REFERENCE: {
+		struct cb_reference	*r = CB_REFERENCE (x);
+		struct cb_field		*f = CB_FIELD (r->value);
 		if (f->flag_no_field) {
 			output ("0");
 			break;
 		}
-		p = chk_field_variable_size (f);
 		if (r->length) {
 			output_integer (r->length);
 			break;
@@ -1283,8 +1277,8 @@ output_size (const cb_tree x)
 		 && !gen_init_working) {
 			out_odoslide_size (f);
 		} else {
-			p = chk_field_variable_size (f);
-			q = f;
+			struct cb_field		*p = chk_field_variable_size (f);
+			struct cb_field		*q = f;
 again:
 			if ((!cb_flag_odoslide || gen_init_working)
 			 && p
@@ -1322,6 +1316,7 @@ again:
 			output_index (r->offset);
 		}
 		break;
+	}
 	case CB_TAG_FIELD:
 		output ("(int)%s%d.size", CB_PREFIX_FIELD, CB_FIELD (x)->id);
 		break;
@@ -4816,13 +4811,14 @@ output_initialize_fp (cb_tree x, struct cb_field *f)
 static void
 output_initialize_uniform (cb_tree x, const int c, const int size)
 {
-	struct cb_field		*f, *v;
-	f = cb_code_field (x);
-	v = chk_field_variable_size (f);
+	struct cb_field		*f = cb_code_field (x);
+
 	/* REPORT lines are cleared to SPACES */
 	if (f->storage == CB_STORAGE_REPORT
-	 && c == ' ')
+	 && c == ' ') {
 		return;
+	}
+
 	output_prefix ();
 	if (size == 1) {
 		output ("*(cob_u8_ptr)(");
@@ -4839,14 +4835,19 @@ output_initialize_uniform (cb_tree x, const int c, const int size)
 			output (", %d, ", c);
 			output_size (x);
 			output (");");
-		} else if (v 
-				&& !gen_init_working 
-				&& (f->flag_unbounded || !cb_complex_odo)) {
-			output (", %d, ", c);
-			out_odoslide_size (f);
-			output (");");
 		} else {
-			output (", %d, %d);", c, size);
+			struct cb_field		*v = NULL;
+			if (!gen_init_working 
+			 && (f->flag_unbounded || !cb_complex_odo)) {
+				v = chk_field_variable_size (f);
+			}
+			if (v) {
+				output (", %d, ", c);
+				out_odoslide_size (f);
+				output (");");
+			} else {
+				output (", %d, %d);", c, size);
+			}
 		}
 	}
 	output_newline ();
