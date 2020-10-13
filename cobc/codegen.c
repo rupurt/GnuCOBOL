@@ -1240,18 +1240,23 @@ output_data (cb_tree x)
 static void
 output_size (const cb_tree x)
 {
+	struct cb_literal	*l;
+	struct cb_reference	*r;
+	struct cb_field		*f;
+	struct cb_field		*p = NULL;
+	struct cb_field		*q;
+
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		output ("1");
 		break;
-	case CB_TAG_LITERAL: {
-		struct cb_literal	*l = CB_LITERAL (x);
+	case CB_TAG_LITERAL:
+		l = CB_LITERAL (x);
 		output ("%d", (int)(l->size + (l->sign != 0)));
 		break;
-	}
-	case CB_TAG_REFERENCE: {
-		struct cb_reference	*r = CB_REFERENCE (x);
-		struct cb_field		*f = CB_FIELD (r->value);
+	case CB_TAG_REFERENCE:
+		r = CB_REFERENCE (x);
+		f = CB_FIELD (r->value);
 		if (f->flag_no_field) {
 			output ("0");
 			break;
@@ -1260,7 +1265,9 @@ output_size (const cb_tree x)
 			output_integer (r->length);
 			break;
 		}
-		if (r->offset && !chk_field_variable_size (f)) {
+		p = chk_field_variable_size (f);
+		if (r->offset 
+		 && p == NULL) {
 			if (f->flag_any_length) {
 				output ("%s%d.size - ", CB_PREFIX_FIELD, f->id);
 			} else {
@@ -1269,7 +1276,7 @@ output_size (const cb_tree x)
 			output_index (r->offset);
 			break;
 		}
-		if (chk_field_variable_size (f)
+		if (p != NULL
 		 && (cb_flag_odoslide
 		  || f->flag_local
 		  || f->flag_item_based
@@ -1277,17 +1284,17 @@ output_size (const cb_tree x)
 		 && !gen_init_working) {
 			out_odoslide_size (f);
 		} else {
-			struct cb_field		*p = chk_field_variable_size (f);
-			struct cb_field		*q = f;
+			q = f;
 again:
 			if ((!cb_flag_odoslide || gen_init_working)
-			 && p
+			 && p != NULL
 			 && p->flag_odo_relative) {
 				q = p;
 				output ("%d", p->size * p->occurs_max);
-			} else if (p && (!r->flag_receiving ||
-				   !cb_field_subordinate (cb_code_field (p->depending), q))) {
-				if (p->offset - q->offset > 0) {
+			} else if (p 
+					&& (!r->flag_receiving 
+				   	 ||	!cb_field_subordinate (cb_code_field (p->depending), q))) {
+				if ((p->offset - q->offset) > 0) {
 					output ("%d + ", p->offset - q->offset);
 				}
 				if (p->size != 1) {
@@ -1295,15 +1302,16 @@ again:
 				}
 				output_integer (p->depending);
 				q = p;
-			} else if(q->usage == CB_USAGE_COMP_X
-				&& q->compx_size > 0) {
+			} else if (q->usage == CB_USAGE_COMP_X
+					&& q->compx_size > 0) {
 				output ("%d", q->compx_size);
 			} else {
 				output ("%d", q->size);
 			}
 
 			for (; q != f; q = q->parent) {
-				if (q->sister && !q->sister->redefines) {
+				if (q->sister 
+				&& !q->sister->redefines) {
 					q = q->sister;
 					p = q->depending ? q : chk_field_variable_size (q);
 					output (" + ");
@@ -1316,7 +1324,6 @@ again:
 			output_index (r->offset);
 		}
 		break;
-	}
 	case CB_TAG_FIELD:
 		output ("(int)%s%d.size", CB_PREFIX_FIELD, CB_FIELD (x)->id);
 		break;
@@ -4811,14 +4818,12 @@ output_initialize_fp (cb_tree x, struct cb_field *f)
 static void
 output_initialize_uniform (cb_tree x, const int c, const int size)
 {
-	struct cb_field		*f = cb_code_field (x);
-
+	struct cb_field		*f;
+	f = cb_code_field (x);
 	/* REPORT lines are cleared to SPACES */
 	if (f->storage == CB_STORAGE_REPORT
-	 && c == ' ') {
+	 && c == ' ')
 		return;
-	}
-
 	output_prefix ();
 	if (size == 1) {
 		output ("*(cob_u8_ptr)(");
@@ -4831,23 +4836,19 @@ output_initialize_uniform (cb_tree x, const int c, const int size)
 			output (", %d, ", c);
 			output_size (x);
 			output (");");
-		} else if (CB_REFERENCE_P(x) && CB_REFERENCE(x)->length) {
+		} else if (CB_REFERENCE_P(x) 
+				&& CB_REFERENCE(x)->length) {
 			output (", %d, ", c);
 			output_size (x);
 			output (");");
+		} else if (!gen_init_working 
+				&& (f->flag_unbounded || !cb_complex_odo)
+				&& chk_field_variable_size (f) != NULL) {
+			output (", %d, ", c);
+			out_odoslide_size (f);
+			output (");");
 		} else {
-			struct cb_field		*v = NULL;
-			if (!gen_init_working 
-			 && (f->flag_unbounded || !cb_complex_odo)) {
-				v = chk_field_variable_size (f);
-			}
-			if (v) {
-				output (", %d, ", c);
-				out_odoslide_size (f);
-				output (");");
-			} else {
-				output (", %d, %d);", c, size);
-			}
+			output (", %d, %d);", c, size);
 		}
 	}
 	output_newline ();
