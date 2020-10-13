@@ -11,7 +11,7 @@ How to build in native Windows environments:
 
 * get/build necessary prerequisites and place them in build_windows
   Note: for convenience you can get the essential ones (MPIR, pdcurses, VBISAM,
-  BDB) from https://sourceforge.net/projects/open-cobol/files/win_prerequisites/
+  BDB) from https://sourceforge.net/projects/gnucobol/files/win_prerequisites/
   As of January 2019, libxml2 binaries (and its dependents) are available at
   https://www.zlatkovic.com/pub/libxml/64bit/ (also for 32bit!), courtesy of Igor Zlatkovic.
   For a manual approach:

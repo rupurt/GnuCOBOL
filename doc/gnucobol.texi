@@ -2329,10 +2329,7 @@ is not available on the current system.
         END-DISPLAY
 @end example
 
-@ignore
-@node Appendices, Index, System Routines, Top
-@end ignore
-@node Appendices, , System Routines, Top
+@node Appendices
 
 @menu
 * Appendix A::                  Compiler @command{cobc} options
@@ -2429,7 +2426,7 @@ The following list was extracted from @file{config/runtime.cfg}.
 
 @ignore
 @comment Create index.
-@node Index, , Appendices, Top
+@node Index
 @unnumbered Index
 @printindex cp
 @end ignore

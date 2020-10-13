@@ -1,4 +1,8 @@
 
+2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
+
+	* gnucobol.texi: remove node structuring that is identical to default
+
 2020-09-28  James K. Lowden  <jklowden@symas.com>
 
 	* cbrunt.tex.gen: adjust for changed runtime.cfg

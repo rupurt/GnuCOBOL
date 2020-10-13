@@ -147,6 +147,6 @@ see HACKING.
 Further information about the project, including the source code repository, history, and frequently asked questions, may be found at 
 
 *		https://www.gnu.org/software/gnucobol/
-*		https://sourceforge.net/projects/open-cobol
+*		https://sourceforge.net/projects/gnucobol
 *		https://savannah.gnu.org/projects/gnucobol
 
