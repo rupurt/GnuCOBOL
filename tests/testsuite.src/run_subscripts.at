@@ -62,7 +62,7 @@ AT_DATA([prog2.cob], [
 AT_CHECK([$COMPILE prog2.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog2], [1], [],
 [libcob: prog2.cob:10: error: subscript of 'X' out of bounds: 11
-	maximum subscript for 'X': 10
+note: maximum subscript for 'X': 10
 ])
 
 AT_CLEANUP
@@ -93,7 +93,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [3],
 [libcob: prog.cob:15: error: OCCURS DEPENDING ON 'N' out of bounds: 3
-	minimum subscript for 'X': 4
+note: minimum subscript for 'X': 4
 ])
 
 AT_DATA([prog2.cob], [
@@ -113,7 +113,7 @@ AT_DATA([prog2.cob], [
 AT_CHECK([$COMPILE prog2.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog2], [1], [],
 [libcob: prog2.cob:10: error: OCCURS DEPENDING ON 'N' out of bounds: 7
-	maximum subscript for 'X': 6
+note: maximum subscript for 'X': 6
 ])
 
 AT_CLEANUP
@@ -139,7 +139,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 [libcob: prog.cob:10: error: subscript of 'X' out of bounds: 5
-	current maximum subscript for 'X': 4
+note: current maximum subscript for 'X': 4
 ])
 
 AT_CLEANUP
@@ -167,7 +167,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 [libcob: prog.cob:10: error: subscript of 'X' out of bounds: 5
-	current maximum subscript for 'X': 4
+note: current maximum subscript for 'X': 4
 ])
 
 AT_CLEANUP
@@ -202,7 +202,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 [libcob: prog.cob:15: error: subscript of 'X' out of bounds: 5
-	current maximum subscript for 'X': 4
+note: current maximum subscript for 'X': 4
 ])
 
 AT_CLEANUP
@@ -374,7 +374,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob -o badprog1], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./badprog1], [1], [],
 [libcob: prog.cob:13: error: subscript of 'y' out of bounds: 6
-	maximum subscript for 'y': 5
+note: maximum subscript for 'y': 5
 ])
 AT_CHECK([$COBC -x prog.cob -o exprog1], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./exprog1], [0], [!], [])
@@ -387,7 +387,7 @@ AT_CHECK([$COBCRUN_DIRECT ./exprog3], [0], [!])
 AT_CHECK([$COBC -x -fec=BoUnd-subscript prog.cob -o badprog2], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./badprog2], [1], [],
 [libcob: prog.cob:13: error: subscript of 'y' out of bounds: 6
-	maximum subscript for 'y': 5
+note: maximum subscript for 'y': 5
 ])
 
 AT_CLEANUP
@@ -454,7 +454,7 @@ AT_CHECK([$COMPILE progn.cob], [0], [], [])
 AT_CHECK([$COMPILE progn2.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 [libcob: prog.cob:14: error: subscript of 'y' out of bounds: 6
-	maximum subscript for 'y': 5
+note: maximum subscript for 'y': 5
 ])
 AT_CHECK([$COBCRUN_DIRECT ./progn], [0], [!], [])
 AT_CHECK([$COBCRUN_DIRECT ./progn2], [0], [!], [])
@@ -498,7 +498,7 @@ AT_CHECK([$COBCRUN_DIRECT ./prog], [1],
 [!
  !
 ], [libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
-	maximum subscript for 'y': 5
+note: maximum subscript for 'y': 5
 ])
 
 AT_CHECK([$COMPILE -DTEST-ZERO-LEN-REF-MOD prog.cob], [0], [], [])

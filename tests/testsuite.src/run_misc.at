@@ -886,7 +886,7 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [!!],
 [libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
-	maximum subscript for 'y': 5
+note: maximum subscript for 'y': 5
 ])
 
 AT_CLEANUP

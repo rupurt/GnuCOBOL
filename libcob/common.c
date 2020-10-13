@@ -6967,7 +6967,7 @@ cob_runtime_hint (const char *fmt, ...)
 	va_list args;
 
 	/* Prefix */
-	fprintf (stderr, "\t");
+	fprintf (stderr, "%s", _("note: "));
 
 	/* Body */
 	va_start (args, fmt);
