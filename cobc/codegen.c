@@ -229,6 +229,8 @@ static int			need_plus_sign = 0;
 static int			odo_stop_now = 0;
 static unsigned int		nolitcast = 0;
 
+static unsigned int		in_func_call = 0;
+static unsigned int		in_cond = 0;
 static unsigned int		inside_check = 0;
 static unsigned int		inside_stack[COB_INSIDE_SIZE];
 
@@ -245,6 +247,7 @@ static const struct system_table	system_tab[] = {
 #undef	COB_SYSTEM_GEN
 
 /* Declarations */
+static void output_occurs (struct cb_field *);
 static void output (const char *, ...)		COB_A_FORMAT12;
 static void output_line (const char *, ...)	COB_A_FORMAT12;
 static void output_storage (const char *, ...)	COB_A_FORMAT12;
@@ -1072,16 +1075,10 @@ is_index_1 (cb_tree x)
 static void
 output_data (cb_tree x)
 {
-	struct cb_literal	*l;
-	struct cb_reference	*r;
-	struct cb_field		*f;
-	struct cb_field		*o_slide;
-	struct cb_field		*o;
-	cb_tree			lsub;
-
+	int did_check = 0;
 	switch (CB_TREE_TAG (x)) {
-	case CB_TAG_LITERAL:
-		l = CB_LITERAL (x);
+	case CB_TAG_LITERAL: {
+		struct cb_literal	*l = CB_LITERAL (x);
 		if (CB_TREE_CLASS (x) == CB_CLASS_NUMERIC) {
 			output ("(cob_u8_ptr)\"%s%s\"",
 					(l->sign < 0) ? "-" : (l->sign > 0) ? "+" : "",
@@ -1091,24 +1088,54 @@ output_data (cb_tree x)
 			output_string (l->data, (int) l->size, l->llit);
 		}
 		break;
-	case CB_TAG_FIELD:
-		f = CB_FIELD (x);
+	}
+	case CB_TAG_FIELD: {
+		struct cb_field		*f = CB_FIELD (x);
 		output("/* %s */",f->name);
 		/* Base address */
 		output_base (f, 0);
 		break;
-	case CB_TAG_REFERENCE:
-		r = CB_REFERENCE (x);
-		f = CB_FIELD (r->value);
+	}
+	case CB_TAG_REFERENCE: {
+		struct cb_reference	*r = CB_REFERENCE (x);
+		struct cb_field		*f = CB_FIELD (r->value);
+
+		if (r->check 
+		 && !gen_init_working
+		 && in_cond
+		 && inside_check == 0
+		 && in_func_call == 0) {
+			int n, sav_stack_id;
+			cb_tree	l;
+
+			inside_stack[inside_check++] = 0;
+			did_check = 1;
+			output_newline ();
+			output_prefix ();
+			output("(");
+			n = output_indent_level;
+			output_indent_level = 0;
+			for (l = r->check; l; l = CB_CHAIN (l)) {
+				sav_stack_id = stack_id;
+				output_stmt (CB_VALUE (l));
+				stack_id = sav_stack_id;
+				if (l == r->check) {
+					output_indent_level = n;
+				}
+			}
+			output ("), ");
+			output_newline ();
+			output_prefix ();
+		}
 
 		/* Base address */
 		output_base (f, 0);
 
 		/* Subscripts */
 		if (r->subs) {
-			lsub = r->subs;
-			o_slide = NULL;
-			o = f;
+			struct cb_field		*o_slide = NULL;
+			struct cb_field		*o = f;
+			cb_tree			lsub = r->subs;
 			for (; f && lsub; f = f->parent) {
 				/* add current field size for OCCURS */
 				if (f->flag_occurs) {
@@ -1161,7 +1188,13 @@ output_data (cb_tree x)
 			output (" + ");
 			output_index (r->offset);
 		}
+
+		if (r->check 
+		 && did_check) {
+			--inside_check;
+		}
 		break;
+	}
 	case CB_TAG_CAST:
 		output ("&");
 		output_param (x, 0);
@@ -1190,23 +1223,18 @@ output_data (cb_tree x)
 static void
 output_size (const cb_tree x)
 {
-	struct cb_literal	*l;
-	struct cb_reference	*r;
-	struct cb_field		*f;
-	struct cb_field		*p;
-	struct cb_field		*q;
-
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		output ("1");
 		break;
-	case CB_TAG_LITERAL:
-		l = CB_LITERAL (x);
+	case CB_TAG_LITERAL: {
+		struct cb_literal	*l = CB_LITERAL (x);
 		output ("%d", (int)(l->size + (l->sign != 0)));
 		break;
-	case CB_TAG_REFERENCE:
-		r = CB_REFERENCE (x);
-		f = CB_FIELD (r->value);
+	}
+	case CB_TAG_REFERENCE: {
+		struct cb_reference	*r = CB_REFERENCE (x);
+		struct cb_field		*f = CB_FIELD (r->value);
 		if (f->flag_no_field) {
 			output ("0");
 			break;
@@ -1221,8 +1249,8 @@ output_size (const cb_tree x)
 			&& !gen_init_working) {
 			out_odoslide_size (f);
 		} else {
-			p = chk_field_variable_size (f);
-			q = f;
+			struct cb_field		*p = chk_field_variable_size (f);
+			struct cb_field		*q = f;
 again:
 			if ((!cb_flag_odoslide || gen_init_working)
 			 && p
@@ -1257,6 +1285,7 @@ again:
 			}
 		}
 		break;
+	}
 	case CB_TAG_FIELD:
 		output ("(int)%s%d.size", CB_PREFIX_FIELD, CB_FIELD (x)->id);
 		break;
@@ -1541,6 +1570,16 @@ output_attr (const cb_tree x)
 					flags |= COB_FLAG_BINARY_TRUNC;
 				}
 
+				if (type == COB_TYPE_NUMERIC_BINARY
+				 && f->usage == CB_USAGE_INDEX) {
+					flags |= COB_FLAG_REAL_BINARY;
+					type = COB_TYPE_NUMERIC_COMP5;
+				} else
+				if (type == COB_TYPE_NUMERIC_BINARY
+				 && (f->flag_binary_swap || f->flag_real_binary)
+				 && (f->flag_indexed_by || f->index_type || f->flag_internal_register)) {
+					type = COB_TYPE_NUMERIC_COMP5;
+				}
 				switch (f->usage) {
 				case CB_USAGE_COMP_6:
 					flags |= COB_FLAG_NO_SIGN_NIBBLE;
@@ -4147,6 +4186,7 @@ output_funcall (cb_tree x)
 		return;
 	}
 
+	in_func_call = 1;
 	screenptr = p->screenptr;
 	output ("%s (", p->name);
 	for (i = 0; i < p->argc; i++) {
@@ -4175,6 +4215,7 @@ output_funcall (cb_tree x)
 		}
 	}
 	output (")");
+	in_func_call = 0;
 	nolitcast = 0;
 	screenptr = 0;
 }
@@ -4182,9 +4223,11 @@ output_funcall (cb_tree x)
 static void
 output_func_1 (const char *name, cb_tree x)
 {
+	in_func_call = 1;
 	output ("%s (", name);
 	output_param (x, param_id);
 	output (")");
+	in_func_call = 0;
 }
 
 /* Condition */
@@ -4194,6 +4237,7 @@ output_cond (cb_tree x, const int save_flag)
 {
 	struct cb_binary_op	*p;
 
+	in_cond = 1;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_CONST:
 		if (x == cb_true) {
@@ -4306,6 +4350,7 @@ output_cond (cb_tree x, const int save_flag)
 		COBC_ABORT ();
 	/* LCOV_EXCL_STOP */
 	}
+	in_cond = 0;
 }
 
 /* MOVE */
@@ -4458,6 +4503,10 @@ static void
 output_figurative (cb_tree x, const struct cb_field *f, const int value,
 		   const int init_occurs)
 {
+	/* REPORT lines are cleared to SPACES */
+	if (f->storage == CB_STORAGE_REPORT
+	 && value == ' ')	
+		return;
 	output_prefix ();
 	/* Check for non-standard 01 OCCURS */
 	if (init_occurs) {
@@ -4504,6 +4553,10 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 		lsize = (int)l->size;
 	}
 	if (lsize == 1) {
+		/* REPORT lines are cleared to SPACES */
+		if (f->storage == CB_STORAGE_REPORT
+		 && l->data[0] == ' ')	
+			return;
 		output_prefix ();
 		output ("memset (");
 		output_data (x);
@@ -4579,6 +4632,14 @@ output_initialize_fp (cb_tree x, struct cb_field *f)
 static void
 output_initialize_uniform (cb_tree x, const int c, const int size)
 {
+	struct cb_field		*f = cb_code_field (x);
+
+	/* REPORT lines are cleared to SPACES */
+	if (f->storage == CB_STORAGE_REPORT
+	 && c == ' ') {
+		return;
+	}
+
 	output_prefix ();
 	if (size == 1) {
 		output ("*(cob_u8_ptr)(");
@@ -4596,7 +4657,18 @@ output_initialize_uniform (cb_tree x, const int c, const int size)
 			output_size (x);
 			output (");");
 		} else {
-			output (", %d, %d);", c, size);
+			struct cb_field		*v = NULL;
+			if (!gen_init_working 
+			 && (f->flag_unbounded || !cb_complex_odo)) {
+				v = chk_field_variable_size (f);
+			}
+			if (v) {
+				output (", %d, ", c);
+				out_odoslide_size (f);
+				output (");");
+			} else {
+				output (", %d, %d);", c, size);
+			}
 		}
 	}
 	output_newline ();
@@ -4929,8 +5001,11 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				/* Begin occurs loop */
 				int		i = f->indexes;
 				i_counters[i] = 1;
-				output_line ("for (i%d = 1; i%d <= %d; i%d++)",
-					     i, i, f->occurs_max, i);
+				output_prefix ();
+				output ("for (i%d = 1; i%d <= ", i, i );
+				output_occurs (f);
+				output ("; i%d++)", i);
+				output_newline ();
 				output_block_open ();
 				CB_REFERENCE (c)->subs =
 				    CB_BUILD_CHAIN (cb_i[i], CB_REFERENCE (c)->subs);
@@ -4962,8 +5037,9 @@ output_initialize (struct cb_initialize *p)
 	f = cb_code_field (p->var);
 	type = deduce_initialize_type (p, f, 1);
 	/* Check for non-standard OCCURS */
-	if ((f->level == 1 || f->level == 77) &&
-	    f->flag_occurs && !p->flag_init_statement) {
+	if ((f->level == 1 || f->level == 77) 
+	 && f->flag_occurs 
+	 && !p->flag_init_statement) {
 		switch (type) {
 		case INITIALIZE_NONE:
 			return;

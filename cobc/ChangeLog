@@ -1,4 +1,16 @@
 
+2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_size): limit variable scope
+	* codegen.c (output_initialize_uniform): limit variable scope and
+	  calculation in chk_field_variable_size to be only done if used
+
+2020-10-12  Ron Norman <rjn@inglenet.com>
+
+	* typeck.c: Flag internal variables with 'flag_real_binary'
+	* codegen.c: Emit USAGE INDEX and internal binary variables 
+	  as COB_TYPE_NUMERIC_COMP5
+
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* typeck.c (cb_emit_json_generate, cb_emit_xml_generate): adjusted to allow
@@ -64,6 +76,11 @@
 
 	* typeck.c (cb_validate_program_body): verify ANY LENGTH as formal parameter
 
+2020-09-04  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: emit active runtime checks also in conditions
+	  for example reference modification or subscript being out of bounds
+
 2020-09-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* scanner.l (read_literal): catch and error  missing termination of literal
@@ -78,6 +95,11 @@
 
 	* codegen.c (codegen_init): fixed broken codegen for multi-source compiles
 	  introduced when fixing bug #666
+
+2020-08-28  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Changes for UNBOUNDED OCCURS
+	* typeck.c (cb_emit_move): Changes for UNBOUNDED OCCURS
 
 2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -871,6 +893,12 @@
 	  they specify it
 	* reserved.c (default_reserved_words): fixed context-sensitive words
 	  marked as not context-sensitive
+
+2019-01-02  Ron Norman <rjn@inglenet.com>
+
+	* field.c: Check for duplicate LINE in REPORT and ignore it
+	* codegen.c: Skip initialize to SPACES for REPORT lines as
+	  all lines are cleared to SPACES
 
 2019-01-02  Simon Sobisch <simonsobisch@gnu.org>
 

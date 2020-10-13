@@ -1079,6 +1079,7 @@ cb_build_register_return_code (const char *name, const char *definition)
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->index_type = CB_STATIC_INT_INDEX;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_return_code = field;
 }
 
@@ -1105,6 +1106,7 @@ cb_build_register_sort_return (const char *name, const char *definition)
 	field = cb_build_index (cb_build_reference (name), cb_zero, 0, NULL);
 	CB_FIELD_PTR (field)->flag_no_init = 1;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_sort_return = field;
 }
 
@@ -1126,6 +1128,7 @@ cb_build_register_number_parameters (const char *name, const char *definition)
 	CB_FIELD_PTR (field)->flag_local = 1;
 	CB_FIELD_PTR (field)->flag_internal_register = 1;
 	CB_FIELD_PTR (field)->index_type = CB_INT_INDEX;
+	CB_FIELD_PTR (field)->flag_real_binary = 1;
 	current_program->cb_call_params = field;
 }
 
@@ -1720,6 +1723,8 @@ cb_build_index (cb_tree x, cb_tree values, const unsigned int indexed_by,
 		f->index_qual = qual;
 	}
 	f->flag_indexed_by = !!indexed_by;
+	if (f->flag_indexed_by)
+		f->flag_real_binary = 1;
 	CB_FIELD_ADD (current_program->working_storage, f);
 	return x;
 }
@@ -10285,6 +10290,49 @@ cb_emit_move (cb_tree src, cb_tree dsts)
 			continue;
 		}
 		if (!tempval) {
+#if 0 /* not yet merged revs 2603+2612 */
+			if (CB_REFERENCE_P (x)
+			 && CB_REFERENCE (x)->length == NULL
+			 && cb_complex_odo) {
+				p = CB_FIELD_PTR(x);
+				if ((f = chk_field_variable_size (p)) != NULL) {
+					bgnpos = -1;
+					if (CB_REFERENCE (x)->offset == NULL
+					 || CB_REFERENCE (x)->offset == cb_int1) {
+						bgnpos = 1;
+					} else if (CB_REFERENCE (x)->offset == cb_int2) {
+						bgnpos = 2;
+					} else
+					if (CB_REFERENCE (x)->offset != NULL
+					 && CB_LITERAL_P (CB_REFERENCE (x)->offset)) {
+						lt = CB_LITERAL (CB_REFERENCE (x)->offset);
+						bgnpos = atoi((const char*)lt->data);
+					}
+					if (bgnpos >= 1
+					 && p->storage != CB_STORAGE_LINKAGE
+					 && !p->flag_item_based 
+					 && CB_LITERAL_P (src)
+					 && !cb_is_field_unbounded (p)) {
+						CB_REFERENCE (x)->length = cb_int (p->size - bgnpos + 1);
+					} else {
+						if (bgnpos >= p->offset
+						 && bgnpos < f->offset
+						 && p->offset < f->offset) {
+							/* Move for fixed size header of field */
+							/* to move values of possible DEPENDING ON fields */
+							svoff = CB_REFERENCE (x)->offset;
+							CB_REFERENCE (x)->offset = cb_int (bgnpos);
+							CB_REFERENCE (x)->length = cb_int (f->offset - p->offset - bgnpos + 1);
+							m = cb_build_move (src, cb_check_sum_field(x));
+							cb_emit (m);
+							CB_REFERENCE (x)->offset = svoff;
+							CB_REFERENCE (x)->length = NULL;
+							/* Then move the full field with ODO lengths set */
+						}
+					}
+				}
+			}
+#endif
 #if 0 /* CHECKME: this is way to much to cater for sum field */
 			m = cb_build_move (src, cb_check_sum_field(x));
 #else

@@ -13,6 +13,9 @@ NEWS - user visible changes				-*- outline -*-
   ** the configure option --with-cjson was replaced by
      --with-json with arguments, allowing new JSON-C handler to be used
 
+  ** runtime checks: previously conditions missed the generation of runtime checks,
+     leading to possible out-of-bounds or null-access there, this was fixed
+
 * New GnuCOBOL features
 
 ** new COBOL compiler (cobc) options:

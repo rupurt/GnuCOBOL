@@ -204,10 +204,6 @@ cob_display_common (const cob_field *f, FILE *fp)
 	} un;
 	int		n;
 	char	wrk[48];
-#if	0	/* RXWRXW - Print bin */
-	cob_field	temp;
-	cob_field_attr	attr;
-#endif
 
 	if (f->size == 0) {
 		return;
@@ -245,21 +241,14 @@ cob_display_common (const cob_field *f, FILE *fp)
 			fprintf (fp, "%x%x", *p >> 4, *p & 0xF);
 		}
 		return;
-	} else if (COB_FIELD_REAL_BINARY(f) ||
-		   (COB_FIELD_TYPE(f) == COB_TYPE_NUMERIC_BINARY &&
-		    !COB_MODULE_PTR->flag_pretty_display)) {
+	} else if (COB_FIELD_TYPE(f) == COB_TYPE_NUMERIC_COMP5) {
+		cob_print_realbin (f, fp, f->attr->digits);
+		return;
+	} else if (COB_FIELD_REAL_BINARY(f) 
+			|| (COB_FIELD_TYPE(f) == COB_TYPE_NUMERIC_BINARY 
+			 && !COB_MODULE_PTR->flag_pretty_display)) {
 		cob_print_realbin (f, fp, bin_digits[f->size]);
 		return;
-#if	0	/* RXWRXW - print bin */
-	} else if (COB_FIELD_TYPE(f) == COB_TYPE_NUMERIC_BINARY &&
-		    !COB_MODULE_PTR->flag_pretty_display) {
-		attr = *f->attr;
-		temp = *f;
-		attr.digits = bin_digits[f->size];
-		temp.attr = &attr;
-		display_numeric (&temp, fp);
-		return;
-#endif
 	} else if (COB_FIELD_IS_NUMERIC (f)) {
 		if (COB_MODULE_PTR->flag_pretty_display) {
 			pretty_display_numeric ((cob_field *)f, fp);
