@@ -1,4 +1,4 @@
-## Copyright (C) 2003-2012, 2014-2017, 2019 Free Software Foundation, Inc.
+## Copyright (C) 2003-2012, 2014-2017, 2019-2020 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch
 ## 
 ## This file is part of GnuCOBOL.
@@ -119,7 +119,7 @@ AT_CHECK([$COBCRUN_DIRECT ./prog2], [1], [],
 AT_CLEANUP
 
 
-AT_SETUP([Subscript bounds with OCCURS DEPENDING ON])
+AT_SETUP([Subscript bounds with OCCURS DEPENDING ON (1)])
 AT_KEYWORDS([runsubscripts subscripts odo])
 
 AT_DATA([prog.cob], [
@@ -139,6 +139,69 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
 [libcob: prog.cob:10: error: subscript of 'X' out of bounds: 5
+	current maximum subscript for 'X': 4
+])
+
+AT_CLEANUP
+
+
+AT_SETUP([Subscript bounds with OCCURS DEPENDING ON (2)])
+AT_KEYWORDS([runsubscripts subscripts odo IF])
+
+# verifies that the check is generated within conditions - simple IF
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 G.
+         02 X           PIC X OCCURS 4 TO 6 DEPENDING ON N.
+       01 N             PIC 9 VALUE 4.
+       PROCEDURE        DIVISION.
+           IF X(5) <> SPACE
+              DISPLAY X(5).
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
+[libcob: prog.cob:10: error: subscript of 'X' out of bounds: 5
+	current maximum subscript for 'X': 4
+])
+
+AT_CLEANUP
+
+
+AT_SETUP([Subscript bounds with OCCURS DEPENDING ON (3)])
+AT_KEYWORDS([runsubscripts subscripts odo EVALUATE WHEN])
+
+# verifies that the check is generated within conditions - WHEN
+# complex test for correct place and not raised if guarded by check
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 G.
+         02 X           PIC X OCCURS 4 TO 6 DEPENDING ON N.
+       01 N             PIC 9 VALUE 4.
+       PROCEDURE        DIVISION.
+           EVALUATE TRUE
+           WHEN N >= 5
+            AND X(5) <> SPACE
+              DISPLAY "1-" X(5)
+           WHEN N >= 5
+           WHEN X(5) <> SPACE
+              DISPLAY "2-" X(5)
+           END-EVALUATE
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
+[libcob: prog.cob:15: error: subscript of 'X' out of bounds: 5
 	current maximum subscript for 'X': 4
 ])
 

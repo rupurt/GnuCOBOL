@@ -29,8 +29,8 @@
 
 2020-09-04  Ron Norman <rjn@inglenet.com>
 
-	* codegen.c: emit runtime checks to IF conditions for
-	  reference modification being out of bounds
+	* codegen.c: emit active runtime checks also in conditions
+	  for example reference modification or subscript being out of bounds
 
 2020-08-28  Ron Norman <rjn@inglenet.com>
 
