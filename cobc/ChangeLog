@@ -1,4 +1,10 @@
 
+2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_size): limit variable scope
+	* codegen.c (output_initialize_uniform): limit variable scope and
+	  calculation in chk_field_variable_size to be only done if used
+
 2020-10-12  Ron Norman <rjn@inglenet.com>
 
 	* typeck.c: Flag internal variables with 'flag_real_binary'
