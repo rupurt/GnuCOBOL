@@ -49,51 +49,75 @@ AT_KEYWORDS([runmisc cobc warning])
 AT_DATA([prog.cob],[
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        77 var1    pic 9.
+        77 var2    pic 99.
         PROCEDURE DIVISION.
         PERFORM UNTIL 0 = 1
            DISPLAY 'BLA'
         END-PERFORM.
+        MOVE var1 to var2
+        MOVE var2 to var1
+        GOBACK.
 ])
 AT_CHECK([$COBC -fsyntax-only prog.cob], [0], [], [])
 # increasing to more warnings
 AT_CHECK([$COBC -fsyntax-only -Wadditional prog.cob], [0], [],
-[prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+[prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
 ])
 AT_CHECK([$COBC -fsyntax-only -fno-diagnostics-show-option -Wadditional prog.cob], [0], [],
-[prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE
+[prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE
 ])
 # which in this case is also included in -Wall
 AT_CHECK([$COBC -fsyntax-only -Wall prog.cob], [0], [],
-[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
-prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+[prog.cob:9: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
+prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
 ])
 # -Wextra is more descriptive ...
 AT_CHECK([$COBC -fsyntax-only -Wextra prog.cob], [0], [],
-[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
-prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
-prog.cob:6: warning: DISPLAY statement not terminated by END-DISPLAY [[-Wterminator]]
+[prog.cob:9: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
+prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+prog.cob:10: warning: DISPLAY statement not terminated by END-DISPLAY [[-Wterminator]]
+prog.cob:13: warning: some digits may be truncated [[-Wpossible-truncate]]
+prog.cob:7: note: 'var2' defined here as PIC 99 [[-Wpossible-truncate]]
+prog.cob:6: note: 'var1' defined here as PIC 9 [[-Wpossible-truncate]]
 ])
 # ... the old -W is in for backwards portability
 AT_CHECK([$COBC -fsyntax-only -W prog.cob], [0], [],
-[prog.cob:5: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
-prog.cob:5: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
-prog.cob:6: warning: DISPLAY statement not terminated by END-DISPLAY [[-Wterminator]]
+[prog.cob:9: warning: expression '0' EQUALS '1' is always FALSE [[-Wconstant-expression]]
+prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+prog.cob:10: warning: DISPLAY statement not terminated by END-DISPLAY [[-Wterminator]]
+prog.cob:13: warning: some digits may be truncated [[-Wpossible-truncate]]
+prog.cob:7: note: 'var2' defined here as PIC 99 [[-Wpossible-truncate]]
+prog.cob:6: note: 'var1' defined here as PIC 9 [[-Wpossible-truncate]]
 ])
 # a global "error" use implies no warning settings
 AT_CHECK([$COBC -fsyntax-only -Werror prog.cob], [0], [], [])
 # a concrete "error" use implies setting the warning
 AT_CHECK([$COBC -fsyntax-only -Werror=additional prog.cob], [1], [],
-[prog.cob:5: error: PERFORM FOREVER since UNTIL is always FALSE [[-Werror=additional]]
+[prog.cob:9: error: PERFORM FOREVER since UNTIL is always FALSE [[-Werror=additional]]
 ])
 AT_CHECK([$COBC -fsyntax-only -fno-diagnostics-show-option -Werror=additional prog.cob], [1], [],
-[prog.cob:5: error: PERFORM FOREVER since UNTIL is always FALSE
+[prog.cob:9: error: PERFORM FOREVER since UNTIL is always FALSE
 ])
 # a "no-error" use implies nothing
 AT_CHECK([$COBC -fsyntax-only -Wno-error=additional prog.cob], [0], [], [])
 # ... now combined
 AT_CHECK([$COBC -fsyntax-only -Werror -Wno-error=additional prog.cob], [0], [], [])
 AT_CHECK([$COBC -fsyntax-only -Werror=additional -Wno-error prog.cob], [1], [],
-[prog.cob:5: error: PERFORM FOREVER since UNTIL is always FALSE [[-Werror=additional]]
+[prog.cob:9: error: PERFORM FOREVER since UNTIL is always FALSE [[-Werror=additional]]
+])
+AT_CHECK([$COBC -fsyntax-only -w -Werror=additional prog.cob], [1], [],
+[prog.cob:9: error: PERFORM FOREVER since UNTIL is always FALSE [[-Werror=additional]]
+])
+AT_CHECK([$COBC -fsyntax-only -w -Wadditional prog.cob], [0], [],
+[prog.cob:9: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+])
+AT_CHECK([$COBC -fsyntax-only -w -Wpossible-truncate prog.cob], [0], [],
+[prog.cob:13: warning: some digits may be truncated [[-Wpossible-truncate]]
+prog.cob:7: note: 'var2' defined here as PIC 99 [[-Wpossible-truncate]]
+prog.cob:6: note: 'var1' defined here as PIC 9 [[-Wpossible-truncate]]
 ])
 # TODO: unknown warnings should only get a diagnostic (in verbose mode)
 #AT_CHECK([$COBC -fsyntax-only -Wunknown-warning prog.cob], [0], [], [])
@@ -649,7 +673,8 @@ AT_CHECK([$COBCRUN -M ./mainer called "first argument" "second" "third"], [0],
 ], [])
 
 # additional test with environment configuration settings removed:
-AT_CHECK([unset COB_PRE_LOAD COB_LIBRARY_PATH && $COBCRUN -M ./mainer called "first argument" "second" "third"], [0],
+AT_CHECK([unset COB_PRE_LOAD COB_LIBRARY_PATH ; \
+   $COBCRUN -M ./mainer called "first argument" "second" "third"], [0],
 [first argument second third:second
 ], [])
 

@@ -1392,8 +1392,8 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 		lock.l_len = 0;
 		errno = 0;
 		if (fcntl (fd, F_SETLK, &lock) < 0) {
-			f->open_mode = COB_OPEN_CLOSED;
 			int		ret = errno;
+			f->open_mode = COB_OPEN_CLOSED;
 			close (fd);
 			switch (ret) {
 			case EACCES:
@@ -1603,9 +1603,9 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		lock.l_start = 0;
 		lock.l_len = 0;
 		if (fcntl (f->fd, F_SETLK, &lock) < 0) {
+			int ret = errno;
 			f->open_mode = COB_OPEN_CLOSED;
 			f->fd = -1;
-			int ret = errno;
 			fclose (fp);
 			switch (ret) {
 			case EACCES:

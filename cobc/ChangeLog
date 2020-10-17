@@ -1,4 +1,10 @@
 
+2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_cobol_info): fixed C89 declaration
+	* codegen.c: minor optimizations in generating pre-calculated offsets
+	  and check for flag_filler instead of strcmp
+
 2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_size): limit variable scope
@@ -6,6 +12,8 @@
 	  calculation in chk_field_variable_size to be only done if used
 	* tree.c (cb_name_errmsg): removed and logic merged into new literal handling
 	  upon merge of 2020-01-03
+	* pplex.l (plex_call_destroy): added cleanup for internal copybook references
+	* help.c (cobc_print_usage_warnings): added -w option
 
 2020-10-12  Ron Norman <rjn@inglenet.com>
 
@@ -159,6 +167,11 @@
 2020-07-08  Simon Sobisch <simonsobisch@gnu.org>
 
 	* scanner.l (scan_x): fixed #658 by building a national literal for nx''
+
+2020-07-07  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c (output_local_field_cache): prevent empty declaration
+	  and additional comment after report OCCURS fields
 
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -576,6 +589,11 @@
 2019-09-09  Ron Norman <rjn@inglenet.com>
 
 	* cobc.h: Add defines for COB_ALIGN_8 to set 8 byte boundary alignment
+
+2019-09-04  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: set temp-field.data after all declarations to avoid problems
+	  with C89 compilers
 
 2019-09-03  Ron Norman <rjn@inglenet.com>
 

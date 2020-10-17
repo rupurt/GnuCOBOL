@@ -134,6 +134,7 @@ cobc_print_usage_warnings (void)
 	puts (_("Warning options:"));
 	puts (_("  -Wall                 enable most warnings (all except as noted below)"));
 	puts (_("  -Wextra               like -Wall but enable some extra warning flags"));
+	puts (_("  -w                    disable all warnings"));
 	puts (_("  -Wno-<warning>        disable warning enabled by default, -Wall or -Wextra"));
 #define	CB_WARNDEF(opt,name,doc)		\
 	puts (doc);

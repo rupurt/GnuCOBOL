@@ -20,7 +20,10 @@
 # along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 
 use strict;
-use warnings;
+
+# use warnings, if available
+# warnings is only a core module since Perl 5.6
+BEGIN { eval "use warnings;" }
 
 $SIG{INT}  = sub { die "\nInterrupted\n" };
 $SIG{QUIT} = sub { die "\nInterrupted\n" };
@@ -361,8 +364,8 @@ sub run_test {
 	# Some programs need to be checked for compiler warnings
 	#if ($exe eq "NC302M" || $exe eq "DB304M") {
 	#	$total = 7;    --> TODO: get amount from test source
-	#	open (my $COBC_OUT, '<', "$exe.cobc.out");
-	#	while (<$COBC_OUT>) {
+	#	open (COBC_OUT, "< $exe.cobc.out");
+	#	while (<COBC_OUT>) {
 	#		if
 	#		if (/ warning: ([A-Z-]+) .* obsolete /) {
 	#			$pass += 1;
@@ -422,12 +425,12 @@ testrepeat:
 	if ($no_output{$exe}) {
 		$total = 1;
 		$pass = 1;
-	} elsif (open (my $PRT, '<', $ENV{"REPORT"})) {
+	} elsif (open (PRT, "< $ENV{'REPORT'}")) {
 
 		# NC107A: check hex values in report
 		if ($exe eq "NC107A") {
-			binmode($PRT);
-			while (<$PRT>) {
+			binmode(PRT);
+			while (<PRT>) {
 				if (/^ *([0-9]+) *OF *([0-9]+) *TESTS WERE/) {
 					$total += $2;
 					$pass += $1;
@@ -454,7 +457,7 @@ testrepeat:
 		# NC113M needs to be "visual" inspected for tests being sequential
 		} elsif ($exe eq "NC113M") {
 			my $seqcount = 0;
-			while (<$PRT>) {
+			while (<PRT>) {
 				if (/^ MARGIN TESTING *MAR-TEST-([0-9]+) /) {
 					$seqcount += 1;
 					if ($seqcount eq $1) {
@@ -473,12 +476,12 @@ testrepeat:
 		# NC121M/NC220M: needs to be inspected for identical display output
 		} elsif ($exe eq "NC121M" || $exe eq "NC220M") {
 			my $line = my $line2 ="";
-			if (open (my $fh, '<', "$exe.out")) {
-				<$fh>;
-				$line = <$fh>;
-				$line2 = <$fh>;
+			if (open (FH, "< $exe.out")) {
+				<FH>;
+				$line = <FH>;
+				$line2 = <FH>;
 			}
-			while (<$PRT>) {
+			while (<PRT>) {
 				if (/^ *([0-9]+) *OF *([0-9]+) *TESTS WERE/) {
 					$total += $2;
 					$pass += $1;
@@ -503,7 +506,7 @@ testrepeat:
 		# NC135A: needs to be inspected for table output
 		} elsif ($exe eq "NC135A") {
 			my $seqcount = 0;
-			while (<$PRT>) {
+			while (<PRT>) {
 				if (/^ *([0-9]+) *OF *([0-9]+) *TESTS WERE/) {
 					$total += $2;
 					$pass += $1;
@@ -530,7 +533,7 @@ testrepeat:
 
 		# normal test procedure
 		} else {
-			while (<$PRT>) {
+			while (<PRT>) {
 				if (/^ *([0-9]+) *OF *([0-9]+) *TESTS WERE/) {
 					$total += $2;
 					$pass += $1;

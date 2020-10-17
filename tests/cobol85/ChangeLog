@@ -1,4 +1,9 @@
 
+2020-10-16  Simon Sobisch <simonsobisch@gnu.org>
+
+	* expand.pl, report.pl, summary.pl: added backwards-compatibility
+	  for Perl 5.0005
+
 2020-10-05  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am: ensure that the all target comes first as .PHONY is

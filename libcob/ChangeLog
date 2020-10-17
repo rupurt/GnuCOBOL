@@ -1,4 +1,8 @@
 
+2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c: fixed C89 declaration
+
 2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (cob_runtime_hint): replaced leading tab by "note"
