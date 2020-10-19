@@ -448,7 +448,10 @@ static void		internal_nanosleep	(cob_s64_t nsecs);
 
 static int		set_config_val	(char *value, int pos);
 static char		*get_config_val	(char *value, int pos, char *orgvalue);
+
 static void		cob_dump_module (char *reason);
+static char		abort_reason[COB_MINI_BUFF] = { 0 };
+
 #ifdef COB_DEBUG_LOG
 static void		cob_debug_open	(void);
 #endif
@@ -604,6 +607,10 @@ cob_terminate_routines (void)
 		return;
 	}
 
+	if (COB_MODULE_PTR && abort_reason[0] != 0) {
+		cob_dump_module (abort_reason);
+	}
+
 	if (cobsetptr->cob_dump_file == cobsetptr->cob_trace_file
 	 || cobsetptr->cob_dump_file == stderr) {
 		cobsetptr->cob_dump_file = NULL;
@@ -748,7 +755,7 @@ DECLNORET static void COB_A_NORETURN
 cob_sig_handler (int signal_value)
 {
 	const char *signal_name;
-	char	reason[80];
+	char signal_text[COB_MINI_BUFF];
 
 #if	defined (HAVE_SIGACTION) && !defined (SA_RESETHAND)
 	struct sigaction	sa;
@@ -765,6 +772,7 @@ cob_sig_handler (int signal_value)
 	}
 	sig_is_handled = 1;
 #endif
+
 	signal_name = get_signal_name (signal_value);
 	/* LCOV_EXCL_START */
 	if (!signal_name) {
@@ -817,16 +825,22 @@ cob_sig_handler (int signal_value)
 		break;
 	}
 	/* LCOV_EXCL_STOP */
-	snprintf (reason, sizeof (reason), _("signal %s"), signal_name);
-	fprintf (stderr, " (%s)\n", reason);
+	snprintf (signal_text, COB_MINI_MAX, _("signal %s"), signal_name);
+	fprintf (stderr, " (%s)\n", signal_text);
+
+	fputc ('\n', stderr);
+	fflush (stderr);
 
 	if (cob_initialized) {
-		cob_dump_module (reason);
+		if (abort_reason[0] == 0) {
+			memcpy (abort_reason, signal_text, COB_MINI_BUFF);
+#if 0	/* Is there a use in this message ?*/
+			fputs (_("abnormal termination - file contents may be incorrect"), stderr);
+			fputc ('\n', stderr);
+#endif
+		}
 		cob_terminate_routines ();
-		fprintf (stderr, _("abnormal termination - file contents may be incorrect"));
 	}
-	putc ('\n', stderr);
-	fflush (stderr);
 
 	cob_sig_handler_ex (signal_value);
 }
@@ -6983,22 +6997,23 @@ void
 cob_runtime_error (const char *fmt, ...)
 {
 	struct handlerlist	*h;
-	struct handlerlist	*hp;
 	char			*p;
 	va_list			ap;
 
-	char			reason[80];
-
-	const char		*err_source_file;
-	unsigned int	err_source_line, err_module_statement = 0;
-	cob_module_ptr	err_module_pointer = NULL;
+	int	more_error_procedures = 1;
 
 #if	1	/* RXWRXW - Exit screen */
 	/* Exit screen mode early */
 	cob_exit_screen ();
 #endif
 
-	if (hdlrs != NULL && !active_error_handler) {
+	if (hdlrs != NULL && !active_error_handler && cobglobptr) {
+
+		const char		*err_source_file;
+		unsigned int	err_source_line, err_module_statement = 0;
+		cob_module_ptr	err_module_pointer = NULL;
+		int call_params = cobglobptr->cob_call_params;
+
 		if (runtime_err_str) {
 			p = runtime_err_str;
 			if (cob_source_file) {
@@ -7023,7 +7038,7 @@ cob_runtime_error (const char *fmt, ...)
 		/* save error location */
 		err_source_file = cob_source_file;
 		err_source_line = cob_source_line;
-		if (cobglobptr && COB_MODULE_PTR) {
+		if (COB_MODULE_PTR) {
 			err_module_pointer = COB_MODULE_PTR;
 			err_module_statement = COB_MODULE_PTR->module_stmt;
 		}
@@ -7032,13 +7047,26 @@ cob_runtime_error (const char *fmt, ...)
 		active_error_handler = 1;
 		h = hdlrs;
 		while (h != NULL) {
-			/* ensure that error handlers set their own locations */
-			cob_source_file = NULL;
-			cob_source_line = 0;
-			h->proc (runtime_err_str);
-			hp = h;
+			int			(*current_proc)(char *) = h->proc;
+			struct handlerlist	*hp = h;
+
 			h = h->next;
 			cob_free (hp);
+	
+			if (more_error_procedures) {
+				/* fresh error buffer with guaranteed size */
+				char local_err_str[COB_ERRBUF_SIZE] = "-";
+				if (runtime_err_str != NULL) {
+					memcpy (&local_err_str, runtime_err_str, COB_ERRBUF_SIZE);
+				}
+
+				/* ensure that error handlers set their own locations */
+				cob_source_file = NULL;
+				cob_source_line = 0;
+				cobglobptr->cob_call_params = 1;
+
+				more_error_procedures = current_proc (runtime_err_str);
+			}
 		}
 		/* LCOV_EXCL_START */
 		if (runtime_err_str[0] == '-' && runtime_err_str[1] == 0) {
@@ -7051,42 +7079,45 @@ cob_runtime_error (const char *fmt, ...)
 		/* restore error location */
 		cob_source_file = err_source_file;
 		cob_source_line = err_source_line;
-		if (cobglobptr) {
-			COB_MODULE_PTR = err_module_pointer;
-			if (COB_MODULE_PTR) {
-				COB_MODULE_PTR->module_stmt = err_module_statement;
-			}
+		COB_MODULE_PTR = err_module_pointer;
+		if (COB_MODULE_PTR) {
+			COB_MODULE_PTR->module_stmt = err_module_statement;
 		}
-	}
-
-	/* Optional Module Dump */
-	if (cobglobptr && COB_MODULE_PTR
-	 && COB_MODULE_PTR->module_stmt != 0) {
-		va_start (ap, fmt);
-		vsnprintf (reason, sizeof(reason), fmt, ap);
-		va_end (ap);
-		cob_dump_module (reason);
+		cobglobptr->cob_call_params = call_params;
 	}
 
 	/* Prefix */
-	fputs ("libcob: ", stderr);
-	if (cob_source_file) {
-		fprintf (stderr, "%s:", cob_source_file);
-		if (cob_source_line) {
-			fprintf (stderr, "%u:", cob_source_line);
+	if (more_error_procedures) {
+		fputs ("libcob: ", stderr);
+		if (cob_source_file) {
+			fprintf (stderr, "%s:", cob_source_file);
+			if (cob_source_line) {
+				fprintf (stderr, "%u:", cob_source_line);
+			}
+			fputc (' ', stderr);
 		}
-		fputc (' ', stderr);
+		fprintf (stderr, "%s: ", _("error"));
+
+		/* Body */
+		va_start (ap, fmt);
+		vfprintf (stderr, fmt, ap);
+		va_end (ap);
+
+		/* Postfix */
+		fputc ('\n', stderr);
+		fflush (stderr);
 	}
-	fprintf (stderr, "%s: ", _("error"));
 
-	/* Body */
-	va_start (ap, fmt);
-	vfprintf (stderr, fmt, ap);
-	va_end (ap);
-
-	/* Postfix */
-	putc ('\n', stderr);
-	fflush (stderr);
+	/* setup reason for optional module dump */
+	if (cob_initialized && abort_reason[0] == 0) {
+#if 0	/* Is there a use in this message ?*/
+		fprintf (stderr, "\n");
+		fprintf (stderr, _("abnormal termination - file contents may be incorrect"));
+#endif
+		va_start (ap, fmt);
+		vsnprintf (abort_reason, COB_MINI_BUFF, fmt, ap);
+		va_end (ap);
+	}
 }
 
 void
@@ -8302,6 +8333,30 @@ cob_set_runtime_option (enum cob_runtime_option_switch opt, void *p)
 	return;
 }
 
+/*
+ * Return current value of special runtime options
+ */
+void *
+cob_get_runtime_option (enum cob_runtime_option_switch opt)
+{
+	switch (opt) {
+	case COB_SET_RUNTIME_TRACE_FILE:
+		return (void*)cobsetptr->cob_trace_file;
+	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
+		return (void*)cobsetptr->cob_display_print_file;
+	case COB_SET_RUNTIME_DISPLAY_PUNCH_FILE:
+		/* only externalize if not aquired by libcob */
+		if (cobsetptr->cob_display_punch_filename != NULL) {
+			return NULL;
+		}
+		return (void*)cobsetptr->cob_display_punch_file;
+	default:
+		cob_runtime_error (_("%s called with unknown option: %d"),
+			"cob_get_runtime_option", opt);
+	}
+	return NULL;
+}
+
 FILE *
 cob_get_dump_file (void)
 {
@@ -8395,30 +8450,6 @@ cob_dump_module (char *reason)
 			}
 		}
 	}
-}
-
-/*
- * Return current value of special runtime options
- */
-void *
-cob_get_runtime_option (enum cob_runtime_option_switch opt)
-{
-	switch(opt) {
-	case COB_SET_RUNTIME_TRACE_FILE:
-		return (void*)cobsetptr->cob_trace_file;
-	case COB_SET_RUNTIME_DISPLAY_PRINTER_FILE:
-		return (void*)cobsetptr->cob_display_print_file;
-	case COB_SET_RUNTIME_DISPLAY_PUNCH_FILE:
-		/* only externalize if not aquired by libcob */
-		if (cobsetptr->cob_display_punch_filename != NULL) {
-			return NULL;
-		}
-		return (void*)cobsetptr->cob_display_punch_file;
-	default:
-		cob_runtime_error (_("%s called with unknown option: %d"),
-			"cob_get_runtime_option", opt);
-	}
-	return NULL;
 }
 
 #ifdef COB_DEBUG_LOG

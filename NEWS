@@ -16,6 +16,11 @@ NEWS - user visible changes				-*- outline -*-
   ** runtime checks: previously conditions missed the generation of runtime checks,
      leading to possible out-of-bounds or null-access there, this was fixed
 
+  ** breaking change: previously the return-code of registered error handlers
+     (CBL_ERROR_PROC or ... ) were ignored. This was changed according to the
+     documentation for CBL_ERROR_PROC -> a RETURN-VALUE of ZERO skips further
+     error handlers to be called, including the internal one.
+
 * New GnuCOBOL features
 
 ** new COBOL compiler (cobc) options:

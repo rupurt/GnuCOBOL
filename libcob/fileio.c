@@ -4835,55 +4835,50 @@ indexed_rewrite (cob_file *f, const int opt)
 				if (isrewcurr (fh->isfd, (void *)f->record->data)) {
 					ret = fisretsts (COB_STATUS_49_I_O_DENIED);
 				}
-#ifdef	COB_WITH_STATUS_02
-				if (!ret && (isstat1 == '0') && (isstat2 == '2')) {
-					ret = COB_STATUS_02_SUCCESS_DUPLICATE;
-				}
-#endif
 			}
 		}
-		restorefileposition (f);
 
-#ifdef	COB_WITH_STATUS_02
-		if(!ret && (isstat1 == '0') && (isstat2 == '2')) {
-			return COB_STATUS_02_SUCCESS_DUPLICATE;
-		}
-#endif
-
-		return ret;
-	}
-
-	memcpy (fh->recwrk, f->record->data, f->record_max);
-	if (isread (fh->isfd, (void *)fh->recwrk, ISEQUAL | ISLOCK)) {
-		ret = fisretsts (COB_STATUS_49_I_O_DENIED);
-	} else {
-#ifdef	ISVARLEN
-		if (f->record_min != f->record_max) {
-			ISRECLEN = f->record->size;
-		}
-#endif
-		if (isrewrite (fh->isfd, (void *)f->record->data)) {
-			ret = fisretsts (COB_STATUS_49_I_O_DENIED);
-		}
 #ifdef	COB_WITH_STATUS_02
 		if (!ret && (isstat1 == '0') && (isstat2 == '2')) {
 			retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
 		}
 #endif
-	}
-	if (!ret) {
-		if ((f->lock_mode & COB_LOCK_AUTOMATIC) &&
-		    !(f->lock_mode & COB_LOCK_MULTIPLE)) {
-			isrelease (fh->isfd);
-		}
-#ifdef	COB_WITH_STATUS_02
-		if ((isstat1 == '0') && (isstat2 == '2')) {
-			return COB_STATUS_02_SUCCESS_DUPLICATE;
-		}
+		restorefileposition (f);
+
+	} else {
+
+		memcpy (fh->recwrk, f->record->data, f->record_max);
+		if (isread (fh->isfd, (void *)fh->recwrk, ISEQUAL | ISLOCK)) {
+			ret = fisretsts (COB_STATUS_49_I_O_DENIED);
+		} else {
+#ifdef	ISVARLEN
+			if (f->record_min != f->record_max) {
+				ISRECLEN = f->record->size;
+			}
 #endif
-		if (retdup) {
-			return retdup;
+			if (isrewrite (fh->isfd, (void *)f->record->data)) {
+				ret = fisretsts (COB_STATUS_49_I_O_DENIED);
+			}
+#ifdef	COB_WITH_STATUS_02
+			if (!ret && (isstat1 == '0') && (isstat2 == '2')) {
+				retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
+			}
+#endif
 		}
+		if (!ret) {
+			if ((f->lock_mode & COB_LOCK_AUTOMATIC)
+			 && !(f->lock_mode & COB_LOCK_MULTIPLE)) {
+				isrelease (fh->isfd);
+			}
+#ifdef	COB_WITH_STATUS_02
+			if ((isstat1 == '0') && (isstat2 == '2')) {
+				retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
+			}
+#endif
+		}
+	}
+	if (retdup) {
+		return retdup;
 	}
 	return ret;
 
@@ -5371,10 +5366,41 @@ cob_read (cob_file *f, cob_field *key, cob_field *fnstatus, const int read_opts)
 	save_status (f, fnstatus, ret);
 }
 
+static int
+is_suppressed_key_value (cob_file *f, const int idx)
+{
+	if (idx < 0 || idx >= (int)f->nkeys) {
+		return -1;
+	}
+#if 0	/* TODO: SUPPRESS string not merged yet */
+	if (f->keys[idx].len_suppress > 0) {
+		int pos = cob_savekey (f, idx, f->keys[idx].field->data);
+		if (memcmp (f->keys[idx].field->data,
+			        f->keys[idx].str_suppress,
+			        f->keys[idx].len_suppress) == 0) {
+			return 1;
+		}
+	} else
+#endif
+	if (f->keys[idx].tf_suppress) {
+		int pos = cob_savekey (f, idx, f->keys[idx].field->data);
+		for (pos = 0;
+			 pos < (int)f->keys[idx].field->size
+		  && f->keys[idx].field->data[pos] == (unsigned char)f->keys[idx].char_suppress;
+			 pos++); 
+		/* All SUPPRESS char ? */
+		if (pos == f->keys[idx].field->size) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
 void
 cob_read_next (cob_file *f, cob_field *fnstatus, const int read_opts)
 {
-	int	ret,idx,pos;
+	int	ret,idx;
 
 	f->flag_read_done = 0;
 
@@ -5411,30 +5437,15 @@ Again:
 	case COB_STATUS_00_SUCCESS:
 	case COB_STATUS_02_SUCCESS_DUPLICATE:
 		/* If record has suppressed key, skip it */
-		/* This is to catch old VBISAM, ODBC & OCI */
+		/* This is to catch CISAM, old VBISAM, ODBC & OCI */
 		if (f->organization == COB_ORG_INDEXED) {
 			idx = f->curkey;
 			if (f->mapkey >= 0) {	/* FD has Indexes in alternate appearance */
 				idx = f->mapkey;
 			}
-#if 0	/* TODO: SUPPRESS string not merged yet */
-			if ((idx >= 0 && idx < (int)f->nkeys) 
-			&& f->keys[idx].len_suppress > 0) {
-				pos = cob_savekey (f, idx, f->keys[idx].field->data);
-				if (memcmp(f->keys[idx].field->data, f->keys[idx].str_suppress,
-							f->keys[idx].len_suppress) == 0) {
-					goto Again;
-				}
-			} else
-#endif
-			if ((idx >= 0 && idx < (int)f->nkeys) 
-			 && f->keys[idx].tf_suppress) {	
-				pos = cob_savekey (f, idx, f->keys[idx].field->data);
-				for (pos = 0; pos < (int)f->keys[idx].field->size 
-					&& f->keys[idx].field->data[pos] == (unsigned char)f->keys[idx].char_suppress;
-					pos++);
-				if (pos == f->keys[idx].field->size) 	/* All SUPPRESS char so skip */
-					goto Again;
+			if (is_suppressed_key_value (f, idx) > 0) {
+				/* SUPPRESS -> so skip */
+				goto Again;
 			}
 		}
 
@@ -5688,10 +5699,12 @@ cob_savekey (cob_file *f, int idx, unsigned char *data)
 	if (f->keys[idx].field == NULL)
 		return -1;
 	if (f->keys[idx].count_components <= 1) {
-		memcpy (data, f->keys[idx].field->data, f->keys[idx].field->size);
+		if (data != f->keys[idx].field->data) {
+			memcpy (data, f->keys[idx].field->data, f->keys[idx].field->size);
+		}
 		return (int)f->keys[idx].field->size;
 	}
-	for(len=part=0; part < f->keys[idx].count_components; part++) {
+	for (len=part=0; part < f->keys[idx].count_components; part++) {
 		memcpy (&data[len], f->keys[idx].component[part]->data,
 							f->keys[idx].component[part]->size);
 		len += f->keys[idx].component[part]->size;
