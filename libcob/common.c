@@ -340,6 +340,7 @@ static struct config_enum shareopts[]	= {{"none","0"},{"read","1"},{"all","2"},{
 static struct config_enum retryopts[]	= {{"none","0"},{"never","64"},{"forever","8"},{NULL,NULL}};
 static struct config_enum dict_opts[]	= {{"false","0"},{"true","1"},{"always","2"},
 											{"no","0"},{"min","1"},{"max","2"},{NULL,NULL}};
+static struct config_enum dups_opts[]	= {{"default","0"},{"never","1"},{"always","2"}};
 static char	varseq_dflt[8] = "0";	/* varseq0: Default Variable length Sequential file format */
 static struct config_enum bdborder[]	= {
 						{"native","0"},
@@ -430,6 +431,7 @@ static struct config_tbl gc_conf[] = {
     {"COB_FILE_DICTIONARY","file_dictionary",     "min",dict_opts,GRP_FILE,ENV_UINT|ENV_ENUMVAL,SETPOS(cob_file_dict),0,3},
 	{"COB_FILE_DICTIONARY_PATH","file_dictionary_path",		NULL,	NULL,GRP_FILE,ENV_FILE,SETPOS(cob_dictionary_path)},
     {"COB_CREATE_TABLE","create_table",  "false",NULL,GRP_FILE,ENV_BOOL,SETPOS(cob_create_table)},
+    {"COB_DUPS_AHEAD","dups_ahead",     "default",dups_opts,GRP_FILE,ENV_UINT|ENV_ENUMVAL,SETPOS(cob_file_dups),0,3},
 #ifdef  WITH_DB
 	{"DB_HOME", "db_home", 			NULL, 	NULL, GRP_FILE, ENV_FILE, SETPOS (bdb_home)},
 #endif
@@ -1559,7 +1561,7 @@ set_cob_time_ns_from_filetime (const FILETIME filetime, struct cob_time *cb_time
 /* Global functions */
 
 int 
-cob_ncase_cmp (char *str1, char *str2, unsigned len)	/* Like strncasecmp */
+cob_ncase_cmp (char *str1, const char *str2, unsigned len)	/* Like strncasecmp */
 {
 	if (len == 0)
 		return(0);
@@ -1574,7 +1576,7 @@ cob_ncase_cmp (char *str1, char *str2, unsigned len)	/* Like strncasecmp */
 }
 
 char *
-cob_str_case_str (char *str1, char *str2)					/* Like  strcasestr  */
+cob_str_case_str (char *str1, const char *str2)					/* Like  strcasestr  */
 {
 	unsigned len;
 	int ch1 = toupper(*str2);

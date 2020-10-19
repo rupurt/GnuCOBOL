@@ -509,6 +509,10 @@ write_file_def (cob_file *f, char *out)
 					k += sprintf(&out[k],"sup%d=x'%02X' ",idx+1,f->keys[idx].char_suppress);
 			}
 		}
+		if (f->flag_read_chk_dups)
+			k += sprintf(&out[k],"dups_ahead=always ");
+		else if (f->flag_read_no_02)
+			k += sprintf(&out[k],"dups_ahead=never ");
 	}
 }
 
@@ -1044,6 +1048,13 @@ cob_set_file_defaults (cob_file *f)
 	 */
 	if (f->organization == COB_ORG_INDEXED) {
 		f->io_routine = ix_routine;
+		f->flag_read_chk_dups = 0;
+		f->flag_read_no_02 = 0;
+		if (file_setptr->cob_file_dups == COB_DUPS_ALWAYS) {
+			f->flag_read_chk_dups = 1;
+		} else if (file_setptr->cob_file_dups == COB_DUPS_NEVER) {
+			f->flag_read_no_02 = 1;
+		}
 		if (f->fcd) {
 			if (f->fcd->fileFormat == MF_FF_CISAM)
 #ifdef WITH_CISAM
@@ -1270,10 +1281,12 @@ cob_set_file_format (cob_file *f, char *defstr, int updt, int *ret)
 					value[j] = 0;
 					if(value[0] == '1'
 					|| toupper((unsigned char)value[0]) == 'T'
+					|| toupper((unsigned char)value[0]) == 'Y'
 					|| strcasecmp(value,"on") == 0)
 						settrue = 1;
 					if(value[0] == '0'
 					|| toupper((unsigned char)value[0]) == 'F'
+					|| toupper((unsigned char)value[0]) == 'N'
 					|| strcasecmp(value,"off") == 0)
 						settrue = 0;
 				}
@@ -1414,6 +1427,19 @@ cob_set_file_format (cob_file *f, char *defstr, int updt, int *ret)
 						cob_runtime_warning (_("I/O routine %s is not known for %s"),
 											value,file_open_env);
 					}
+				}
+				continue;
+			}
+			if(strcasecmp(option,"dups_ahead") == 0) {
+				f->flag_read_chk_dups = 0;
+				f->flag_read_no_02 = 0;
+				if(strcasecmp(value,"always") == 0) {
+					f->flag_read_chk_dups = 1;
+				} else if(strcasecmp(value,"never") == 0) {
+					f->flag_read_no_02 = 1;
+				} else if(strcasecmp(value,"default") != 0) {
+					cob_runtime_warning (_("dups_ahead option %s is not valid for %s"),
+											value,file_open_env);
 				}
 				continue;
 			}

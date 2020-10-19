@@ -136,7 +136,8 @@ static	vb_rtd_t *vbisam_rtd = NULL;
 
 #ifdef COB_WITH_STATUS_02
 #define COB_CHECK_DUP(s) s ? s : \
-		(isstat1 == '0' && isstat2 == '2') ? COB_STATUS_02_SUCCESS_DUPLICATE : 0
+		(isstat1 == '0' && isstat2 == '2' && !f->flag_read_no_02) ? \
+		COB_STATUS_02_SUCCESS_DUPLICATE : 0
 #else
 #define COB_CHECK_DUP(s) s ? s : s 
 #endif
@@ -147,10 +148,12 @@ struct indexfile {
 	char	*filename;	/* ISAM data file name */
 	char	*savekey;	/* Area to save last primary key read */
 	char	*recwrk;	/* Record work/save area */
+	char	*recorg;	/* Original Record save area */
 	int		nkeys;		/* Actual keys in file */
 	int		isfd;		/* ISAM file number */
 	long	recnum;		/* Last record number read */
 	long	saverecnum;	/* isrecnum of next record to process */
+	long	duprecnum;	/* isrecnum of dups_ahead process */
 	int		saveerrno;	/* savefileposition errno */
 	int		lmode;		/* File lock mode for 'isread' */
 	int		startcond;	/* Previous 'start' condition value */
@@ -482,6 +485,9 @@ freefh (struct indexfile *fh)
 	}
 	if (fh->recwrk) {
 		cob_free ((void *)fh->recwrk);
+	}
+	if (fh->recorg) {
+		cob_free ((void *)fh->recorg);
 	}
 	cob_free ((void *)fh);
 }
@@ -969,6 +975,17 @@ dobuild:
 	f->flag_nonexistent = 0;
 	f->flag_end_of_file = 0;
 	f->flag_begin_of_file = 0;
+#ifndef COB_WITH_STATUS_02
+	if (f->flag_read_chk_dups) {
+		int k;
+		for (k = 1; k < f->nkeys; ++k) {
+			if ((fh->key[k].k_flags & ISDUPS))
+				break;
+		}
+		if (k >= f->nkeys)			/* No duplicate keys */
+			f->flag_read_chk_dups = 0;
+	}
+#endif
 	return ret;
 }
 
@@ -1432,7 +1449,40 @@ isam_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 	if (f->variable_record)
 		cob_set_int (f->variable_record, (int) f->record->size);
 
+#ifdef COB_WITH_STATUS_02
 	return COB_CHECK_DUP (ret);
+#else
+	/* Read ahead to see if next record has same key value */
+	if (ret == COB_STATUS_00_SUCCESS
+	 && f->flag_read_chk_dups
+	 && fh->readdir != 0
+	 && f->curkey > 0
+	 && (fh->key[f->curkey].k_flags & ISDUPS)) {
+		indexed_savekey(fh, f->record->data, f->curkey);
+		isread (fh->isfd, (void *)fh->recwrk, fh->readdir);
+		ret = fisretsts (0);
+		if (ret == COB_STATUS_00_SUCCESS) {
+			if (indexed_cmpkey(fh, (void*)fh->recwrk, f->curkey, 0) == 0)
+				ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+			if (fh->readdir == ISNEXT) {
+				isread (fh->isfd, (void *)fh->recwrk, ISPREV);
+			} else {
+				isread (fh->isfd, (void *)fh->recwrk, ISNEXT);
+			}
+		} else {
+			if (fh->readdir == ISNEXT) {
+				isread (fh->isfd, (void *)fh->recwrk, ISLAST);
+			} else {
+				isread (fh->isfd, (void *)fh->recwrk, ISFIRST);
+			}
+			ret = COB_STATUS_00_SUCCESS;
+		}
+		memset(fh->savekey, 0, fh->lenkey);
+	} else {
+		ret = COB_CHECK_DUP (ret);
+	}
+	return ret;
+#endif
 }
 
 /* WRITE to the INDEXED file  */
@@ -1441,7 +1491,7 @@ static int
 isam_write (cob_file_api *a, cob_file *f, const int opt)
 {
 	struct indexfile	*fh;
-	int			ret = 0;
+	int			ret, retdup;
 
 	COB_UNUSED (a);
 	fh = f->file;
@@ -1454,10 +1504,29 @@ isam_write (cob_file_api *a, cob_file *f, const int opt)
 	 && indexed_cmpkey(fh, f->record->data, 0, 0) <= 0) {
 		return COB_STATUS_21_KEY_INVALID;
 	}
+	retdup = ret = COB_STATUS_00_SUCCESS;
 
 	if (f->record_min != f->record_max) {
 		ISRECLEN = f->record->size;
 	}
+#ifndef COB_WITH_STATUS_02
+	if (f->flag_read_chk_dups) {
+		int k;
+		savefileposition (f);
+		for (k = 1; k < f->nkeys; ++k) {
+			if (fh->key[k].k_flags & ISDUPS) {
+				memcpy (fh->recwrk, f->record->data, f->record_max);
+				isstart (fh->isfd, &fh->key[k], fh->key[k].k_len, 
+						(void *)fh->recwrk, ISEQUAL);
+				if (!isread (fh->isfd, (void *)fh->recwrk, ISEQUAL)) {
+					retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
+					break;
+				}
+			}
+		}
+		restorefileposition (f);
+	}
+#endif
 	if ((opt & COB_WRITE_LOCK)
 	 && !(f->lock_mode & COB_LOCK_AUTOMATIC) 
 	 && !f->flag_file_lock) {
@@ -1484,6 +1553,9 @@ isam_write (cob_file_api *a, cob_file *f, const int opt)
 	}
 	indexed_savekey(fh, f->record->data, 0);
 
+	if (ret == COB_STATUS_00_SUCCESS
+	 && retdup != COB_STATUS_00_SUCCESS)
+		ret = retdup;
 	return ret;
 }
 
@@ -1535,11 +1607,14 @@ isam_rewrite (cob_file_api *a, cob_file *f, const int opt)
 {
 	struct indexfile	*fh;
 	int			k;
-	int			ret;
+	int			ret, retdup;
+#ifndef COB_WITH_STATUS_02
+	int			svky;
+#endif
 
 	COB_UNUSED (a);
 	fh = f->file;
-	ret = COB_STATUS_00_SUCCESS;
+	retdup = ret = COB_STATUS_00_SUCCESS;
 	if (f->flag_nonexistent) {
 		return COB_STATUS_49_I_O_DENIED;
 	}
@@ -1548,7 +1623,17 @@ isam_rewrite (cob_file_api *a, cob_file *f, const int opt)
 	&&  indexed_cmpkey(fh, f->record->data, 0, 0) != 0) {
 		return COB_STATUS_21_KEY_INVALID;
 	}
+#ifndef COB_WITH_STATUS_02
+	svky = f->curkey;
+	if (f->flag_read_chk_dups
+	 || f->curkey >= 0) { 	
+		if (f->curkey < 0) {
+			isstart (fh->isfd, &fh->key[0], fh->key[0].k_len, (void *)f->record->data, ISEQUAL);
+			f->curkey = 0;
+		}
+#else
 	if (f->curkey >= 0) { 	
+#endif
 		/* Index is active */
 		/* Save record data */
 		memcpy (fh->recwrk, f->record->data, f->record_max);
@@ -1557,20 +1642,54 @@ isam_rewrite (cob_file_api *a, cob_file *f, const int opt)
 		memcpy (fh->recwrk, f->record->data, f->record_max);
 		if (f->curkey != 0) {
 			/* Activate primary index */
-			isstart (fh->isfd, &fh->key[0], 0, (void *)fh->recwrk, ISEQUAL);
+			isstart (fh->isfd, &fh->key[0], fh->key[0].k_len, (void *)fh->recwrk, ISEQUAL);
 		}
 		/* Verify record exists */
 		if (isread (fh->isfd, (void *)fh->recwrk, ISEQUAL)) {
 			restorefileposition (f);
 			return COB_STATUS_21_KEY_INVALID;
 		}
+		fh->duprecnum = ISRECNUM;
+		if (fh->recorg != NULL)
+			memcpy (fh->recorg, fh->recwrk, f->record_max);
 		for (k = 1; k < f->nkeys && ret == COB_STATUS_00_SUCCESS; ++k) {
 			if (fh->key[k].k_flags & ISDUPS) {
+#ifndef COB_WITH_STATUS_02
+				if (f->flag_read_chk_dups
+				 && retdup == COB_STATUS_00_SUCCESS) {
+					if (fh->recorg == NULL) {
+						fh->recorg = cob_malloc ((size_t)(f->record_max + 1));
+						memcpy (fh->recorg, fh->recwrk, f->record_max);
+					}
+					/* If new record did not change this key then skip check */
+					indexed_savekey(fh, (void*)fh->recorg, k);
+					if (indexed_cmpkey(fh, (void *)f->record->data, k, 0) == 0) {
+						continue;
+					}
+
+					memcpy (fh->recwrk, f->record->data, f->record_max);
+					indexed_savekey(fh, (void*)fh->recwrk, k);
+					isstart (fh->isfd, &fh->key[k], fh->key[k].k_len, 
+							(void *)fh->recwrk, ISEQUAL);
+					while (ISERRNO == 0) {
+						if (isread (fh->isfd, (void *)fh->recwrk, ISNEXT))
+							break;
+						if(ISRECNUM == fh->duprecnum)
+							continue;
+						if (indexed_cmpkey(fh, (void *)fh->recwrk, k, 0) == 0) {
+							retdup = COB_STATUS_02_SUCCESS_DUPLICATE;
+							break;
+						}
+					}
+					f->curkey = svky;
+				}
+#endif
+				ret = COB_STATUS_00_SUCCESS;
 				continue;
 			}
 			memcpy (fh->recwrk, f->record->data, f->record_max);
-			isstart (fh->isfd, &fh->key[k], fh->key[k].k_leng,
-				 (void *)fh->recwrk, ISEQUAL);
+			isstart (fh->isfd, &fh->key[k], fh->key[k].k_len, 
+					(void *)fh->recwrk, ISEQUAL);
 			if (!isread (fh->isfd, (void *)fh->recwrk, ISEQUAL)
 			 && ISRECNUM != fh->recnum) {
 				ret = COB_STATUS_22_KEY_EXISTS;
@@ -1595,6 +1714,9 @@ isam_rewrite (cob_file_api *a, cob_file *f, const int opt)
 
 		ret = COB_CHECK_DUP (ret);
 		restorefileposition (f);
+		if (ret == COB_STATUS_00_SUCCESS
+		 && retdup != COB_STATUS_00_SUCCESS)
+			ret = retdup;
 
 	} else {
 

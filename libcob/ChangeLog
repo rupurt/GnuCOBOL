@@ -1,4 +1,15 @@
 
+2020-10-19  Ron Norman <rjn@inglenet.com>
+
+	* coblocal.h: Add cob_file_dups and change parameter type
+	            for cob_ncase_cmp and cob_str_case_str
+	* common.h: Add flags flag_read_chk_dups and flag_read_no_02
+	* common.c: Changed parameter type for cob_ncase_cmp and cob_str_case_str
+	            Added 'dups_ahead' for runtime.cfg
+	* fileio.c: Add checks for 'dups_ahead' options for INDEXED files
+	* fisam.c:  Add code to check or not for 'dups_ahead' options for INDEXED files
+	* fbdb.c:   Add code to check or not for 'dups_ahead' options for INDEXED files
+
 2020-10-12  Ron Norman <rjn@inglenet.com>
 
 	* common.c: Add cob_ncase_cmp and cob_str_case_str
