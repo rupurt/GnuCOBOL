@@ -253,6 +253,7 @@ typedef struct __cob_settings {
 	unsigned int	cob_file_dict;		/* When to use filename.dd (File definition) */
 	unsigned int	cob_bdb_byteorder;	/* Byte order to use for BDB files */
 	unsigned int	cob_create_table;	/* Generate CREATE TABLE at runtime if needed */
+	unsigned int	cob_file_dups;		/* When to check for duplicate key in INDEXED file*/
 	char		*cob_dictionary_path;	/* Place to write filename.dd stats */
 	char		*cob_stats_filename;	/* Place to write I/O stats */
 	char 		*cob_file_path;
@@ -418,8 +419,8 @@ COB_HIDDEN char		*cob_strcat		(char*, char*, int);
 COB_HIDDEN char		*cob_strjoin		(char**, int, char*);
 
 COB_HIDDEN void	cob_set_field_to_uint	(cob_field *, const cob_u32_t);
-COB_HIDDEN int cob_ncase_cmp (char *, char *, unsigned );
-COB_HIDDEN char * cob_str_case_str (char *, char *);
+COB_HIDDEN int cob_ncase_cmp (char *, const char *, unsigned );
+COB_HIDDEN char * cob_str_case_str (char *, const char *);
 
 /* static inline of smaller helpers */
 

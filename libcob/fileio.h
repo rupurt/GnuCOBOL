@@ -449,7 +449,13 @@ COB_HIDDEN void	cob_oci_init_fileio (cob_file_api *);
 void	cob_isam_init_fileio (cob_file_api *);
 #endif
 
+/* cob_file_dict values */
 #define COB_DICTIONARY_NO	0
 #define COB_DICTIONARY_MIN	1
 #define COB_DICTIONARY_ALL	2
+
+/* cob_file_dups values */
+#define COB_DUPS_DEFAULT	0
+#define COB_DUPS_NEVER		1
+#define COB_DUPS_ALWAYS		2
 #endif

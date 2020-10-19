@@ -746,6 +746,7 @@ ix_bdb_write_internal (cob_file *f, const int rewrite, const int opt)
 {
 	struct indexed_file	*p;
 	cob_u32_t		i, len;
+	unsigned int		dupcnt = 0;
 	unsigned int		dupno = 0;
 	cob_u32_t		flags = 0;
 	int			close_cursor, ret;
@@ -785,6 +786,8 @@ ix_bdb_write_internal (cob_file *f, const int rewrite, const int opt)
 			flags =  0;
 			dupno = get_dupno(f, i);
 			dupno = COB_DUPSWAP (dupno);
+			if (dupno > dupcnt)
+				dupcnt = dupno;
 			len = db_savekey(f, p->temp_key, f->record->data, 0);
 			p->data.data = p->temp_key;
 			p->data.size = (cob_dbtsize_t)len;
@@ -822,7 +825,8 @@ ix_bdb_write_internal (cob_file *f, const int rewrite, const int opt)
 			return COB_STATUS_51_RECORD_LOCKED;
 		}
 	}
-	if (dupno > 0) {
+	if (!f->flag_read_no_02
+	 && dupcnt > 1) {
 		return COB_STATUS_02_SUCCESS_DUPLICATE;
 	}
 	return COB_STATUS_00_SUCCESS;
@@ -1679,7 +1683,8 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 				}
 			} else {
 				if (memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0) {
-					if (p->key_index > 0 && f->keys[p->key_index].tf_duplicates) {
+					if (p->key_index > 0 
+					 && f->keys[p->key_index].tf_duplicates) {
 						memcpy (&dupno, (cob_u8_ptr)p->data.data + p->primekeylen, sizeof (unsigned int));
 						dupno = COB_DUPSWAP (dupno);
 						while (ret == 0
@@ -1701,8 +1706,8 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 								return COB_STATUS_10_END_OF_FILE;
 							}
 						} else {
-							if (memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0 &&
-								dupno == p->last_dupno[p->key_index]) {
+							if (memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0 
+							 && dupno == p->last_dupno[p->key_index]) {
 								read_nextprev = 1;
 							} else {
 								if (nextprev == DB_PREV) {
@@ -1784,11 +1789,6 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 		}
 	}
 
-	bdb_close_index (f, p->key_index);
-	if (p->key_index != 0) {
-		bdb_close_cursor (f);
-	}
-
 	f->record->size = p->data.size;
 	if (f->record->size > f->record_max) {
 		f->record->size = f->record_max;
@@ -1797,6 +1797,28 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 		ret = COB_STATUS_00_SUCCESS;
 	}
 	memcpy (f->record->data, p->data.data, f->record->size);
+
+	if (p->key_index > 0
+	 && f->keys[p->key_index].tf_duplicates
+	 &&	!f->flag_read_no_02
+	 && ret == COB_STATUS_00_SUCCESS) {
+		if (nextprev == DB_FIRST)
+			nextprev = DB_NEXT;
+		else if (nextprev == DB_LAST) 
+			nextprev = DB_PREV;
+		ret = DB_SEQ (p->cursor[p->key_index], nextprev);
+		if (ret == 0
+		 && memcmp (p->key.data, p->last_readkey[p->key_index], (size_t)p->key.size) == 0) {
+			ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+		} else {
+			ret = COB_STATUS_00_SUCCESS;
+		}
+	}
+
+	bdb_close_index (f, p->key_index);
+	if (p->key_index != 0) {
+		bdb_close_cursor (f);
+	}
 
 	return ret;
 }
@@ -1884,6 +1906,8 @@ ix_bdb_rewrite (cob_file_api *a, cob_file *f, const int opt)
 
 	if (ret != COB_STATUS_00_SUCCESS) {
 		bdb_close_cursor (f);
+		if (ret == COB_STATUS_23_KEY_NOT_EXISTS)
+			return COB_STATUS_21_KEY_INVALID;
 		return ret;
 	}
 
