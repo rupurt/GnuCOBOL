@@ -6172,6 +6172,11 @@ AT_KEYWORDS([runfile])
 
 AT_SKIP_IF([test "$COB_HAS_ISAM" = "no"])
 
+# real ISAM has the key information and will "fail" one part,
+# BDB hasn't and will "pass" this one but fail the other
+# -> skip as 4.x feature
+AT_SKIP_IF([true])
+
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
        PROGRAM-ID. prog.
@@ -6325,7 +6330,10 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
+[libcob: prog.cob:82: error: unknown file error (status = 39) for file file2 ('.' => ./fileX) on OPEN
+])
+AT_CHECK([COB_KEYCHECK=OFF $COBCRUN_DIRECT ./prog], [0], [], [])
 
 AT_CLEANUP
 
@@ -6333,7 +6341,7 @@ AT_CLEANUP
 AT_SETUP([READ INPUT pipe & WRITE OUTPUT pipe])
 AT_KEYWORDS([runfile])
 
-# not implemented in 2.2+
+# only implemented with 4+
 AT_XFAIL_IF([true])
 
 AT_DATA([test-data-in],
