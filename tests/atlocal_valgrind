@@ -158,20 +158,58 @@ for cobenv in `"${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | gr
 done
 
 
-COB_OBJECT_EXT="@COB_OBJECT_EXT@"
-COB_EXE_EXT="@COB_EXE_EXT@"
-COB_BIGENDIAN="@COB_BIGENDIAN@"
-COB_HAS_ISAM="@COB_HAS_ISAM@"
-COB_HAS_XML2="@COB_HAS_XML2@"
-COB_HAS_JSON="@COB_HAS_JSON@"
-COB_HAS_CURSES="@COB_HAS_CURSES@"
-COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
+# different flags checked in the testsuite
+if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
+	COB_OBJECT_EXT="@COB_OBJECT_EXT@"
+	COB_EXE_EXT="@COB_EXE_EXT@"
+	COB_BIGENDIAN="@COB_BIGENDIAN@"
+	COB_HAS_ISAM="@COB_HAS_ISAM@"
+	COB_HAS_XML2="@COB_HAS_XML2@"
+	COB_HAS_JSON="@COB_HAS_JSON@"
+	COB_HAS_CURSES="@COB_HAS_CURSES@"
+	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
+else
+	# prevent multiple calls by caching the output
+	"${abs_top_builddir}/pre-inst-env" ${COBC} --info > info.out
+
+	COB_OBJECT_EXT="$(grep COB_OBJECT_EXT info.out | cut -d: -f2 | cut -b2-)"
+	COB_EXE_EXT="$(grep COB_EXE_EXT info.out | cut -d: -f2 | cut -b2-)"
+
+	if test $(grep -i -c "little-endian" info.out) = 0; then
+		COB_BIGENDIAN="yes"
+	else
+		COB_BIGENDIAN="no"
+	fi
+
+	COB_HAS_64_BIT_POINTER=`"${abs_top_builddir}/pre-inst-env" ${COBCRUN} --info | grep "64bit-mode" | cut -d: -f2 | cut -b2-`
+	cob_indexed=$(grep -i "indexed file" info.out | cut -d: -f2)
+	case $(grep -i "indexed file" info.out | cut -d: -f2) in
+	" disabled")	COB_HAS_ISAM="no";;
+	" BDB") 		COB_HAS_ISAM="db";;
+	" VBISAM"*)	COB_HAS_ISAM="vbisam";;
+	" D-ISAM")	COB_HAS_ISAM="disam";;
+	" C-ISAM")	COB_HAS_ISAM="cisam";;
+	" EXTFH")	COB_HAS_ISAM="index_extfh";;
+	*)		echo "unknown entry -$cob_indexed- please report" && exit 1;;
+	esac
+	if test $(grep -i -c "XML library.*disabled" info.out) = 0; then
+		COB_HAS_XML2="yes"
+	else
+		COB_HAS_XML2="no"
+	fi
+	if test $(grep -i -c "JSON library.*disabled" info.out) = 0; then
+		COB_HAS_JSON="yes"
+	else
+		COB_HAS_JSON="no"
+	fi
+fi
 if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 	# running MSYS builds as not-visible child processes result in
 	# "Redirection is not supported" (old PDcurses) and exit 127 (NCurses)
 	# --> disabling the tests for this feature
 	COB_HAS_CURSES="no"
 fi
+
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT

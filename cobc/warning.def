@@ -46,7 +46,7 @@ CB_WARNDEF (cb_warn_archaic, "archaic",
 	_("  -Warchaic             warn if archaic features are used"))
 
 CB_WARNDEF (cb_warn_redefinition, "redefinition",
-	_("  -Wredefinition        warn about incompatible redefinition of data items"))
+	_("  -Wredefinition        warn about non-referenced ambiguous data items"))
 
 CB_WARNDEF (cb_warn_truncate, "truncate",
 	_("  -Wtruncate            warn about field truncation from constant assignments"))

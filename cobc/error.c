@@ -625,6 +625,9 @@ cb_note_x (const enum cb_warn_opt opt, cb_tree x, const char *fmt, ...)
 	va_start (ap, fmt);
 	if (opt != COB_WARNOPT_NONE) {
 		const enum cb_warn_val	pref = cb_warn_opt_val[opt];
+		if (pref == COBC_WARN_DISABLED) {
+			return;
+		}
 		print_error (x->source_file, x->source_line, _("note: "),
 			fmt, ap, warning_option_text (opt, pref));
 	} else {
@@ -754,7 +757,7 @@ redefinition_error (cb_tree x)
 			return;
 		}
 		listprint_suppress ();
-		cb_note_x (COB_WARNOPT_NONE, CB_VALUE (w->items),
+		cb_note_x (cb_warn_redefinition, CB_VALUE (w->items),
 			_("'%s' previously defined here"), w->name);
 		listprint_restore ();
 	}
@@ -766,16 +769,17 @@ redefinition_warning (cb_tree x, cb_tree y)
 	struct cb_word	*w;
 	cb_tree		z;
 
-	w = CB_REFERENCE (x)->word;
-	cb_warning_x (cb_warn_additional, x, _("redefinition of '%s'"), w->name);
-
+	/* early exit if warning disabled */
 	{
-		const enum cb_warn_opt	opt = cb_warn_additional;
+		const enum cb_warn_opt	opt = cb_warn_redefinition;
 		const enum cb_warn_val	pref = cb_warn_opt_val[opt];
 		if (pref == COBC_WARN_DISABLED) {
 			return;
 		}
 	}
+
+	w = CB_REFERENCE (x)->word;
+	cb_warning_x (cb_warn_redefinition, x, _("redefinition of '%s'"), w->name);
 
 	z = NULL;
 	if (y) {
@@ -789,7 +793,7 @@ redefinition_warning (cb_tree x, cb_tree y)
 			return;
 		}
 		listprint_suppress ();
-		cb_note_x (cb_warn_additional, z, _("'%s' previously defined here"), w->name);
+		cb_note_x (cb_warn_redefinition, z, _("'%s' previously defined here"), w->name);
 		listprint_restore ();
 	}
 }

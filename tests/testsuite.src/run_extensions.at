@@ -3276,7 +3276,32 @@ prog.cob:31: warning: size of 'SECOND-VARIANT-A' larger than size of 'SECOND-HEA
 prog.cob:33: warning: size of 'SECOND-VARIANT-B' larger than size of 'SECOND-HEADER'
 ])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+AT_CLEANUP
 
+
+AT_SETUP([REDEFINES: non-referenced ambiguous item])
+AT_KEYWORDS([extensions redefines])
+
+# bad extension, supported for compatibility to at least MicroFocus
+# the redefines always applies to the item defined before 
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 X             PIC X value '1'.
+       01 X             PIC X value '2'.
+       01 G             REDEFINES X PIC 9.
+       PROCEDURE        DIVISION.
+           IF G NOT = 2
+              DISPLAY 'G IS ' G.
+           STOP RUN.
+])
+
+# syntax checked in syn_definition.at
+AT_CHECK([$COMPILE -w prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CLEANUP
 
 

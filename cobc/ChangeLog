@@ -227,6 +227,12 @@
 
 	* pplex.l: allow more characters in $DISPLAY
 
+2020-06-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* error.c (redefinition_warning), typeck.c (warning_destination): use
+	  appropriate warning flag to allow handling -Werror=... and -Wno-...
+	* warning.def (redefinition): clarified help message
+
 2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
 
 	FR #53 TURN directive

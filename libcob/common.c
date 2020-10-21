@@ -7715,7 +7715,7 @@ print_info_detailed (const int verbose)
 #endif
 
 #if defined	(WITH_INDEX_EXTFH)
-	var_print (_("ISAM file handler"), 		"EXTFH", "", 0);
+	var_print (_("indexed file handler"), 		"EXTFH", "", 0);
 #elif defined	(WITH_DB)
 	{
 		int	major, minor, patch;
@@ -7729,19 +7729,19 @@ print_info_detailed (const int verbose)
 				"BDB", major, minor, patch, DB_VERSION_MAJOR, DB_VERSION_MINOR);
 		}
 	}
-	var_print (_("ISAM file handler"), 		buff, "", 0);
+	var_print (_("indexed file handler"), 		buff, "", 0);
 #elif defined	(WITH_CISAM)
-	var_print (_("ISAM file handler"), 		"C-ISAM", "", 0);
+	var_print (_("indexed file handler"), 		"C-ISAM", "", 0);
 #elif defined	(WITH_DISAM)
-	var_print (_("ISAM file handler"), 		"D-ISAM", "", 0);
+	var_print (_("indexed file handler"), 		"D-ISAM", "", 0);
 #elif defined	(WITH_VBISAM)
 #if defined	(VB_RTD)
-	var_print (_("ISAM file handler"), 		"VBISAM (RTD)", "", 0);
+	var_print (_("indexed file handler"), 		"VBISAM (RTD)", "", 0);
 #else
-	var_print (_("ISAM file handler"), 		"VBISAM", "", 0);
+	var_print (_("indexed file handler"), 		"VBISAM", "", 0);
 #endif
 #else
-	var_print (_("ISAM file handler"), 		_("disabled"), "", 0);
+	var_print (_("indexed file handler"), 		_("disabled"), "", 0);
 #endif
 
 	{

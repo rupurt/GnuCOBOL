@@ -2541,21 +2541,21 @@ cobc_print_info (void)
 #endif
 
 #if defined	(WITH_INDEX_EXTFH)
-	cobc_var_print (_("ISAM file handler"),		"EXTFH", 0);
+	cobc_var_print (_("indexed file handler"),		"EXTFH", 0);
 #elif defined	(WITH_DB)
-	cobc_var_print (_("ISAM file handler"),		"BDB", 0);
+	cobc_var_print (_("indexed file handler"),		"BDB", 0);
 #elif defined	(WITH_CISAM)
-	cobc_var_print (_("ISAM file handler"),		"C-ISAM", 0);
+	cobc_var_print (_("indexed file handler"),		"C-ISAM", 0);
 #elif defined	(WITH_DISAM)
-	cobc_var_print (_("ISAM file handler"),		"D-ISAM", 0);
+	cobc_var_print (_("indexed file handler"),		"D-ISAM", 0);
 #elif defined	(WITH_VBISAM)
 #if defined	(VB_RTD)
-	cobc_var_print (_("ISAM file handler"),		"VBISAM (RTD)", 0);
+	cobc_var_print (_("indexed file handler"),		"VBISAM (RTD)", 0);
 #else
-	cobc_var_print (_("ISAM file handler"),		"VBISAM", 0);
+	cobc_var_print (_("indexed file handler"),		"VBISAM", 0);
 #endif
 #else
-	cobc_var_print (_("ISAM file handler"),		_("disabled"), 0);
+	cobc_var_print (_("indexed file handler"),		_("disabled"), 0);
 #endif
 
 #if defined(__MPIR_VERSION)

@@ -416,8 +416,13 @@ AT_CHECK([$COMPILE_ONLY prog.cob], [0], [], [])
 
 AT_CLEANUP
 
+
 AT_SETUP([REDEFINES: non-referenced ambiguous item])
-AT_KEYWORDS([redefines])
+AT_KEYWORDS([redefines extensions])
+
+# bad extension, supported for compatibility to at least MicroFocus
+# the redefines always applies to the item defined before, verified in
+# run_extensions.at, syntax check for redefinition in syn_definition.at
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
