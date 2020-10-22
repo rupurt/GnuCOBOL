@@ -1,4 +1,12 @@
 
+2020-10-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* call.c (cob_set_library_path, cob_init_call): completely reworked
+	  reading in COB_LIBRARY_PATH: have working-directory prefixed only
+	  if not part of environment setting COB_LIBRARY_PATH already,
+	  always suffix internal default COB_LIBRARY_PATH,
+	  remove trailing spaces from entries
+
 2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c: fixed C89 declaration
