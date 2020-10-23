@@ -32,7 +32,7 @@ COBCRUN_DIRECT="" # used for running created executables through tools
 # prepend PATH with the actual binaries to let the testsuite find them for
 # general check and version output, otherwise not needed
 #PATH="${abs_top_builddir}/libcob/.libs:${PATH}"
-PATH="${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
+PATH="${abs_top_builddir}:${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
 export PATH
 ABS_COBC="${abs_top_builddir}/cobc/cobc@COB_EXE_EXT@"
 ABS_COBCRUN="${abs_top_builddir}/bin/cobcrun@COB_EXE_EXT@"
@@ -68,7 +68,9 @@ else
 fi
 export at_group
 
-VG_LOG_PREFIX="${abs_builddir}/valgrind/%q{at_group}_%p"
+VL_LOG_DIR="${abs_builddir}/valgrind"
+mkdir -f $VL_LOG_DIR
+VG_LOG_PREFIX="$VL_LOG_DIR/%q{at_group}_%p"
 
 VG_COBC_LOG="$VG_LOG_PREFIX-cobc.log"
 VG_COBCRUN_LOG="$VG_LOG_PREFIX-cobcrun.log"
