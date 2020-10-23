@@ -315,7 +315,7 @@ cob_set_library_path ()
 
 	/* setup buffer and count number of separators,
 	   check for "." */
-	i = 0;
+	i = 1;
 	pstr = buff + 2; /* leaving place for prefixing the working directory */
 	buff[0] = ' ';
 	buff[1] = PATHSEP_CHAR;
