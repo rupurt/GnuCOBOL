@@ -114,6 +114,7 @@ struct indexed_file {
 	unsigned char	*saverec;	/* For saving copy of record */
 	DBT		key;
 	DBT		data;
+	int		start_cond;
 	int		key_index;
 	unsigned int	bdb_lock_id;
 	int		write_cursor_open;
@@ -844,6 +845,7 @@ ix_bdb_start_internal (cob_file *f, const int cond, cob_field *key,
 	dupno = 0;
 	ret = 0;
 	p = f->file;
+	p->start_cond = cond;
 	/* Look up for the key */
 	key_index = db_findkey (f, key, &fullkeylen, &partlen);
 	if (key_index < 0) {
@@ -895,7 +897,8 @@ ix_bdb_start_internal (cob_file *f, const int cond, cob_field *key,
 		}
 		break;
 	case COB_GT:
-		while (ret == 0 && db_cmpkey (f, p->key.data, f->record->data, p->key_index, partlen) == 0) {
+		while (ret == 0 
+			&& db_cmpkey (f, p->key.data, f->record->data, p->key_index, partlen) == 0) {
 			ret = DB_SEQ (p->cursor[p->key_index], DB_NEXT);
 		}
 		break;
@@ -1801,6 +1804,7 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 	if (p->key_index > 0
 	 && f->keys[p->key_index].tf_duplicates
 	 &&	!f->flag_read_no_02
+	 && p->start_cond == 0
 	 && ret == COB_STATUS_00_SUCCESS) {
 		if (nextprev == DB_FIRST)
 			nextprev = DB_NEXT;
@@ -1815,6 +1819,7 @@ ix_bdb_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 		}
 	}
 
+	p->start_cond = 0;
 	bdb_close_index (f, p->key_index);
 	if (p->key_index != 0) {
 		bdb_close_cursor (f);

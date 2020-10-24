@@ -1622,6 +1622,8 @@ cob_drop_xfd (struct file_xfd *fx)
 	for(k=0; k < fx->nkeys; k++) {
 		if (fx->key[k]->create_index)
 			cob_free (fx->key[k]->create_index);
+		if (fx->key[k]->count_eq.text)
+			cob_free (fx->key[k]->count_eq.text);
 		if (fx->key[k]->where_eq.text)
 			cob_free (fx->key[k]->where_eq.text);
 		if (fx->key[k]->where_ge.text)
@@ -2033,6 +2035,32 @@ cob_sql_stmt (
 				strcpy(comma," AND ");
 			}
 		}
+	} else if (strcasecmp(stmt,"COUNT") == 0
+			&& fx->fileorg == COB_ORG_INDEXED) {
+		bufsz = 32 + fx->lncols + fx->ncols * 4 + strlen(fx->tablename);
+		sbuf = cob_malloc (bufsz + 1);
+		strcpy(comma,"");
+		pos = sprintf(sbuf,"SELECT COUNT(*) FROM %s ",fx->tablename);
+		pos += sprintf(&sbuf[pos],"WHERE ");
+		if (db->isodbc)
+			fmt = "%s%s %s ?";
+		else
+			fmt = "%s%s %s :%d";
+		strcpy(comma,"");
+		for (j=0; j < fx->key[idx]->ncols; j++) {
+			k = fx->key[idx]->col[j];
+			pos += sprintf(&sbuf[pos],fmt,comma,fx->map[k].colname,"=",j+1);
+			strcpy(comma," AND ");
+		}
+		if(db->oracle) {
+			pos += sprintf(&sbuf[pos]," ORDER BY ");
+			strcpy(comma,"");
+			for (j=0; j < fx->key[idx]->ncols; j++) {
+				k = fx->key[idx]->col[j];
+				pos += sprintf(&sbuf[pos],"%s%s",comma,fx->map[k].colname);
+				strcpy(comma,",");
+			}
+		}
 	} else {
 		cob_runtime_error (_("Unknown SQL statement: %.20s!"),stmt);
 		return NULL;
@@ -2075,15 +2103,23 @@ cob_sql_select (
 		s = &fx->key[ky]->where_la;
 	else if (cond == COB_NE)
 		s = &fx->key[ky]->where_ne;
+	else if (cond == COB_COUNT)
+		s = &fx->key[ky]->count_eq;
 	else
 		return NULL;
 
 	if (s->text == NULL) {
-		s->text = cob_sql_stmt (db, fx, (char*)"SELECT", ky, cond, read_opts);
+		if (cond == COB_COUNT)
+			s->text = cob_sql_stmt (db, fx, (char*)"COUNT", ky, cond, read_opts);
+		else
+			s->text = cob_sql_stmt (db, fx, (char*)"SELECT", ky, cond, read_opts);
 	} else if (s->readopts != read_opts) {
 		DEBUG_LOG ("db",("Free %d Statement\n",cond));
 		freeit (s);
-		s->text = cob_sql_stmt (db, fx, (char*)"SELECT", ky, cond, read_opts);
+		if (cond == COB_COUNT)
+			s->text = cob_sql_stmt (db, fx, (char*)"COUNT", ky, cond, read_opts);
+		else
+			s->text = cob_sql_stmt (db, fx, (char*)"SELECT", ky, cond, read_opts);
 	}
 	s->readopts = read_opts;
 	if (cond == COB_LT
@@ -2093,6 +2129,19 @@ cob_sql_select (
 	else
 		s->isdesc = FALSE;
 	return s;
+}
+
+void
+cob_xfd_swap_data (char *p1, char *p2, int len)
+{
+	char	wk;
+	while(len-- > 0) {
+		wk = *p1;
+		*p1 = *p2;
+		*p2 = wk;
+		p1++;
+		p2++;
+	}
 }
 
 /*

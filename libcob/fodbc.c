@@ -197,7 +197,6 @@ chkOdbc(struct db_state *db)
 	return FALSE;
 }
 
-#define szErrMsg 512
 #define dbStsRetry          (EAGAIN * 1000)
 static int
 getOdbcMsg(
@@ -212,7 +211,7 @@ getOdbcMsg(
 {
 	int		sts,htype;
 	char	lState[5+3];
-	char	*cp,msgtxt[szErrMsg + 10];
+	char	*cp,msgtxt[COB_SMALL_BUFF];
 	if(hndl == db->dbEnvH) {
 		htype = SQL_HANDLE_ENV;
 	} else if(hndl == db->dbDbcH) {
@@ -221,7 +220,7 @@ getOdbcMsg(
 		htype = SQL_HANDLE_STMT;
 	}
 	sts = SQLGetDiagRec(htype,hndl,*errnum,(SQLCHAR*)lState,odbcStatus,
-						(SQLCHAR *)msgtxt,szErrMsg,errLen);
+						(SQLCHAR *)msgtxt,(int)(sizeof(msgtxt)-1),errLen);
 	if(sts == SQL_SUCCESS) {
 		sprintf(szState,"%.5s",lState);
 		cp = msgtxt;
@@ -304,7 +303,7 @@ chkSts(
 	SQLSMALLINT errLen;
 	int			i;
 	SQLCHAR		szState[10];
-	char		errMsg[szErrMsg+16];
+	char		errMsg[COB_SMALL_BUFF];
 
 	if(odbcSts == SQL_SUCCESS) {
 		db->dbStatus = 0;
@@ -330,13 +329,13 @@ chkSts(
 		memset(szState,0,sizeof(szState));
 		memset(db->odbcState, 0, sizeof(db->odbcState));
 		i = 1;
-		getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,szErrMsg,&errLen);
+		getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,(int)(sizeof(errMsg)-1),&errLen);
 		memcpy(db->odbcState, szState, 5);
 		DEBUG_LOG("db",("%.40s Status of %d '%.5s'\n", msg, db->dbStatus, szState));
 		if(errMsg[0] >= ' ')
 			DEBUG_LOG("db",("    : %s\n",errMsg));
 		while(TRUE) {
-			if(getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,szErrMsg,&errLen)
+			if(getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,(int)(sizeof(errMsg)-1),&errLen)
 				!= SQL_SUCCESS)
 				break;
 		}
@@ -365,7 +364,7 @@ chkSts(
 	}
 
 	i = 1;
-	getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,szErrMsg,&errLen);
+	getOdbcMsg(db,hndl,&i,(char*)szState,&odbcStatus,errMsg,(int)(sizeof(errMsg)-1),&errLen);
 	if(odbcStatus < 0)
 		db->dbStatus = -odbcStatus;
 	else
@@ -590,6 +589,7 @@ odbc_setup_stmt (
 	int				idx)
 {
 	int		k,pos;
+	SQLULEN	opt;
 	if (!s->handle) {
 		if(chkSts(db,(char*)"Alloc Stmt Handle",db->dbDbcH,
 				SQLAllocHandle(SQL_HANDLE_STMT,db->dbDbcH,&s->handle))){
@@ -603,6 +603,19 @@ odbc_setup_stmt (
 		s->iscursor = FALSE;
 	}
 	if (!s->preped) {
+		if (fx->fl->flag_read_chk_dups
+		 && idx > 0
+		 && fx->fl->keys[idx].tf_duplicates == 1) {
+			opt = SQL_CURSOR_DYNAMIC;
+			chkSts(db,(char*)"Set CURSOR DYNAMIC",s->handle,
+				SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_TYPE, 
+												(SQLPOINTER)opt, SQL_IS_UINTEGER));
+			opt = SQL_SCROLLABLE;
+			chkSts(db,(char*)"Set CURSOR SCROLLABLE",s->handle,
+				SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_SCROLLABLE, 
+												(SQLPOINTER)opt, SQL_IS_UINTEGER));
+		}
+
 		if(chkSts(db,(char*)"Prepare Stmt",s->handle,
 				SQLPrepare(s->handle,(SQLCHAR*)s->text,strlen(s->text)))){
 			DEBUG_LOG("db",("SQLPrepare %.40s status %d; Failed!\n",s->text,db->dbStatus));
@@ -723,12 +736,17 @@ odbc_commit (cob_file_api *a, cob_file *f)
 		db->autocommit = FALSE;
 		db->updatesDone = 0;
 		return 0;
-	} else if (db->updatesDone < db->commitInterval
-			&& f->last_operation != COB_LAST_CLOSE)
+	} 
+	if (db->updatesDone < db->commitInterval
+	 && f->last_operation != COB_LAST_CLOSE)
 		return 0;
 	if (db->mysql) {
 		odbcStmt (db, (char*)"COMMIT");
-		odbcStmt (db, (char*)"SET autocommit=0");
+		if (db->autocommit) {
+			odbcStmt (db, (char*)"SET autocommit=1");
+		} else {
+			odbcStmt (db, (char*)"SET autocommit=0");
+		}
 		odbcStmt (db, (char*)"BEGIN");
 	} else {
 		if (chkSts(db,(char*) "Commit EndTran ENV",db->dbEnvH,
@@ -772,7 +790,10 @@ odbc_rollback (cob_file_api *a, cob_file *f)
 			DEBUG_LOG("db",("AutoCommit is OFF!\n"));
 		}
 		db->autocommit = FALSE;
-	} else if (db->updatesDone < db->commitInterval)
+		db->updatesDone = 0;
+		return 0;
+	} 
+	if (db->updatesDone < db->commitInterval)
 		return 0;
 	if (db->mysql) {
 		odbcStmt (db, (char*)"ROLLBACK");
@@ -809,6 +830,84 @@ odbc_sync (cob_file_api *a, cob_file *f)
 				SQLEndTran(SQL_HANDLE_DBC,db->dbDbcH,SQL_COMMIT)))
 		return COB_STATUS_30_PERMANENT_ERROR;
 	return 0;
+}
+
+/****************************************************
+	Issue one SQL statment to count records with matching key value
+		Return number of rows with same key 
+*****************************************************/
+static int
+odbcCountIndex(
+	struct db_state	*db,
+	cob_file *f,
+	struct file_xfd *fx,
+	int		idx)
+{
+	int		rtn, pos, i, j, notsup;
+	unsigned char	supchr;
+	struct map_xfd *col;
+
+	if (fx->key[idx]->count_eq.handle == NULL) {
+		if(chkSts(db,(char*)"Alloc count hndl",db->dbDbcH,
+					SQLAllocHandle( SQL_HANDLE_STMT, db->dbDbcH, &fx->key[idx]->count_eq.handle ))) {
+			return db->dbStatus;
+		}
+	}
+
+	if (fx->key[idx]->count_eq.text == NULL)
+		cob_sql_select (db, fx, idx, COB_COUNT, 0, odbc_free_stmt);
+	varFetch[0] = 0;
+	if (f->keys[idx].tf_suppress) {
+		notsup = 0;
+		if (f->keys[idx].len_suppress <= 1) {
+			supchr = f->keys[idx].char_suppress;
+			for (j=0; j < fx->key[idx]->ncols && !notsup; j++) {
+				col = &fx->map[fx->key[idx]->col[j]];
+				if (col->sdata[0] == supchr) {
+					for (i=0; i < col->sqlColSize && col->sdata[i] == f->keys[idx].char_suppress; i++);
+					if (i < col->sqlColSize)
+						notsup = 1;
+				}
+			}
+			if (notsup) 	/* This key value is suppressed */
+				return -1;
+		} else {
+			col = &fx->map[fx->key[idx]->col[0]];
+			if (memcmp(col->sdata, f->keys[idx].str_suppress, f->keys[idx].len_suppress) == 0)
+				return -1;
+		}
+	}
+
+	if (!fx->key[idx]->count_eq.preped) {
+		if(chkSts(db,(char*)"Peek prepare", fx->key[idx]->count_eq.handle,
+					SQLPrepare(fx->key[idx]->count_eq.handle,
+									(SQLCHAR*)fx->key[idx]->count_eq.text,
+									strlen(fx->key[idx]->count_eq.text)))) {
+			return 0;
+		} else {
+			pos = 0;
+			for (j=0; j < fx->key[idx]->ncols; j++) {
+				bindParam (db, fx, &fx->key[idx]->count_eq, &fx->map[fx->key[idx]->col[j]], ++pos);
+			}
+			fx->key[idx]->count_eq.preped = 1;
+		}
+	}
+	db->dbStatus = 0;
+	if(chkSts(db,(char*)"Peek BindCol",fx->key[idx]->count_eq.handle,
+			SQLBindCol(fx->key[idx]->count_eq.handle, 1, SQL_C_CHAR,
+						varFetch, sizeof(varFetch), (SQLPOINTER)NULL))) {
+		return 0;
+	}
+	chkSts(db,(char*)"Peek Exec",fx->key[idx]->count_eq.handle,
+			SQLExecute(fx->key[idx]->count_eq.handle));
+	if(chkSts(db,(char*)"Peek Fetch",fx->key[idx]->count_eq.handle, 
+				SQLFetch(fx->key[idx]->count_eq.handle))) {
+		return 0;
+	}
+	rtn = atoi(varFetch);
+	chkSts(db,(char*)"Peek Close cursor",fx->key[idx]->count_eq.handle,
+		SQLCloseCursor (fx->key[idx]->count_eq.handle));
+	return rtn;
 }
 
 /****************************************************
@@ -1352,6 +1451,7 @@ odbc_open (cob_file_api *a, cob_file *f, char *filename, const int mode, const i
 	f->flag_end_of_file = 0;
 	f->flag_begin_of_file = 0;
 	p->savekey = cob_malloc ((size_t)(p->maxkeylen + 1));
+	p->suppkey = cob_malloc ((size_t)(p->maxkeylen + 1));
 	p->saverec = cob_malloc ((size_t)(f->record_max + 1));
 	for (k=0; k < fx->nmap; k++) {
 		if (fx->map[k].cmd == XC_DATA
@@ -1420,6 +1520,9 @@ odbc_close (cob_file_api *a, cob_file *f, const int opt)
 			}
 			cob_drop_xfd (fx);
 		}
+		if (p->savekey != NULL) cob_free (p->savekey);
+		if (p->suppkey != NULL) cob_free (p->suppkey);
+		if (p->saverec != NULL) cob_free (p->saverec);
 		cob_free (p);
 	}
 	f->file = NULL;
@@ -1691,6 +1794,25 @@ odbc_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 		break;
 	}
 
+	if (ret == COB_STATUS_00_SUCCESS
+	 && f->flag_read_chk_dups
+	 && f->curkey > 0
+	 && f->keys[f->curkey].tf_duplicates == 1) {
+		int	klen;
+		memcpy (p->saverec, f->record->data, f->record_max);
+		klen = db_savekey (f, p->savekey, f->record->data, f->curkey);
+		if (! SQLFetchScroll(fx->start->handle,SQL_FETCH_NEXT, 0)) {
+			cob_xfd_to_file (db, fx, f);
+			db_savekey (f, p->suppkey, f->record->data, f->curkey);
+			if (memcmp(p->suppkey, p->savekey, klen) == 0) {
+				ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+			}
+			chkSts(db,(char*)"Peek reset",fx->start->handle,
+					SQLFetchScroll(fx->start->handle,SQL_FETCH_PRIOR, 0));
+		}
+		memcpy (f->record->data, p->saverec, f->record_max);
+	}
+
 	return ret;
 }
 
@@ -1702,6 +1824,7 @@ odbc_write (cob_file_api *a, cob_file *f, const int opt)
 {
 	struct indexed_file	*p;
 	struct file_xfd	*fx;
+	int			k, num;
 	int			ret = COB_STATUS_00_SUCCESS;
 	COB_UNUSED (a);
 
@@ -1714,6 +1837,15 @@ odbc_write (cob_file_api *a, cob_file *f, const int opt)
 	cob_file_to_xfd (db, fx, f);
 
 	odbc_set_nulls (db, fx);
+	if (f->flag_read_chk_dups) {
+		for (k=1; k < fx->nkeys; k++) {
+			if (f->keys[k].tf_duplicates == 1) {
+				num = odbcCountIndex (db, f, fx, k);
+				if( num > 0)
+					ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+			}
+		}
+	}
 	if (!fx->insert.preped) {
 		odbc_setup_stmt (db, fx, &fx->insert, SQL_BIND_PRMS, 0);
 	}
@@ -1804,7 +1936,7 @@ odbc_rewrite (cob_file_api *a, cob_file *f, const int opt)
 {
 	struct indexed_file	*p;
 	struct file_xfd	*fx;
-	int			k, pos;
+	int			k, pos, num, klen;
 	int			ret = COB_STATUS_00_SUCCESS;
 	COB_UNUSED (a);
 
@@ -1815,6 +1947,30 @@ odbc_rewrite (cob_file_api *a, cob_file *f, const int opt)
 	fx = p->fx;
 	if (fx->update.text == NULL) {
 		fx->update.text = cob_sql_stmt (db, fx, (char*)"UPDATE", 0, 0, 0);
+	}
+
+	if (f->flag_read_chk_dups) {
+		DEBUG_LOG("db",("REWRITE: %s, begin check dups\n",f->select_name));
+		memcpy (p->saverec, f->record->data, f->record_max);
+		if(!odbc_read (a, f, f->keys[0].field, 0)) {
+			for (k=1; k < fx->nkeys && ret == COB_STATUS_00_SUCCESS; k++) {
+				if (f->keys[k].tf_duplicates == 1) {
+					klen = db_savekey (f, p->suppkey, f->record->data, k);
+					db_savekey (f, p->savekey, p->saverec, k);
+					if (memcmp(p->suppkey, p->savekey, klen) != 0) {
+						cob_xfd_swap_data ((char*)p->saverec, (char*)f->record->data, f->record_max);
+						cob_index_to_xfd (db, fx, f, k);	/* Put new data into Index */
+						num = odbcCountIndex (db, f, fx, k);
+						if (num > 0) {
+							ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+						}
+						cob_xfd_swap_data ((char*)p->saverec, (char*)f->record->data, f->record_max);
+						cob_index_to_xfd (db, fx, f, k);	/* Put old data back into Index */
+					}
+				}
+			}
+		}
+		memcpy (f->record->data, p->saverec, f->record_max);
 	}
 
 	cob_file_to_xfd (db, fx, f);
@@ -1832,6 +1988,8 @@ odbc_rewrite (cob_file_api *a, cob_file *f, const int opt)
 		if (db->dbStatus == db->dbStsDupKey) {
 			DEBUG_LOG("db",("%.60s Duplicate; Failed!\n",fx->update.text));
 			ret = COB_STATUS_22_KEY_EXISTS;
+		} else if (db->dbStatus == db->dbStsNotFound) {
+			return COB_STATUS_21_KEY_INVALID;
 		} else {
 			DEBUG_LOG("db",("SQLExecute %.40s status %d; Failed!\n",fx->update.text,db->dbStatus));
 			ret = COB_STATUS_30_PERMANENT_ERROR;

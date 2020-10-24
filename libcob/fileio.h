@@ -377,6 +377,7 @@ struct key_xfd {
 	short			col[MAXKEYCOLS];	/* Offset in file_xfd.map to column def */
 	int				lncreate;
 	char			*create_index;	/* SQL CREATE INDEX */
+	SQL_STMT		count_eq;	/* SELECT COUNT(*) WHERE index EQ */
 	SQL_STMT		where_eq;	/* SELECT WHERE index EQ */
 	SQL_STMT		where_ne;	/* SELECT WHERE index NE */
 	SQL_STMT		where_le;	/* SELECT WHERE index LE */
@@ -386,6 +387,7 @@ struct key_xfd {
 	SQL_STMT		where_fi;	/* SELECT index first */
 	SQL_STMT		where_la;	/* SELECT index last */
 };
+#define COB_COUNT 16			/* Build SELECT COUNT(*) for given index */
 
 /*
  * Primary table for in memory XFD
@@ -431,6 +433,7 @@ COB_HIDDEN void 	cob_xfd_to_ddl (struct db_state *db, struct file_xfd *fx, FILE 
 COB_HIDDEN void 	cob_file_to_xfd (struct db_state *db, struct file_xfd *fx, cob_file *fl);
 COB_HIDDEN void		cob_index_to_xfd (struct db_state *db, struct file_xfd *fx, cob_file *fl, int idx);
 COB_HIDDEN void		cob_index_clear (struct db_state *db, struct file_xfd *fx, cob_file *fl, int idx);
+COB_HIDDEN void		cob_xfd_swap_data (char *p1, char *p2, int len);
 COB_HIDDEN void		cob_drop_xfd (struct file_xfd *fx);
 COB_HIDDEN void 	cob_sql_dump_stmt (struct db_state  *db, char *stmt, int doall);
 COB_HIDDEN void 	cob_sql_dump_data (struct db_state *db, struct file_xfd *fx);
