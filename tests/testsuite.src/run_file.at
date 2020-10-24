@@ -7075,8 +7075,8 @@ AT_DATA([prog.cob], [
            MOVE "~~~" TO f-key1-2
            START f KEY = f-key1-1
            READ f NEXT
-           IF (f-status <> "00") OR
-                   (file1-serial <> 4)
+           IF (f-status <> "00") 
+           OR (file1-serial <> 4)
                DISPLAY "FAILED 1: status " f-status
            END-IF
 
@@ -7084,8 +7084,8 @@ AT_DATA([prog.cob], [
            MOVE "~~~" TO f-key1-2
            START f KEY < f-key1-1
            READ f PREVIOUS
-           IF (f-status <> "00") OR
-                   (file1-serial <> 3)
+           IF (f-status <> "00") 
+           OR (file1-serial <> 3)
                DISPLAY "FAILED 2: status " f-status
            END-IF
 
@@ -7093,51 +7093,49 @@ AT_DATA([prog.cob], [
            MOVE "~~~" TO f-key1-2
            START f KEY > f-key1-1
            READ f NEXT
-           IF (f-status <> "00") OR
-                   (file1-serial <> 4)
+           IF (f-status <> "00") 
+           OR (file1-serial <> 4)
                DISPLAY "FAILED 3: status " f-status
-                       "serial: " file1-serial
+                       " serial: " file1-serial
            END-IF
 
            MOVE "aab" TO f-key2-1
            MOVE "~~~" TO f-key2-2
            START f KEY = f-key2-1
            READ f NEXT
-           IF (f-status <> "00") OR
-                   (file1-serial <> 4)
+           IF (f-status <> "00") 
+           OR (file1-serial <> 4)
                DISPLAY "FAILED 4: status " f-status
-                       "serial: " file1-serial
+                       " serial: " file1-serial
            END-IF
 
            MOVE "aab" TO f-key2-1
            MOVE "~~~" TO f-key2-2
            START f KEY < f-key2-1
            READ f PREVIOUS
-           IF (f-status <> "00") OR
-                   (file1-serial <> 3)
+           IF (f-status <> "00")
+           OR (file1-serial <> 3)
                DISPLAY "FAILED 5: status " f-status
-                       "serial: " file1-serial
+                       " serial: " file1-serial
            END-IF
 
            MOVE "aaa" TO f-key2-1
            MOVE "~~~" TO f-key2-2
            START f KEY > f-key2-1
            READ f NEXT
-           IF (f-status <> "00") OR
-                   (file1-serial <> 4)
+           IF (f-status <> "00")
+           OR (file1-serial <> 4)
                DISPLAY "FAILED 6: status " f-status
-                       "serial: " file1-serial
+                       " serial: " file1-serial
            END-IF
 
            MOVE "XX-" TO f-key3-1
            START f KEY > f-key3-1
            READ f NEXT
-      *    Not yet implemented: Return file-status "02" if duplicates exist
-      *    IF (f-status <> "02") OR
-           IF (f-status <> "00") OR
-                   (file1-serial <> 3)
+           IF (f-status <> "00")
+           OR (file1-serial <> 3)
                DISPLAY "FAILED 7: status " f-status
-                       "serial: " file1-serial
+                       " serial: " file1-serial
            END-IF
            CLOSE f
            STOP RUN

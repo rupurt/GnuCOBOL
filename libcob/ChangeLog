@@ -1,4 +1,11 @@
 
+2020-10-24  Ron Norman <rjn@inglenet.com>
+
+	* fbdb.c:    More code for 'dups_ahead' options for INDEXED files
+	* foci.c:    More code for 'dups_ahead' options for INDEXED files
+	* fodbc.c:   More code for 'dups_ahead' options for INDEXED files
+	* fsqlxfd.c: More code for 'dups_ahead' options for INDEXED files
+
 2020-10-19  Ron Norman <rjn@inglenet.com>
 
 	* coblocal.h: Add cob_file_dups and change parameter type
@@ -9,6 +16,8 @@
 	* fileio.c: Add checks for 'dups_ahead' options for INDEXED files
 	* fisam.c:  Add code to check or not for 'dups_ahead' options for INDEXED files
 	* fbdb.c:   Add code to check or not for 'dups_ahead' options for INDEXED files
+	            Now returns '21' if doing a REWRITE and the record does not
+				exist (used to be '23')
 
 2020-10-12  Ron Norman <rjn@inglenet.com>
 
