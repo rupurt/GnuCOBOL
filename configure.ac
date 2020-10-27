@@ -836,8 +836,12 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	  [AC_MSG_CHECKING([if linking of ./libcob/cJSON.c works])
 	   CPPFLAGS="$curr_cppflags -I./libcob"
 	   LIBS="$LIBS $COMMON_LIBS"
-	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
-	    [[cJSON_CreateNull ();]])],
+	   AC_LINK_IFELSE([
+		AC_LANG_PROGRAM([[#include "cJSON.c"]],
+	                   [[#if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+                        	#error Needs at least cJSON 1.3.0
+					     #endif
+						 cJSON_CreateNull ();]])],
 	   [AC_MSG_RESULT([yes])
 	    AC_DEFINE([WITH_CJSON], [1])
 	    with_cjson_local="yes (in ./libcob)"],
@@ -850,8 +854,12 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	    [AC_MSG_CHECKING([if linking of $srcdir/libcob/cJSON.c works])
 	     CPPFLAGS="$curr_cppflags -I$srcdir/libcob"
 	     LIBS="$LIBS $COMMON_LIBS"
-	     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
-	      [[cJSON_CreateNull ();]])],
+	     AC_LINK_IFELSE([
+		  AC_LANG_PROGRAM([[#include "cJSON.c"]],
+	                     [[#if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+                         	  #error Needs at least cJSON 1.3.0
+					       #endif
+						   cJSON_CreateNull ();]])],
 	     [AC_MSG_RESULT([yes])
 	      AC_DEFINE([WITH_CJSON], [1])
 	      with_cjson_local="yes (in $srcdir/libcob)"],
@@ -890,6 +898,9 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 			  #include <cjson/cJSON.h>
 			  #elif defined HAVE_CJSON_H
 			  #include <cJSON.h>
+			  #endif
+			  #if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+               	#error Needs at least cJSON 1.3.0
 			  #endif]],
 			  [[cJSON_CreateNull ();]])],
 			  [AC_MSG_RESULT([yes])
@@ -929,7 +940,10 @@ AS_IF([test "$USE_JSON" = "json-c" -o "$USE_JSON" = "check"],  [
 	 AC_MSG_CHECKING([if linking against libjson-c with "$JSON_C_LIBS" works])
 	 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	 [#include <json.h>]],
-	  [[json_c_version ();]])],
+	  [[#if (JSON_C_MAJOR_VERSION * 100 + JSON_C_MINOR_VERSION) < 12
+           	#error Needs at least json-c 0.12
+		#endif
+		json_c_version ();]])],
 	  [AC_MSG_RESULT([yes])
 	   AC_DEFINE([WITH_JSON_C], [1])
 	   USE_JSON=json-c
