@@ -1,4 +1,9 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobcrun.c: defaults.h removed
+	* Makefile.am: removed passing COB_EXPORT_DYN to LD_FLAGS
+
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am: fixed inclusion of libsupport, now libtoolized

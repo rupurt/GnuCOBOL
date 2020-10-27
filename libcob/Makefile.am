@@ -34,7 +34,7 @@ endif
 #COBCRUN = cobcrun$(EXEEXT)
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)/lib -I$(top_srcdir)/lib \
-	$(LIBCOB_CPPFLAGS)
+	$(LIBCOB_CPPFLAGS) -DLOCALEDIR=\"$(localedir)\"
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
 # note: currently misses libsupport...
 libcob_la_LIBADD = $(LIBCOB_LIBS) $(CODE_COVERAGE_LIBS)

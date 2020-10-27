@@ -350,10 +350,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\defaults.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\cobc\flag.def"
 				>
 			</File>

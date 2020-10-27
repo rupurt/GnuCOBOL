@@ -202,10 +202,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\defaults.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcob.h"
 				>
 			</File>

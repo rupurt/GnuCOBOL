@@ -19,7 +19,6 @@
 */
 
 #include <config.h>
-#include <defaults.h>
 #include <tarstamp.h>
 
 #include <stdio.h>

@@ -1,4 +1,11 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* call.c, common.c: defaults.h removed
+	* call.c: allow omitting the definition for COB_LIBRARY_PATH via config.h
+	* call.c (cob_get_field_str): check return code of ftell before use
+	* Makefile.am: pass LOCALEDIR via define
+
 2020-10-22  Simon Sobisch <simonsobisch@gnu.org>
 
 	* call.c (cob_set_library_path, cob_init_call): completely reworked

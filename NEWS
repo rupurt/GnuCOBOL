@@ -1,17 +1,23 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.1 final to be released (in Oct 2020)
+ GnuCOBOL 3.1 final to be released (end of October 2020)
+ 
+* TOBEDONE:
 
- GnuCOBOL 3.1 rc2 to be released (in the next days...)
+  ** fixes and enhancements for stack trace and dump generation
+  
+  ** allowing ref-mod with zero-length, also with runtime checks enabled
+  
+  ** tests with few more systems
 
 * Changes since 3.1-rc1
 
-  ** new configure option --enable-hardening new option to enable GNU C's
-     hardening options or leave as-is or disable (which previous versions
-     effectively did)
-
   ** the configure option --with-cjson was replaced by
      --with-json with arguments, allowing new JSON-C handler to be used
+
+  ** new configure option --enable-hardening to eihter enable GNU C's
+     hardening options or leave as-is or disable (which previous versions
+     effectively did)
 
   ** runtime checks: previously conditions missed the generation of runtime checks,
      leading to possible out-of-bounds or null-access there, this was fixed
@@ -20,6 +26,14 @@ NEWS - user visible changes				-*- outline -*-
      (CBL_ERROR_PROC or ... ) were ignored. This was changed according to the
      documentation for CBL_ERROR_PROC -> a RETURN-VALUE of ZERO skips further
      error handlers to be called, including the internal one.
+
+  ** build system: defaults.h is not created or included any more, all configure
+     provided defines are now found in the single header config.h
+
+  ** cobc -g (and configure --enable-debug) use the most expressive debugging options
+     available on the system
+
+  ** tested and adjusted to work on more systems (OS + compilers)
 
 * New GnuCOBOL features
 
@@ -33,7 +47,6 @@ NEWS - user visible changes				-*- outline -*-
    -Wno-ignored-error allows to suppress messages that normally would be an
       error and only allowed because they are never executed
    -Wimplicit-define and -Wcorresponding are now enabled by default
-      
 
 **  EXHIBIT and EXHIBIT NAMED implemented
 

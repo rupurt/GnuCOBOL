@@ -82,7 +82,7 @@ VG_COBCRUN_DIRECT_LOG="$VG_LOG_PREFIX-cobcrun_direct.log"
 MEMCHECK="valgrind --tool=memcheck --read-var-info=yes --track-origins=yes --leak-check=full --show-leak-kinds=all $VG_SUPPR"
 SGCHECK="valgrind --tool=exp-sgcheck --read-var-info=yes $VG_SUPPR"
 
-# cobol85 test use environment from a new perl process --> export needed
+# NIST tests (tests/cobol85) are executed in a separate perl process with a new environment --> export needed
 COBC="libtool --mode=execute $MEMCHECK --log-file=$VG_COBC_LOG ${COBC}"
 COBCRUN="libtool --mode=execute $MEMCHECK --log-file=$VG_COBCRUN_LOG ${COBCRUN}"
 COBCRUN_DIRECT="$MEMCHECK --log-file=$VG_COBCRUN_DIRECT_LOG ${COBCRUN_DIRECT}"
@@ -109,8 +109,11 @@ RUN_PROG_MANUAL="${abs_builddir}/run_prog_manual.sh"
 # unset option if not internally set in this script
 _unset_option () {
 	if test "$1" != "COB_CONFIG_DIR" \
+	     -a "$1" != "COB_COPY_DIR" \
 	     -a "$1" != "COB_RUNTIME_CONFIG" \
 	     -a "$1" != "COB_LIBRARY_PATH" \
+	     -a "$1" != "COB_CFLAGS" \
+	     -a "$1" != "COB_LIBS" \
 	     -a "$1" != "COB_UNIX_LF"; then
 		unset $1
 	fi
@@ -134,7 +137,6 @@ export PATHSEP
 exec_prefix="@prefix@" # this is is likely referenced in the LIBS entries below
 
 COB_CFLAGS="-I${abs_top_srcdir} @COB_CFLAGS@"
-COB_LDFLAGS="@COB_LDFLAGS@"
 COB_LIBS="-L${abs_top_builddir}/libcob/.libs @COB_LIBS@"
 COB_CONFIG_DIR="${abs_top_srcdir}/config"
 COB_COPY_DIR="${abs_top_srcdir}/copy"
@@ -144,7 +146,7 @@ SHLIB_PATH="${abs_top_builddir}/libcob/.libs:$SHLIB_PATH"
 LIBPATH="${abs_top_builddir}/libcob/.libs:$LIBPATH"
 COB_LIBRARY_PATH="${abs_top_builddir}/extras"
 
-export COB_CFLAGS COB_LDFLAGS COB_LIBS
+export COB_CFLAGS COB_LIBS
 export COB_CONFIG_DIR COB_COPY_DIR
 export LD_LIBRARY_PATH DYLD_LIBRARY_PATH SHLIB_PATH LIBPATH
 export COB_LIBRARY_PATH
@@ -152,10 +154,18 @@ COB_UNIX_LF=1
 export COB_UNIX_LF
 
 # unset all environment variables that are used in libcob
-# for runtime configuration
+# for runtime configuration ...
 COB_RUNTIME_CONFIG="${abs_top_srcdir}/config/runtime_empty.cfg"
 export COB_RUNTIME_CONFIG
-for cobenv in `"${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1`; \
+for cobenv in $("${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1); \
+	do _unset_option $cobenv; \
+done
+
+# prevent multiple calls by caching the output
+"${abs_top_builddir}/pre-inst-env" ${COBC} --info > info.out
+
+# ... and also unset for the compiler
+for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
 	do _unset_option $cobenv; \
 done
 
@@ -171,8 +181,6 @@ if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
 	COB_HAS_CURSES="@COB_HAS_CURSES@"
 	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
 else
-	# prevent multiple calls by caching the output
-	"${abs_top_builddir}/pre-inst-env" ${COBC} --info > info.out
 
 	COB_OBJECT_EXT="$(grep COB_OBJECT_EXT info.out | cut -d: -f2 | cut -b2-)"
 	COB_EXE_EXT="$(grep COB_EXE_EXT info.out | cut -d: -f2 | cut -b2-)"
@@ -183,7 +191,7 @@ else
 		COB_BIGENDIAN="no"
 	fi
 
-	COB_HAS_64_BIT_POINTER=`"${abs_top_builddir}/pre-inst-env" ${COBCRUN} --info | grep "64bit-mode" | cut -d: -f2 | cut -b2-`
+	COB_HAS_64_BIT_POINTER=$(grep "64bit-mode" info.out | cut -d: -f2 | cut -b2-)
 	cob_indexed=$(grep -i "indexed file" info.out | cut -d: -f2)
 	case $(grep -i "indexed file" info.out | cut -d: -f2) in
 	" disabled")	COB_HAS_ISAM="no";;

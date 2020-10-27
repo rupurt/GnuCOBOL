@@ -1,4 +1,9 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pre-inst-env.in: prefix instead of overwriting COB_CFLAGS,
+	  COB_LDFLAGS, COB_LIBS
+
 2020-06-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* compile, config.guess, config.sub, texinfo.tex:

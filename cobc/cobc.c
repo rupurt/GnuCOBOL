@@ -24,7 +24,6 @@
 /* #define DEBUG_REPLACE */
 
 #include <config.h>
-#include <defaults.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -342,6 +341,14 @@ static struct cobc_mem_struct	*cobc_plexmem_base = NULL;
 
 static const char	*cobc_cc;		/* C compiler */
 static char		*cobc_cflags;		/* C compiler flags */
+#ifdef COB_DEBUG_FLAGS
+static const char		*cobc_debug_flags;		/* C debgging flags */
+#else
+#ifndef	_MSC_VER
+#error		missing definition of COB_DEBUG_FLAGS
+#endif
+#endif
+
 static char		*cobc_libs;		/* -l... */
 static char		*cobc_lib_paths;	/* -L... */
 static char		*cobc_include;		/* -I... */
@@ -359,9 +366,21 @@ static size_t		cobc_libs_len;
 static size_t		cobc_lib_paths_len;
 static size_t		cobc_include_len;
 static size_t		cobc_ldflags_len;
+#ifdef COB_EXPORT_DYN
 static size_t		cobc_export_dyn_len;
+#else
+#define		cobc_export_dyn_len		0
+#endif
+#ifdef COB_SHARED_OPT
 static size_t		cobc_shared_opt_len;
+#else
+#define		cobc_shared_opt_len		0
+#endif
+#ifdef COB_PIC_FLAGS
 static size_t		cobc_pic_flags_len;
+#else
+#define		cobc_pic_flags_len		0
+#endif
 
 static char		*save_temps_dir = NULL;
 static struct strcache	*base_string;
@@ -1619,7 +1638,7 @@ static void
 turn_ec_for_table (struct cb_exception *table, const size_t table_len,
 		   struct cb_exception ec, const int to_on_off)
 {
-	int	i;
+	size_t	i;
 
 	if (ec.code & 0x00FF) {
 		/* Set individual level-1 EC */
@@ -1974,7 +1993,7 @@ cobc_getenv_path (const char *env)
 	char	*p;
 
 	p = getenv (env);
-	if (!p || *p == 0 || *p == ' ') {
+	if (!p || *p == 0) {
 		return NULL;
 	}
 	if (strchr (p, PATHSEP_CHAR) != NULL) {
@@ -2443,6 +2462,19 @@ cobc_var_print (const char *msg, const char *val, const unsigned int env)
 }
 
 static void
+cobc_var_and_envvar_print (const char* name, const char* defined_val)
+{
+	char* s = getenv (name);
+
+	cobc_var_print (name, defined_val, 0);
+
+	if (s && *s) {
+		cobc_var_print (name, s, 1);
+	}
+
+}
+
+static void
 cobc_print_info (void)
 {
 	char	buff[16];
@@ -2463,40 +2495,26 @@ cobc_print_info (void)
 	cobc_var_print ("LDFLAGS",		COB_BLD_LDFLAGS, 0);
 	putchar ('\n');
 	puts (_("GnuCOBOL information"));
-	cobc_var_print ("COB_CC",		COB_CC, 0);
-	if ((s = getenv ("COB_CC")) != NULL) {
-		cobc_var_print ("COB_CC",	s, 1);
-	}
-	cobc_var_print ("COB_CFLAGS",		COB_CFLAGS, 0);
-	if ((s = getenv ("COB_CFLAGS")) != NULL) {
-		cobc_var_print ("COB_CFLAGS",	s, 1);
-	}
-	cobc_var_print ("COB_LDFLAGS",		COB_LDFLAGS, 0);
-	if ((s = getenv ("COB_LDFLAGS")) != NULL) {
-		cobc_var_print ("COB_LDFLAGS",	s, 1);
-	}
-	cobc_var_print ("COB_LIBS",		COB_LIBS, 0);
-	if ((s = getenv ("COB_LIBS")) != NULL) {
-		cobc_var_print ("COB_LIBS",	s, 1);
-	}
-	cobc_var_print ("COB_CONFIG_DIR",	COB_CONFIG_DIR, 0);
-	if ((s = getenv ("COB_CONFIG_DIR")) != NULL) {
-		cobc_var_print ("COB_CONFIG_DIR",	s, 1);
-	}
-	cobc_var_print ("COB_COPY_DIR",		COB_COPY_DIR, 0);
-	if ((s = getenv ("COB_COPY_DIR")) != NULL) {
-		cobc_var_print ("COB_COPY_DIR",	s, 1);
-	}
-	if ((s = getenv ("COBCPY")) != NULL) {
+	cobc_var_and_envvar_print ("COB_CC",		COB_CC);
+	cobc_var_and_envvar_print ("COB_CFLAGS",	COB_CFLAGS);
+#ifdef COB_DEBUG_FLAGS
+	cobc_var_and_envvar_print ("COB_DEBUG_FLAGS", COB_DEBUG_FLAGS);
+#endif
+	cobc_var_and_envvar_print ("COB_LDFLAGS",	COB_LDFLAGS);
+	cobc_var_and_envvar_print ("COB_LIBS",		COB_LIBS);
+	cobc_var_and_envvar_print ("COB_CONFIG_DIR",	COB_CONFIG_DIR);
+	cobc_var_and_envvar_print ("COB_COPY_DIR",		COB_COPY_DIR);
+	if ((s = getenv ("COBCPY")) != NULL && *s) {
 		cobc_var_print ("COBCPY",	s, 1);
 	}
+	{
+		const char* val;
 #if defined (_MSC_VER)
-	cobc_var_print ("COB_MSG_FORMAT",	"MSC", 0);
+		val = "MSC";
 #else
-	cobc_var_print ("COB_MSG_FORMAT",	"GCC", 0);
+		val = "GCC";
 #endif
-	if ((s = getenv ("COB_MSG_FORMAT")) != NULL) {
-		cobc_var_print ("COB_MSG_FORMAT",	s, 1);
+		cobc_var_and_envvar_print ("COB_MSG_FORMAT", val);
 	}
 	cobc_var_print ("COB_OBJECT_EXT",	COB_OBJECT_EXT, 0);
 	cobc_var_print ("COB_MODULE_EXT",	COB_MODULE_EXT, 0);
@@ -3180,12 +3198,8 @@ process_command_line (const int argc, char **argv)
 			cb_flag_c_labels = 1;
 #endif
 			cb_flag_remove_unreachable = 0;
-#ifndef	_MSC_VER
-#ifndef __ORANGEC__
-			COBC_ADD_STR (cobc_cflags, " -g", NULL, NULL);
-#else
-			COBC_ADD_STR (cobc_cflags, " +v", NULL, NULL);
-#endif
+#ifdef COB_DEBUG_FLAGS
+			COBC_ADD_STR (cobc_cflags, " ", cobc_debug_flags, NULL);
 #endif
 			break;
 
@@ -7598,7 +7612,6 @@ process_compile (struct filename *fn)
 	}
 	return process(cobc_buffer);
 #endif
-
 }
 
 /* Create single-element assembled object */
@@ -7830,8 +7843,7 @@ process_module (struct filename *fn)
 #endif
 
 	size = strlen (name);
-	bufflen = cobc_cc_len
-			+ cobc_shared_opt_len
+	bufflen = cobc_cc_len + cobc_shared_opt_len
 			+ cobc_pic_flags_len + cobc_export_dyn_len
 			+ size + fn->object_len
 #ifdef	_MSC_VER
@@ -8171,7 +8183,7 @@ set_cobc_defaults (void)
 	char			*p;
 
 	cobc_cc = cobc_getenv_path ("COB_CC");
-	if (cobc_cc == NULL) {
+	if (cobc_cc == NULL ) {
 		cobc_cc = COB_CC;
 	}
 
@@ -8193,6 +8205,15 @@ set_cobc_defaults (void)
 	} else {
 		COBC_ADD_STR (cobc_ldflags, COB_LDFLAGS, NULL, NULL);
 	}
+
+#ifdef COB_DEBUG_FLAGS
+	p = cobc_getenv ("COB_DEBUG_FLAGS");
+	if (p && *p) {
+		cobc_debug_flags = (const char *)p;
+	} else {
+		cobc_debug_flags = COB_DEBUG_FLAGS;
+	}
+#endif
 
 	p = cobc_getenv ("COB_LIBS");
 	if (p) {
@@ -8310,9 +8331,15 @@ finish_setup_compiler_env (void)
 	cobc_cc_len = strlen (cobc_cc);
 	cobc_cflags_len = strlen (cobc_cflags);
 	cobc_include_len = strlen (cobc_include);
+#ifdef COB_SHARED_OPT
 	cobc_shared_opt_len = strlen (COB_SHARED_OPT);
+#endif
+#ifdef COB_PIC_FLAGS
 	cobc_pic_flags_len = strlen (COB_PIC_FLAGS);
+#endif
+#ifdef COB_EXPORT_DYN
 	cobc_export_dyn_len = strlen (COB_EXPORT_DYN);
+#endif
 	cobc_ldflags_len = strlen (cobc_ldflags);
 	cobc_lib_paths_len = strlen (cobc_lib_paths);
 	cobc_libs_len = strlen (cobc_libs);

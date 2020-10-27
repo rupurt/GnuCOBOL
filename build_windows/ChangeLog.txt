@@ -1,4 +1,11 @@
 
+2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: removed defaults.h from project files
+	* defaults.h.in: integrated into config.h.in
+	* config.h.in: updated
+	* README: updated build and test instructions
+
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 
 	* config.h.in: included CJSON_LOCAL option

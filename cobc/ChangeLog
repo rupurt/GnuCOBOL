@@ -1,4 +1,15 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, config.c: defaults.h removed
+	* cobc.c (cobc_getenv, cobc_getenv_path): return leading space
+	  for later error reporting
+	* cobc.c: allow omitting the definition for COB_EXPORT_DYN, COB_SHARED_OPT,
+	  COB_PIC_FLAGS via config.h (mostly for MSVC)
+	* cobc.c (cobc_print_info): extracted common code to cobc_var_and_envvar_print
+	  and additionally check environment var for "empty"
+	* Makefile.am: pass LOCALEDIR via define
+
 2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_cobol_info): fixed C89 declaration
@@ -20,6 +31,10 @@
 	* typeck.c: Flag internal variables with 'flag_real_binary'
 	* codegen.c: Emit USAGE INDEX and internal binary variables 
 	  as COB_TYPE_NUMERIC_COMP5
+
+2020-10-06  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c: handling new COB_DEBUG_FLAGS
 
 2020-09-30  Simon Sobisch <simonsobisch@gnu.org>
 

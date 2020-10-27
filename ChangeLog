@@ -1,9 +1,27 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac, m4/ax_ac_define_resolved.m4, Makefile.am:
+	  defaults.h is not created or included any more,
+	  all configure provided defines are now found in the single
+	  header config.h; new macro ax_ac_define_resolved.m4 resolves
+	  variables previously resolved via make, which also limits the amount
+	  of variables defined in every Makefile.in
+	* configure.ac: move LOCALEDIR definition from config.h to Makefiles;
+	  use $() instead of backticks in all places
+
+2020-10-06  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefile.am: added explicit dependency order for subfolders
+	* configure.ac: check for more debugging options and store them
+	  as COB_DEBUG_FLAGS (defaults.h) for use in cobc; include them
+	  for --enable-debug, see FR 388
+
 2020-10-02  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac (--enable-hardening): new option to enable or disable
 	  GNU C's hardening options or leave as-is (previous versions effectively
-	  used --disable-hardening)
+	  used --disable-hardening), see FR 388
 	* configure.ac: "common libs" are now also used for local cJSON check
 	  (needs math lib on some environments, as libcob does)
 	* configure.ac: check for declaration of fmemopen

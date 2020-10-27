@@ -20,7 +20,6 @@
 
 
 #include <config.h>
-#include <defaults.h>
 
 #ifndef	_GNU_SOURCE
 #define _GNU_SOURCE	1
@@ -346,6 +345,7 @@ cob_set_library_path ()
 		pstr++;
 	}
 
+#ifdef COB_LIBRARY_PATH
 	if (COB_LIBRARY_PATH[0] != 0
 	 && strcmp (COB_LIBRARY_PATH, ".") != 0) {
 		for (p = (char *)COB_LIBRARY_PATH; *p; p++, pstr++) {
@@ -366,6 +366,7 @@ cob_set_library_path ()
 			*pstr = *p;
 		}
 	}
+#endif
 	*pstr = 0;
 
 	/* prefix working directory if missing */
@@ -1985,10 +1986,13 @@ cob_get_field_str (const cob_field *f, char *buffer, size_t size)
 			cob_display_common (f, fp);
 #ifndef HAVE_FMEMOPEN
 			{
-				int pos = ftell (fp);
-				fseek (fp, 0, SEEK_SET);
-				fread ((void *)buffer, 1, pos, fp);
-				if (size > pos) buffer[pos] = 0;
+				int cur_pos = ftell (fp);
+				if (cur_pos >= 0) {
+					size_t	pos = (size_t) cur_pos;
+					fseek (fp, 0, SEEK_SET);
+					fread ((void*)buffer, 1, pos, fp);
+					if (size > pos) buffer[pos] = 0;
+				}
 			}
 #endif
 			fclose (fp);
