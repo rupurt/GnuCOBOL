@@ -327,6 +327,10 @@ process_command_line (int argc, char *argv[])
 			cobcrun_print_version ();
 			putchar ('\n');
 			print_version ();
+			if (verbose_output) {
+				putchar ('\n');
+				print_version_summary ();
+			}
 			exit (EXIT_SUCCESS);
 
 		case 'M':

@@ -1589,15 +1589,25 @@ struct cobjmp_buf {
 	void	*cbj_ptr_rest[2];
 };
 
+#define __LIBCOB_VERSION	3
+#define __LIBCOB_VERSION_MINOR		1
+#define __LIBCOB_VERSION_PATCHLEVEL	0	/* Note: possibly differs from patchelvel shown with cobc --version! */
+
+#define __LIBCOB_RELEASE (__LIBCOB_VERSION * 10000 + __LIBCOB_VERSION_MINOR * 100 + __LIBCOB_VERSION_PATCHLEVEL)
+
+
 /*******************************/
 
 /* Function declarations */
 
 /*******************************/
 /* Functions in common.c */
+COB_EXPIMP const char*	libcob_version (void);
+COB_EXPIMP int		set_libcob_version (int *, int *, int *);
 COB_EXPIMP void		print_info	(void);
 COB_EXPIMP void		print_info_detailed	(const int);
 COB_EXPIMP void		print_version	(void);
+COB_EXPIMP void		print_version_summary (void);
 COB_EXPIMP int		cob_load_config	(void);
 COB_EXPIMP void		print_runtime_conf	(void);
 

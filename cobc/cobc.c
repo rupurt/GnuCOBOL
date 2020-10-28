@@ -2368,7 +2368,7 @@ cobc_print_version (void)
 	putchar ('\n');
 	printf (_("Packaged  %s"), COB_TAR_DATE);
 	putchar ('\n');
-	printf (_("C version %s%s"), GC_C_VERSION_PRF, GC_C_VERSION);
+	printf ("%s %s", _("C version"), GC_C_VERSION_PRF GC_C_VERSION);
 	putchar ('\n');
 }
 
@@ -2381,7 +2381,7 @@ cobc_print_shortversion (void)
 	putchar ('\t');
 	printf (_("Packaged  %s"), COB_TAR_DATE);
 	putchar ('\n');
-	printf (_("C version %s%s"), GC_C_VERSION_PRF, GC_C_VERSION);
+	printf ("%s %s", _("C version"), GC_C_VERSION_PRF GC_C_VERSION);
 	putchar ('\n');
 }
 
@@ -2487,8 +2487,7 @@ cobc_print_info (void)
 	cobc_var_print (_("build environment"),	COB_BLD_BUILD, 0);
 	cobc_var_print ("CC", COB_BLD_CC, 0);
 	/* Note: newline because most compilers define a long version string (> 30 characters) */
-	snprintf (versbuff, 55, "%s%s", GC_C_VERSION_PRF, GC_C_VERSION);
-	cobc_var_print ("C version", versbuff, 0);
+	cobc_var_print (_("C version"), GC_C_VERSION_PRF GC_C_VERSION, 0);
 	cobc_var_print ("CPPFLAGS",		COB_BLD_CPPFLAGS, 0);
 	cobc_var_print ("CFLAGS",		COB_BLD_CFLAGS, 0);
 	cobc_var_print ("LD",			COB_BLD_LD, 0);

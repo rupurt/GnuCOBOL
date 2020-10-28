@@ -86,12 +86,19 @@ dist-hook:
 
 # Create dist_win manually (dist-zip would have the same content as dist-gzip)
 distwindir = $(distdir)_win
-distwin: distdir $(top_srcdir)/build_windows $(top_srcdir)/build_aux/create_win_dist.sh
-	EXTSRCDIR=$(srcdir) EXTDISTDIR=$(distdir) EXTWINDISTDIR=$(distwindir) $(top_srcdir)/build_aux/create_win_dist.sh
+distwindir: distdir $(top_srcdir)/build_windows $(top_srcdir)/build_aux/create_win_dist.sh
+	EXTSRCDIR=$(abs_srcdir) EXTDISTDIR=$(distdir) EXTWINDISTDIR=$(distwindir) $(top_srcdir)/build_aux/create_win_dist.sh
 
-distwin-zip: distwin
+distwin-zip: distwindir
 	rm -f "$(distwindir).zip"
 	zip -rq "$(distwindir).zip" "$(distwindir)"
+
+distmingwdir = GnuCOBOL_mingw
+distmingwdir: all $(top_srcdir)/build_aux/create_mingw_bindist.sh
+	EXTSRCDIR=$(abs_srcdir) EXTDISTDIR=$(distmingwdir) EXTBUILDDIR=$(abs_builddir) $(top_srcdir)/build_aux/create_mingw_bindist.sh
+
+distwin:   distwindir
+distmingw: distmingwdir
 
 $(tarstamps):
 	@echo "Creating $@..."
@@ -108,7 +115,7 @@ vcs-update:
 
 
 # targets that are only logical targets and should always be executed
-.PHONY: test checkall checkmanual vcs-update
+.PHONY: test checkall checkmanual vcs-update distwin distmingw
 
 test: all
 	cd tests && $(MAKE) $(AM_MAKEFLAGS) test

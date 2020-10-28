@@ -1,4 +1,12 @@
 
+2020-10-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* create_mingw_bindist.sh: completely revised, now also copying
+	  locales, usable from makefile, generating correct version info
+	  into generated docs + set_env.cmd, set_env.cmd with "drop exe"
+	  and double-click functionality, creating two output folders
+	  (dbg and stripped)
+
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pre-inst-env.in: prefix instead of overwriting COB_CFLAGS,
