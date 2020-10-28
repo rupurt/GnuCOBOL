@@ -1,6 +1,11 @@
 
 2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
 
+	* version_cobc.rc, version_cobcrun.rc, version_libcob.rc:
+	  use new defined constants from libcob/common.h for version numbers
+
+2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
+
 	* general: removed defaults.h from project files
 	* defaults.h.in: integrated into config.h.in
 	* config.h.in: updated
