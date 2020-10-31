@@ -1,4 +1,8 @@
 
+2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_initialize_compound): resolve occurs_max only once
+
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c, config.c: defaults.h removed

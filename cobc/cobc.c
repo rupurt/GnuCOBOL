@@ -5523,9 +5523,7 @@ xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xre
 			cnt = 0;
 			(void)terminate_str_at_first_trailing_space (print_data);
 			print_program_data (print_data);
-//			if (elem->next) {
-				pd_off = sprintf (print_data, "%38.38s", " ");
-//			}
+			pd_off = sprintf (print_data, "%38.38s", " ");
 		}
 	}
 	while (++cnt < maxcnt) {
@@ -5534,10 +5532,8 @@ xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xre
 	pd_off += sprintf (print_data + pd_off, " x%-6u",
 		xref->amount);
 
-//	if (cnt) {
-		(void)terminate_str_at_first_trailing_space (print_data);
-		print_program_data (print_data);
-//	}
+	(void)terminate_str_at_first_trailing_space (print_data);
+	print_program_data (print_data);
 }
 
 static void

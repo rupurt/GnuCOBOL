@@ -27,6 +27,11 @@
 	  remove trailing spaces from entries
 	* common.c (get_math_info): use return of snprintf instead of extra strlen
 
+2020-10-20  Simon Sobisch <simonsobisch@gnu.org>
+
+	* move.c (cob_move_all): optimization by removing unnecessary malloc/free
+	  for most executions and using constant attributes
+
 2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c: fixed C89 declaration
