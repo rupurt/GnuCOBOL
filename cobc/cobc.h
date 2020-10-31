@@ -334,6 +334,7 @@ enum cobc_name_type {
 /* List of error messages */
 struct list_error {
 	struct list_error	*next;
+	struct list_error	*prev;
 	int			line;		/* Line number for error */
 	char			*file;		/* File name */
 	char			*prefix;	/* Error prefix */

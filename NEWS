@@ -6,23 +6,22 @@ NEWS - user visible changes				-*- outline -*-
 
   ** fixes and enhancements for stack trace and dump generation
   
-  ** allowing ref-mod with zero-length, also with runtime checks enabled
-  
-  ** tests with few more systems
+  ** allow ref-mod with zero-length, also with runtime checks enabled
 
 * Changes since 3.1-rc1
 
   ** the configure option --with-cjson was replaced by
      --with-json with arguments, allowing new JSON-C handler to be used
 
-  ** new configure option --enable-hardening to eihter enable GNU C's
-     hardening options or leave as-is or disable (which previous versions
+  ** new configure option --enable-hardening to either enable GNU C's
+     hardening options or leave as-is, or disable (which previous versions
      effectively did)
 
-  ** runtime checks: previously conditions missed the generation of runtime checks,
-     leading to possible out-of-bounds or null-access there, this was fixed
+ **  ensure runtime checks are generated - nder some conditions the
+     generated code had excluded runtime checks, permitting out-of-bounds or
+     null-pointer accesses
 
-  ** breaking change: previously the return-code of registered error handlers
+  ** Breaking change: previously the return-code of registered error handlers
      (CBL_ERROR_PROC or ... ) were ignored. This was changed according to the
      documentation for CBL_ERROR_PROC -> a RETURN-VALUE of ZERO skips further
      error handlers to be called, including the internal one.
@@ -30,36 +29,44 @@ NEWS - user visible changes				-*- outline -*-
   ** build system: defaults.h is not created or included any more, all configure
      provided defines are now found in the single header config.h
 
-  ** cobc -g (and configure --enable-debug) use the most expressive debugging options
-     available on the system
+  ** cobc -g (and configure --enable-debug) use the most expressive
+     debugging options available on the system
 
-  ** tested and adjusted to work on more systems (OS + compilers)
+  ** the interal Xref got a huge speedup, has all references in ascending order
+     now and includes the total amount of direct references
 
-* New GnuCOBOL features
+  ** the interal listing got a speedup and has all error references in
+     ascending order now
 
-** new COBOL compiler (cobc) options:
-   -f[no]-diagnostics-show-option, enabled by default, shows the command line
-       option responsible for the diagnostic message
 
-** adjustments to warning options:
+** adjustments to cobc's warning options:
    -Wdangling-text "new" option to enable "source text after program area",
-      not included in -Wall any moe
+      not included in -Wall any more
    -Wno-ignored-error allows to suppress messages that normally would be an
       error and only allowed because they are never executed
    -Wimplicit-define and -Wcorresponding are now enabled by default
 
+  ** tested and adjusted to work on more systems (OS + compilers)
+
+  ** the GnuCOBOL Manual has been updated
+
+* New GnuCOBOL features
+
+** new COBOL compiler (cobc) options:
+   -f[no]-diagnostics-show-option, enabled by default, shows the
+       command line option responsible for the diagnostic message
+
 **  EXHIBIT and EXHIBIT NAMED implemented
 
 **  support for MicroFocus extension "LOCAL-STORAGE implies RECURSIVE"
-    defaults to "on" for `-std=mf` and `-std=mf-strict`
+    defaults to "on" for `-std=mf` and `-std=mf-strict`!
+
 
 * Known issues in 3.1-rc1
- 
-** the documentation is not in the final state for the release
 
 ** testsuite:
-  * if built with vbisam, cisam or disam some tests will lead to UNEXPECTED PASS,
-    depending on the actual version used some other may fail
+  * if built with vbisam, cisam or disam, depending on the version used, some
+    tests will lead to UNEXPECTED PASS, while others may fail
   * possibly failing tests (false positives):
     * temporary path invalid
     * compiler outputs (assembler)
@@ -442,8 +449,9 @@ NEWS - user visible changes				-*- outline -*-
 
 ** New listing options:
 
-  -t listing, -T wide listing, --tlines=lines, lines per page of listing
-  -Xref
+  -t listing, -T wide listing, --tlines=lines, lines per page of listing;
+  -Xref now handled internally, if you want to use cobxref define
+  COB_EXTERNAL_XREF during configure
 
   Note: -P, generate preprocessor listing, is still available (and improved)
 

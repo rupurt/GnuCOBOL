@@ -552,6 +552,7 @@ struct cb_next_elem {
 /* xref entries */
 struct cb_xref_elem {
 	struct cb_xref_elem	*next;
+	struct cb_xref_elem	*prev;
 	int			line;
 	int			receive;
 };
@@ -559,7 +560,8 @@ struct cb_xref_elem {
 struct cb_xref {
 	struct cb_xref_elem	*head;
 	struct cb_xref_elem	*tail;
-	int			skip;
+	int		amount;
+	int		skip;
 };
 
 struct cb_call_elem {
@@ -2283,10 +2285,21 @@ extern struct cb_program	*cb_find_defined_program_by_name (const char *);
 extern struct cb_program	*cb_find_defined_program_by_id (const char *);
 
 /* cobc.c */
+#ifndef COB_EXTERNAL_XREF
+#define COB_INTERNAL_XREF
+#endif
+
+#ifdef COB_INTERNAL_XREF
 extern void			cobc_xref_link (struct cb_xref *, const int, const int);
 extern void			cobc_xref_link_parent (const struct cb_field *);
 extern void			cobc_xref_set_receiving (const cb_tree);
 extern void			cobc_xref_call (const char *, const int, const int, const int);
+#else
+#define cobc_xref_link(x,l,r)
+#define cobc_xref_link_parent(f)
+#define cobc_xref_set_receiving(t)
+#define cobc_xref_call (n l,i,s)
+#endif
 extern unsigned int		cb_correct_program_order;
 
 /* Function defines */

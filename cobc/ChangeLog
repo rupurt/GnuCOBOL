@@ -61,11 +61,24 @@
 
 	* flag.def (intrinsics): remove extraneous newline in output
 
-2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
-
-	* ppparse.y: slightly improved directive errors, still much work to do
-
 2020-09-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (cobc_xref_link), tree.h: changed cb_xref_elem to a dual-linked
+	  list allowing to insert elements and read backwards (in most cases the
+	  reference numbers increase)
+	  and added a counter to cb_xref
+	* error.c (cb_add_error_to_listing), cobc.h, cobc.c: changed list_error
+	  to a dual-linked list (in most cases the reference numbers increase
+	  and we can drop list_error_reverse this way)
+	* cobc.c, tree.h: if external reference should be used: define the funtions
+	  to a no-op, removing some clutter in the xref functions
+	* cobc.c (terminate_str_at_first_trailing_space): insert one string instead
+	  of zeroing out the complete memory
+	* cobc.c (get_next_listing_line): uses memset for spacing out till end of line
+	  instead of iterating over the char array manually
+	* typeck.c (cb_emit_open): only add a receiving entry when not OPEN INPUT
+
+2020-09-10  Simon Sobisch <simonsobisch@gnu.org>
 
 	update for compiler diagnostivs including FR 386: show warning flag in use
 	

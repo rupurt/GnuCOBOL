@@ -10376,7 +10376,8 @@ cb_emit_open (cb_tree file, cb_tree mode, cb_tree sharing)
 	f = CB_FILE (file);
 	open_mode = CB_INTEGER(mode)->val;
 
-	if (open_mode == COB_OPEN_OUTPUT) {
+	if (cb_listing_xref
+	 && open_mode != COB_OPEN_INPUT) {
 		/* add a "receiving" entry for the file */
 		cobc_xref_link (&f->xref, CB_REFERENCE (orig_file)->common.source_line, 1);
 	}

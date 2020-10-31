@@ -4002,7 +4002,7 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 			/* force generation of report source field TODO: Check why */
 			fld = CB_FIELD_PTR (p->report_source);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 			if (CB_TREE_TAG (p->report_source) == CB_TAG_REFERENCE) {
 				ref = CB_REFERENCE (p->report_source);
@@ -4017,14 +4017,14 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 		 && CB_REF_OR_FIELD_P (p->report_sum_counter)) {
 			fld = CB_FIELD_PTR (p->report_sum_counter);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 		}
 		if (p->report_control
 		 && CB_REF_OR_FIELD_P (p->report_control)) {
 			fld = CB_FIELD_PTR (p->report_control);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 		}
 		if (p->children) {
@@ -4415,6 +4415,8 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	if (!scratch_buff) {
 		scratch_buff = cobc_main_malloc ((size_t)COB_MINI_BUFF);
 	}
+	/* FIXME: when this text is changed test DEPENDING ON with ODOSLIDE fails
+	          --> describe the issue here and use at least a define */
 	snprintf (scratch_buff, (size_t)COB_MINI_MAX, "%s Record", f->name);
 	f->record = CB_FIELD (cb_build_implicit_field (cb_build_reference (scratch_buff),
 				f->record_max));

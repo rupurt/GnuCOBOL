@@ -64,8 +64,7 @@
 
 #include "libcob/cobgetopt.h"
 
-#if defined (COB_EXPERIMENTAL) || 1
-#define COB_INTERNAL_XREF
+#ifdef COB_INTERNAL_XREF
 enum xref_type {
 	XREF_FIELD,
 	XREF_FILE,
@@ -233,7 +232,7 @@ FILE			*cb_listing_file = NULL;
 						   for COBOL 2002 (removed it) would be 7 */
 #define CB_INDICATOR	CB_MARGIN_A - 1
 #define CB_SEQUENCE	cb_text_column /* the only configuration available...*/
-#define CB_ENDLINE	cb_text_column + cb_indicator_column + 1
+#define CB_ENDLINE	(cb_text_column + cb_indicator_column + 1)
 
 #define CB_MAX_LINES	55
 #define CB_LIST_PICSIZE 80
@@ -2478,7 +2477,6 @@ static void
 cobc_print_info (void)
 {
 	char	buff[16];
-	char	versbuff[56];
 	char	*s;
 
 	cobc_print_version ();
@@ -5183,15 +5181,20 @@ set_category (int category, int usage, char *type)
 	}
 }
 
-/* terminate string at first trailing space and return its length */
+/* terminate string at first trailing space ' ' and return its length */
 static int
 terminate_str_at_first_trailing_space (char * const str)
 {
 	int	i;
 
+#if 0 /* Simon: We likely do not need to zero-out the complete memory... */
 	for (i = strlen (str) - 1; i && isspace ((unsigned char)str[i]); i--) {
 		str[i] = '\0';
 	}
+#else
+	for (i = strlen (str) - 1; i && str[i] == ' '; i--);
+	str[i + 1] = '\0';
+#endif
 	return i;
 }
 
@@ -5353,48 +5356,68 @@ print_fields_in_section (struct cb_field *first_field_in_section)
 	return found;
 }
 
+#ifdef COB_INTERNAL_XREF
 /* create xref_elem with line number for existing xref entry */
 void
 cobc_xref_link (struct cb_xref *list, const int line, const int receiving)
 {
-#ifdef COB_INTERNAL_XREF
-	struct cb_xref_elem *elem;
+	struct cb_xref_elem* elem = list->tail;
+	struct cb_xref_elem* new_elem;
 
-	for (elem = list->head; elem; elem = elem->next) {
-		if (elem->line == line) {
-			if (receiving) {
-				elem->receive = 1;
+	/* only search if line is less then last entry ...*/
+	if (elem && elem->line >= line) {
+		for (; elem; elem = elem->prev) {
+			if (elem->line == line) {
+				if (receiving) {
+					elem->receive = 1;
+				}
+				return;
 			}
-			return;
+			if (elem->line < line) {
+				break;
+			}
 		}
 	}
+	/* ... otherwise it is guaranteed to be new */
 
-	elem = cobc_parse_malloc (sizeof (struct cb_xref_elem));
-	elem->line = line;
-	elem->receive = receiving;
+	list->amount++;
+
+	new_elem = cobc_parse_malloc (sizeof (struct cb_xref_elem));
+	new_elem->line = line;
+	new_elem->receive = receiving;
+	new_elem->prev = elem;
 
 	/* add xref_elem to head/tail
 	   remark: if head == NULL, then tail may contain reference to child's
 	   head marking it as "referenced by child" - we don't want to preserve
 	   this information but overwrite it with the actual reference */
 	if (list->head == NULL) {
-		list->head = elem;
+		list->head = new_elem;
 	} else if (list->tail != NULL) {
-		list->tail->next = elem;
+		/* inserting in between, elem is last matched entry */
+		if (list->tail->line > line) {
+			if (!elem) {
+				new_elem->next = list->head;
+				list->head->prev = new_elem;
+				list->head = new_elem;
+			} else {
+				new_elem->next = elem->next;
+				elem->next = new_elem;
+				if (list->tail == elem) {
+					list->tail = new_elem;
+				}
+			}
+			return;
+		}
+		list->tail->next = new_elem;
 	}
-	list->tail = elem;
-#else
-	COB_UNUSED (list);
-	COB_UNUSED (line);
-	COB_UNUSED (receiving);
-#endif
+	list->tail = new_elem;
 }
 
 /* set "referenced by child" (including lvl 88 validation) for field's parents */
 void
 cobc_xref_link_parent (const struct cb_field *field)
 {
-#ifdef COB_INTERNAL_XREF
 	struct cb_field *f;
 	const struct cb_xref *f_xref = &field->xref;
 	struct cb_xref *p_xref;
@@ -5407,16 +5430,12 @@ cobc_xref_link_parent (const struct cb_field *field)
 		}
 		p_xref->tail = f_xref->tail;
 	}
-#else
-	COB_UNUSED (field);
-#endif
 }
 
 /* add a "receiving" entry for a given field reference */
 void
 cobc_xref_set_receiving (const cb_tree target_ext)
 {
-#ifdef COB_INTERNAL_XREF
 	cb_tree	target = target_ext;
 	struct cb_field		*target_fld;
 	int				xref_line;
@@ -5437,15 +5456,11 @@ cobc_xref_set_receiving (const cb_tree target_ext)
 		xref_line = cb_source_line;
 	}
 	cobc_xref_link (&target_fld->xref, xref_line, 1);
-#else
-	COB_UNUSED (target_ext);
-#endif
 }
 
 void
 cobc_xref_call (const char *name, const int line, const int is_ident, const int is_sys)
 {
-#ifdef COB_INTERNAL_XREF
 	struct cb_call_elem	*elem;
 
 	for (elem = current_program->call_xref.head; elem; elem = elem->next) {
@@ -5467,14 +5482,8 @@ cobc_xref_call (const char *name, const int line, const int is_ident, const int 
 		current_program->call_xref.tail->next = elem;
 	}
 	current_program->call_xref.tail = elem;
-#else
-	COB_UNUSED (name);
-	COB_UNUSED (line);
-	COB_UNUSED (is_ident);
-#endif
 }
 
-#ifdef COB_INTERNAL_XREF
 static void
 xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xref_parent)
 {
@@ -5510,19 +5519,25 @@ xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xre
 	for (elem = xref->head; elem; elem = elem->next) {
 		pd_off += sprintf (print_data + pd_off, " %c%-6u",
 			elem->receive ? '*' : ' ', elem->line);
-		if (++cnt >= maxcnt) {
+		if (++cnt == maxcnt) {
 			cnt = 0;
 			(void)terminate_str_at_first_trailing_space (print_data);
 			print_program_data (print_data);
-			if (elem->next) {
+//			if (elem->next) {
 				pd_off = sprintf (print_data, "%38.38s", " ");
-			}
+//			}
 		}
 	}
-	if (cnt) {
+	while (++cnt < maxcnt) {
+		pd_off += sprintf (print_data + pd_off, "        ");
+	}
+	pd_off += sprintf (print_data + pd_off, " x%-6u",
+		xref->amount);
+
+//	if (cnt) {
 		(void)terminate_str_at_first_trailing_space (print_data);
 		print_program_data (print_data);
-	}
+//	}
 }
 
 static void
@@ -5674,7 +5689,7 @@ xref_calls (struct cb_call_xref *list)
 	}
 	return gotone;
 }
-#endif
+#endif /* COB_INTERNAL_XREF */
 
 static void
 print_program_trailer (void)
@@ -6000,9 +6015,17 @@ get_next_listing_line (FILE *fd, char **pline, int fixed)
 	}
 
 	if (fixed) {
+#if 1 /* Simon: that should be portable enough */
+		int size = (unsigned int)CB_ENDLINE - i;
+		if (size > 0) {
+			memset (&out_line[i], ' ', (size_t)size);
+			i = (unsigned int)CB_ENDLINE;
+		}
+#else
 		while (i < (unsigned int)CB_ENDLINE) {
 			out_line[i++] = ' ';
 		}
+#endif
 	} else {
 		out_line[i++] = ' ';
 	}
@@ -6225,7 +6248,7 @@ print_errors_for_line (const struct list_error * const first_error,
 	const unsigned int	max_chars_on_line = cb_listing_wide ? 120 : 80;
 	size_t msg_off;
 
-	for (err = first_error; err; err = err->next) {
+	for (err = first_error; err && err->line <= line_num; err = err->next) {
 		if (err->line == line_num) {
 			pd_off = snprintf (print_data, max_chars_on_line, "%s%s", err->prefix, err->msg);
 			if (pd_off == -1) {	/* snprintf returns -1 in MS and on HPUX if max is reached */
@@ -7110,21 +7133,6 @@ print_replace_main (struct list_files *cfile, FILE *fd,
 	return pline_cnt;
 }
 
-static struct list_error *
-list_error_reverse (struct list_error *p)
-{
-	struct list_error	*next;
-	struct list_error	*last;
-
-	last = NULL;
-	for (; p; p = next) {
-		next = p->next;
-		p->next = last;
-		last = p;
-	}
-	return last;
-}
-
 /*
 Print the listing for the file in cfile, with copybooks expanded and
 after text has been REPLACE'd.
@@ -7305,10 +7313,6 @@ print_program (struct list_files *cfile, int in_copy)
 {
 	struct list_error	*err;
 	struct list_files	*cur;
-
-	if (cfile->err_head) {
-		cfile->err_head = list_error_reverse (cfile->err_head);
-	}
 
 	if (cb_listing_with_source) {
 		/* actual printing of program code, copybooks included */
@@ -7588,7 +7592,7 @@ process_compile (struct filename *fn)
 #ifdef	_MSC_VER
 	sprintf (cobc_buffer, gflag_set ?
 		"%s /c %s %s /Od /MDd /Zi /FR /c /Fa\"%s\" /Fo\"%s\" \"%s\"" :
-		"%s /c %s %s /MD /c /Fa\"%s\" /Fo\"%s\" \"%s\"",
+		"%s /c %s %s     /MD          /c /Fa\"%s\" /Fo\"%s\" \"%s\"",
 			cobc_cc, cobc_cflags, cobc_include, name,
 			name, fn->translate);
 	if (verbose_output > 1) {

@@ -220,11 +220,11 @@ cb_add_error_to_listing (const char *file, int line,
 		/* set correct listing entry for this file */
 		cfile = cb_current_file;
 		if (!cfile->name
-			|| (file && strcmp (cfile->name, file))) {
+		 || (file && strcmp (cfile->name, file))) {
 			cfile = cfile->copy_head;
 			while (cfile) {
 				if (file && cfile->name
-					&& !strcmp (cfile->name, file)) {
+				 && !strcmp (cfile->name, file)) {
 					break;
 				}
 				cfile = cfile->next;
@@ -234,9 +234,51 @@ cb_add_error_to_listing (const char *file, int line,
 		if (!cfile) {
 			cfile = cb_current_file;
 		}
-		/* add error to listing entry */
-		err->next = cfile->err_head;
-		cfile->err_head = err;
+		/* add error to listing entry - in order */
+#if 0	/* note: we don't need to check 'file' here because of cfile's scope */
+		if (!err->file) {
+			struct list_error	*old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (old_err->file) {
+					continue;
+				}
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		} else {
+			struct list_error* old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (!old_err
+				 || strcmp (old_err->file, err->file)) {
+					continue;
+				}
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		}
+#else
+		{
+			struct list_error* old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		}
+#endif
+
+		if (!err->prev) {
+			err->next = cfile->err_head;
+			cfile->err_head = err;
+		} else {
+			err->next = err->prev->next;
+			err->prev->next = err;
+		}
 
 		/* Otherwise, just write error to the listing file */
 	} else {

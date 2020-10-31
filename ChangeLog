@@ -1,7 +1,7 @@
 
 2020-10-28  Simon Sobisch <simonsobisch@gnu.org>
 
-	* Makefile.am: target for mingw-dist
+	* Makefile.am: target for distmingwdir
 
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
