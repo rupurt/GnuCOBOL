@@ -589,7 +589,6 @@ odbc_setup_stmt (
 	int				idx)
 {
 	int		k,pos;
-	SQLULEN	opt;
 	if (!s->handle) {
 		if(chkSts(db,(char*)"Alloc Stmt Handle",db->dbDbcH,
 				SQLAllocHandle(SQL_HANDLE_STMT,db->dbDbcH,&s->handle))){
@@ -606,14 +605,21 @@ odbc_setup_stmt (
 		if (fx->fl->flag_read_chk_dups
 		 && idx > 0
 		 && fx->fl->keys[idx].tf_duplicates == 1) {
-			opt = SQL_CURSOR_DYNAMIC;
-			chkSts(db,(char*)"Set CURSOR DYNAMIC",s->handle,
-				SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_TYPE, 
-												(SQLPOINTER)opt, SQL_IS_UINTEGER));
-			opt = SQL_SCROLLABLE;
-			chkSts(db,(char*)"Set CURSOR SCROLLABLE",s->handle,
-				SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_SCROLLABLE, 
-												(SQLPOINTER)opt, SQL_IS_UINTEGER));
+			if (db->mysql) {
+				chkSts(db,(char*)"MySQL Set CURSOR FORWARD",s->handle,
+					SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_TYPE, 
+										(SQLPOINTER)SQL_CURSOR_FORWARD_ONLY, SQL_IS_UINTEGER));
+				chkSts(db,(char*)"Set CURSOR SCROLLABLE",s->handle,
+					SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_SCROLLABLE, 
+										(SQLPOINTER)SQL_SCROLLABLE, SQL_IS_UINTEGER));
+			} else {
+				chkSts(db,(char*)"Set CURSOR DYNAMIC",s->handle,
+					SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_TYPE, 
+										(SQLPOINTER)SQL_CURSOR_DYNAMIC, SQL_IS_UINTEGER));
+				chkSts(db,(char*)"Set CURSOR SCROLLABLE",s->handle,
+					SQLSetStmtAttr(s->handle, SQL_ATTR_CURSOR_SCROLLABLE, 
+										(SQLPOINTER)SQL_SCROLLABLE, SQL_IS_UINTEGER));
+			}
 		}
 
 		if(chkSts(db,(char*)"Prepare Stmt",s->handle,
@@ -1806,6 +1812,7 @@ odbc_read_next (cob_file_api *a, cob_file *f, const int read_opts)
 			db_savekey (f, p->suppkey, f->record->data, f->curkey);
 			if (memcmp(p->suppkey, p->savekey, klen) == 0) {
 				ret = COB_STATUS_02_SUCCESS_DUPLICATE;
+				DEBUG_TRACE("db",("Read: %s; index %d DUPS ahead\n",f->select_name,f->curkey+1));
 			}
 			chkSts(db,(char*)"Peek reset",fx->start->handle,
 					SQLFetchScroll(fx->start->handle,SQL_FETCH_PRIOR, 0));
