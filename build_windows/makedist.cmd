@@ -63,7 +63,7 @@ if /i "%1%"=="DEBUG" (
    set config=Release
 )
 
-rem TODO: read this from defaults.h
+rem TODO: read this from config.h
 set "ltversion=-5"
 
 if exist "%cob_build_path%Win32\%config%\cobc.exe" (

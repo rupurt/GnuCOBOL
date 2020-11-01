@@ -1,4 +1,10 @@
 
+2020-11-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.h.in: cater for libcob-5
+	* set_env_vs.bat, set_env_vs_x64.bat, set_env_vs_dist.bat,
+	  set_env_vs_dist_x64.bat: removed VS2005
+
 2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* version_cobc.rc, version_cobcrun.rc, version_libcob.rc, version_gcdiff.rc:

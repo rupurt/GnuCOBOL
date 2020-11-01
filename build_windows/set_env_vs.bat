@@ -71,8 +71,8 @@ if not [%found%] == [] (
    goto :setup_gc
 )
 
-:: Visual Studio 2015, 2013, 2012, 2010, 2008, 2005
-for %%v in ("%VS140COMNTOOLS%" "%VS120COMNTOOLS%" "%VS110COMNTOOLS%" "%VS100COMNTOOLS%" "%VS90COMNTOOLS%" "%VS80COMNTOOLS%") do (
+:: Visual Studio 2015, 2013, 2012, 2010, 2008
+for %%v in ("%VS140COMNTOOLS%" "%VS120COMNTOOLS%" "%VS110COMNTOOLS%" "%VS100COMNTOOLS%" "%VS90COMNTOOLS%") do (
    if not [%found%] == []  goto :eof
    call :vsvars_old %%v
 )
