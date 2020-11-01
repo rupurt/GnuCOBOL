@@ -228,11 +228,13 @@ struct cb_exception cb_exception_table[] = {
 #define	CB_FLAG_ON(var,print_help,name,doc)	int var = 1;
 #define	CB_FLAG_RQ(var,print_help,name,def,opt,doc)	int var = def;
 #define	CB_FLAG_NQ(print_help,name,opt,doc)
+#define	CB_FLAG_OP(print_help,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
 int cb_mf_ibm_comp = -1;
 int cb_cob_line_num = 0;
 int cb_all_files_xfd = 0;
@@ -501,11 +503,14 @@ static const struct option long_options[] = {
 	{"f" name,		CB_RQ_ARG, NULL, opt},
 #define	CB_FLAG_NQ(print_help,name,opt,doc)			\
 	{"f" name,		CB_RQ_ARG, NULL, opt},
+#define	CB_FLAG_OP(print_help,name,opt,doc)			\
+	{"f" name,		CB_OP_ARG, NULL, opt},
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
 	{"fibmcomp",		CB_NO_ARG, &cb_mf_ibm_comp, 1},
 	{"fno-ibmcomp",		CB_NO_ARG, &cb_mf_ibm_comp, 0},
 
@@ -2570,34 +2575,51 @@ cobc_options_error_build (void)
 
 /* decipher dump options given on command line */
 static void
-cobc_def_dump_opts (const char *opt)
+cobc_def_dump_opts (const char *opt, const int on)
 {
 	char	*p, *q;
+	int 	dump_to_set;
+
 	if (!strcasecmp (opt, "ALL")) {
-		cb_flag_dump = COB_DUMP_ALL;
+		if (on) {
+			cb_flag_dump = COB_DUMP_ALL;
+		} else {
+			cb_flag_dump = COB_DUMP_NONE;
+		}
 		return;
 	}
 
 	p = cobc_strdup (opt);
 	q = strtok (p, ",");
+	if (!q) {
+		q = (char *) "";
+	}
+	dump_to_set = 0;
 	while (q) {
 		if (!strcasecmp (q, "FD")) {
-			cb_flag_dump |= COB_DUMP_FD;
+			dump_to_set |= COB_DUMP_FD;
 		} else if (!strcasecmp (q, "WS")) {
-			cb_flag_dump |= COB_DUMP_WS;
+			dump_to_set |= COB_DUMP_WS;
 		} else if (!strcasecmp (q, "LS")) {
-			cb_flag_dump |= COB_DUMP_LS;
+			dump_to_set |= COB_DUMP_LS;
 		} else if (!strcasecmp (q, "RD")) {
-			cb_flag_dump |= COB_DUMP_RD;
+			dump_to_set |= COB_DUMP_RD;
 		} else if (!strcasecmp (q, "SD")) {
-			cb_flag_dump |= COB_DUMP_SD;
+			dump_to_set |= COB_DUMP_SD;
 		} else if (!strcasecmp (q, "SC")) {
-			cb_flag_dump |= COB_DUMP_SC;
+			dump_to_set |= COB_DUMP_SC;
+		} else if (!strcasecmp (q, "LO")) {
+			dump_to_set |= COB_DUMP_LO;
 		} else {
-			cobc_err_exit (_("-fdump= requires one of 'ALL', 'FD', 'WS', 'LS', "
-			                 "'RD', 'FD', 'SC' not '%s'"), opt);
+			cobc_err_exit (_("option requires one of 'ALL', 'FD', 'WS', 'LS', "
+			                 "'RD', 'FD', 'SC', 'LO' - not '%s'"), opt);
 		}
 		q = strtok (NULL, ",");
+	}
+	if (on) {
+		cb_flag_dump |= dump_to_set;
+	} else {
+		cb_flag_dump ^= dump_to_set;
 	}
 	cobc_free (p);
 }
@@ -3428,7 +3450,7 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 7:
-			/* -fmax-errors=<xx> : maximum errors until abort */
+			/* -fmax-errors=<xx> : Maximum errors until abort */
 			n = cobc_deciph_optarg (cob_optarg, 0);
 			if (n < 0) {
 				cobc_err_exit (COBC_INV_PAR, "-fmax-errors");
@@ -3437,11 +3459,21 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 8:
-			cobc_def_dump_opts (cob_optarg);
+			/* -fdump=<scope> : Add sections for dump code generation */
+			cobc_def_dump_opts (cob_optarg, 1);
+			break;
+
+		case 13:
+			/* -fno-dump=<scope> : Suppress sections in dump code generation */
+			if (cob_optarg) {
+				cobc_def_dump_opts (cob_optarg, 0);
+			} else {
+				cb_flag_dump = COB_DUMP_NONE;
+			}
 			break;
 
 		case 9:
-			/* -fcallfh=<func> : function for EXTFH */
+			/* -fcallfh=<func> : Function-name for EXTFH */
 			cb_call_extfh = cobc_main_strdup (cob_optarg);
 			break;
 

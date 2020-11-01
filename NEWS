@@ -27,9 +27,22 @@ NEWS - user visible changes				-*- outline -*-
 * many internal changes, changing some defaults (TODO: list in detail)
 
 
- GnuCOBOL 3.1-final to be released (in Aug-Sept 2020)
- 
- GnuCOBOL 3.1-rc1 to be released (in June 2020)
+
+* Known issues in 3.1
+
+** testsuite:
+  * if built with vbisam, cisam or disam, depending on the version used, some
+    tests will lead to UNEXPECTED PASS, while others may fail
+  * possibly failing tests (false positives):
+    * temporary path invalid
+    * compiler outputs (assembler)
+    * function with variable-length RETURNING item
+
+** the recent additions of ">> TURN" and "variable LIKE variable" do not work
+   as expected in all cases
+
+
+ GnuCOBOL 3.1 (October 2020)
 
 * New GnuCOBOL features
 
@@ -45,8 +58,19 @@ NEWS - user visible changes				-*- outline -*-
 ** TYPEDEF and SAME AS (COBOL 2002) implemented, including the MicroFocus
    and RM/COBOL variants
 
+   TO BE MERGED (not in trunk yet):
+** >>TURN (COBOL 2002) directive implemented, allowing some exception checks
+   to be turned on/off per source as desired
+
+** on abort a stack trace will be genereated, this can be suppressed by
+   runtime configuration option COB_STRACK_TRACE
+
 ** Improved support for different compiler extensions (ACUCOBOL, IBM,
    Fujitsu, MicroFocus COBOL, Microsoft COBOL, RM/COBOL, CA Realia and more)
+   including EXHIBIT / EXHIBIT NAMED
+
+** support for MicroFocus extension "LOCAL-STORAGE implies RECURSIVE"
+   defaults to "on" for `-std=mf` and `-std=mf-strict`!
 
 ** file handling: include support for a callable EXTFH interface also provided
    by several compilers including Micro Focus
@@ -64,6 +88,48 @@ NEWS - user visible changes				-*- outline -*-
 ** screen i/o: initial mouse support (for details see runtime.cfg),
    use of CURSOR clause in SPECIAL-NAMES for positioning on ACCEPT
 
+  ** the configure option --with-cjson was replaced by
+     --with-json with arguments, allowing new JSON-C handler to be used
+
+  ** new configure option --enable-hardening to either enable GNU C's
+     hardening options or leave as-is, or disable (which previous versions
+     effectively did)
+
+ **  ensure runtime checks are generated - nder some conditions the
+     generated code had excluded runtime checks, permitting out-of-bounds or
+     null-pointer accesses
+
+  ** Breaking change: previously the return-code of registered error handlers
+     (CBL_ERROR_PROC or ... ) were ignored. This was changed according to the
+     documentation for CBL_ERROR_PROC -> a RETURN-VALUE of ZERO skips further
+     error handlers to be called, including the internal one.
+
+  ** build system: defaults.h is not created or included any more, all configure
+     provided defines are now found in the single header config.h
+
+  ** cobc -g (and configure --enable-debug) use the most expressive
+     debugging options available on the system
+
+  ** the interal Xref got a huge speedup, has all references in ascending order
+     now and includes the total amount of direct references
+
+  ** the interal listing got a speedup and has all error references in
+     ascending order now
+
+
+** adjustments to cobc's warning options:
+   -Wdangling-text "new" option to enable "source text after program area",
+      not included in -Wall any more
+   -Wno-ignored-error allows to suppress messages that normally would be an
+      error and only allowed because they are never executed
+   -Wimplicit-define and -Wcorresponding are now enabled by default
+
+  ** fixes and enhancements for dump generation
+
+  ** tested and adjusted to work on more systems (OS + compilers)
+
+  ** the GnuCOBOL Manual has been updated
+
 
 * Removed functions
 
@@ -75,18 +141,23 @@ NEWS - user visible changes				-*- outline -*-
 
 * Changes to the COBOL compiler (cobc) options:
 
-<<<<<<< .working
-  CHECKME
-||||||| .merge-left.r3609
-  CHECKME - are there any?
-=======
+** new options:
+
+   -f[no]-diagnostics-show-option, enabled by default, shows the
+       command line option responsible for the diagnostic message
+
+   TO BE MERGED (not in trunk yet):
+   -f[no]-ec=exception-name to tune the exception checks similar to the >>TURN
+       directive, you may also leave out the "EC-" prefix here, example to
+       enable all checks but disable all bound checks but OCCURS DEPENDING ON:
+       cobc -debug -fno-ec=bound -fec=bound-odo
+
 ** adjustments to warning options:
    -Wextra "new" option to enable every possible warning that is not dialect
        specific (this option used to be called -W)
    -Wadditional  new warning group for all warnings that don't have a group
        on their own
    -Wno-error and -Wno-error=<warning> to treat (specific <warning>s) not as error
->>>>>>> .merge-right.r3612
 
 
 * Changes in the COBOL runtime (libcob)
@@ -400,8 +471,9 @@ NEWS - user visible changes				-*- outline -*-
 
 ** New listing options:
 
-  -t listing, -T wide listing, --tlines=lines, lines per page of listing
-  -Xref
+  -t listing, -T wide listing, --tlines=lines, lines per page of listing;
+  -Xref now handled internally, if you want to use cobxref define
+  COB_EXTERNAL_XREF during configure
 
   Note: -P, generate preprocessor listing, is still available (and improved)
 

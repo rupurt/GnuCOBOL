@@ -80,6 +80,11 @@
 
 	* call.c: define fmemopen if available but declaration missing
 
+2020-10-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c: extracted (is_suppressed_key_value) from (cob_read_next)
+	* fileio.c (cob_savekey): fixed undefined behaviour (memcpy to itself)
+
 2020-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am (install-data-hook): removed as per initial patch from
@@ -112,6 +117,49 @@
 
 	* common.c (set_config_val): only create a new trace file if we already
 	  have one open before
+	* common.c, coblocal.h (__cob_settings): new runtime configuration
+	* termio.c (cob_dump_field, display_alnum_dump): adjusted dump output,
+	  including new "ALL ZEROES"
+	* termio.c (cob_dump_output, cob_dump_file): new functions
+	  for adjusted codegen instead of "special directives" in
+	  (cob_dump_field) with fallback for 3.1rc1
+	* fileio.c, coblocal.h: extracted (cob_exit_fileio_msg_only) from
+	  (cob_exit_fileio) to be called only once and before the dump
+	* common.c, coblocal.h (__cob_settings): new runtime configuration
+	  COB_STACKTRACE allowing to disable stracktrace creation on abort
+	* common.c: also handle SIGEMT; skip module dump for SIGTERM and SIGINT
+
+2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	work on installable error handlers (per MF and ACU)
+	* common.c (cob_runtime_error): remove error handler from the que before
+	  calling it, effectively let error handlers re-install themselves;
+	  check return code of called error handler, allowing to skip others
+	  including the internal one; provide each error handler with a copy
+	  of the error message (effectively CALL BY CONTENT)
+
+2020-08-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c: ensure that the module dump is only done once,
+	  for example if a signal is trapped while dumping and that it is
+	  always done on "error exit" (moved to cob_terminate_routines); store the
+	  reason for the error exit as soon as possible
+	* common.c (cob_stack_trace_internal): extracted from cob_dump_module
+	* common.c (cob_runtime_error): always output the COBOL stack trace to
+	  stderr on abort; note: the availability of the details (line + statement)
+	  depends on the compiled modules (use of -fsource-location and friends)
+	* common.c (cob_stack_trace), common.h: new external function to output the
+	  current COBOL stack trace
+	* common.c (cob_dump_module): stack trace is only output if we don't dump
+	  to stderr or stdout (fixing double-output in the default scenario)
+	* common.c (cob_dump_module): dump if at least one module is prepared for
+	  dump, not only "dump all if the last one was prepared"
+	* common.h (cob_runtime_option_switch: COB_SET_RUNTIME_DUMP_FILE),
+	  common.c (cob_set_runtime_option, cob_get_runtime_option): external
+	  setting for the module dump FILE *
+	* common.c: ensure that stack tracing + module dumping is never done
+	  recursive
+	* termio.c (cob_dump_field): adjusted handling of fields with NULL address
 
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -163,6 +211,30 @@
 	* call.c, common.h: add new functions cob_call_cobol and cob_call_entry
 	  for C modules to call COBOL modules using 'stdarg' type of
 	  parameter passing
+
+2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	new functions in the C API for cob_field based access, see FR #383 FR #384
+	* common.c, common.h (cob_get_param_field, cob_get_field_size,
+	  cob_get_field_sign, cob_get_field_scale, cob_get_field_digits,
+	  cob_get_field_constant, cob_get_field_type, explain_field_type):
+	  new functions to get a cob_field or information about it
+	* common.c, common.h (cob_get_field_str, cob_get_field_str_buffered):
+	  new functions to get a field's value in "pretty-display" form
+	* common.c, common.h (cob_put_field_str): new function to set the field's
+	  data using the appropriate internal type, returns EINVAL if data is invalid
+	* common.c, common.h, coblocal.h (cob_runtime_warning_external): exported
+	  function, handle missing caller attribute
+
+	* common.c, common.h (cob_get_param_str, cob_get_param_str_bufffered,
+	  cob_put_field_str): string exchange functions for param based API
+	* common.c, common.h (cob_getenv_direct): new function similar to cob_getenv
+	  but without internal memory allocation
+	* termio.c, coblocal.h: renamed display_common to cob_display_common and made
+	  it internally available
+	* intrinsic.c, coblocal.h: made cob_check_numval_f internally available
+	* fileio.c, coblocal.h: renamed cob_srttmpfile to cob_create_tmpfile and made
+	  it internally available
 
 2020-06-25  Simon Sobisch <simonsobisch@gnu.org>
 

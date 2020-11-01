@@ -194,7 +194,7 @@ check_valid_value (const char *fname, const int line, const char *name, const ch
 	return ret;
 }
 
-#if 0
+#if 0	/* unused */
 static void
 unsupported_value (const char *fname, const int line, const char *name, const char *val)
 {

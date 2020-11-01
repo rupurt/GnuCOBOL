@@ -122,6 +122,7 @@ enum cb_format {
 #define	CB_CS_JSON_GENERATE		(1U << 31)
 /* HACK: no more space - using minor one until re-written */
 #define	CB_CS_I_O_CONTROL		CB_CS_DAY
+#define	CB_CS_EXHIBIT			CB_CS_DAY
 
 /* Support for cobc from stdin */
 #define COB_DASH			"-"
@@ -354,6 +355,8 @@ extern struct cb_exception	cb_exception_table[];
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
+#undef	CB_FLAG_NO
 
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -375,11 +378,15 @@ extern struct cb_exception	cb_exception_table[];
 #define	CB_FLAG_ON(var,print_help,name,doc)		extern int var;
 #define CB_FLAG_RQ(var,print_help,name,def,opt,doc)	extern int var;
 #define CB_FLAG_NQ(print_help,name,opt,doc)
+#define CB_FLAG_OP(print_help,name,opt,doc)
+#define CB_FLAG_NO(print_help,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
+#undef	CB_FLAG_NO
 
 
 #define	CB_WARNDEF(opt,name,doc)	opt,
@@ -427,13 +434,15 @@ extern int			cb_flag_optimize_check;
 extern int			cb_flag_functions_all;
 
 extern int			cb_flag_dump;
-#define COB_DUMP_FD	0x0001
-#define COB_DUMP_WS	0x0002
-#define COB_DUMP_RD	0x0004
-#define COB_DUMP_SD	0x0008
-#define COB_DUMP_SC	0x0010
-#define COB_DUMP_LS	0x0020
-#define COB_DUMP_ALL	(COB_DUMP_FD|COB_DUMP_WS|COB_DUMP_RD|COB_DUMP_SD|COB_DUMP_SC|COB_DUMP_LS)
+#define COB_DUMP_NONE	0x0000	/* No dump */
+#define COB_DUMP_FD	0x0001	/* FILE SECTION -> FILE DESCRIPTION */
+#define COB_DUMP_WS	0x0002  /* WORKING-STORAGE SECTION */
+#define COB_DUMP_RD	0x0004	/* REPORT SECTION */
+#define COB_DUMP_SD	0x0008	/* FILE SECTION -> SORT DESCRIPTION */
+#define COB_DUMP_SC	0x0010	/* SCREEN SECTION */
+#define COB_DUMP_LS	0x0020  /* LINKAGE SECTION */
+#define COB_DUMP_LO	0x0040  /* LOCAL-STORAGE SECTION */
+#define COB_DUMP_ALL	(COB_DUMP_FD|COB_DUMP_WS|COB_DUMP_RD|COB_DUMP_SD|COB_DUMP_SC|COB_DUMP_LS|COB_DUMP_LO)
 
 
 extern int			cb_unix_lf;

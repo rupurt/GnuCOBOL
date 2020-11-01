@@ -5376,6 +5376,34 @@ cob_read (cob_file *f, cob_field *key, cob_field *fnstatus, const int read_opts)
 }
 
 static int
+is_suppressed_key_value (cob_file *f, const int idx)
+{
+	if (idx < 0 || idx >= (int)f->nkeys) {
+		return -1;
+	}
+	if (f->keys[idx].len_suppress > 0) {
+		(void) cob_savekey (f, idx, f->keys[idx].field->data);
+		if (memcmp (f->keys[idx].field->data,
+			        f->keys[idx].str_suppress,
+			        f->keys[idx].len_suppress) == 0) {
+			return 1;
+		}
+	} else
+	if (f->keys[idx].tf_suppress) {
+		int pos = cob_savekey (f, idx, f->keys[idx].field->data);
+		for (pos = 0;
+			 pos < (int)f->keys[idx].field->size
+		  && f->keys[idx].field->data[pos] == (unsigned char)f->keys[idx].char_suppress;
+			 pos++); 
+		/* All SUPPRESS char ? */
+		if (pos == f->keys[idx].field->size) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+static int
 cob_chk_dups (cob_file *f)
 {
 	void *savrec;
@@ -5388,11 +5416,8 @@ cob_chk_dups (cob_file *f)
 	for (k = 0; k < (int)f->nkeys; ++k) {
 		if (f->keys[k].tf_duplicates == 2) {
 			memcpy (f->record->data, savrec, f->record->size);
-			if (f->keys[k].len_suppress > 0) {
-				cob_savekey (f, k, f->keys[k].field->data);
-				if (memcmp(f->keys[k].field->data, f->keys[k].str_suppress,
-							f->keys[k].len_suppress) == 0) 
-					continue;
+			if (is_suppressed_key_value (f, k) > 0) {
+				continue;
 			}
 			ret = fileio_funcs[get_io_ptr (f)]->read (&file_api, f, f->keys[k].field, 0);
 			if (ret == COB_STATUS_00_SUCCESS
@@ -5412,7 +5437,7 @@ cob_chk_dups (cob_file *f)
 void
 cob_read_next (cob_file *f, cob_field *fnstatus, const int read_opts)
 {
-	int	ret,idx,pos;
+	int	ret,idx;
 
 	f->last_operation = COB_LAST_READ_SEQ;
 	f->flag_read_done = 0;
@@ -5467,28 +5492,15 @@ Again:
 	case COB_STATUS_00_SUCCESS:
 	case COB_STATUS_02_SUCCESS_DUPLICATE:
 		/* If record has suppressed key, skip it */
-		/* This is to catch old VBISAM, ODBC & OCI */
+		/* This is to catch CISAM, old VBISAM, ODBC & OCI */
 		if (f->organization == COB_ORG_INDEXED) {
 			idx = f->curkey;
 			if (f->mapkey >= 0) {	/* FD has Indexes in alternate appearance */
 				idx = f->mapkey;
 			}
-			if ((idx >= 0 && idx < (int)f->nkeys) 
-			&& f->keys[idx].len_suppress > 0) {
-				pos = cob_savekey (f, idx, f->keys[idx].field->data);
-				if (memcmp(f->keys[idx].field->data, f->keys[idx].str_suppress,
-							f->keys[idx].len_suppress) == 0) {
-					goto Again;
-				}
-			} else
-			if ((idx >= 0 && idx < (int)f->nkeys) 
-			 && f->keys[idx].tf_suppress) {	
-				pos = cob_savekey (f, idx, f->keys[idx].field->data);
-				for (pos = 0; pos < (int)f->keys[idx].field->size 
-					&& f->keys[idx].field->data[pos] == (unsigned char)f->keys[idx].char_suppress;
-					pos++);
-				if (pos == f->keys[idx].field->size) 	/* All SUPPRESS char so skip */
-					goto Again;
+			if (is_suppressed_key_value (f, idx) > 0) {
+				/* SUPPRESS -> so skip */
+				goto Again;
 			}
 		}
 
@@ -5806,10 +5818,12 @@ cob_savekey (cob_file *f, int idx, unsigned char *data)
 	if (f->keys[idx].field == NULL)
 		return -1;
 	if (f->keys[idx].count_components <= 1) {
-		memcpy (data, f->keys[idx].field->data, f->keys[idx].field->size);
+		if (data != f->keys[idx].field->data) {
+			memcpy (data, f->keys[idx].field->data, f->keys[idx].field->size);
+		}
 		return (int)f->keys[idx].field->size;
 	}
-	for(len=part=0; part < f->keys[idx].count_components; part++) {
+	for (len=part=0; part < f->keys[idx].count_components; part++) {
 		memcpy (&data[len], f->keys[idx].component[part]->data,
 							f->keys[idx].component[part]->size);
 		len += f->keys[idx].component[part]->size;
@@ -6563,15 +6577,15 @@ cob_new_item (struct cobsort *hp, const size_t size)
 	return q;
 }
 
-static FILE *
-cob_srttmpfile (void)
+FILE *
+cob_create_tmpfile (const char *ext)
 {
 	FILE		*fp;
 	char		*filename;
 	int		fd;
 
 	filename = cob_malloc ((size_t)COB_FILE_BUFF);
-	cob_temp_name (filename, NULL);
+	cob_temp_name (filename, ext);
 	cob_incr_temp_iteration ();
 	fd = open (filename,
 		    O_CREAT | O_TRUNC | O_RDWR | O_BINARY | COB_OPEN_TEMPORARY,
@@ -6593,7 +6607,7 @@ static int
 cob_get_sort_tempfile (struct cobsort *hp, const int n)
 {
 	if (hp->file[n].fp == NULL) {
-		hp->file[n].fp = cob_srttmpfile ();
+		hp->file[n].fp = cob_create_tmpfile (NULL);
 		if (hp->file[n].fp == NULL) {
 			cob_runtime_error (_("SORT is unable to acquire temporary file"));
 			cob_stop_run (1);
@@ -7200,25 +7214,34 @@ cob_get_filename_print (cob_file* file, const int show_resolved_name)
 */
 
 void
+cob_exit_fileio_msg_only (void)
+{
+	struct file_list	*l;
+	static int output_done = 0;
+
+	if (output_done) {
+		return;
+	}
+	output_done = 1;
+
+	for (l = file_cache; l; l = l->next) {
+		if (l->file
+		 && l->file->open_mode != COB_OPEN_CLOSED
+		 && l->file->open_mode != COB_OPEN_LOCKED
+		 && !l->file->flag_nonexistent
+		 && !COB_FILE_SPECIAL (l->file)) {
+			cob_runtime_warning (_("implicit CLOSE of %s"),
+				cob_get_filename_print (l->file, 0));
+		}
+	}
+}
+
+void
 cob_exit_fileio (void)
 {
 	struct file_list	*l;
 	struct file_list	*p;
 	int		k;
-
-	for (l = file_cache; l; l = l->next) {
-		if (l->file 
-		 && l->file->open_mode != COB_OPEN_CLOSED 
-		 && l->file->open_mode != COB_OPEN_LOCKED 
-		 && !l->file->flag_nonexistent) {
-			if (COB_FILE_SPECIAL (l->file)) {
-				continue;
-			}
-			cob_close (l->file, NULL, COB_CLOSE_ABORT, 0);
-			cob_runtime_warning (_("implicit CLOSE of %s"),
-				cob_get_filename_print (l->file, 0));
-		}
-	}
 
 	for(k=0; k < COB_IO_MAX; k++) {
 		if(fileio_funcs[k] != NULL) {

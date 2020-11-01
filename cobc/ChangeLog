@@ -2,6 +2,9 @@
 2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_initialize_compound): resolve occurs_max only once
+	* cobc.c, flag.def: added -fno-dump=<scope>
+	* flag.def, cobc.c, cobc.h, help.c: added CB_FLAG_OP for flags
+	  with optional parameter
 
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -14,11 +17,19 @@
 	  and additionally check environment var for "empty"
 	* Makefile.am: pass LOCALEDIR via define
 
+2020-10-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_cobol_info): fixed C89 declaration
+	* codegen.c: minor optimizations in generating pre-calculated offsets
+	  and check for flag_filler instead of strcmp
+
 2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_size): limit variable scope
 	* codegen.c (output_initialize_uniform): limit variable scope and
 	  calculation in chk_field_variable_size to be only done if used
+	* pplex.l (plex_call_destroy): added cleanup for internal copybook references
+	* help.c (cobc_print_usage_warnings): added -w option
 
 2020-10-12  Ron Norman <rjn@inglenet.com>
 
@@ -116,6 +127,15 @@
 	* codegen.c: Changes for UNBOUNDED OCCURS
 	* typeck.c (cb_emit_move): Changes for UNBOUNDED OCCURS
 
+2020-08-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c: fixed dump of non-standard 01-OCCURS and LINKAGE
+
+2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
+
+	* config.def, parser.y: added cb_local_implies_recursive to cater for MF's
+	  strange extension
+
 2020-08-14  Simon Sobisch <simonsobisch@gnu.org>
 
 	* tree.h (struct cb_file), parser.y: added decription_entry for
@@ -123,6 +143,11 @@
 	* tree.c (finalize_file), parser.y, error.c (cb_warning_dialect_x):
 	  improved syntax checks, now allowing RECORD VARYING also with
 	  fixed length FD (as all other known compilers do)
+
+2020-07-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h, codegen.c: added dumping of LOCAL-STORAGE,
+	  fixed dump of of SD
 
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -146,9 +171,19 @@
 	* scanner.l: add EQUALS as alias for EQUAL in conditions (bug #663).
 	* typeck.c: fixed segfault with parens around condition word (bug #663).
 
+2020-07-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* scanner.l (scan_x): fixed #658 by building a national literal for nx''
+
 2020-07-07  Edward Hart <edward.dan.hart@gmail.com>
 
 	* cobc.c, scanner.l: fixed memory issues.
+
+2020-07-06  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #359 Realia / OSVS / MSCOBOL compatibility
+	* parser.y, cobc.h, reserved.c, tree.c, tree.h: added partial
+	  support for EXHIBIT (full parsing, without CHANGED + UPON)
 
 2020-07-05  Edward Hart <edward.dan.hart@gmail.com>
 
