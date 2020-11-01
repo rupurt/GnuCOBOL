@@ -7146,21 +7146,41 @@ cob_get_filename_print (cob_file* file, const int show_resolved_name)
 */
 
 void
+cob_exit_fileio_msg_only (void)
+{
+	struct file_list	*l;
+	static int output_done = 0;
+
+	if (output_done) {
+		return;
+	}
+	output_done = 1;
+
+	for (l = file_cache; l; l = l->next) {
+		if (l->file
+		 && l->file->open_mode != COB_OPEN_CLOSED
+		 && l->file->open_mode != COB_OPEN_LOCKED
+		 && !l->file->flag_nonexistent
+		 && !COB_FILE_SPECIAL (l->file)) {
+			cob_runtime_warning (_("implicit CLOSE of %s"),
+				cob_get_filename_print (l->file, 0));
+		}
+	}
+}
+
+void
 cob_exit_fileio (void)
 {
 	struct file_list	*l;
 	struct file_list	*p;
 
 	for (l = file_cache; l; l = l->next) {
-		if (l->file && l->file->open_mode != COB_OPEN_CLOSED &&
-		    l->file->open_mode != COB_OPEN_LOCKED &&
-		    !l->file->flag_nonexistent) {
-			if (COB_FILE_SPECIAL (l->file)) {
-				continue;
-			}
+		if (l->file
+		 && l->file->open_mode != COB_OPEN_CLOSED
+		 && l->file->open_mode != COB_OPEN_LOCKED
+		 && !l->file->flag_nonexistent
+		 && !COB_FILE_SPECIAL (l->file)) {
 			cob_close (l->file, NULL, COB_CLOSE_NORMAL, 0);
-			cob_runtime_warning (_("implicit CLOSE of %s"),
-				cob_get_filename_print (l->file, 0));
 		}
 	}
 #ifdef	WITH_DB

@@ -2610,35 +2610,52 @@ cobc_options_error_build (void)
 
 /* decipher dump options given on command line */
 static void
-cobc_def_dump_opts (const char *opt)
+cobc_def_dump_opts (const char *opt, const int on)
 {
 	char	*p, *q;
+	int 	dump_to_set;
 	cb_old_trace = 0;			/* Use new methods */
+
 	if (!strcasecmp (opt, "ALL")) {
-		cb_flag_dump = COB_DUMP_ALL;
+		if (on) {
+			cb_flag_dump = COB_DUMP_ALL;
+		} else {
+			cb_flag_dump = COB_DUMP_NONE;
+		}
 		return;
 	}
 
 	p = cobc_strdup (opt);
 	q = strtok (p, ",");
+	if (!q) {
+		q = (char *) "";
+	}
+	dump_to_set = 0;
 	while (q) {
 		if (!strcasecmp (q, "FD")) {
-			cb_flag_dump |= COB_DUMP_FD;
+			dump_to_set |= COB_DUMP_FD;
 		} else if (!strcasecmp (q, "WS")) {
-			cb_flag_dump |= COB_DUMP_WS;
+			dump_to_set |= COB_DUMP_WS;
 		} else if (!strcasecmp (q, "LS")) {
-			cb_flag_dump |= COB_DUMP_LS;
+			dump_to_set |= COB_DUMP_LS;
 		} else if (!strcasecmp (q, "RD")) {
-			cb_flag_dump |= COB_DUMP_RD;
+			dump_to_set |= COB_DUMP_RD;
 		} else if (!strcasecmp (q, "SD")) {
-			cb_flag_dump |= COB_DUMP_SD;
+			dump_to_set |= COB_DUMP_SD;
 		} else if (!strcasecmp (q, "SC")) {
-			cb_flag_dump |= COB_DUMP_SC;
+			dump_to_set |= COB_DUMP_SC;
+		} else if (!strcasecmp (q, "LO")) {
+			dump_to_set |= COB_DUMP_LO;
 		} else {
-			cobc_err_exit (_("-fdump= requires one of 'ALL', 'FD', 'WS', 'LS', "
-			                 "'RD', 'FD', 'SC' not '%s'"), opt);
+			cobc_err_exit (_("option requires one of 'ALL', 'FD', 'WS', 'LS', "
+			                 "'RD', 'FD', 'SC', 'LO' - not '%s'"), opt);
 		}
 		q = strtok (NULL, ",");
+	}
+	if (on) {
+		cb_flag_dump |= dump_to_set;
+	} else {
+		cb_flag_dump ^= dump_to_set;
 	}
 	cobc_free (p);
 }
@@ -3483,7 +3500,13 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 8:
-			cobc_def_dump_opts (cob_optarg);
+			/* -fdump=<scope> : sections to generate dump code */
+			cobc_def_dump_opts (cob_optarg, 1);
+			break;
+
+		case 13:
+			/* -fno-dump=<scope> : sections to generate dump code */
+			cobc_def_dump_opts (cob_optarg, 0);
 			break;
 
 		case 9:

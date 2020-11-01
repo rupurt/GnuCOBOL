@@ -395,6 +395,7 @@ static struct config_tbl gc_conf[] = {
 	{"COB_SET_TRACE", "set_trace", 		"0", 	NULL, GRP_MISC, ENV_BOOL, SETPOS (cob_line_trace)},
 	{"COB_TRACE_FILE", "trace_file", 		NULL, 	NULL, GRP_MISC, ENV_FILE, SETPOS (cob_trace_filename)},
 	{"COB_TRACE_FORMAT", "trace_format",	"%P %S Line: %L", NULL,GRP_MISC, ENV_STR, SETPOS (cob_trace_format)},
+	{"COB_STACKTRACE", "stacktrace", 	"1", 	NULL, GRP_CALL, ENV_BOOL, SETPOS (cob_stacktrace)},
 	{"COB_DUMP_FILE", "dump_file",		NULL,	NULL, GRP_MISC, ENV_FILE, SETPOS (cob_dump_filename)},
 	{"COB_DUMP_WIDTH", "dump_width",		"100",	NULL, GRP_MISC, ENV_UINT, SETPOS (cob_dump_width)},
 #ifdef  _WIN32
@@ -450,6 +451,11 @@ static char		*get_config_val	(char *value, int pos, char *orgvalue);
 
 static void		cob_dump_module (char *reason);
 static char		abort_reason[COB_MINI_BUFF] = { 0 };
+static unsigned int 	dump_trace_started;	/* ensures that we dump/stacktrace only once */
+#define 		DUMP_TRACE_DONE_DUMP 		(1U << 0)
+#define 		DUMP_TRACE_DONE_TRACE		(1U << 1)
+#define 		DUMP_TRACE_ACTIVE_TRACE		(1U << 2)
+static void		cob_stack_trace_internal (FILE *target);
 
 #ifdef COB_DEBUG_LOG
 static void		cob_debug_open	(void);
@@ -605,9 +611,21 @@ cob_terminate_routines (void)
 	if (!cob_initialized || !cobglobptr) {
 		return;
 	}
+	cob_exit_fileio_msg_only ();
 
 	if (COB_MODULE_PTR && abort_reason[0] != 0) {
-		cob_dump_module (abort_reason);
+		if (cobsetptr->cob_stacktrace) {
+			if (!(dump_trace_started & (DUMP_TRACE_DONE_TRACE || DUMP_TRACE_ACTIVE_TRACE))) {
+				dump_trace_started |= DUMP_TRACE_DONE_TRACE;
+				dump_trace_started |= DUMP_TRACE_ACTIVE_TRACE;
+				cob_stack_trace_internal (stderr);
+				dump_trace_started ^= DUMP_TRACE_ACTIVE_TRACE;
+			}
+		}
+		if (!(dump_trace_started & DUMP_TRACE_DONE_DUMP)) {
+			dump_trace_started |= DUMP_TRACE_DONE_DUMP;
+			cob_dump_module (abort_reason);
+		}
 	}
 
 	if (cobsetptr->cob_dump_file == cobsetptr->cob_trace_file
@@ -660,13 +678,15 @@ cob_terminate_routines (void)
 
 	cob_exit_screen ();
 	cob_exit_fileio ();
+	cob_exit_reportio ();
+	cob_exit_mlio ();
+
 	cob_exit_intrinsic ();
 	cob_exit_strings ();
 	cob_exit_numeric ();
+
 	cob_exit_common_modules ();
 	cob_exit_call ();
-	cob_exit_reportio ();
-	cob_exit_mlio ();
 	cob_exit_common ();
 }
 
@@ -704,6 +724,10 @@ get_signal_name (int signal_value)
 #ifdef	SIGTERM
 	case SIGTERM:
 		return "SIGTERM";
+#endif
+#ifdef	SIGEMT
+	case SIGEMT:
+		return "SIGEMT";
 #endif
 #ifdef	SIGPIPE
 	case SIGPIPE:
@@ -781,6 +805,18 @@ cob_sig_handler (int signal_value)
 		signal_name = _("unknown");
 	}
 	/* LCOV_EXCL_STOP */
+
+	/* Skip dumping for SIGTERM and SIGINT */
+#ifdef	SIGTERM
+	if (signal_value == SIGTERM) {
+		dump_trace_started |= DUMP_TRACE_DONE_DUMP;
+	}
+#endif
+#ifdef	SIGINT
+	if (signal_value == SIGINT) {
+		dump_trace_started |= DUMP_TRACE_DONE_DUMP;
+	}
+#endif
 
 #ifdef	HAVE_SIGACTION
 #ifndef	SA_RESETHAND
@@ -915,6 +951,13 @@ cob_set_signal (void)
 		(void)sigaction (SIGTERM, &sa, NULL);
 	}
 #endif
+#ifdef	SIGEMT
+	(void)sigaction (SIGEMT, NULL, &osa);
+	if (osa.sa_handler != SIG_IGN) {
+		(void)sigemptyset (&sa.sa_mask);
+		(void)sigaction (SIGEMT, &sa, NULL);
+	}
+#endif
 #ifdef	SIGPIPE
 	(void)sigaction (SIGPIPE, NULL, &osa);
 	if (osa.sa_handler != SIG_IGN) {
@@ -961,6 +1004,11 @@ cob_set_signal (void)
 #ifdef	SIGTERM
 	if (signal (SIGTERM, SIG_IGN) != SIG_IGN) {
 		(void)signal (SIGTERM, cob_sig_handler);
+	}
+#endif
+#ifdef	SIGEMT
+	if (signal (SIGEMT, SIG_IGN) != SIG_IGN) {
+		(void)signal (SIGEMT, cob_sig_handler);
 	}
 #endif
 #ifdef	SIGPIPE
@@ -7046,12 +7094,12 @@ cob_runtime_error (const char *fmt, ...)
 		active_error_handler = 1;
 		h = hdlrs;
 		while (h != NULL) {
-			int			(*current_proc)(char *) = h->proc;
+			int			(*current_handler)(char *) = h->proc;
 			struct handlerlist	*hp = h;
 
 			h = h->next;
 			cob_free (hp);
-	
+
 			if (more_error_procedures) {
 				/* fresh error buffer with guaranteed size */
 				char local_err_str[COB_ERRBUF_SIZE] = "-";
@@ -7064,7 +7112,7 @@ cob_runtime_error (const char *fmt, ...)
 				cob_source_line = 0;
 				cobglobptr->cob_call_params = 1;
 
-				more_error_procedures = current_proc (runtime_err_str);
+				more_error_procedures = current_handler (runtime_err_str);
 			}
 		}
 		/* LCOV_EXCL_START */
@@ -8472,6 +8520,11 @@ cob_set_runtime_option (enum cob_runtime_option_switch opt, void *p)
 		}
 		cobsetptr->cob_display_punch_file = (FILE *)p;
 		break;
+	case COB_SET_RUNTIME_DUMP_FILE:
+		/* note: if set cob_dump_file is always external (libcob only opens it on abort)
+		         therefore we don't need to close the old one */
+		cobsetptr->cob_dump_file = (FILE *)p;
+		break;
 	case COB_SET_RUNTIME_RESCAN_ENV:
 		cob_rescan_env_vals ();
 		break;
@@ -8499,11 +8552,59 @@ cob_get_runtime_option (enum cob_runtime_option_switch opt)
 			return NULL;
 		}
 		return (void*)cobsetptr->cob_display_punch_file;
+	case COB_SET_RUNTIME_DUMP_FILE:
+		return (void*)cobsetptr->cob_dump_file;
 	default:
 		cob_runtime_error (_("%s called with unknown option: %d"),
 			"cob_get_runtime_option", opt);
 	}
 	return NULL;
+}
+
+/* output the COBOL-view of the stacktrace to the given target,
+   does an early exit if 'target' is NULL, 
+   'target' is FILE *  */
+void
+cob_stack_trace (void *target)
+{
+	if (target == NULL || !cobglobptr || !COB_MODULE_PTR) {
+		return;
+	}
+	dump_trace_started |= DUMP_TRACE_ACTIVE_TRACE;
+	cob_stack_trace_internal ((FILE *)target);
+	dump_trace_started ^= DUMP_TRACE_ACTIVE_TRACE;
+}
+
+/* internal output the COBOL-view of the stacktrace to the given target */
+void
+cob_stack_trace_internal (FILE *target)
+{
+	cob_module	*mod;
+
+	if (target == stderr
+	 || target == stdout) {
+		fflush (stdout);
+		fflush (stderr);
+	}
+
+	fputc ('\n', target);
+	for (mod = COB_MODULE_PTR; mod; mod = mod->next) {
+		if (mod->module_stmt != 0
+		 && mod->module_sources) {
+			fprintf (target, _(" Last statement of %s was at line %d of %s"),
+					mod->module_name,
+					COB_GET_LINE_NUM(mod->module_stmt),
+					mod->module_sources[COB_GET_FILE_NUM(mod->module_stmt)]);
+			fputc ('\n', target);
+			if (mod->next == mod) {
+				fputs ("FIXME: recursive mod (stack trace)\n", target);
+				break;
+			}
+		} else {
+			fprintf (target, _(" Last statement of %s unknown"), mod->module_name);
+			fputc ('\n', target);
+		}
+	}
 }
 
 FILE *
@@ -8512,11 +8613,16 @@ cob_get_dump_file (void)
 #if 1 /* new version as currently only COB_DUMP_TO_FILE is used */
 	if (cobsetptr->cob_dump_file != NULL) {	/* If DUMP active, use that */
 		return cobsetptr->cob_dump_file;
-	} else if (cobsetptr->cob_dump_filename != NULL) {	/* Dump file defined */
-		cobsetptr->cob_dump_file = fopen (cobsetptr->cob_dump_filename, "a");
+	} else if (cobsetptr->cob_dump_filename != NULL) {	/* DUMP file defined */
+		cobsetptr->cob_dump_file = cob_open_logfile (cobsetptr->cob_dump_filename);
 		if (cobsetptr->cob_dump_file != NULL) {
 			return cobsetptr->cob_dump_file;
 		}
+		/* could not open the file
+		   unset the filename for not referencing it later */
+		cob_free (cobsetptr->cob_dump_filename);
+		cobsetptr->cob_dump_filename = NULL;
+		/* Fall-through */
 	}
 	if (cobsetptr->cob_trace_file != NULL) {	/* If TRACE active, use that */
 		return cobsetptr->cob_trace_file;
@@ -8559,43 +8665,84 @@ static void
 cob_dump_module (char *reason)
 {
 	cob_module	*mod;
-	FILE		*fp;
-	int		(*cancel_func)(const int);
-	int		num_stmts = 0;
+	int		wants_dump = 0;
 
-	if (COB_MODULE_PTR
-	 && COB_MODULE_PTR->flag_dump_ready) {		/* Was it compiled with -fdump= */
-		fflush (stdout);
-		fflush (stderr);
+	/* Was any module compiled with -fdump? */
+	for (mod = COB_MODULE_PTR; mod; mod = mod->next) {
+		if (mod->flag_dump_ready) {
+			wants_dump = 1;
+			break;
+		}
+		if (mod->next == mod) {
+			fputs ("FIXME: recursive mod (module dump)\n", stderr);
+			break;
+		}
+	}
+
+	if (wants_dump) {
+		FILE		*fp;
 #if 1 /* new version as currently only COB_DUMP_TO_FILE is used */
-		fp = cob_get_dump_file();
+		fp = cob_get_dump_file ();
 #else
-		fp = cob_get_dump_file(COB_DUMP_TO_FILE);
+		fp = cob_get_dump_file (COB_DUMP_TO_FILE);
 #endif
-		fprintf (fp, _("Module dump due to %s\n"), reason);
-		for (mod = COB_MODULE_PTR; mod; mod = mod->next) {
-			if (mod->module_stmt != 0
-			 && mod->module_sources) {
-				fprintf (fp,_(" Last statement of %s was Line %d of %s\n"),
-						mod->module_name,
-						COB_GET_LINE_NUM(mod->module_stmt),
-						mod->module_sources[COB_GET_FILE_NUM(mod->module_stmt)]);
-				num_stmts++;
-			} else {
-				fprintf (fp,_(" Last statement of %s unknown\n"), mod->module_name);
+		if (fp != stderr) {
+			if (reason) {
+				if (reason[0] == 0) {
+					reason = (char *)_ ("unknown");
+				}
+				fputc ('\n', fp);
+				fprintf (fp, _("Module dump due to %s"), reason);
+				fputc ('\n', fp);
 			}
+			if (fp != stdout) {
+				/* was already sent to stderr before this function was called,
+				   so skip here for stdout/stderr ... */
+				if (!(dump_trace_started & DUMP_TRACE_ACTIVE_TRACE)) {
+					dump_trace_started |= DUMP_TRACE_ACTIVE_TRACE;
+					cob_stack_trace_internal (fp);
+					dump_trace_started ^= DUMP_TRACE_ACTIVE_TRACE;
+				}
+			}
+			fflush (stdout);
+		} else {
+			fflush (stderr);
 		}
-		if (num_stmts == 0) {
-			return;
-		}
-		fprintf(fp,"\n");
+
+		fputc ('\n', fp);
 		for (mod = COB_MODULE_PTR; mod; mod = mod->next) {
 			if (mod->module_cancel.funcint) {
+				int (*cancel_func)(const int);
 				cancel_func = mod->module_cancel.funcint;
-				fprintf (fp, _("Dump Program-Id %s from %s compiled %s\n"),
-						mod->module_name, mod->module_source, mod->module_formatted_date);
+
+				fprintf (fp, _("Dump Program-Id %s from %s compiled %s"),
+					mod->module_name, mod->module_source, mod->module_formatted_date);
+				fputc ('\n', fp);
 				(void)cancel_func (-10);
-				fprintf (fp,"\n");
+				fputc ('\n', fp);
+			}
+			if (mod->next == mod) {
+#if 0			/* already output above */
+				fputs ("FIXME: recursive mod (module dump)\n", stderr);
+#endif
+				break;
+			}
+		}
+		if (fp != stdout && fp != stderr) {
+			char * fname = NULL;
+			if (cobsetptr->cob_dump_filename) {
+				fname = cobsetptr->cob_dump_filename;
+			} else
+			if (cobsetptr->cob_trace_file == fp
+			 && cobsetptr->cob_trace_filename != NULL
+			 && !cobsetptr->external_trace_file) {
+				fname = cobsetptr->cob_trace_filename;
+			}
+			if (fname != NULL) {
+				fputc ('\n', stderr);
+				fprintf (stderr, _("dump written to %s"), fname);
+				fputc ('\n', stderr);
+				fflush (stderr);
 			}
 		}
 	}

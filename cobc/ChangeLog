@@ -2,6 +2,7 @@
 2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_initialize_compound): resolve occurs_max only once
+	* cobc.c, flag.def: added -fno-dump=<scope>
 
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -143,6 +144,10 @@
 	* codegen.c: Changes for UNBOUNDED OCCURS
 	* typeck.c (cb_emit_move): Changes for UNBOUNDED OCCURS
 
+2020-08-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c: fixed dump of non-standard 01-OCCURS and LINKAGE
+
 2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* config.def, parser.y: added cb_local_implies_recursive to cater for MF's
@@ -155,6 +160,11 @@
 	* tree.c (finalize_file), parser.y, error.c (cb_warning_dialect_x):
 	  improved syntax checks, now allowing RECORD VARYING also with
 	  fixed length FD (as all other known compilers do)
+
+2020-07-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h, codegen.c: added dumping of LOCAL-STORAGE,
+	  fixed dump of of SD
 
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 

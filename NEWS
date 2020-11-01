@@ -3,10 +3,10 @@ NEWS - user visible changes				-*- outline -*-
  GnuCOBOL 3.1 final to be released (end of October 2020)
  
 * TOBEDONE:
-
-  ** fixes and enhancements for stack trace and dump generation
   
   ** allow ref-mod with zero-length, also with runtime checks enabled
+
+  ** file-name handling issues (MF-compat)
 
 * Changes since 3.1-rc1
 
@@ -46,6 +46,8 @@ NEWS - user visible changes				-*- outline -*-
       error and only allowed because they are never executed
    -Wimplicit-define and -Wcorresponding are now enabled by default
 
+  ** fixes and enhancements for dump generation
+
   ** tested and adjusted to work on more systems (OS + compilers)
 
   ** the GnuCOBOL Manual has been updated
@@ -60,6 +62,9 @@ NEWS - user visible changes				-*- outline -*-
 
 **  support for MicroFocus extension "LOCAL-STORAGE implies RECURSIVE"
     defaults to "on" for `-std=mf` and `-std=mf-strict`!
+
+**  on abort a stack trace will be genereated, this can be suppressed by
+    runtime configuration option COB_STRACK_TRACE
 
 
 * Known issues in 3.1-rc1

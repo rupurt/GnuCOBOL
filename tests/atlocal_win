@@ -117,6 +117,9 @@ for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
 	do _unset_option $cobenv; \
 done
 
+COB_STACKTRACE=0
+export COB_STACKTRACE
+
 # different flags checked in the testsuite
 # note: kept intended to ease merge from atlocal.in
 

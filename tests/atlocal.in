@@ -137,6 +137,9 @@ for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
 	do _unset_option $cobenv; \
 done
 
+COB_STACKTRACE=0
+export COB_STACKTRACE
+
 
 # different flags checked in the testsuite
 if test "$GNUCOBOL_TEST_LOCAL" != "1"; then

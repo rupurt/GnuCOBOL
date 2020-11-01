@@ -8976,7 +8976,7 @@ AT_CHECK([diff reference_append trace_append.txt], [0], [], [])
 AT_CLEANUP
 
 
-AT_SETUP([Test dump feature])
+AT_SETUP([stack and dump feature])
 AT_KEYWORDS([Dump])
 
 AT_DATA([./cpyabrt], [
@@ -9060,7 +9060,7 @@ AT_DATA([prog.cob], [
        01  WORK-AREA IS EXTERNAL.
            05  SUB                             PICTURE 9(4) COMP SYNC.
                88  ODD-RECORD                  VALUE 1 3 5.
-
+       01  SUMS-NON-STD-OCCURS PIC S9(15)V9(03) OCCURS 8 VALUE -42.345.
 
        PROCEDURE DIVISION.
 
@@ -9100,12 +9100,12 @@ AT_DATA([prog.cob], [
            CALL "sub1" USING bin, TSPFL-RECORD.
 
        CALL-SUB-2 SECTION.
-           MOVE 4096 TO bin
+           MOVE 4096 TO bin, SUMS-NON-STD-OCCURS (2)
            CALL "sub2" USING bin, TSPFL-RECORD.
 
        CALL-IT-OMIT SECTION.
-           MOVE 5440 TO bin
-           CALL "sub1" USING bin, OMITTED.
+           MOVE 5440 TO bin, SUMS-NON-STD-OCCURS (3)
+           CALL "sub2" USING bin, TSPFL-RECORD.
 
            END PROGRAM prog.
 
@@ -9213,70 +9213,108 @@ AT_DATA([prog.cob], [
          05  TSTHEX2   PIC X(60).
          05  TSTTAILX  PIC X(80).
 
+       01  BASED-RECORD BASED.
+           10  B-NUM              PICTURE 9(4) VALUE 123.
+           10  B-DISK             PICTURE X(8) VALUE "marvdisc".
+           10  B-NO-TERMINALS     PICTURE 9(4).
+       77  BASED-NEVER-SET        PIC     X    BASED.
+
        LINKAGE SECTION.
        01  X  PIC 9(9) BINARY.
        01  TSPFL-RECORD.
-           10  CM-CUST-NUM                     PICTURE X(8).
-           10  CM-COMPANY                      PICTURE X(25).
-           10  CM-DISK                         PICTURE X(8).
-           10  CM-NO-TERMINALS                 PICTURE 9(4).
+           10  CM-CUST-NUM        PICTURE X(8).
+           10  CM-COMPANY         PICTURE X(25).
+           10  CM-DISK            PICTURE X(8).
+           10  CM-NO-TERMINALS    PICTURE 9(4).
+       77  DYNAMIC-NUM            PICTURE 9(4).
 
        PROCEDURE DIVISION USING X, TSPFL-RECORD.
-            MOVE ALL "X" TO TSTREC.
-            MOVE 1 TO TSTG-1 (1).
-            MOVE 2 TO TSTG-1 (2).
-            MOVE 3 TO TSTG-1 (3).
-            MOVE 'A' TO TSTX-2 (1,1).
-            MOVE 'B' TO TSTX-2 (2,1).
-            MOVE 'C' TO TSTX-2 (3,1).
-            MOVE 'xx' TO TSTX-2 (1,4).
-            MOVE 'yy' TO TSTX-2 (2,4).
-            MOVE 'zz' TO TSTX-2 (3,4).
-            MOVE SPACES TO TSTX-2 (1,3).
-            MOVE HIGH-VALUES TO TSTX (4).
-            MOVE LOW-VALUES TO TSTX-2 (2,3).
-            MOVE HIGH-VALUES TO TSTX-2 (3,3).
-            MOVE "Quick brown fox jumped over the dog"
-              TO TSTLONG, TSTLONG (50:36).
-            MOVE "Quicker grey fox jumped the cougar"
-              TO TSTHEX (1:35).
-            MOVE 17 TO HEXV.
-            MOVE HEXC TO TSTHEX (39:1).
-            MOVE HEXC TO TSTTAIL1 (2:1).
-            MOVE 7 TO HEXV.
-            MOVE HEXC TO TSTHEX (47:1).
-            MOVE 13 TO HEXV.
-            MOVE HEXC TO TSTHEX (59:1).
-            MOVE 0 TO HEXV.
-            MOVE HEXC TO TSTHEX2 (39:1), TSTHEX2 (10:1).
-            MOVE 9 TO HEXV.
-            MOVE HEXC TO TSTHEX2 (47:1).
-            MOVE '\' TO TSTHEX2 (32:1).
-            MOVE 13 TO HEXV.
-            MOVE HEXC TO TSTHEX2 (59:1).
-            MOVE 'A' TO TSTHEX2 (54:1).
-            MOVE LOW-VALUES TO TSTTAILX.
-            COPY cpyabrt.
+           
+           IF ADDRESS OF BASED-RECORD = NULL
+              ALLOCATE BASED-RECORD INITIALIZED
+           ELSE
+              SET ADDRESS OF DYNAMIC-NUM TO ADDRESS OF BASED-RECORD
+              ADD 1 TO B-NUM
+           END-IF
+           
+           IF X = 5440
+               CALL "sub1" USING X, OMITTED.
+           MOVE ALL "X" TO TSTREC.
+           MOVE 1 TO TSTG-1 (1).
+           MOVE 2 TO TSTG-1 (2).
+           MOVE 3 TO TSTG-1 (3).
+           MOVE 'A' TO TSTX-2 (1,1).
+           MOVE 'B' TO TSTX-2 (2,1).
+           MOVE 'C' TO TSTX-2 (3,1).
+           MOVE 'xx' TO TSTX-2 (1,4).
+           MOVE 'yy' TO TSTX-2 (2,4).
+           MOVE 'zz' TO TSTX-2 (3,4).
+           MOVE SPACES TO TSTX-2 (1,3).
+           MOVE HIGH-VALUES TO TSTX (4).
+           MOVE LOW-VALUES TO TSTX-2 (2,3).
+           MOVE HIGH-VALUES TO TSTX-2 (3,3).
+           MOVE "Quick brown fox jumped over the dog"
+             TO TSTLONG, TSTLONG (50:36).
+           MOVE "Quicker grey fox jumped the cougar"
+             TO TSTHEX (1:35).
+           MOVE 17 TO HEXV.
+           MOVE HEXC TO TSTHEX (39:1).
+           MOVE HEXC TO TSTTAIL1 (2:1).
+           MOVE 7 TO HEXV.
+           MOVE HEXC TO TSTHEX (47:1).
+           MOVE 13 TO HEXV.
+           MOVE HEXC TO TSTHEX (59:1).
+           MOVE 0 TO HEXV.
+           MOVE HEXC TO TSTHEX2 (39:1), TSTHEX2 (10:1).
+           MOVE 9 TO HEXV.
+           MOVE HEXC TO TSTHEX2 (47:1).
+           MOVE '\' TO TSTHEX2 (32:1).
+           MOVE 13 TO HEXV.
+           MOVE HEXC TO TSTHEX2 (59:1).
+           MOVE 'A' TO TSTHEX2 (54:1).
+           MOVE LOW-VALUES TO TSTTAILX.
+      *
+           COPY cpyabrt.
        END PROGRAM sub2.
 ])
 
-AT_CHECK([$COMPILE -fdump=ALL prog.cob], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([COB_DUMP_FILE=tstdump.txt \
+AT_CAPTURE_FILE(./tstdump.dump)
+
+# also checking that a dump file without anything to dump does not do anything
+AT_CHECK([COB_STACKTRACE=1 COB_DUMP_FILE=tstdump.dump \
 $COBCRUN_DIRECT ./prog], [1],
 [X is 000000001
 X is 000005441
 ],
 [libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
 libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+ Last statement of sub1 was at line 4 of cpyabrt
+ Last statement of sub2 was at line 251 of prog.cob
+ Last statement of prog was at line 118 of prog.cob
 ])
 
-AT_CAPTURE_FILE(./tstdump.txt)
+AT_CHECK([$COMPILE -fdump=ALL prog.cob], [0], [], [])
 
-AT_DATA([reference_tmpl],
-[Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
- Last statement of sub1 was Line 4 of cpyabrt
- Last statement of prog was Line 118 of prog.cob
+AT_CHECK([COB_DUMP_FILE=tstdump.dump \
+$COBCRUN_DIRECT ./prog], [1],
+[X is 000000001
+X is 000005441
+],
+[libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+dump written to tstdump.dump
+])
+
+AT_DATA([reference_tmpl], [
+Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+
+ Last statement of sub1 was at line 4 of cpyabrt
+ Last statement of sub2 was at line 251 of prog.cob
+ Last statement of prog was at line 118 of prog.cob
 
 Dump Program-Id sub1 from prog.cob compiled MMM DD YYYY HH:MM:SS
 
@@ -9284,7 +9322,7 @@ WORKING-STORAGE
 **********************
 01        ZRO                             000000000
 01        HEXV                            13
-01        TEST-BASED.                     <NULL> address
+01        TEST-BASED.                    <NULL> address
 01        TEST-ALLOCED.
   05      TEST-ALLOCED-SUB1              ALL SPACES
   05      TEST-ALLOCED-SUB2               000000
@@ -9335,7 +9373,72 @@ WORKING-STORAGE
 LINKAGE
 **********************
 01        X                               000005441
-01        TSPFL-RECORD.                   <NULL> address
+01        TSPFL-RECORD.                  <NULL> address
+
+Dump Program-Id sub2 from prog.cob compiled MMM DD YYYY HH:MM:SS
+
+WORKING-STORAGE
+**********************
+01        ZRO                             000000000
+01        HEXV                            13
+01        IDX                             000000000
+01        TSTREC.
+  05      TSTDEP                         'XXX'
+  05      TSTX.
+       15 TSTG-1 (1)                      01
+       15 TSTX-2 (1,1)                   'A'
+       15 TSTX-2 (1,2)                   'XX'
+       15 TSTX-2 (1,3)                   ALL SPACES
+       15 TSTX-2 (1,4)                   'xx'
+       15 TSTG-1 (2)                      02
+       15 TSTX-2 (2,1)                   'B'
+       15 TSTX-2 (2,2)                   'XX'
+       15 TSTX-2 (2,3)                   ALL LOW-VALUES
+       15 TSTX-2 (2,4)                   'yy'
+       15 TSTG-1 (3)                      03
+       15 TSTX-2 (3,1)                   'C'
+       15 TSTX-2 (3,2)                   'XX'
+       15 TSTX-2 (3,3)                   ALL HIGH-VALUES
+       15 TSTX-2 (3,4)                   'zz'
+       15 TSTG-1 (4)                     ALL HIGH-VALUES
+       15 TSTX-2 (4,1)                   ALL HIGH-VALUES
+       15 TSTX-2 (4,2)                   ALL HIGH-VALUES
+       15 TSTX-2 (4,3)                   ALL HIGH-VALUES
+       15 TSTX-2 (4,4)                   ALL HIGH-VALUES
+  05      TSTTAIL1                        X  _
+                                     1 x 5811
+  05      TSTCOMP3                        58585
+  05      TSTLONG                        'Quick brown fox jumped over the dog              Quick br'
+                                         'own fox jumped over the dog'
+  05      TSTHEX                          Q u i c  k e r    g r e y    f o x    j u m  p e d   _
+                                     1 x 51756963 6B657220 67726579 20666F78 206A756D 70656420 _
+                                          t h e    c o u g  a r   X  X X   X  X X X X  X X   X _
+                                    25 x 74686520 636F7567 61722058 58581158 58585858 58580758 _
+                                          X X X X  X X X X  X X   X  X X X X  X X X X  X X X X _
+                                    49 x 58585858 58585858 58580D58 58585858 58585858 58585858 _
+                                          X X X X  X X X X  X X X X  X X X X  X X X X  X X X X _
+                                    73 x 58585858 58585858 58585858 58585858 58585858 58585858 _
+                                          X X X X
+                                    97 x 58585858
+  05      TSTHEX2                        XXXXXXXXX\0XXXXXXXXXXXXXXXXXXXXX\\XXXXXX\0XXXXXXX\tXXXXXX
+                                    54 : AXXXX\rX
+  05      TSTTAILX                       Quick brown fox jumped over the dog     \0ALPHA ELECTRICA
+                                    57 : L CO.\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0
+01        BASED-RECORD.
+     10   B-NUM                           0124
+     10   B-DISK                         'marvdisc'
+     10   B-NO-TERMINALS                  0000
+77        BASED-NEVER-SET                <NULL> address      
+
+LINKAGE
+**********************
+01        X                               000005441
+01        TSPFL-RECORD.
+     10   CM-CUST-NUM                    'ALP00000'
+     10   CM-COMPANY                     'ALPHA ELECTRICAL CO. LTD.'
+     10   CM-DISK                        '8417'
+     10   CM-NO-TERMINALS                 0010
+77        DYNAMIC-NUM                     0124
 
 Dump Program-Id prog from prog.cob compiled MMM DD YYYY HH:MM:SS
 
@@ -9352,7 +9455,7 @@ FD FLATFILE
 WORKING-STORAGE
 **********************
 77        MAX-SUB                         0006
-77        CUST-STAT                      '00'
+77        CUST-STAT                      ALL ZEROES
 77        REC-NUM                         0001
 01        BIN                             000005441
 01        TEST-DATA.
@@ -9386,41 +9489,86 @@ WORKING-STORAGE
   05      FILLER                          254
 01        WORK-AREA.
   05      SUB                             0007
+01        SUMS-NON-STD-OCCURS (1)         -000000000000042.345
+01        SUMS-NON-STD-OCCURS (2)         +000000000004096.000
+01        SUMS-NON-STD-OCCURS (3)         +000000000005440.000
+01        SUMS-NON-STD-OCCURS (4)         -000000000000042.345
+01        SUMS-NON-STD-OCCURS (5)         -000000000000042.345
+01        SUMS-NON-STD-OCCURS (6)         -000000000000042.345
+01        SUMS-NON-STD-OCCURS (7)         -000000000000042.345
+01        SUMS-NON-STD-OCCURS (8)         -000000000000042.345
 
 ])
 
 # AT_DATA workaround via sed:
 AT_CHECK([sed -e 's/_$//' reference_tmpl > reference], [0], [], [])
 AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
-tstdump.txt > tstdump.sed], [0], [], [])
+tstdump.dump > tstdump.sed], [0], [], [])
+
+AT_CHECK([diff reference tstdump.sed], [0], [], [])
+
+# using both
+AT_CHECK([COB_STACKTRACE=1 COB_DUMP_FILE=tstdump.dump \
+$COBCRUN_DIRECT ./prog], [1],
+[X is 000000001
+X is 000005441
+],
+[libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+ Last statement of sub1 was at line 4 of cpyabrt
+ Last statement of sub2 was at line 251 of prog.cob
+ Last statement of prog was at line 118 of prog.cob
+ 
+dump written to tstdump.dump
+])
+
+AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+tstdump.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
 
 AT_CHECK([$COMPILE -fdump=FD,LS prog.cob -o prog_fdls], [0], [], [])
 
-AT_CHECK([COB_DUMP_FILE=tstdump_fdls.txt \
+AT_CHECK([COB_DUMP_FILE=tstdump_fdls.dump \
 $COBCRUN_DIRECT ./prog_fdls], [1],
 [X is 000000001
 X is 000005441
 ],
 [libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
 libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+dump written to tstdump_fdls.dump
 ])
 
 
-AT_CAPTURE_FILE(./tstdump_fdls.txt)
+AT_CAPTURE_FILE(./tstdump_fdls.dump)
 
-AT_DATA([reference_fdls_tmpl],
-[Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
- Last statement of sub1 was Line 4 of cpyabrt
- Last statement of prog was Line 118 of prog.cob
+AT_DATA([reference_fdls_tmpl], [
+Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+
+ Last statement of sub1 was at line 4 of cpyabrt
+ Last statement of sub2 was at line 251 of prog.cob
+ Last statement of prog was at line 118 of prog.cob
 
 Dump Program-Id sub1 from prog.cob compiled MMM DD YYYY HH:MM:SS
 
 LINKAGE
 **********************
 01        X                               000005441
-01        TSPFL-RECORD.                   <NULL> address
+01        TSPFL-RECORD.                  <NULL> address
+
+Dump Program-Id sub2 from prog.cob compiled MMM DD YYYY HH:MM:SS
+
+LINKAGE
+**********************
+01        X                               000005441
+01        TSPFL-RECORD.
+     10   CM-CUST-NUM                    'ALP00000'
+     10   CM-COMPANY                     'ALPHA ELECTRICAL CO. LTD.'
+     10   CM-DISK                        '8417'
+     10   CM-NO-TERMINALS                 0010
+77        DYNAMIC-NUM                     0124
 
 Dump Program-Id prog from prog.cob compiled MMM DD YYYY HH:MM:SS
 
@@ -9439,9 +9587,81 @@ FD FLATFILE
 # AT_DATA workaround via sed:
 AT_CHECK([sed -e 's/_$//' reference_fdls_tmpl > reference], [0], [], [])
 AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
-tstdump_fdls.txt > tstdump.sed], [0], [], [])
+tstdump_fdls.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
+
+AT_CHECK([$COMPILE -fdump=ALL -fno-dump=LO,WS,SC prog.cob -o prog_allfdls], [0], [], [])
+
+AT_CHECK([COB_DUMP_FILE=tstdump_allfdls.dump \
+$COBCRUN_DIRECT ./prog_allfdls], [1],
+[X is 000000001
+X is 000005441
+],
+[libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+dump written to tstdump_allfdls.dump
+])
+
+AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+tstdump_allfdls.dump > tstdump.sed], [0], [], [])
+
+AT_CHECK([diff reference tstdump.sed], [0], [], [])
+
+# CHECKME @ Ron: The result is likely wrong, please verify later
+#AT_CHECK([$COMPILE -fdump=LS prog.cob -fsticky-linkage -o prog_ls_sticky], [0], [], [])
+#
+#AT_CHECK([COB_DUMP_FILE=tstdump_ls_sticky.dump \
+#$COBCRUN_DIRECT ./prog_ls_sticky], [1],
+#[X is 000000001
+#X is 000005441
+#],
+#[libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+#libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+#
+#dump written to tstdump_ls_sticky.dump
+#])
+#
+#
+#AT_CAPTURE_FILE(./tstdump_ls_sticky.dump)
+#
+#AT_DATA([reference_ls_sticky_tmpl], [
+#Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+#
+# Last statement of sub1 was at line 4 of cpyabrt
+# Last statement of sub2 was at line 251 of prog.cob
+# Last statement of prog was at line 118 of prog.cob
+#
+#Dump Program-Id sub1 from prog.cob compiled MMM DD YYYY HH:MM:SS
+#
+#LINKAGE
+#**********************
+#01        X                               000005441
+#01        TSPFL-RECORD.                  <NULL> address
+#
+#Dump Program-Id sub2 from prog.cob compiled MMM DD YYYY HH:MM:SS
+#
+#LINKAGE
+#**********************
+#01        X                               000005441
+#01        TSPFL-RECORD.
+#     10   CM-CUST-NUM                    'ALP00000'
+#     10   CM-COMPANY                     'ALPHA ELECTRICAL CO. LTD.'
+#     10   CM-DISK                        '8417'
+#     10   CM-NO-TERMINALS                 0010
+#77        DYNAMIC-NUM                     0124
+#
+#Dump Program-Id prog from prog.cob compiled MMM DD YYYY HH:MM:SS
+#
+#])
+#
+## AT_DATA workaround via sed:
+#AT_CHECK([sed -e 's/_$//' reference_ls_sticky_tmpl > reference], [0], [], [])
+#AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+#tstdump_ls_sticky.dump > tstdump.sed], [0], [], [])
+#
+#AT_CHECK([diff reference tstdump.sed], [0], [], [])
 
 AT_CLEANUP
 

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001-2012, 2014-2019 Free Software Foundation, Inc.
+   Copyright (C) 2001-2012, 2014-2020 Free Software Foundation, Inc.
    Written by Keisuke Nishida, Roger While, Simon Sobisch, Edward Hart
 
    This file is part of GnuCOBOL.
@@ -405,10 +405,10 @@ is_field_display (cob_field *f)
 static void
 display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int max_width)
 {
-	unsigned int	i, j, pos, lowv, highv, spacev, printv, delv, len, colsize;
+	unsigned int	i, j, pos, lowv, highv, spacev, zerov, printv, delv, len, colsize;
 	char	wrk[200];
 
-	lowv = highv = spacev = printv = delv = 0;
+	lowv = highv = spacev = zerov = printv = delv = 0;
 	colsize = max_width - indent - 2;
 	for (i = 0; i < f->size; i++) {
 		if (f->data[i] == 0x00) {
@@ -419,32 +419,43 @@ display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int ma
 		} else if (f->data[i] == ' ') {
 			spacev++;
 			printv++;
-		} else if (f->data[i] >= ' '
-			&& f->data[i] <= 0x7F
-			&& isprint(f->data[i])) {
+		} else if (f->data[i] == '0') {
+			zerov++;
 			printv++;
-		} else if (f->data[i] == '\b'
-			|| f->data[i] == '\f'
-			|| f->data[i] == '\n'
-			|| f->data[i] == '\r'
-			|| f->data[i] == '\t') {
+		} else
+		if (f->data[i] >= ' '
+		 && f->data[i] <= 0x7F
+		 && isprint(f->data[i])) {
+			printv++;
+		} else
+		if (f->data[i] == '\b'
+		 || f->data[i] == '\f'
+		 || f->data[i] == '\n'
+		 || f->data[i] == '\r'
+		 || f->data[i] == '\t') {
 			delv++;
 		}
 	}
-	for (len = f->size; len > 0 && f->data[len-1] == ' '; len--);
 
 	if (spacev == f->size) {
-		fprintf(fp,"ALL SPACES");
+		fprintf (fp, "ALL SPACES");
 		return;
 	}
+	if (zerov == f->size) {
+		fprintf (fp, "ALL ZEROES");
+		return;
+	}
+
 	if (lowv == f->size) {
-		fprintf(fp,"ALL LOW-VALUES");
+		fprintf (fp, "ALL LOW-VALUES");
 		return;
 	}
 	if (highv == f->size) {
-		fprintf(fp,"ALL HIGH-VALUES");
+		fprintf (fp, "ALL HIGH-VALUES");
 		return;
 	}
+
+	for (len = f->size; len > 0 && f->data[len-1] == ' '; len--);
 
 	if (lowv > 0
 	 && (lowv+printv) == f->size) {
@@ -535,102 +546,141 @@ display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int ma
 }
 
 static int	dump_null_adrs = 0;
-/* Display field for DUMP purposes */
+
+/* Output for DUMP purposes */
+void
+cob_dump_output (const char *str)
+{
+	FILE	*fp = cob_get_dump_file ();
+	fprintf (fp, "\n%s\n**********************\n", str);
+}
+
+/* Output file header for DUMP purposes */
+void
+cob_dump_file (const char *name, cob_file *fl)
+{
+	FILE	*fp = cob_get_dump_file ();
+	const char *mode;
+
+	switch (fl->open_mode) {
+	case COB_OPEN_CLOSED:
+		mode = "CLOSED";
+		break;
+	case COB_OPEN_LOCKED:
+		mode = "LOCKED";
+		break;
+	default:
+		mode = "OPEN";
+		break;
+	}
+	/* check only included for 3.1rc1 - compat */
+	if (name) {
+		fprintf (fp, "\n%s\n**********************\n", name);
+	}
+	fprintf (fp, "   File is %s\n", mode);
+	fprintf (fp, "   FILE STATUS  '%.2s'\n", fl->file_status);
+}
+
+/* Output field for DUMP purposes */
 void
 cob_dump_field (const int level, const char *name, 
-		cob_field *fa, const int offset, const int indexes, ...)
+		cob_field *f_addr, const int offset, const int indexes, ...)
 {
-	FILE	*fp;
-	char	vname[COB_MAX_WORDLEN + 1 + COB_MAX_SUBSCRIPTS * 4 + 1];
+	FILE	*fp = cob_get_dump_file ();
+
+	/* fieldname and additional for subscripts: " ()" + indexes (max-size 7 + ",") */
+	char	vname[COB_MAX_WORDLEN + 1 + 3 + COB_MAX_SUBSCRIPTS * (7 + 1)];
 	char	lvlwrk[16];
-	va_list	ap;
-	int	idx, subscript, size, adjust, indent;
+	int 	adjust, indent;
 	cob_field	f[1];
 
-	fp = cob_get_dump_file ();
-
-	if (level < 0) {	/* Special directive */
+	if (level < 0) {	/* Special directive, only included for 3.1rc1 - compat */
 		if (level == -1) {
-			fprintf(fp, "\n%s\n**********************\n",name);
-			dump_null_adrs = 0;
+			cob_dump_output (name);
 		} else
-		if (level == -2
-		 && name != NULL) {
-			cob_file *fl = (cob_file*)name;
-			if (fl->open_mode == COB_OPEN_CLOSED) 
-				fprintf(fp,"   File is CLOSED\n");
-			else if (fl->open_mode == COB_OPEN_LOCKED) 
-				fprintf(fp,"   File is LOCKED\n");
-			else
-				fprintf(fp,"   File is OPEN\n");
-			fprintf(fp, "   FILE STATUS  '%.2s'\n",fl->file_status);
+		if (level == -2) {
+			cob_dump_file (NULL, (cob_file*)name);
 		}
-	} else {
-		strncpy (vname, name, (size_t)COB_MAX_WORDLEN);
-		vname[COB_MAX_WORDLEN] = 0;
-		memcpy (f, fa, sizeof (cob_field));
-		adjust = offset;
-		va_start (ap, indexes);
-		if (indexes > 0) {
-			strcat (vname," (");
-			for (idx = 1; idx <= indexes; idx++) {
-				subscript = va_arg (ap, int);
-				size = va_arg (ap, int);
-				adjust = adjust + (subscript * size);
-				if (idx > 1) {
-					strcat (vname,",");
-				}
-				sprintf(&vname[strlen(vname)],"%d",subscript+1);
-			}
-			strcat (vname,")");
-		}
-		f->data += adjust;
-		if (level == 77
-		 && f->data != NULL)
-			dump_null_adrs = 0;
-		if (level == 77
-		 || level == 1) {
-			indent = 0;
-			sprintf(lvlwrk,"%02d",level);
-		} else {
-			indent = level / 2;
-			if (indent > 7)
-				indent = 7;
-			sprintf(lvlwrk,"%*s%02d",indent," ",level);
-		}
-		if (f->attr->type == COB_TYPE_GROUP) {
-			strcat(vname,".");
-			if (f->data == NULL) {
-				dump_null_adrs = 1;
-				fprintf(fp, "%-10s%-30s  <NULL> address\n",lvlwrk,vname);
-			} else {
-				fprintf(fp, "%-10s%s\n",lvlwrk,vname);
-				dump_null_adrs = 0;
-			}
-		} else if (dump_null_adrs) {
-			/* Skip printing as Group had no address */
-		} else {
-			fprintf(fp, "%-10s%-30s ",lvlwrk,vname);
-			if (strlen(vname) > 30)
-				fprintf(fp,"\n%-*s",41," ");
-			if (f->data == NULL) {
-				fprintf(fp," <NULL> address");
-			} else if (!is_field_display(f)
-				&& (f->attr->type == COB_TYPE_NUMERIC_EDITED
-				 || f->attr->type == COB_TYPE_NUMERIC_DISPLAY)) {
-				display_alnum_dump (f, fp, 41, cobsetptr->cob_dump_width);
-			} else if (f->attr->type == COB_TYPE_ALPHANUMERIC
-				|| f->attr->type == COB_TYPE_ALPHANUMERIC_EDITED
-				|| f->size > 39) {
-				display_alnum_dump (f, fp, 41, cobsetptr->cob_dump_width);
-			} else {
-				fprintf(fp, " ");
-				cob_display_common (f, fp);
-			}
-			fprintf(fp, "\n");
-		}
+		return;
 	}
-	va_end (ap);
+
+	memcpy (f, f_addr, sizeof (cob_field));
+	memcpy (vname, name, COB_MAX_WORDLEN);
+	adjust = offset;
+
+	if (indexes > 0) {
+		va_list	ap;
+		int	idx, subscript, size;
+		strcat (vname, " (");
+		va_start (ap, indexes);
+		for (idx = 1; idx <= indexes; idx++) {
+			subscript = va_arg (ap, int);
+			size = va_arg (ap, int);
+			adjust = adjust + (subscript * size);
+			if (idx > 1) {
+				strcat (vname,",");
+			}
+			sprintf (&vname[strlen(vname)], "%d", subscript + 1);
+		}
+		va_end (ap);
+		strcat (vname,")");
+	}
+	if (f->data) {
+		f->data += adjust;
+	}
+	if (level == 77
+	 || level == 1) {
+		indent = 0;
+		sprintf(lvlwrk,"%02d",level);
+		if (f->data != NULL) {
+			dump_null_adrs = 0;
+		} else {
+			dump_null_adrs = 1;
+			if (COB_FIELD_TYPE (f) == COB_TYPE_GROUP) {
+				strcat (vname, ".");
+			}
+			fprintf (fp, "%-10s%-30s <NULL> address\n", lvlwrk, vname);
+			return;
+		}
+	} else if (dump_null_adrs) {
+		/* Skip printing as previous Group had no address */
+		return;
+	} else {
+		/* TODO: try to find a better algorithm for indent
+			(with level 1, 10, 15 + ... we have one at 5 and all others on 7),
+			maybe use a configuration here?	*/
+		indent = level / 2;
+		if (indent > 7)
+			indent = 7;
+		sprintf (lvlwrk, "%*s%02d", indent, " ", level);
+	}
+	if (f->data == NULL) {
+		fprintf (fp, "%-10s%-30s <CODEGEN ERROR, PLEASE REPORT THIS!>\n", lvlwrk, vname);
+		return;
+	}
+	if (f->attr->type == COB_TYPE_GROUP) {
+		strcat(vname,".");
+		fprintf (fp, "%-10s%s\n", lvlwrk, vname);
+	} else {
+		fprintf (fp, "%-10s%-30s ", lvlwrk, vname);
+		if (strlen (vname) > 30) {
+			fprintf (fp, "\n%-*s", 41, " ");
+		}
+		if (  (COB_FIELD_TYPE (f) == COB_TYPE_NUMERIC_EDITED
+			|| COB_FIELD_TYPE (f) == COB_TYPE_NUMERIC_DISPLAY)
+		 && !is_field_display (f)) {
+			display_alnum_dump (f, fp, 41, cobsetptr->cob_dump_width);
+		} else
+		if (COB_FIELD_TYPE (f) == COB_TYPE_ALPHANUMERIC
+		 || COB_FIELD_TYPE (f) == COB_TYPE_ALPHANUMERIC_EDITED
+		 || f->size > 39) {
+			display_alnum_dump (f, fp, 41, cobsetptr->cob_dump_width);
+		} else {
+			fprintf (fp, " "); 
+			cob_display_common (f, fp);
+		}
+		fprintf (fp, "\n");
+	}
 }
 
 /* ACCEPT */

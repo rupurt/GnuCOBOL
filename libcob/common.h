@@ -1764,10 +1764,13 @@ enum cob_runtime_option_switch {
 	COB_SET_RUNTIME_TRACE_FILE = 0,				/* 'p' is  FILE *  */
 	COB_SET_RUNTIME_DISPLAY_PRINTER_FILE = 1,	/* 'p' is  FILE *  */
 	COB_SET_RUNTIME_RESCAN_ENV = 2,		/* rescan environment variables */
-	COB_SET_RUNTIME_DISPLAY_PUNCH_FILE = 3	/* 'p' is  FILE *  */
+	COB_SET_RUNTIME_DISPLAY_PUNCH_FILE = 3,	/* 'p' is  FILE *  */
+	COB_SET_RUNTIME_DUMP_FILE = 4	/* 'p' is  FILE *  */
 };
 COB_EXPIMP void			cob_set_runtime_option		(enum cob_runtime_option_switch opt, void *p);
 COB_EXPIMP void			*cob_get_runtime_option		(enum cob_runtime_option_switch opt);
+
+COB_EXPIMP void			cob_stack_trace (void *target);		/* 'target' is FILE *  */
 
 #define COB_GET_LINE_NUM(n) ( n & 0xFFFFF )
 #define COB_GET_FILE_NUM(n) ( (n >> 20) & 0xFFF)
@@ -2376,6 +2379,8 @@ typedef struct {
 /* Functions in termio.c */
 
 COB_EXPIMP void cob_display	(const int, const int, const int, ...);
+COB_EXPIMP void cob_dump_output (const char *);
+COB_EXPIMP void cob_dump_file (const char *, cob_file *);
 COB_EXPIMP void cob_dump_field	(const int, const char *, cob_field *, const int, const int, ...);
 COB_EXPIMP void cob_accept	(cob_field *);
 
