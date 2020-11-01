@@ -1056,7 +1056,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <math.h>]],
 #  [AC_MSG_RESULT([no])],
 #  [])
 
-AC_CHECK_FUNCS([fdatasync sigaction])
+AC_CHECK_FUNCS([fdatasync sigaction fmemopen])
 AC_CHECK_DECLS([fdatasync])	# also check for declaration, missing on MacOS...
 AC_CHECK_DECLS([fmemopen])	# also check for declaration, missing on AIX...
 

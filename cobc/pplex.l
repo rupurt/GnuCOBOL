@@ -1205,6 +1205,14 @@ plex_clear_all (void)
 void
 plex_call_destroy (void)
 {
+	struct copy_info* ci;
+
+	while (copy_stack) {
+		ci = copy_stack;
+		copy_stack = ci->next;
+		cobc_free (ci);
+	}
+
 	(void)pplex_destroy ();
 }
 
@@ -1549,7 +1557,7 @@ start:
 				++newline_count;
 			}
 			cb_plex_error (newline_count,
-			_("version control conflict marker in file"));
+				_("version control conflict marker in file"));
 			if (cb_source_format != CB_FORMAT_FREE) {
 				++newline_count;
 			}

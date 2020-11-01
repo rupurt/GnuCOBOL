@@ -37,6 +37,7 @@
 #ifdef	HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#include <errno.h>
 
 #ifdef HAVE_FMEMOPEN
 #if defined(HAVE_DECL_FMEMOPEN) && HAVE_DECL_FMEMOPEN == 0
@@ -1879,7 +1880,7 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
  * Routines for C interface with COBOL
  */
 
-static cob_field *
+cob_field *
 cob_get_param_field (int n, const char *caller_name)
 {
 	if (cobglobptr == NULL
@@ -1934,21 +1935,8 @@ cob_get_num_params ( void )
 int
 cob_get_param_type (int n)
 {
-	cob_field	*f = cob_get_param_field (n, "cob_get_param_type");
-
-	if (f == NULL)
-		return -1;
-	if (f->attr->type == COB_TYPE_NUMERIC_BINARY) {
-		if (COB_FIELD_REAL_BINARY (f)) {
-			return COB_TYPE_NUMERIC_COMP5;
-		}
-#ifndef WORDS_BIGENDIAN
-		if (!COB_FIELD_BINARY_SWAP(f)) {
-			return COB_TYPE_NUMERIC_COMP5;
-		}
-#endif
-	}
-	return (int)f->attr->type;
+	cob_field* f = cob_get_param_field (n, "cob_get_param_type");
+	return cob_get_field_type (f);
 }
 
 int
@@ -1995,15 +1983,28 @@ int
 cob_get_param_constant (int n)
 {
 	cob_field	*f = cob_get_param_field (n, "cob_get_param_constant");
-	if (f == NULL) 
-		return -1;
-	if (COB_FIELD_CONTENT(f)) 
-		return 3;
-	if (COB_FIELD_VALUE(f)) 
-		return 2;
-	if (COB_FIELD_CONSTANT(f)) 
-		return 1;
-	return 0;
+	return cob_get_field_constant (f);
+}
+
+const char *
+cob_get_param_str (int n, char *buffer, size_t size)
+{
+	cob_field	*f = cob_get_param_field (n, "cob_get_param_str");
+	return cob_get_field_str (f, buffer, size);
+}
+
+const char *
+cob_get_param_str_buffered (int n)
+{
+	cob_field	*f = cob_get_param_field (n, "cob_get_param_str_buffered");
+	return cob_get_field_str_buffered (f);
+}
+
+int
+cob_put_param_str (int n, const char *str)
+{
+	cob_field	*f = cob_get_param_field (n, "cob_put_param_str");
+	return cob_put_field_str (f, str);
 }
 
 void *
@@ -2183,8 +2184,6 @@ cob_get_picx_param (int n, void *char_field, size_t char_len)
 	return cob_get_picx (f->data, f->size, char_field, char_len);
 }
 
-#if 0 /* to be merged */
-
 int
 cob_get_field_type (const cob_field *f)
 {
@@ -2246,7 +2245,19 @@ cob_get_field_constant (const cob_field *f)
 	if (f == NULL) {
 		return -1;
 	}
+#if 0 /* maybe previously? got the contant value? */
 	return COB_FIELD_CONSTANT (f);
+#else
+	if (f == NULL) 
+		return -1;
+	if (COB_FIELD_CONTENT(f)) 
+		return 3;
+	if (COB_FIELD_VALUE(f)) 
+		return 2;
+	if (COB_FIELD_CONSTANT(f)) 
+		return 1;
+	return 0;
+#endif
 }
 
 const char *
@@ -2324,7 +2335,7 @@ cob_put_field_str (const cob_field *dst, const char *str)
 	if (dst->size <= 0) return EINVAL;
 
 	if (COB_FIELD_CONSTANT (dst)) {
-		cob_runtime_warning_external ("cob_put_field_str", 0,
+		cob_runtime_warning_external ("cob_put_field_str", 1,
 			_ ("attempt to over-write constant field with '%s'"),
 			str);
 		return EINVAL;
@@ -2348,7 +2359,6 @@ cob_put_field_str (const cob_field *dst, const char *str)
 	cob_move (&wrk, (cob_field *)dst);
 	return 0;
 }
-#endif /* to be merged */
 
 void
 cob_put_s64_param (int n, cob_s64_t val)
@@ -2364,15 +2374,14 @@ cob_put_s64_param (int n, cob_s64_t val)
 		return;
 	}
 
-	cbl_data = f->data;
-	size = f->size;
 	if (COB_FIELD_CONSTANT (f)) {
 		cob_runtime_warning_external ("cob_put_s64_param", 1,
 			_("attempt to over-write constant parameter %d with " CB_FMT_LLD),
 			n, val);
 		return;
 	}
-
+	cbl_data = f->data;
+	size = f->size;
 	switch (f->attr->type) {
 	case COB_TYPE_NUMERIC_DISPLAY:
 		cob_put_s64_pic9 (val, cbl_data, size);
@@ -2421,14 +2430,14 @@ cob_put_u64_param (int n, cob_u64_t val)
 		return;
 	}
 
-	cbl_data = f->data;
-	size = f->size;
 	if (COB_FIELD_CONSTANT (f)) {
 		cob_runtime_warning_external ("cob_put_u64_param", 1,
 			_("attempt to over-write constant parameter %d with " CB_FMT_LLD),
 			n, val);
 		return;
 	}
+	cbl_data = f->data;
+	size = f->size;
 	switch (f->attr->type) {
 	case COB_TYPE_NUMERIC_DISPLAY:
 		cob_put_u64_pic9 (val, cbl_data, size);

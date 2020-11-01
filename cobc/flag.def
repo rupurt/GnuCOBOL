@@ -33,6 +33,9 @@
 /* Flags with required parameter and no associated variable */
 /* CB_FLAG_NQ (help switch, name, getopt return, help) */
 
+/* Flags with optional parameter and no associated variable */
+/* CB_FLAG_OP (help switch, name, getopt return, help) */
+
 
 /* Flags with required parameter */
 
@@ -73,14 +76,17 @@ CB_FLAG_NQ (1, "intrinsics", 10,		/* added to cb_intrinsic_list */
 CB_FLAG_NQ (0, "ec", 11,
 	_("  -fec=<exception-name>\tenable code generation for <exception-name>,\n"
       "                        sets -fsource-location"))
-
 CB_FLAG_NQ (0, "no-ec", 12,
 	_("  -fno-ec=<exception-name>\tdisable code generation for <exception-name>"))
 #endif
 
 CB_FLAG_NQ (1, "dump", 8,
 	_("  -fdump=<scope>        dump data fields on abort, <scope> may be\n"
-	  "                        a combination of: ALL, WS, LS, RD, FD, SC"))
+	  "                        a combination of: ALL, WS, LS, RD, FD, SC, LO"))
+CB_FLAG_OP (0, "no-dump", 13,
+	_("  -fno-dump=<scope>     exclude data fields from dumping on abort, <scope> may\n"
+	  "                        be a combination of: ALL, WS, LS, RD, FD, SC, LO"))
+
 
 CB_FLAG_NQ (1, "callfh", 9,
 	_("  -fcallfh=<name>       specifies <name> to be used for I/O\n"

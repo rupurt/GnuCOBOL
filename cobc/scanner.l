@@ -1330,7 +1330,7 @@ scan_x (const char *text, const char *type)
 			    _("hexadecimal literal has zero length; X'00' will be assumed"));
 		if (type[0] == 'B') {
 			yylval = cb_build_numeric_literal (0, "0", 0);
-		} else if (type[0] == 'N') {
+		} else if (type[0] != 'N') {
 			yylval = cb_build_alphanumeric_literal (plex_buff, 1);
 		} else {
 			yylval = cb_build_national_literal (plex_buff, 1);
