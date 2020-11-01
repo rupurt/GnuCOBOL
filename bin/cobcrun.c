@@ -272,7 +272,7 @@ process_command_line (int argc, char *argv[])
 		switch (c) {
 		case '?':
 			/* Unknown option or ambiguous */
-			exit (1);
+			exit (EXIT_FAILURE);
 
 		case 'c':
 		case 'C':
@@ -282,7 +282,7 @@ process_command_line (int argc, char *argv[])
 				fputs (_("invalid configuration file name"), stderr);
 				putc ('\n', stderr);
 				fflush (stderr);
-				exit (1);
+				exit (EXIT_FAILURE);
 			}
 			/* LCOV_EXCL_STOP */
 			arg_shift++;
@@ -296,12 +296,12 @@ process_command_line (int argc, char *argv[])
 		case 'h':
 			/* --help */
 			cobcrun_print_usage (argv[0]);
-			exit (0);
+			exit (EXIT_SUCCESS);
 
 		case 'i':
 			/* --info */
 			print_info_detailed (verbose_output);
-			exit (0);
+			exit (EXIT_SUCCESS);
 
 		case 'q':
 			/* --brief : reduced reporting */
@@ -329,7 +329,7 @@ process_command_line (int argc, char *argv[])
 			cobcrun_print_version ();
 			putchar ('\n');
 			print_version ();
-			exit (0);
+			exit (EXIT_SUCCESS);
 
 		case 'M':
 		case 'm':
@@ -341,7 +341,7 @@ process_command_line (int argc, char *argv[])
 				putc ('\n', stderr);
 				fputs (err_msg, stderr);
 				fflush (stderr);
-				exit (1);
+				exit (EXIT_FAILURE);
 			}
 			/* shift argument again if two part argument was used */
 			if (c == 'M') {
@@ -356,7 +356,7 @@ process_command_line (int argc, char *argv[])
 			putc ('\n', stderr);
 			fputs (_("Please report this!"), stderr);
 			fflush (stderr);
-			exit (1);
+			exit (EXIT_FAILURE);
 		/* LCOV_EXCL_STOP */
 
 		}
@@ -387,7 +387,7 @@ main (int argc, char **argv)
 		if (print_runtime_wanted) {
 			cob_init_nomain (0, &argv[0]);
 			print_runtime_conf ();
-			cob_stop_run (0);
+			cob_stop_run (EXIT_SUCCESS);
 		}
 		fprintf (stderr, _("%s: missing PROGRAM name"), argv[0]);
 		putc ('\n', stderr);

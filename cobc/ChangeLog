@@ -1,5 +1,10 @@
 
 2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
+	* pplex.l: extracted (ppcopy_try_open) from (ppcopy) to split file search
+	  from actual processing and removing duplicate code
+	* cobc.c: adjusted handling of output file name (especially with COB_DASH),
+	  fixing errors in MinGW + CYGWIN
+	* cobc.c: use EXIT_SUCCESS and EXIT_FAILURE instead of exit(0/1)
 
 	* codegen.c (output_size): limit variable scope
 	* codegen.c (output_initialize_uniform): limit variable scope and
@@ -27,21 +32,38 @@
 
 	* Makefile.am: fixed inclusion of libsupport
 	* cobc.h: include gettext without lib prefix
+	* pplex.l: extracted (ppcopy_try_open) from (ppcopy) to split file search
+	  from actual processing and removing duplicate code
+	* cobc.c: adjusted handling of output file name (especially with COB_DASH),
+	  fixing errors in MinGW + CYGWIN
+
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR
 	* typeck.c: adjusted check of defines for JSON
 
+2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* typeck.c (cb_validate_program_body): verify ANY LENGTH as formal parameter
+
 2020-09-04  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: emit active runtime checks also in conditions
 	  for example reference modification or subscript being out of bounds
+	* typeck.c (cb_build_identifier): allow bad subscripts with -frelax-syntax,
+	  don't generate odo-check for UNBOUNDED items
 
 2020-08-28  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Changes for UNBOUNDED OCCURS
 	* typeck.c (cb_emit_move): Changes for UNBOUNDED OCCURS
+
+2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* help.c: adjusted help output;
+	  including fix for bug #670 "multiple listing of -debug"
+	* flag.def: removed dummy variables cb_def_dump, cb_def_callfh
 
 2020-07-26  Edward Hart <edward.dan.hart@gmail.com>
 

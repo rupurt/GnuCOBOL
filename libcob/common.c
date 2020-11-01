@@ -1431,6 +1431,9 @@ cob_check_trace_file (void)
 	if (cobsetptr->cob_trace_filename) {
 		cobsetptr->cob_trace_file = cob_open_logfile (cobsetptr->cob_trace_filename);
 		if (!cobsetptr->cob_trace_file) {
+			/* could not open the file
+			   unset the filename for not referencing it later */
+			cobsetptr->cob_trace_filename = NULL;
 			cobsetptr->cob_trace_file = stderr;
 		}
 	} else {
@@ -2143,7 +2146,7 @@ cob_stop_run (const int status)
 	struct exit_handlerlist	*h;
 
 	if (!cob_initialized) {
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 
 	if (exit_hdlrs != NULL) {
@@ -3034,7 +3037,7 @@ void
 cob_check_based (const unsigned char *x, const char *name)
 {
 	if (!x) {
-		/* name includes '' already and can be ... 'x' (addressed by 'y'= */
+		/* name includes '' already and can be ... 'x' (addressed by 'y') */
 		cob_runtime_error (_("BASED/LINKAGE item %s has NULL address"), name);
 		cob_stop_run (1);
 	}
@@ -4416,7 +4419,7 @@ cob_gettmpdir (void)
 		 && (tmpdir = check_valid_env_tmpdir ("USERPROFILE")) == NULL) {
 #else
 		if ((tmpdir = check_valid_env_tmpdir ("TMP")) == NULL
-			&& (tmpdir = check_valid_env_tmpdir ("TEMP")) == NULL) {
+		 && (tmpdir = check_valid_env_tmpdir ("TEMP")) == NULL) {
 			if (!check_valid_dir ("/tmp")) {
 				tmp = cob_fast_malloc (5U);
 				strcpy (tmp, "/tmp");
@@ -4651,7 +4654,7 @@ cob_sys_system (const void *cmdline)
 			/* LCOV_EXCL_STOP */
 #ifdef _WIN32
 			/* All known _WIN32 implementations use MSVCRT's system()
-			   which passes the given commandline as paramter to "cmd /k".
+			   which passes the given commandline as parameter to "cmd /k".
 			   Because "of compatibility" this checks if you have a
 			   leading and trailing " and if yes simply removes them (!).
 			   Check if this is the case and if it is handled already
@@ -6291,7 +6294,8 @@ set_config_val (char *value, int pos)
 		}
 
 		/* call internal routines that do post-processing */
-		if (strcmp (gc_conf[pos].env_name, "COB_TRACE_FILE") == 0) {
+		if (strcmp (gc_conf[pos].env_name, "COB_TRACE_FILE") == 0
+		 && cobsetptr->cob_trace_file != NULL) {
 			cob_new_trace_file ();
 		}
 
@@ -7160,9 +7164,23 @@ cob_fatal_error (const enum cob_fatal_error fatal_error)
 	/* LCOV_EXCL_STOP */
 	/* Note: can be simply tested; therefore no exclusion */
 	case COB_FERROR_RECURSIVE:
-		cob_runtime_error (_("recursive CALL from %s to %s which is NOT RECURSIVE"),
-				COB_MODULE_PTR->module_name, cob_module_err->module_name);
-		cob_module_err = NULL;
+#if 0 /* not merged yet */
+		/* LCOV_EXCL_LINE */
+		if (cob_module_err) {
+			cob_runtime_error (_("recursive CALL from '%s' to '%s' which is NOT RECURSIVE"),
+					COB_MODULE_PTR->module_name, cob_module_err->module_name);
+			cob_module_err = NULL;
+		/* LCOV_EXCL_START */
+		/* Note: only in for old modules - not active with current generation */
+		} else {
+			cob_runtime_error (_("invalid recursive COBOL CALL to '%s'"),
+					   COB_MODULE_PTR->module_name);
+		}
+		/* LCOV_EXCL_STOP */
+#else
+		cob_runtime_error (_("invalid recursive COBOL CALL to '%s'"),
+				   COB_MODULE_PTR->module_name);
+#endif
 		break;
 	/* LCOV_EXCL_START */
 	case COB_FERROR_FREE:
@@ -7522,7 +7540,7 @@ get_math_info (char *version_buffer, size_t size, const int verbose)
 	(void)sscanf (mpir_version, "%d.%d.%d", &major, &minor, &patch);
 	curr_size = strlen (version_buffer);
 	{
-		char *deli = " - ";
+		const char *deli = " - ";
 		snprintf (version_buffer + curr_size, size - curr_size, "%s", deli);
 		curr_size += strlen (deli);
 	}
@@ -7663,10 +7681,6 @@ print_info_detailed (const int verbose)
 	var_print (_("native character set"),		"ASCII", "", 0);
 #endif
 
-	var_print (_("extended screen I/O"), (char*)&screenio_info, "", 0);
-
-	var_print (_("mouse support"), 	mouse_support, "", 0);
-
 	snprintf (buff, sizeof (buff), "%d", WITH_VARSEQ);
 	var_print (_("variable file format"), buff, "", 0);
 	if ((s = getenv ("COB_VARSEQ_FORMAT")) != NULL) {
@@ -7803,6 +7817,9 @@ print_info_detailed (const int verbose)
 #else
 	var_print (_("JSON library"), 		_("disabled"), "", 0);
 #endif
+
+	var_print (_("extended screen I/O"),	(char*)&screenio_info, "", 0);
+	var_print (_("mouse support"),		mouse_support, "", 0);
 
 #ifdef COB_DEBUG_LOG
 	var_print ("DEBUG_LOG",		_("enabled"), "", 0);

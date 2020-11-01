@@ -941,7 +941,7 @@ cobc_strdup (const char *dupstr)
 	return p;
 }
 
-#ifdef	_MSC_VER
+#if	defined (_WIN32) || defined (__CYGWIN__)
 static char *
 cobc_stradd_dup (const char *str1, const char *str2)
 {
@@ -1611,7 +1611,7 @@ cobc_err_exit (const char *fmt, ...)
 	va_end (ap);
 	putc ('\n', stderr);
 	fflush (stderr);
-	cobc_early_exit (1);
+	cobc_early_exit (EXIT_FAILURE);
 }
 
 static struct cb_define_struct *
@@ -1935,7 +1935,7 @@ cobc_terminate (const char *str)
 		print_program_trailer ();
 	}
 	cobc_clean_up (1);
-	exit (1);
+	exit (EXIT_FAILURE);
 }
 
 static void
@@ -2401,7 +2401,9 @@ cobc_deciph_funcs (const char *opt)
 	cobc_free (p);
 }
 
-#if	defined (_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#if	defined (_WIN32)      || defined (__CYGWIN__) \
+ || defined (__WATCOMC__) || defined (__BORLANDC__) \
+ || defined (__OS400__)
 static void
 file_stripext (char *buff)
 {
@@ -2539,7 +2541,7 @@ process_command_line (const int argc, char **argv)
 	int			list_system_routines = 0;
 	enum cob_exception_id	i;
 	char			ext[COB_MINI_BUFF];
-	char			*conf_label;	/* we want a dynamic address for erroc.c, not a static one */
+	char			*conf_label;	/* we want a dynamic address for error.c, not a static one */
 	char			*conf_entry;
 	const char		*copt = NULL;	/* C optimization options */
 
@@ -2575,7 +2577,7 @@ process_command_line (const int argc, char **argv)
 
 		case '?':
 			/* Unknown option or ambiguous */
-			cobc_early_exit (1);
+			cobc_early_exit (EXIT_FAILURE);
 
 		case 'h':
 			/* --help */
@@ -2603,7 +2605,7 @@ process_command_line (const int argc, char **argv)
 				cobc_buffer = NULL;
 #endif
 			}
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		case 'V':
 			/* --version */
@@ -2633,12 +2635,12 @@ process_command_line (const int argc, char **argv)
 				cobc_buffer = NULL;
 #endif
 			}
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		case 'i':
 			/* --info */
 			cobc_print_info ();
-			cobc_early_exit (0);
+			cobc_early_exit (EXIT_SUCCESS);
 
 		/*
 			The following list options are postponed until
@@ -2746,7 +2748,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit for configuration errors resulting from -std/-conf/default.conf */
 	if (conf_ret != 0) {
-		cobc_early_exit (1);
+		cobc_early_exit (EXIT_FAILURE);
 	}
 
 	cob_optind = 1;
@@ -3118,7 +3120,7 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 'e':
-			/* -e <xx> : Add an extension suffix */
+			/* -ext <xx> : Add an extension suffix */
 			if (strlen (cob_optarg) > 15U) {
 				cobc_err_exit (COBC_INV_PAR, "--ext");
 			}
@@ -3339,7 +3341,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit for configuration errors resulting from -f<conf-tag>[=<value>] */
 	if (conf_ret != 0) {
-		cobc_early_exit (1);
+		cobc_early_exit (EXIT_FAILURE);
 	}
 
 	/* handling of list options */
@@ -3361,7 +3363,7 @@ process_command_line (const int argc, char **argv)
 
 	/* Exit if list options were specified */
 	if (exit_option) {
-		cobc_early_exit (0);
+		cobc_early_exit (EXIT_SUCCESS);
 	}
 
 	/* Exit on missing options */
@@ -7401,7 +7403,9 @@ process_module_direct (struct filename *fn)
 	if (output_name) {
 		name = output_name_buff;
 		strcpy (name, output_name);
-#if	defined(_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#if	defined (_MSC_VER) \
+ || defined (__WATCOMC__) || defined (__BORLANDC__) \
+ || defined (__OS400__)
 		file_stripext (name);
 #else
 		if (strchr (output_name, '.') == NULL) {
@@ -7410,7 +7414,9 @@ process_module_direct (struct filename *fn)
 #endif
 	} else {
 		name = file_basename (fn->source, NULL);
-#if	!defined(_MSC_VER) && !defined(__OS400__) && !defined(__WATCOMC__) && !defined(__BORLANDC__)
+#if	!defined (_MSC_VER) \
+ && !defined (__WATCOMC__) && !defined (__BORLANDC__) \
+ && !defined (__OS400__)
 		strcat (name, "." COB_MODULE_EXT);
 #endif
 	}
@@ -7515,7 +7521,9 @@ process_module (struct filename *fn)
 	if (output_name) {
 		name = output_name_buff;
 		strcpy (name, output_name);
-#if	defined(_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#if	defined (_MSC_VER) \
+ || defined (__WATCOMC__) || defined (__BORLANDC__) \
+ || defined (__OS400__)
 		file_stripext (name);
 #else
 		if (strchr (output_name, '.') == NULL) {
@@ -7524,7 +7532,9 @@ process_module (struct filename *fn)
 #endif
 	} else {
 		name = file_basename (fn->source, NULL);
-#if	!defined(_MSC_VER) && !defined(__OS400__) && !defined(__WATCOMC__) &&! defined(__BORLANDC__)
+#if	!defined (_MSC_VER) \
+ && !defined (__WATCOMC__) && !defined (__BORLANDC__) \
+ && !defined (__OS400__)
 		strcat (name, "." COB_MODULE_EXT);
 #endif
 	}
@@ -7625,7 +7635,9 @@ process_library (struct filename *l)
 	if (output_name) {
 		name = output_name_buff;
 		strcpy (name, output_name);
-#if	defined(_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#if	defined (_MSC_VER) \
+ || defined (__WATCOMC__) || defined (__BORLANDC__) \
+ || defined (__OS400__)
 		file_stripext (name);
 #else
 		if (strchr (output_name, '.') == NULL) {
@@ -7634,7 +7646,9 @@ process_library (struct filename *l)
 #endif
 	} else {
 		name = file_basename (l->source, NULL);
-#if	!defined(_MSC_VER) && !defined(__OS400__) && !defined(__WATCOMC__) && !defined(__BORLANDC__)
+#if	!defined (_MSC_VER) \
+ && !defined (__WATCOMC__) && !defined (__BORLANDC__) \
+ && !defined (__OS400__)
 		strcat (name, "." COB_MODULE_EXT);
 #endif
 	}
@@ -7715,7 +7729,7 @@ process_link (struct filename *l)
 {
 	struct filename	*f;
 	const char		*name;
-#if defined(_MSC_VER) || defined (COB_STRIP_CMD)
+#if defined(_WIN32) || defined(__CYGWIN__) || defined (COB_STRIP_CMD)
 	const char		*exe_name;
 #endif
 	size_t		bufflen;
@@ -7743,7 +7757,9 @@ process_link (struct filename *l)
 	}
 
 	if (output_name) {
-#if	defined(_MSC_VER) || defined(__OS400__) || defined(__WATCOMC__) || defined(__BORLANDC__)
+#if	defined (_WIN32)      || defined (__CYGWIN__) \
+ || defined (__WATCOMC__) || defined (__BORLANDC__) \
+ || defined (__OS400__)
 		name = cobc_main_strdup (output_name);
 		file_stripext ((char *)name);
 #else
@@ -7756,8 +7772,11 @@ process_link (struct filename *l)
 			name = file_basename (l->source, NULL);
 		}
 	}
-#ifdef	_MSC_VER
+#if	defined (_WIN32) || defined (__CYGWIN__)
 	exe_name = cobc_stradd_dup (name, COB_EXE_EXT);
+#ifndef _MSC_VER
+	name = exe_name;
+#endif
 #endif
 
 	size = strlen (name);
@@ -8151,8 +8170,8 @@ process_file (struct filename *fn, int status)
 		set_listing_header_code ();
 	}
 
-	if (cb_compile_level >= CB_LEVEL_PREPROCESS &&
-	    fn->need_preprocess) {
+	if (cb_compile_level >= CB_LEVEL_PREPROCESS
+	 && fn->need_preprocess) {
 		/* Preprocess */
 		fn->has_error = preprocess (fn);
 		status |= fn->has_error;
@@ -8282,8 +8301,9 @@ main (int argc, char **argv)
 		cobc_flag_library = 0;
 	}
 
-	if (output_name && cb_compile_level < CB_LEVEL_LIBRARY &&
-	    (argc - iargs) > 1) {
+	if (output_name
+	 && cb_compile_level < CB_LEVEL_LIBRARY
+	 && (argc - iargs) > 1) {
 		cobc_err_exit (_("%s option invalid in this combination"), "-o");
 	}
 

@@ -1,4 +1,23 @@
 
+2020-10-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac (--enable-hardening): new option to enable or disable
+	  GNU C's hardening options or leave as-is (previous versions effectively
+	  used --disable-hardening)
+	* configure.ac: "common libs" are now also used for local cJSON check
+	  (needs math lib on some environments, as libcob does)
+	* configure.ac: check for declaration of fmemopen
+
+2020-10-01  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac (COB_CFLAGS): more cleanup of debugging options from CFLAGS
+	  when creating COB_CFLAGS
+
+2020-10-01  Bob Dubner <rdubner@symas.com>
+
+	* configure.ac (COB_CFLAGS): remove "-Wp,-D_FORTIFY_SOURCE=.'" from CFLAGS
+	  when creating COB_CFLAGS
+
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: replaced --with-cjson and --with-json-c by

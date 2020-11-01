@@ -1077,13 +1077,43 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 	return 0;
 }
 
+static const char *
+ppcopy_try_open (const char *dir, const char *name)
+{
+	struct cb_text_list	*el = cb_extension_list;
+	const char		*test_next = "";
+
+	for (;;) {
+		if (dir) {
+			snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%c%s%s",
+				dir, SLASH_CHAR, name, test_next);
+		} else {
+			snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%s",
+				name, test_next);
+		}
+		plexbuff2[COB_SMALL_MAX] = 0;
+#if 0	/* TODO: output in (very?) verbose mode */
+		printf ("checking COPY file: %s\n", plexbuff2);
+#endif
+		if (access (plexbuff2, R_OK) == 0) {
+			return plexbuff2;
+		}
+		if (!el) {
+			break;
+		}
+		test_next = el->text;
+		el = el->next;
+	}
+	return NULL;
+}
+
 int
 ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 {
 	struct cb_text_list	*il;
-	struct cb_text_list	*el;
 	int ret;
 	const char		*s;
+	const char		*filename;
 
 	if (cb_current_file) {
 		cb_current_file->copy_line = cb_source_line;
@@ -1099,41 +1129,32 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 	}
 
 	/* Find the file */
-	if (access (s, R_OK) == 0) {
-		ret = ppopen (s, replace_list);
+
+	/* try name as is + extensions ... */
+	filename = ppcopy_try_open (NULL, s);
+	/* ... if not found, try in copybook directories  */
+	if (!filename
+	 && *s != SLASH_CHAR
+#if defined (_WIN32) || defined (__DJGPP__)
+	 && *s != '/' && *(s + 1) != ':'
+#else
+#endif
+	) {
+		for (il = cb_include_list; il; il = il->next) {
+			filename = ppcopy_try_open (il->text, s);
+			if (filename) {
+				break;
+			}
+		}
+	}
+	
+	if (filename) {
+		ret = ppopen (filename, replace_list);
 		if (ret == 0) return 0;	/* LCOV_EXCL_BR_LINE */
 		goto err_handling;	/* LCOV_EXCL_LINE */
 	}
 
-	for (el = cb_extension_list; el; el = el->next) {
-		snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%s", s, el->text);
-		plexbuff2[COB_SMALL_MAX] = 0;
-		if (access (plexbuff2, R_OK) == 0) {
-			ret = ppopen (plexbuff2, replace_list);
-			if (ret == 0) return 0;	/* LCOV_EXCL_BR_LINE */
-			goto err_handling;	/* LCOV_EXCL_LINE */
-		}
-	}
-#if defined (_WIN32) || defined (__DJGPP__)
-	if (*s != SLASH_CHAR && *s != '/' && *(s + 1) != ':') {
-#else
-	if (*s != SLASH_CHAR) {
-#endif
-		for (il = cb_include_list; il; il = il->next) {
-			for (el = cb_extension_list; el; el = el->next) {
-				snprintf (plexbuff2, (size_t)COB_SMALL_MAX,
-					  "%s%c%s%s", il->text, SLASH_CHAR, name, el->text);
-				plexbuff2[COB_SMALL_MAX] = 0;
-				if (access (plexbuff2, R_OK) == 0) {
-					ret = ppopen (plexbuff2, replace_list);
-					if (ret == 0) return 0;	/* LCOV_EXCL_BR_LINE */
-					goto err_handling;	/* LCOV_EXCL_LINE */
-				}
-			}
-		}
-	}
-
-	/* ensure to have original errno, not the one from another file */
+	/* ensure to have errno from name as specified, not rom another file */
 	(void)access (s, R_OK);
 	/* pass file error as we have no more places to check */
 	cb_error ("%s: %s", s, cb_get_strerror ());

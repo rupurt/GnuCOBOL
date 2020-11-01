@@ -686,11 +686,11 @@ cb_config_entry (char *buff, const char *fname, const int line)
 
 	case CB_ANY:
 		if (strcmp (name, "assign-clause") == 0) {
-		        if ((strcmp (val, "dynamic") == 0)
+			if ((strcmp (val, "dynamic") == 0)
 			    || (strcmp (val, "mf") == 0)) {
 				cb_assign_type_default = CB_ASSIGN_VARIABLE_DEFAULT;
 			} else if ((strcmp (val, "external") == 0)
-				   || (strcmp (val, "ibm") == 0)) {
+			       || (strcmp (val, "ibm") == 0)) {
 				cb_assign_type_default = CB_ASSIGN_EXT_FILE_NAME_REQUIRED;
 			} else {
 				invalid_value (fname, line, name, val, "dynamic, external, mf, ibm", 0, 0);

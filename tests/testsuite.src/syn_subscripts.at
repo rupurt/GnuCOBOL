@@ -1,4 +1,4 @@
-## Copyright (C) 2003-2012, 2014 Free Software Foundation, Inc.
+## Copyright (C) 2003-2012, 2014, 2020 Free Software Foundation, Inc.
 ## Written by Keisuke Nishida, Roger While, Simon Sobisch
 ## 
 ## This file is part of GnuCOBOL.
@@ -39,7 +39,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:10: error: 'I' is not an integer value
 prog.cob:12: error: 'I' is not a numeric value
 ])
@@ -78,11 +78,18 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:10: error: subscript of 'X' out of bounds: 0
 prog.cob:16: error: subscript of 'X' out of bounds: 3
 prog.cob:18: error: subscript of 'Y' out of bounds: 0
 prog.cob:24: error: subscript of 'Y' out of bounds: 4
+])
+
+AT_CHECK([$COMPILE_ONLY -frelax-syntax-checks prog.cob], [0], [],
+[prog.cob:10: warning: subscript of 'X' out of bounds: 0
+prog.cob:16: warning: subscript of 'X' out of bounds: 3
+prog.cob:18: warning: subscript of 'Y' out of bounds: 0
+prog.cob:24: warning: subscript of 'Y' out of bounds: 4
 ])
 
 AT_CLEANUP
@@ -105,7 +112,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:10: error: subscript of 'X' out of bounds: 0
 prog.cob:11: error: subscript of 'X' out of bounds: 7
 ])
@@ -133,7 +140,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], ,
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:9: error: 'G' cannot be subscripted
 prog.cob:11: error: 'X' cannot be subscripted
 ])
