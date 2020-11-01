@@ -1,4 +1,4 @@
-:: Copyright (C) 2014-2019 Free Software Foundation, Inc.
+:: Copyright (C) 2014-2020 Free Software Foundation, Inc.
 :: Written by Simon Sobisch, Edward Hart
 ::
 :: This file is part of GnuCOBOL.
@@ -142,21 +142,6 @@ if exist "%VS90COMNTOOLS%vsvars64.bat" (
 )
 if exist "%VS90COMNTOOLS%vcvarsqueryregistry.bat" (
    call "%VS90COMNTOOLS%vcvarsqueryregistry.bat"
-)
-if %errorlevel% equ 0 (
-   if exist "%VCINSTALLDIR%vcvarsall.bat" (
-       call "%VCINSTALLDIR%vcvarsall.bat" %arch%
-       goto :gc
-   )
-)
-
-:: Visual Studio 2005
-if exist "%VS80COMNTOOLS%vsvars64.bat" (
-   call "%VS80COMNTOOLS%vsvars64.bat"
-   goto :gc
-)
-if exist "%VS80COMNTOOLS%vcvarsqueryregistry.bat" (
-   call "%VS80COMNTOOLS%vcvarsqueryregistry.bat"
 )
 if %errorlevel% equ 0 (
    if exist "%VCINSTALLDIR%vcvarsall.bat" (

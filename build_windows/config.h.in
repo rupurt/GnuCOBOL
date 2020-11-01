@@ -358,9 +358,9 @@
 
 /* libraries passed to linker by cobc */
 #ifndef __ORANGEC__
-#define COB_LIBS         "libcob.lib"
+#define COB_LIBS         "libcob-5.lib"
 #else
-#define COB_LIBS         "libcob.l"
+#define COB_LIBS         "libcob-5.l"
 #endif
 
 

@@ -1,4 +1,4 @@
-:: Copyright (C) 2014-2019 Free Software Foundation, Inc.
+:: Copyright (C) 2014-2020 Free Software Foundation, Inc.
 :: Written by Simon Sobisch
 ::
 :: This file is part of GnuCOBOL.
@@ -98,11 +98,6 @@ if exist "%VS100COMNTOOLS%vsvars32.bat" (
 :: Visual Studio 2008
 if exist "%VS90COMNTOOLS%vsvars32.bat" (
    call "%VS90COMNTOOLS%vsvars32.bat"
-   goto :gc
-)
-:: Visual Studio 2005
-if exist "%VS80COMNTOOLS%vsvars32.bat" (
-   call "%VS80COMNTOOLS%vsvars32.bat"
    goto :gc
 )
 
