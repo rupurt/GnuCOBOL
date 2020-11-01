@@ -200,7 +200,6 @@
     <ClInclude Include="..\..\libcob\fileio.h" />
     <ClInclude Include="..\..\libcob\sysdefines.h" />
     <ClInclude Include="..\config.h" />
-    <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob\cobgetopt.h" />
     <ClInclude Include="..\..\libcob\coblocal.h" />
     <ClInclude Include="..\..\libcob\common.h" />

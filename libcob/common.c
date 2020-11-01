@@ -19,7 +19,6 @@
 */
 
 #include <config.h>
-#include <defaults.h>
 #include <tarstamp.h>
 
 #include <stdio.h>
@@ -6973,7 +6972,7 @@ cob_runtime_hint (const char *fmt, ...)
 	va_list args;
 
 	/* Prefix */
-	fprintf (stderr, "\t");
+	fprintf (stderr, "%s", _("note: "));
 
 	/* Body */
 	va_start (args, fmt);
@@ -7466,8 +7465,8 @@ get_screenio_and_mouse_info (char *version_buffer, size_t size, const int verbos
 	{
 		const int	chtype_val = (int)sizeof (chtype) * 8;
 		char	chtype_def[10] = { '\0' };
-		char	wide_def[5] = {'\0'};
-		char	utf8_def[5] = {'\0'};
+		char	wide_def[6] = {'\0'};
+		char	utf8_def[6] = {'\0'};
 		const char	*match;
 		if (chtype_val != opt1) {
 			match = "!";
@@ -7480,13 +7479,13 @@ get_screenio_and_mouse_info (char *version_buffer, size_t size, const int verbos
 		} else {
 			match = "";
 		}
-		snprintf (wide_def, 4, "%d[%d%s]", wide, opt2, match);
+		snprintf (wide_def, 5, "%d[%d%s]", wide, opt2, match);
 		if (wide != opt2) {
 			match = "!";
 		} else {
 			match = "";
 		}
-		snprintf (utf8_def, 4, "%d[%d%s]", utf8, opt3, match);
+		snprintf (utf8_def, 5, "%d[%d%s]", utf8, opt3, match);
 		snprintf (version_buffer, size, "%s (CHTYPE=%s, WIDE=%s, UTF8=%s)",
 			buff, chtype_def, wide_def, utf8_def);
 	}
@@ -7521,28 +7520,24 @@ static void
 get_math_info (char *version_buffer, size_t size, const int verbose)
 {
 	int	major, minor, patch;
-#if defined (mpir_version)
 	size_t	curr_size;
-#endif
 	COB_UNUSED (verbose);
 
 	memset (version_buffer, 0, size--);
 	major = 0, minor = 0, patch = 0;
 	(void)sscanf (gmp_version, "%d.%d.%d", &major, &minor, &patch);
 	if (major == __GNU_MP_VERSION && minor == __GNU_MP_VERSION_MINOR) {
-		snprintf (version_buffer, size, _("%s, version %d.%d.%d"), "GMP", major, minor, patch);
+		curr_size = snprintf (version_buffer, size, _("%s, version %d.%d.%d"), "GMP", major, minor, patch);
 	} else {
-		snprintf (version_buffer, size, _("%s, version %d.%d.%d (compiled with %d.%d)"),
+		curr_size = snprintf (version_buffer, size, _("%s, version %d.%d.%d (compiled with %d.%d)"),
 			"GMP", major, minor, patch, __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR);
 	}
 #if defined (mpir_version)
 	major = 0, minor = 0, patch = 0;
 	(void)sscanf (mpir_version, "%d.%d.%d", &major, &minor, &patch);
-	curr_size = strlen (version_buffer);
 	{
 		const char *deli = " - ";
-		snprintf (version_buffer + curr_size, size - curr_size, "%s", deli);
-		curr_size += strlen (deli);
+		curr_size += snprintf (version_buffer + curr_size, size - curr_size, "%s", deli);
 	}
 
 	if (major == __MPIR_VERSION && minor == __MPIR_VERSION_MINOR) {
@@ -7554,16 +7549,80 @@ get_math_info (char *version_buffer, size_t size, const int verbose)
 			_("%s, version %d.%d.%d (compiled with %d.%d)"),
 			"MPIR", major, minor, patch, __MPIR_VERSION, __MPIR_VERSION_MINOR);
 	}
+#else
+	COB_UNUSED (curr_size);
 #endif
 }
 
+/* internal library version as string,
+   note: the patchlevel may differ from the package one */
+const char* libcob_version () {
 
-void
-print_version (void)
+/* FIXME: replace this define by a general one (COB_TREE_DEBUG) _was_ for debugging
+          the parse tree only ... */
+#if defined (COB_TREE_DEBUG) || defined (_DEBUG)
+	{
+		int	major, minor;
+		major = 0, minor = 0;
+		(void)sscanf (PACKAGE_VERSION, "%d.%d", &major, &minor);
+		/* LCOV_EXCL_START */
+		if (major != __LIBCOB_VERSION || minor != __LIBCOB_VERSION_MINOR) {
+			const char* version = CB_XSTRINGIFY (__LIBCOB_VERSION) "."
+				CB_XSTRINGIFY (__LIBCOB_VERSION_MINOR);
+			cob_runtime_error (_("version mismatch"));
+			cob_runtime_hint (_("%s has version %s.%d"), "libcob internally",
+						version, __LIBCOB_VERSION_PATCHLEVEL);
+			cob_runtime_hint (_("%s has version %s.%d"), "libcob package",
+						PACKAGE_VERSION, PATCH_LEVEL);
+			cob_stop_run (1);
+		}
+		/* LCOV_EXCL_STOP */
+		{
+			int check, patch;
+			patch = 0;
+			check = set_libcob_version (&major, &minor, &patch);
+			/* LCOV_EXCL_START */
+			if (check != 0 && check != 3) {
+				cob_runtime_error (_("version mismatch"));
+				/* untranslated as it is very unlikely to happen */
+				cob_runtime_hint ("internal version check differs at %d\n", check);
+				cob_stop_run (1);
+			}
+			/* LCOV_EXCL_STOP */
+		}
+	}
+#endif
+	return CB_XSTRINGIFY (__LIBCOB_VERSION) "."
+		CB_XSTRINGIFY (__LIBCOB_VERSION_MINOR) "."
+		CB_XSTRINGIFY (__LIBCOB_VERSION_PATCHLEVEL);
+}
+
+/* internal library version set/compare,
+   if 'mayor' is not 0 on entry compares against the given
+   values, returns the parameter that is not matching
+   given parameters will be set to the internal values on exit
+   note: the patchlevel may differ from the package one */
+int set_libcob_version (int *mayor, int *minor, int *patch) {
+	int ret = 0;
+	if (*mayor != 0) {
+		if (*mayor != __LIBCOB_VERSION) {
+			ret = 1;
+		} else if (*minor != __LIBCOB_VERSION_MINOR) {
+			ret = 2;
+		} else if (*patch != __LIBCOB_VERSION_PATCHLEVEL) {
+			ret = 3;
+		}
+	}
+	*mayor = __LIBCOB_VERSION;
+	*minor = __LIBCOB_VERSION_MINOR;
+	*patch = __LIBCOB_VERSION_PATCHLEVEL;
+	return ret;
+}
+
+static void set_cob_build_stamp (char *cob_build_stamp)
 {
-	char	cob_build_stamp[COB_MINI_BUFF];
-	char	month[64];
 	int		status, day, year;
+	char	month[64];
 
 	/* Set up build time stamp */
 	memset (cob_build_stamp, 0, (size_t)COB_MINI_BUFF);
@@ -7573,11 +7632,95 @@ print_version (void)
 	status = sscanf (__DATE__, "%s %d %d", month, &day, &year);
 	if (status == 3) {
 		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
-			  "%s %2.2d %4.4d %s", month, day, year, __TIME__);
+			"%s %2.2d %4.4d %s", month, day, year, __TIME__);
 	} else {
 		snprintf (cob_build_stamp, (size_t)COB_MINI_MAX,
-			  "%s %s", __DATE__, __TIME__);
+			"%s %s", __DATE__, __TIME__);
 	}
+}
+
+/* provides a two line output for GnuCOBOL + C compiler and used libraries */
+void
+print_version_summary (void)
+{
+	char	cob_build_stamp[COB_MINI_BUFF];
+
+	set_cob_build_stamp (cob_build_stamp);
+	
+	printf ("%s %s (%s), ",
+		PACKAGE_NAME, libcob_version(), cob_build_stamp);
+
+	/* note: some compilers use a very long identifier */
+	printf ("%s\n", GC_C_VERSION_PRF GC_C_VERSION);
+
+	printf ("%s %d.%d.%d",
+#ifdef __MPIR_VERSION
+		"MPIR", __MPIR_VERSION, __MPIR_VERSION_MINOR, __MPIR_VERSION_PATCHLEVEL
+#else
+		"GMP", __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL
+#endif
+	);
+
+#if defined (LIBXML_VERSION)
+	printf (", libxml2 %d.%d.%d",
+		LIBXML_VERSION / 10000,
+		(LIBXML_VERSION - (int)(LIBXML_VERSION / 10000) * 10000) / 100,
+		LIBXML_VERSION % 100);
+#endif
+
+#if defined (CJSON_VERSION_MAJOR)
+	printf (", cJSON %d.%d.%d",
+		CJSON_VERSION_MAJOR, CJSON_VERSION_MINOR, CJSON_VERSION_PATCH);
+#endif
+#if defined (JSON_C_MAJOR_VERSION)
+	printf (", JSON-c %d.%d.%d",
+		JSON_C_MAJOR_VERSION, JSON_C_MINOR_VERSION, JSON_C_MICRO_VERSION);
+#endif
+#if defined (PDC_VER_MAJOR)
+	printf (", %s %d.%d",
+#ifdef PDC_VER_YEAR	/* still the correct distinction in 2020 */
+		"PDCursesMod",
+#else
+		"PDCurses",
+#endif
+		PDC_VER_MAJOR, PDC_VER_MINOR);
+#ifdef PDC_VER_CHANGE
+	printf (".%d", PDC_VER_CHANGE);
+#endif
+#endif
+#if defined (NCURSES_VERSION_MAJOR)
+	printf (", %s %d.%d.%d",
+#ifdef NCURSES_WIDECHAR
+		"ncursesw",
+#else
+		"ncurses",
+#endif
+		NCURSES_VERSION_MAJOR, NCURSES_VERSION_MINOR, NCURSES_VERSION_PATCH);
+#endif
+
+#if defined	(WITH_DB)
+	printf (", BDB %d.%d.%d",
+		DB_VERSION_MAJOR, DB_VERSION_MINOR, DB_VERSION_PATCH);
+#endif
+#if defined	(WITH_CISAM)
+	printf (", C-ISAM");
+#endif
+#if defined	(WITH_DISAM)
+	printf (", D-ISAM");
+#endif
+#if defined	(WITH_VBISAM)
+	printf (", VB-ISAM");
+#endif
+	putchar ('\n');
+
+}
+
+void
+print_version (void)
+{
+	char	cob_build_stamp[COB_MINI_BUFF];
+
+	set_cob_build_stamp (cob_build_stamp);
 
 	printf ("libcob (%s) %s.%d\n",
 		PACKAGE_NAME, PACKAGE_VERSION, PATCH_LEVEL);
@@ -7628,8 +7771,7 @@ print_info_detailed (const int verbose)
 	var_print (_("build environment"), 	COB_BLD_BUILD, "", 0);
 	var_print ("CC", COB_BLD_CC, "", 0);
 	/* Note: newline because most compilers define a long version string (> 30 characters) */
-	snprintf (buff, 55, "%s%s", GC_C_VERSION_PRF, GC_C_VERSION);
-	var_print ("C version", buff, "", 0);
+	var_print (_("C version"), GC_C_VERSION_PRF GC_C_VERSION, "", 0);
 	var_print ("CPPFLAGS", COB_BLD_CPPFLAGS, "", 0);
 	var_print ("CFLAGS", COB_BLD_CFLAGS, "", 0);
 	var_print ("LD", COB_BLD_LD, "", 0);
@@ -7833,6 +7975,9 @@ print_runtime_conf ()
 	char	value[COB_MEDIUM_BUFF], orgvalue[COB_MINI_BUFF];
 
 #ifdef ENABLE_NLS	/* note: translated version of definition values */
+#ifdef	HAVE_SETLOCALE
+	const char	*s;
+#endif
 	setting_group[1] = _("CALL configuration");
 	setting_group[2] = _("File I/O configuration");
 	setting_group[3] = _("Screen I/O configuration");
@@ -7992,14 +8137,18 @@ print_runtime_conf ()
 
 
 #ifdef	HAVE_SETLOCALE
-	printf ("    : %-*s : %s\n", hdlen, "LC_CTYPE", (char *) setlocale (LC_CTYPE, NULL));
-	printf ("    : %-*s : %s\n", hdlen, "LC_NUMERIC", (char *) setlocale (LC_NUMERIC, NULL));
-	printf ("    : %-*s : %s\n", hdlen, "LC_COLLATE", (char *) setlocale (LC_COLLATE, NULL));
-#ifdef	LC_MESSAGES
-	printf ("    : %-*s : %s\n", hdlen, "LC_MESSAGES", (char *) setlocale (LC_MESSAGES, NULL));
+#ifdef	ENABLE_NLS
+	s = getenv ("LOCALEDIR");
+	printf ("    : %-*s : %s\n", hdlen, "LOCALEDIR", s ? s : LOCALEDIR);
 #endif
-	printf ("    : %-*s : %s\n", hdlen, "LC_MONETARY", (char *) setlocale (LC_MONETARY, NULL));
-	printf ("    : %-*s : %s\n", hdlen, "LC_TIME", (char *) setlocale (LC_TIME, NULL));
+	printf ("    : %-*s : %s\n", hdlen, "LC_CTYPE", setlocale (LC_CTYPE, NULL));
+	printf ("    : %-*s : %s\n", hdlen, "LC_NUMERIC", setlocale (LC_NUMERIC, NULL));
+	printf ("    : %-*s : %s\n", hdlen, "LC_COLLATE", setlocale (LC_COLLATE, NULL));
+#ifdef	LC_MESSAGES
+	printf ("    : %-*s : %s\n", hdlen, "LC_MESSAGES", setlocale (LC_MESSAGES, NULL));
+#endif
+	printf ("    : %-*s : %s\n", hdlen, "LC_MONETARY", setlocale (LC_MONETARY, NULL));
+	printf ("    : %-*s : %s\n", hdlen, "LC_TIME", setlocale (LC_TIME, NULL));
 #endif
 }
 

@@ -5189,11 +5189,13 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				/* Begin occurs loop */
 				int		i = f->indexes;
 				i_counters[i] = 1;
+				output_block_open ();
 				output_prefix ();
-				output ("for (i%d = 1; i%d <= ", i, i );
+				output ("const int max_i%d = ", i);
 				output_occurs (f);
-				output ("; i%d++)", i);
+				output (" + 1;");
 				output_newline ();
+				output_line ("for (i%d = 1; i%d < max_i%d; i%d++)", i, i, i, i);
 				output_block_open ();
 				CB_REFERENCE (c)->subs =
 				    CB_BUILD_CHAIN (cb_i[i], CB_REFERENCE (c)->subs);
@@ -5208,6 +5210,7 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 			if (f->flag_occurs) {
 				/* Close loop */
 				CB_REFERENCE (c)->subs = CB_CHAIN (CB_REFERENCE (c)->subs);
+				output_block_close ();
 				output_block_close ();
 			}
 		}

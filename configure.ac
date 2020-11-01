@@ -96,6 +96,7 @@ AH_TEMPLATE([WITH_JSON_C], [Use JSON-C library as JSON handler])
 
 AH_TEMPLATE([COB_EXPORT_DYN], [Compile/link option for exporting symbols])
 AH_TEMPLATE([COB_PIC_FLAGS], [Compile/link option for PIC code])
+AH_TEMPLATE([COB_DEBUG_FLAGS], [Compile/link option for debugging])
 AH_TEMPLATE([COB_SHARED_OPT], [Compile/link option for shared code])
 AH_TEMPLATE([COB_STRIP_CMD], [Strip command])
 AH_TEMPLATE([USE_LIBDL], [Use system dynamic loader])
@@ -263,6 +264,7 @@ curr_libs="$LIBS"
 enable_cflags_setting=no
 AC_MSG_CHECKING([whether CFLAGS -O can be modified])
 # Enable setting if the user has not specified the optimisation in CFLAGS.
+# Checked before AC_PROG_CC and default flags are applied.
 echo "$CFLAGS" | grep "\-O.*\( \|$\)" 1>/dev/null 2>/dev/null
 if test $? != 0; then
 	enable_cflags_setting=yes
@@ -672,7 +674,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		return 0;
 	}
 	]])],
-	[COB_GMP_LIB=`./conftest$ac_exeext x`],
+	[COB_GMP_LIB=$(./conftest$ac_exeext x)],
 	[AC_MSG_ERROR([Unable to extract GMP version information from gmp_version])],
 	[AC_MSG_WARN([matching GMP version assumed])]
 	 COB_GMP_LIB="cross")
@@ -696,7 +698,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 		return 0;
 	}
 	]])],
-	[COB_GMP_HEADER=`./conftest$ac_exeext x`],
+	[COB_GMP_HEADER=$(./conftest$ac_exeext x)],
 	[AC_MSG_ERROR([Unable to extract GMP version information from header])],
 	[AC_MSG_WARN([cannot run test program while cross-compiling])
 	 COB_GMP_HEADER="cross-compilation - assumed"])
@@ -734,10 +736,10 @@ AS_IF([test "$with_xml2" = "yes" -o "$with_xml2" = "check"], [
 	  AC_CHECK_PROG(xml2_config_found, xml2-config, "yes")
 	  if test "$xml2_config_found" = "yes"; then
 	    if test -z "${XML2_CFLAGS+x}"; then
-	      XML2_CFLAGS="`xml2-config --cflags`"
+	      XML2_CFLAGS="$(xml2-config --cflags)"
 	    fi
 	    if test -z "${XML2_LIBS+x}"; then
-	      XML2_LIBS="`xml2-config --libs`"
+	      XML2_LIBS="$(xml2-config --libs)"
 	    fi
 	  fi
 	fi])
@@ -828,8 +830,12 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	  [AC_MSG_CHECKING([if linking of ./lib/cJSON.c works])
 	   CPPFLAGS="$curr_cppflags -I./lib"
 	   LIBS="$LIBS $COMMON_LIBS"
-	   AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
-	    [[cJSON_CreateNull ();]])],
+	   AC_LINK_IFELSE([
+		AC_LANG_PROGRAM([[#include "cJSON.c"]],
+	                   [[#if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+                        	#error Needs at least cJSON 1.3.0
+					     #endif
+						 cJSON_CreateNull ();]])],
 	   [AC_MSG_RESULT([yes])
 	    AC_DEFINE([WITH_CJSON], [1])
 	    with_cjson_local="yes (in ./lib)"],
@@ -842,8 +848,12 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 	    [AC_MSG_CHECKING([if linking of $srcdir/lib/cJSON.c works])
 	     CPPFLAGS="$curr_cppflags -I$srcdir/lib"
 	     LIBS="$LIBS $COMMON_LIBS"
-	     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "cJSON.c"]],
-	      [[cJSON_CreateNull ();]])],
+	     AC_LINK_IFELSE([
+		  AC_LANG_PROGRAM([[#include "cJSON.c"]],
+	                     [[#if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+                         	  #error Needs at least cJSON 1.3.0
+					       #endif
+						   cJSON_CreateNull ();]])],
 	     [AC_MSG_RESULT([yes])
 	      AC_DEFINE([WITH_CJSON], [1])
 	      with_cjson_local="yes (in $srcdir/lib)"],
@@ -882,6 +892,9 @@ AS_IF([test "$USE_JSON" = "cjson" -o "$USE_JSON" = "local" -o "$USE_JSON" = "che
 			  #include <cjson/cJSON.h>
 			  #elif defined HAVE_CJSON_H
 			  #include <cJSON.h>
+			  #endif
+			  #if (CJSON_VERSION_MAJOR * 100 + CJSON_VERSION_MINOR) < 103
+               	#error Needs at least cJSON 1.3.0
 			  #endif]],
 			  [[cJSON_CreateNull ();]])],
 			  [AC_MSG_RESULT([yes])
@@ -921,7 +934,10 @@ AS_IF([test "$USE_JSON" = "json-c" -o "$USE_JSON" = "check"],  [
 	 AC_MSG_CHECKING([if linking against libjson-c with "$JSON_C_LIBS" works])
 	 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	 [#include <json.h>]],
-	  [[json_c_version ();]])],
+	  [[#if (JSON_C_MAJOR_VERSION * 100 + JSON_C_MINOR_VERSION) < 12
+           	#error Needs at least json-c 0.12
+		#endif
+		json_c_version ();]])],
 	  [AC_MSG_RESULT([yes])
 	   AC_DEFINE([WITH_JSON_C], [1])
 	   USE_JSON=json-c
@@ -1561,8 +1577,8 @@ if test "$with_db" = "yes"; then
 			return 0;
 		}
 		]])],
-		[COB_BDB_HEADER=`./conftest$ac_exeext x`]
-		[COB_BDB_HEADER_STR=`./conftest$ac_exeext x y`],
+		[COB_BDB_HEADER=$(./conftest$ac_exeext x)]
+		[COB_BDB_HEADER_STR=$(./conftest$ac_exeext x y)],
 		[AC_MSG_ERROR([Unable to extract Berkeley DB version information from db.h])],
 		[AC_MSG_WARN([cannot run test program while cross-compiling])
 		 COB_BDB_HEADER="cross"
@@ -1821,16 +1837,6 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[]], [[
 	 fi
 	 AC_MSG_WARN([cannot run test program while cross-compiling])])
 
-#if test "$enable_debug" != "yes" -a "$COB_USES_GCC_NO_ICC" = "yes"; then
-#	curr_cflags="$CFLAGS"
-#	CFLAGS="$CFLAGS -fno-asynchronous-unwind-tables"
-#	AC_MSG_CHECKING([for gcc unwind tables option])
-#	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
-#		[AC_DEFINE([HAVE_UNWIND_OPT], [1]) AC_MSG_RESULT([yes])],
-#		[AC_MSG_RESULT([no])])
-#	CFLAGS="$curr_cflags"
-#fi
-
 # Check gcc wrapv option
 # We likely don't need this and remove it before 3.0 final release
 #if test "$COB_USES_GCC_NO_ICC" = "yes"; then
@@ -1895,39 +1901,73 @@ else
 		COB_MODULE_EXT="dll"
 	else
 		# normal case...
-		COB_MODULE_EXT=`echo "$acl_cv_shlibext" | sed -e 's/dll\.a/dll/'`
+		COB_MODULE_EXT=$(echo "$acl_cv_shlibext" | sed -e 's/dll\.a/dll/')
 	fi
 fi
 COB_OBJECT_EXT="$OBJEXT"
 LIBS="$curr_libs"
-COB_EXPORT_DYN="`eval echo $export_dynamic_flag_spec`"
+COB_EXPORT_DYN="$(eval echo $export_dynamic_flag_spec)"
 # FIXME: lt_prog_compiler_pic is not always correct, for example with occ
-COB_PIC_FLAGS=`echo "$lt_prog_compiler_pic" | sed -e 's/^ //'`
+COB_PIC_FLAGS=$(echo "$lt_prog_compiler_pic" | sed -e 's/^ //')
 
 if test "$enable_cflags_setting" = "yes"; then
-
 	if test "$enable_hardening" != "yes"; then
 		# Remove -O2 option added by AC_PROG_CC and add -O0
 		if test "$enable_debug" = "yes" -o "$enable_code_coverage" = "yes"; then
-			CFLAGS=`echo "$CFLAGS" | sed -e 's/ *-O@<:@0-9a-zA-Z@:>@* */ /g' -e 's/ $//' -e 's/^ //'`
+			CFLAGS=$(echo "$CFLAGS" | sed -e 's/ *-O@<:@0-9a-zA-Z@:>@* */ /g' -e 's/ $//' -e 's/^ //')
 			if test "$COB_USES_GCC" = "yes"; then
 				CFLAGS="$CFLAGS -O0"
 			fi
 		fi
 	fi
-
-	# For debugging: add -g3 if using GCC.
-	if test "$enable_debug" = "yes" -a "$COB_USES_GCC" = "yes"; then
-		curr_cflags="$CFLAGS"
-		CFLAGS="$CFLAGS -g3"
-		AC_MSG_CHECKING([for gcc -g3 option])
-		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
-			[AC_MSG_RESULT([yes])],
-			[CFLAGS="$curr_cflags"; AC_MSG_RESULT([no])])
-	fi
 fi
 
 unset enable_cflags_setting
+
+# cobc.c assumed -g for all but _MSC_VER
+COB_DEBUG_FLAGS="-g"
+
+# For debugging: add most expressive debug level if using GCC (compatible)
+curr_cflags="$CFLAGS"
+cob_temp_flags="-ggdb3"
+CFLAGS="$curr_cflags $cob_temp_flags"
+AC_MSG_CHECKING([for debug option $cob_temp_flags])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+	[AC_MSG_RESULT([yes])
+	 COB_DEBUG_FLAGS="$cob_temp_flags"],
+	[AC_MSG_RESULT([no])
+	 cob_temp_flags="-g3"
+	 CFLAGS="$curr_cflags $cob_temp_flags"
+	 AC_MSG_CHECKING([for debug option $cob_temp_flags])
+	 AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+		[AC_MSG_RESULT([yes])
+		 COB_DEBUG_FLAGS="$cob_temp_flags"],
+		[AC_MSG_RESULT([no])])
+	]
+)
+
+cob_temp_flags="-fasynchronous-unwind-tables"
+CFLAGS="$curr_cflags $cob_temp_flags"
+AC_MSG_CHECKING([for debug option $cob_temp_flags])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+	[AC_MSG_RESULT([yes])
+	 COB_DEBUG_FLAGS="$COB_DEBUG_FLAGS $cob_temp_flags"],
+	[AC_MSG_RESULT([no])
+	 cob_temp_flags="-funwind-tables"
+	 CFLAGS="$curr_cflags $cob_temp_flags"
+	 AC_MSG_CHECKING([for debug option $cob_temp_flags])
+	 AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
+		[AC_MSG_RESULT([yes])
+		 COB_DEBUG_FLAGS="$COB_DEBUG_FLAGS $cob_temp_flags"],
+		[AC_MSG_RESULT([no])])
+	]
+)
+
+if test "$enable_debug" = "yes"; then
+	CFLAGS="$curr_cflags $COB_DEBUG_FLAGS"
+else
+	CFLAGS="$curr_cflags"
+fi
 
 if test "$enable_hardening" = "yes"; then
 	AC_MSG_NOTICE([Compile with hardening options])
@@ -1938,7 +1978,7 @@ if test "$enable_hardening" = "yes"; then
 	CPPFLAGS="$CPPFLAGS -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
 
 	curr_cflags="$CFLAGS"
-	cob_temp_flags="-fstack-protector-all"
+	cob_temp_flags="-fstack-protector-strong"
 	CFLAGS="$curr_cflags $cob_temp_flags"
 	AC_MSG_CHECKING([for $cob_temp_flags option])
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int testint;]])],
@@ -2040,7 +2080,7 @@ fi
 cob_temp_flags="$CFLAGS $CPPFLAGS"
 
 if test "$enable_hardening" = no; then
-	cob_temp_flags=`echo x$cob_temp_flags |		\
+	cob_temp_flags=$(echo x$cob_temp_flags |		\
 	 sed -e 's/^x//'				\
  	     -e 's/-Wp,-D_FORTIFY_SOURCE=.//g'		\
  	     -e 's/-D_FORTIFY_SOURCE=.//g'		\
@@ -2048,21 +2088,20 @@ if test "$enable_hardening" = no; then
  	     -e 's/-fstack-protector-strong//g'		\
  	     -e 's/-fstack-protector-all//g'		\
  	     -e 's/-fstack-protector//g'		\
-	     `
+	     )
 fi
 
-cob_temp_flags=`echo x$cob_temp_flags |		\
+cob_temp_flags=$(echo x$cob_temp_flags |		\
 	 sed -e 's/^x//'				\
-	     -e 's/-g[[0-9 ]]//g'				\
-	     -e 's/-g$//'				\
-	     -e 's/-gdb//'				\
+	     -e 's/-g\(db\)\{0,1\}[[0-9 ]]//g'				\
+	     -e 's/-g\(db\)\{0,1\}$//'				\
 	     -e 's/[[+-]]O[[0-9s]]*//g'			\
  	     -e 's/-O//g'				\
  	     -e 's/-funwind-tables//g'			\
  	     -e 's/-fasynchronous-unwind-tables//g'	\
  	     -e 's/  / /g'	\
  	     -e 's/ $//g'	\
-	     `
+	     )
 
 if test "x$cob_temp_flags" != "x"; then
 	COB_CFLAGS="$cob_temp_flags $COB_CFLAGS"
@@ -2091,22 +2130,22 @@ COB_FIX_LIBTOOL=""
 case $host_os in
   mingw*)
 	if test "$prefix" = "NONE"; then
-		COB_CONFIG_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/config"
-		COB_SCHEMA_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/schema"
-		COB_COPY_DIR="`cd /usr && pwd -W`/local/share/$PACKAGE_TARNAME/copy"
+		COB_CONFIG_DIR="$(cd /usr && pwd -W)/local/share/$PACKAGE_TARNAME/config"
+		COB_COPY_DIR="$(cd /usr && pwd -W)/local/share/$PACKAGE_TARNAME/copy"
+		COB_SCHEMA_DIR="$(cd /usr && pwd -W)/local/share/$PACKAGE_TARNAME/schema"
 	fi
 	if test "$COB_USES_GCC" = "yes"; then
 		COB_EXPORT_DYN="-Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--enable-auto-image-base"
 		COB_FIX_LIBTOOL="-Wl,--enable-auto-import"
 	fi
-	COB_FIX_LIB=""
+	#COB_FIX_LIB=""
 	;;
   cygwin*)
 	if test "$COB_USES_GCC" = "yes"; then
 		COB_EXPORT_DYN="-Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--enable-auto-image-base"
 		COB_FIX_LIBTOOL="-Wl,--enable-auto-import"
 	fi
-	COB_FIX_LIB=""
+	#COB_FIX_LIB=""
 	;;
   darwin* | rhapsody*)
 	if test "$COB_USES_GCC" = "yes"; then
@@ -2258,18 +2297,42 @@ AM_CONDITIONAL([COB_MAKE_IX], [test "$COB_HAS_ISAM" != no])
 AM_CONDITIONAL([COB_MAKE_RUN_BINARIES], [test "$cross_compiling" != yes])
 # FIXME: Should be tested as the system may can actually run these (Bash on Windows?)
 
-AC_DEFINE_UNQUOTED([COB_EXPORT_DYN], ["$COB_EXPORT_DYN"])
-AC_DEFINE_UNQUOTED([COB_PIC_FLAGS], ["$COB_PIC_FLAGS"])
-AC_DEFINE_UNQUOTED([COB_SHARED_OPT], ["$COB_SHARED_OPT"])
-AC_DEFINE_UNQUOTED([COB_OBJECT_EXT], ["$COB_OBJECT_EXT"])
-AC_DEFINE_UNQUOTED([COB_MODULE_EXT], ["$COB_MODULE_EXT"])
-AC_DEFINE_UNQUOTED([COB_EXE_EXT], ["$COB_EXE_EXT"])
+AC_DEFINE_UNQUOTED([COB_CC],			["$COB_CC"],		[compiler used by cobc])
+AX_AC_DEFINE_RESOLVED([COB_CFLAGS],		[$COB_CFLAGS],		[compiler flags passed to compiler by cobc])
+AX_AC_DEFINE_RESOLVED([COB_LDFLAGS],	[$COB_LDFLAGS],		[linker flags passed to linker by cobc])
+AX_AC_DEFINE_RESOLVED([COB_LIBS],		[$COB_LIBS],		[libraries passed to linker by cobc])
+AC_DEFINE_UNQUOTED([COB_PIC_FLAGS],		["$COB_PIC_FLAGS"])
+AC_DEFINE_UNQUOTED([COB_DEBUG_FLAGS],	["$COB_DEBUG_FLAGS"])
+AC_DEFINE_UNQUOTED([COB_EXPORT_DYN],	["$COB_EXPORT_DYN"])
+AC_DEFINE_UNQUOTED([COB_SHARED_OPT],	["$COB_SHARED_OPT"])
+AC_DEFINE_UNQUOTED([COB_MODULE_EXT],	["$COB_MODULE_EXT"])
+AC_DEFINE_UNQUOTED([COB_OBJECT_EXT],	["$OBJEXT"])
+AC_DEFINE_UNQUOTED([COB_EXE_EXT],		["$COB_EXE_EXT"])
+AX_AC_DEFINE_RESOLVED([COB_LIBRARY_PATH],	[$COB_LIBRARY_PATH], 	[default search path for extra modules])
 if test "x$striplib" != "x"; then
 	AC_DEFINE_UNQUOTED([COB_STRIP_CMD], ["$striplib"])
 fi
+AX_AC_DEFINE_RESOLVED([COB_CONFIG_DIR],	[$COB_CONFIG_DIR],	[default search path for copybooks])
+AX_AC_DEFINE_RESOLVED([COB_COPY_DIR],	[$COB_COPY_DIR],	[default search path for configuration files])
+AX_AC_DEFINE_RESOLVED([COB_SCHEMA_DIR],	[$COB_SCHEMA_DIR],	[default search path for indexed schema definitions])
+
+#AX_AC_DEFINE_RESOLVED([DATADIR],		[$datarootdir], 	[path for configuration files])
+#AX_AC_DEFINE_RESOLVED([LOCALEDIR],		[$localedir], 		[path for locale-dependent data])
+
+#AC_DEFINE_UNQUOTED([COBC_NAME],	["$(echo cobc    | $SED "$program_transform_name")"], [executable name for compiler])
+AC_DEFINE_UNQUOTED([COBCRUN_NAME],	["$(echo cobcrun | $SED "$program_transform_name")"], [executable name for module runner])
+
+# informational only
+AC_DEFINE_UNQUOTED([COB_BLD_CC],		["$CC"],		[informational: compiler during compilation])
+AC_DEFINE_UNQUOTED([COB_BLD_CFLAGS],	["$CFLAGS"],	[informational: compiler flags during compilation])
+AC_DEFINE_UNQUOTED([COB_BLD_CPPFLAGS],	["$CPPFLAGS"],	[informational: preparser flags during compilation])
+AC_DEFINE_UNQUOTED([COB_BLD_LD],		["$LD"],		[informational: linker during compilation])
+AC_DEFINE_UNQUOTED([COB_BLD_LDFLAGS],	["$LDFLAGS"],	[informational: linker flags during compilation])
+AC_DEFINE_UNQUOTED([COB_BLD_BUILD],		["$build"],		[informational: build environment during compilation])
+
 AC_SUBST([COB_CC])
 AC_SUBST([COB_CFLAGS])
-AC_SUBST([COB_LDFLAGS])
+AC_SUBST([COB_LDFLAGS]) # needed for pre-inst-env
 AC_SUBST([COB_LIBS])
 AC_SUBST([COB_CONFIG_DIR])
 AC_SUBST([COB_SCHEMA_DIR])
@@ -2284,14 +2347,17 @@ AC_SUBST([LIBCOB_CISAM])
 AC_SUBST([LIBCOB_DISAM])
 AC_SUBST([LIBCOB_VBISAM])
 AC_SUBST([LIBCOB_CPPFLAGS])
-AC_SUBST([COB_EXPORT_DYN])
-AC_SUBST([COB_PIC_FLAGS])
-AC_SUBST([COB_SHARED_OPT])
+
+# was used in bin/Makefile.am - seems not to be needed
+#AC_SUBST([COB_EXPORT_DYN])
+
+# used in the testsuite
 COB_BIGENDIAN="$ac_cv_c_bigendian"
 AC_SUBST([COB_BIGENDIAN])
-AC_SUBST([COB_FIX_LIB])
+
+#AC_SUBST([COB_FIX_LIB])
 AC_SUBST([COB_FIX_LIBTOOL])
-AC_SUBST([COB_KEYWORD_INLINE])
+
 AC_SUBST([COB_HAS_ISAM])
 AC_SUBST([COB_HAS_CISAM])
 AC_SUBST([COB_HAS_DISAM])
@@ -2326,12 +2392,13 @@ fi
 AC_MSG_NOTICE([ COB_CC            ${COB_CC}])
 AC_MSG_NOTICE([ COB_CFLAGS        ${COB_CFLAGS}])
 AC_MSG_NOTICE([ COB_LDFLAGS       ${COB_LDFLAGS}])
+AC_MSG_NOTICE([ COB_DEBUG_FLAGS   ${COB_DEBUG_FLAGS}])
 AC_MSG_NOTICE([ COB_LIBS          ${COB_LIBS}])
 AC_MSG_NOTICE([ COB_CONFIG_DIR    ${COB_CONFIG_DIR}])
 AC_MSG_NOTICE([ COB_COPY_DIR      ${COB_COPY_DIR}])
 AC_MSG_NOTICE([ COB_SCHEMA_DIR    ${COB_SCHEMA_DIR}])
 AC_MSG_NOTICE([ COB_LIBRARY_PATH  ${COB_LIBRARY_PATH}])
-AC_MSG_NOTICE([ COB_OBJECT_EXT    ${COB_OBJECT_EXT}])
+AC_MSG_NOTICE([ COB_OBJECT_EXT    ${OBJEXT}])
 AC_MSG_NOTICE([ COB_MODULE_EXT    ${COB_MODULE_EXT}])
 AC_MSG_NOTICE([ COB_EXE_EXT       ${COB_EXE_EXT}])
 AC_MSG_NOTICE([ COB_SHARED_OPT    ${COB_SHARED_OPT}])

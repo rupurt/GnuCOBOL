@@ -852,6 +852,49 @@ AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 
 AT_CLEANUP
 
+
+AT_SETUP([TURN directive])
+AT_KEYWORDS([runmisc BOUND NOBOUND directives])
+
+# not merged yet
+AT_SKIP_IF(true)
+
+# note: we only check here that the TURN directive applies
+#       for more general tests, including command line options
+#       and extension directives, see run_subscript.at, run_refmod.at
+
+AT_DATA([prog.cob], [
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  x VALUE "12345!".
+           03  y PIC X OCCURS 5 TIMES.
+           03  z PIC X.
+       01  idx PIC 99 VALUE 6.
+
+       PROCEDURE DIVISION.
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
+           DISPLAY y (idx) WITH NO ADVANCING
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
+       >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
+           DISPLAY y (idx) WITH NO ADVANCING
+       >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
+           DISPLAY y (idx) WITH NO ADVANCING
+           .
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [!!],
+[libcob: prog.cob:20: error: subscript of 'y' out of bounds: 6
+note: maximum subscript for 'y': 5
+])
+
+AT_CLEANUP
+
+
 ## OCCURS clause
 
 AT_SETUP([Level 01 subscripts])
@@ -1572,7 +1615,7 @@ AT_DATA([prog.cob], [       IDENTIFICATION DIVISION.
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0],
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [COBOL: X is 000001280 and Y is 0000000015
 COBOL: X is 000002560 and Y is 0000000016
 ], [])
@@ -2788,7 +2831,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [ XVAL is 00512;  Length is 2
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [ XVAL is 00512;  Length is 2
  VAL9 is 01024;  Length is 3
  XVAL is 10240;  Length is 2
 XVAL2 is 16706; Length is 2
@@ -6511,11 +6554,11 @@ dump (unsigned char *data)
 AT_CHECK([$COMPILE -std=mf -fno-move-non-numeric-lit-to-numeric-is-zero prog.cob cmod.c], [0], [],
 [prog.cob: in paragraph 'MAIN-1':
 prog.cob:28: warning: numeric value is expected
-prog.cob:6: warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob:6: note: 'MYFLD' defined here as PIC 9(4)
 prog.cob:34: warning: numeric value is expected
-prog.cob:6: warning: 'MYFLD' defined here as PIC 9(4)
+prog.cob:6: note: 'MYFLD' defined here as PIC 9(4)
 prog.cob:52: warning: numeric value is expected
-prog.cob:7: warning: 'BIGFLT' defined here as USAGE FLOAT
+prog.cob:7: note: 'BIGFLT' defined here as USAGE FLOAT
 ])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
@@ -6778,14 +6821,10 @@ CAPI(void *p1, ...)
 }
 ]])
 
-AT_CHECK([cobc -x -std=mf -Wall -debug -fstatic-call prog.cob cmod.c], [0], [], [prog.cob:37: warning: BY CONTENT assumed for alphanumeric item 'NE'
-prog.cob:38: warning: BY CONTENT assumed for alphanumeric item 'NE'
-prog.cob:52: warning: BY CONTENT assumed for alphanumeric item 'CHRX'
-prog.cob:53: warning: BY CONTENT assumed for alphanumeric item 'CHRX'
-prog.cob:57: warning: BY CONTENT assumed for alphanumeric item 'GRPX'
-])
+AT_CHECK([$COMPILE -w -std=mf -fstatic-call prog.cob cmod.c], [0], [], [])
 
-AT_CHECK([./prog], [0], [Line 25: CALL with 1 parameters
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[Line 25: CALL with 1 parameters
      P1: X        BY REFERENCE X(6)        'ABCDEF';
 Line 27: CALL with 2 parameters
      P1: COMP-4   LITERAL      S9(9)       2560;
@@ -7118,8 +7157,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [],
 [prog.cob:10: warning: value size exceeds data size
-prog.cob:10: warning: value is 30000
-prog.cob:7: warning: 'x' defined here as PIC 9(4)
+prog.cob:10: note: value is 30000
+prog.cob:7: note: 'x' defined here as PIC 9(4)
 ])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [x IS ZERO
@@ -7183,20 +7222,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$COMPILE prog.cob], [0], [],
-[prog.cob:11: warning: value size exceeds data size
-prog.cob:11: warning: value size is 4
-prog.cob:7: warning: 'x-left' defined here as PIC X(03)
-prog.cob:11: warning: value size exceeds data size
-prog.cob:11: warning: value size is 4
-prog.cob:8: warning: 'x-right' defined here as PIC X(03)
-prog.cob:21: warning: value size exceeds data size
-prog.cob:21: warning: value size is 4
-prog.cob:7: warning: 'x-left' defined here as PIC X(03)
-prog.cob:31: warning: value size exceeds data size
-prog.cob:31: warning: value size is 4
-prog.cob:8: warning: 'x-right' defined here as PIC X(03)
-])
+AT_CHECK([$COMPILE -Wno-truncate prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CLEANUP
 
@@ -7383,7 +7409,7 @@ AT_DATA([prog.cob], [
                          DBX-RECORD-CODE (REC-NAME-DBX) '.'.
 ])
 
-AT_CHECK([$COMPILE -frelax-syntax-checks prog.cob ], [0], [],
+AT_CHECK([$COMPILE -frelax-syntax-checks prog.cob], [0], [],
 [prog.cob:26: warning: INDEXED should follow ASCENDING/DESCENDING
 ])
 
@@ -7911,7 +7937,7 @@ AT_DATA([prog.cob], [
            MOVE SPACES TO D-RND.
 ])
 
-AT_CHECK([$COBC -x -std=ibm -farithmetic-osvs -w prog.cob ], [0], [], [])
+AT_CHECK([$COBC -x -std=ibm -farithmetic-osvs -w prog.cob], [0], [], [])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [-- TEST COMPUTE WITH ROUNDING --
  AMOUNT:  123.45  PERCENT: 24
@@ -7932,7 +7958,7 @@ Complex  RSLT    IS 188 RSLTv9  IS 188.0
 -- TEST FINISHED --
 ], [])
 
-AT_CHECK([$COBC -x -std=ibm -w -fno-arithmetic-osvs prog.cob ], [0], [], [])
+AT_CHECK([$COBC -x -std=ibm -w -fno-arithmetic-osvs prog.cob], [0], [], [])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [-- TEST COMPUTE WITH ROUNDING --
  AMOUNT:  123.45  PERCENT: 24
@@ -8849,7 +8875,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0],
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [SIZE ERROR, last value = 1.7014118E+38
 ], [])
 
@@ -8908,7 +8934,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 # note: the actual value is not checked as this depends on intermediate rounding
-AT_CHECK([./prog], [0], ignore, [SIZE ERROR raised])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], ignore, [SIZE ERROR raised])
 
 AT_CLEANUP
 
@@ -9064,12 +9090,9 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE prog.cob -w], [0], [],
-[prog.cob: in paragraph 'MAIN-10':
-prog.cob:20: error (ignored): offset must be greater than zero
-])
+AT_CHECK([$COMPILE prog.cob -w], [0], [], [])
 
-AT_CHECK([./prog], [0],
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
 [A: OK VAR-LEN > 16 AND VAR-LEN < 200
 B: OK VAR IS NOT SPACES
 C: OK VAR IS SPACES
@@ -9200,7 +9223,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [1 2 3 4 5 Test Part 1 Completed
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [1 2 3 4 5 Test Part 1 Completed
 1 2 3 4 5 Test Part 2 Completed
 5 4 3 2 1 Test Part 3 Completed
 ], [])
@@ -9232,7 +9255,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [WFLT IS $18,536.23
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [WFLT IS $18,536.23
 COST IS $18,536.23
 ], [])
 
@@ -9260,7 +9283,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [0001
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [0001
 0002
 0003
 0004
@@ -9309,7 +9332,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([cobc -x -std=mf -w prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [Pointer test was good
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [Pointer test was good
 ], [])
 
 AT_CLEANUP
@@ -10206,7 +10229,7 @@ COBCSUB(int y, unsigned char x[15])
 
 AT_CHECK([cobc -x -std=ibm -debug -Wall prog.cob cmod.c], [0], [], [])
 
-AT_CHECK([./prog], [0], [00000001 'Fun and games for you'
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [00000001 'Fun and games for you'
 00000002 'More Fun and games for all'
 00000003 'Fun and games' via SUB2
 00000004 'More Fun and games ....' via SUB2
@@ -10970,9 +10993,9 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=cobol2002 -w prog.cob ], [0], [], [])
+AT_CHECK([cobc -x -std=cobol2002 -w prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [23 tests & 00 failed
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [23 tests & 00 failed
 ], [])
 
 AT_CLEANUP
@@ -11030,10 +11053,12 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=mf prog.cob ], [0], [], [prog.cob:28: warning: subscript missing for 'MY-ELEMENT-1' - defaulting to 1
+AT_CHECK([$COMPILE -std=mf prog.cob], [0], [],
+[prog.cob:28: warning: subscript missing for 'MY-ELEMENT-1' - defaulting to 1
 ])
 
-AT_CHECK([./prog], [0], [MY-LEN       is 240
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[MY-LEN       is 240
 MY-DATA      is 240 and 240
 MY-ELEMENT-1 is 10 and 010
 MY-TABLE     is 12 and 012
@@ -11102,10 +11127,12 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=acu prog.cob ], [0], [], [prog.cob:28: warning: subscript missing for 'MY-ELEMENT-1' - defaulting to 1
+AT_CHECK([$COMPILE -std=acu prog.cob], [0], [],
+[prog.cob:28: warning: subscript missing for 'MY-ELEMENT-1' - defaulting to 1
 ])
 
-AT_CHECK([./prog], [0], [MY-LEN       is 0000000240
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[MY-LEN       is 0000000240
 MY-DATA      is 0000000240 and 240
 MY-ELEMENT-1 is 0000000010 and 010
 MY-TABLE     is 0000000240 and 240
@@ -11721,7 +11748,8 @@ AT_DATA([prog.cob], [
            PERFORM CHECK-IT.
            
            DISPLAY TEST-MODE (TESTMODE) 
-                   TESTCASE " tests with " TESTFAIL " failed".
+                   TESTCASE " tests with " TESTFAIL " failed"
+                   WITH NO ADVANCING.
            STOP RUN RETURNING 0.
 
        CHECK-IT SECTION.
@@ -11762,10 +11790,9 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=ibm -w prog.cob ], [0], [], [])
-
-AT_CHECK([./prog], [0], [IBMCOMP   24 tests with 00 failed
-], [])
+AT_CHECK([$COMPILE -w -std=ibm prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[IBMCOMP   24 tests with 00 failed], [])
 
 AT_CLEANUP
 
@@ -12373,7 +12400,8 @@ AT_DATA([prog.cob], [
            PERFORM CHECK-IT.
            
            DISPLAY TEST-MODE (TESTMODE) 
-                   TESTCASE " tests with " TESTFAIL " failed".
+                   TESTCASE " tests with " TESTFAIL " failed"
+                   WITH NO ADVANCING.
            STOP RUN RETURNING 0.
 
        CHECK-IT SECTION.
@@ -12414,10 +12442,10 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=mf -w -fibmcomp prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE -w -fibmcomp prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [IBMCOMP   24 tests with 00 failed
-], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[IBMCOMP   24 tests with 00 failed], [])
 
 AT_CLEANUP
 
@@ -13025,7 +13053,8 @@ AT_DATA([prog.cob], [
            PERFORM CHECK-IT.
            
            DISPLAY TEST-MODE (TESTMODE) 
-                   TESTCASE " tests with " TESTFAIL " failed".
+                   TESTCASE " tests with " TESTFAIL " failed"
+                   WITH NO ADVANCING.
            STOP RUN RETURNING 0.
 
        CHECK-IT SECTION.
@@ -13066,10 +13095,9 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
-
-AT_CHECK([./prog], [0], [MF        24 tests with 00 failed
-], [])
+AT_CHECK([$COMPILE -w -std=mf prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[MF        24 tests with 00 failed], [])
 
 AT_CLEANUP
 
@@ -13718,12 +13746,14 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=default -w prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE -w prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [DEFAULT   24 tests with 00 failed
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[DEFAULT   24 tests with 00 failed
 ], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([Group Usage 1])
 AT_KEYWORDS([Numeric])
@@ -13753,16 +13783,15 @@ AT_DATA([prog.cob], [
            MOVE "12345678" TO COM3-FLD1 (1:).
            MOVE "12345678" TO COM3-FLD2 (1:).
            MOVE "12345678" TO COM3-FLD3 (1:).
-           DISPLAY TESTRECORD.
+           DISPLAY TESTRECORD WITH NO ADVANCING.
            STOP RUN.
 
            
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
-
-AT_CHECK([./prog], [0], [x12xxx123x123x
-], [])
+AT_CHECK([$COMPILE -w -std=mf prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[x12xxx123x123x], [])
 
 AT_CLEANUP
 
@@ -13801,12 +13830,13 @@ AT_DATA([prog.cob], [
            
 ])
 
-AT_CHECK([cobc -x -std=mf -w -fibmcomp prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE -w -fibmcomp prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [x12xxx1234xx1234x
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [x12xxx1234xx1234x
 ], [])
 
 AT_CLEANUP
+
 
 AT_SETUP([MF COMP-5 noibmcomp])
 AT_KEYWORDS([NOIBMCOMP])
@@ -13829,9 +13859,9 @@ AT_DATA([prog.cob], [
            STOP RUN RETURNING 0.
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [LEN PIC 99 COMP-5 is 1 :
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [LEN PIC 99 COMP-5 is 1 :
 LEN PIC 99 COMP-4 is 1 :
 LEN PIC 9(4) COMP-5 is 2 :
 LEN PIC 9(4) COMP-4 is 2 :
@@ -13861,9 +13891,9 @@ AT_DATA([prog.cob], [
            STOP RUN RETURNING 0.
 ])
 
-AT_CHECK([cobc -x -std=mf -w -fibmcomp prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE -fibmcomp prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [LEN PIC 99 COMP-5 is 2 :
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [LEN PIC 99 COMP-5 is 2 :
 LEN PIC 99 COMP-4 is 2 :
 LEN PIC 9(4) COMP-5 is 2 :
 LEN PIC 9(4) COMP-4 is 2 :
@@ -13897,15 +13927,15 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([cobc -x -std=mf -w prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [2767 vs 32767
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [2767 vs 32767
 5535 vs 65535
 ], [])
 
-AT_CHECK([cobc -x -std=mf -fnotrunc -w prog.cob ], [0], [], [])
+AT_CHECK([$COMPILE -fnotrunc prog.cob], [0], [], [])
 
-AT_CHECK([./prog], [0], [32767 vs 32767
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [32767 vs 32767
 65535 vs 65535
 ], [])
 

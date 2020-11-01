@@ -33,7 +33,6 @@
 				<FILE NAME="..\..\libcob\common.h" TITLE="common.h" CLEAN="0"/>
 				<FILE NAME="..\..\cobc\config.def" TITLE="config.def" CLEAN="0"/>
 				<FILE NAME="..\config.h" TITLE="config.h" CLEAN="0"/>
-				<FILE NAME="..\defaults.h" TITLE="defaults.h" CLEAN="0"/>
 				<FILE NAME="..\..\libcob\exception.def" TITLE="exception.def" CLEAN="0"/>
 				<FILE NAME="..\..\cobc\flag.def" TITLE="flag.def" CLEAN="0"/>
 				<FILE NAME="..\..\libcob.h" TITLE="libcob.h" CLEAN="0"/>

@@ -24,7 +24,6 @@ build_aux/ylwrap eol=lf
 build_windows/ChangeLog.txt eol=crlf
 build_windows/README.txt eol=crlf
 build_windows/config.h.in eol=crlf
-build_windows/defaults.h.in eol=crlf
 build_windows/makebisonflex.bat eol=crlf
 build_windows/makedist.cmd eol=crlf
 build_windows/maketarstamp.ps1 eol=lf
@@ -143,6 +142,7 @@ libcob/libcobdi.c -text
 libcob/libcobvb.c -text
 libcob/sysdefines.h -text
 m4/ax_ac_append_to_file.m4 -text
+m4/ax_ac_define_resolved.m4 -text
 m4/ax_ac_print_to_file.m4 -text
 m4/ax_add_am_macro_static.m4 -text
 m4/ax_am_macros_static.m4 -text
@@ -207,6 +207,7 @@ po/nl.po -text
 po/pt.po -text
 po/quot.sed -text
 po/remove-potcdate.sin -text
+po/sr.po -text
 po/stamp-po -text
 po/sv.po -text
 po/update_linguas.sh eol=lf

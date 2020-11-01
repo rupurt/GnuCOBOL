@@ -193,7 +193,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\config.h" />
-    <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob.h" />
     <ClInclude Include="..\..\tarstamp.h" />
     <ClInclude Include="..\..\libcob\cobgetopt.h" />

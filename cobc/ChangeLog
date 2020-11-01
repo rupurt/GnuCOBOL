@@ -1,10 +1,20 @@
 
+2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_initialize_compound): resolve occurs_max only once
+
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, config.c: defaults.h removed
+	* cobc.c (cobc_getenv, cobc_getenv_path): return leading space
+	  for later error reporting
+	* cobc.c: allow omitting the definition for COB_EXPORT_DYN, COB_SHARED_OPT,
+	  COB_PIC_FLAGS via config.h (mostly for MSVC)
+	* cobc.c (cobc_print_info): extracted common code to cobc_var_and_envvar_print
+	  and additionally check environment var for "empty"
+	* Makefile.am: pass LOCALEDIR via define
+
 2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
-	* pplex.l: extracted (ppcopy_try_open) from (ppcopy) to split file search
-	  from actual processing and removing duplicate code
-	* cobc.c: adjusted handling of output file name (especially with COB_DASH),
-	  fixing errors in MinGW + CYGWIN
-	* cobc.c: use EXIT_SUCCESS and EXIT_FAILURE instead of exit(0/1)
 
 	* codegen.c (output_size): limit variable scope
 	* codegen.c (output_initialize_uniform): limit variable scope and
@@ -20,6 +30,11 @@
 
 	* cobc.c,cobc.h,typeck.c: When -debug -O compile options 
 	   are used then optimize the subscript checks.
+	  as COB_TYPE_NUMERIC_COMP5
+
+2020-10-06  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c: handling new COB_DEBUG_FLAGS
 
 2020-10-02  Ron Norman <rjn@inglenet.com>
 
@@ -43,6 +58,48 @@
 	* cobc.c (cobc_print_info): adjusted version output for JSON and MPIR
 	* typeck.c: adjusted check of defines for JSON
 
+2020-09-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (cobc_xref_link), tree.h: changed cb_xref_elem to a dual-linked
+	  list allowing to insert elements and read backwards (in most cases the
+	  reference numbers increase)
+	  and added a counter to cb_xref
+	* error.c (cb_add_error_to_listing), cobc.h, cobc.c: changed list_error
+	  to a dual-linked list (in most cases the reference numbers increase
+	  and we can drop list_error_reverse this way)
+	* cobc.c, tree.h: if external reference should be used: define the funtions
+	  to a no-op, removing some clutter in the xref functions
+	* cobc.c (terminate_str_at_first_trailing_space): insert one string instead
+	  of zeroing out the complete memory
+	* cobc.c (get_next_listing_line): uses memset for spacing out till end of line
+	  instead of iterating over the char array manually
+	* typeck.c (cb_emit_open): only add a receiving entry when not OPEN INPUT
+
+2020-09-10  Simon Sobisch <simonsobisch@gnu.org>
+
+	update for compiler diagnostivs including FR 386: show warning flag in use
+	
+	* cobc.c, cobc.h, error.c, tree.h, typeck.c: change internal representation
+	  of warning options from integers to new enum cb_warn_opt which can have
+	  a warning value of new enum cb_warn_val instead of defines
+	* pplex.l: extended struct copy_info to a double-linked list to preserve
+	  correct order for "file was included here" messages
+	* pplex.l, error.c (cb_inclusion_note), tree.h: moved warning message output
+	  "file was included here" to error.c as "note", with adjusted msgid
+	* cobc.c, error.c: moved (cobc_too_many_errors) to error.c and distinguish
+	  between -Wfatal-errors (internally -1) and -fmax-errors
+	* warning.def (cb_warn_source_after_code), pplex.l (ppinput):
+	  moved "source text after program-area" from -Wother to a separate
+	  new warning -Wdangling-text, not enabled by default any more
+	* warning.def: enable cb_warn_implicit_define and cb_warn_corresponding
+	  by default
+	* warning.def, errror.c: new option cb_warn_ignored_error instead of
+	  "errror (ignored), also allowing to keep the error with
+	  -Werror=ignored-error
+	* cobc.c, flag.def (cb_diagnostic_show_option), error.c:
+	  new option -fdiagnostics-show-option, enabled by default, to print the
+	  command line option that is responsible for the reason for the diagnostic
+
 2020-09-08  Simon Sobisch <simonsobisch@gnu.org>
 
 	* typeck.c (cb_validate_program_body): verify ANY LENGTH as formal parameter
@@ -58,6 +115,14 @@
 
 	* codegen.c: Changes for UNBOUNDED OCCURS
 	* typeck.c (cb_emit_move): Changes for UNBOUNDED OCCURS
+
+2020-08-14  Simon Sobisch <simonsobisch@gnu.org>
+
+	* tree.h (struct cb_file), parser.y: added decription_entry for
+	  reference in error messages
+	* tree.c (finalize_file), parser.y, error.c (cb_warning_dialect_x):
+	  improved syntax checks, now allowing RECORD VARYING also with
+	  fixed length FD (as all other known compilers do)
 
 2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -114,6 +179,12 @@
 
 	* pplex.l: allow more characters in $DISPLAY
 
+2020-06-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* error.c (redefinition_warning), typeck.c (warning_destination): use
+	  appropriate warning flag to allow handling -Werror=... and -Wno-...
+	* warning.def (redefinition): clarified help message
+
 2020-06-23  Ron Norman <rjn@inglenet.com>
 
 	* parser.y: Changed to use common parsing for [NOT] EXCEPTION
@@ -133,6 +204,19 @@
 	  parameters' were not cached when the unrelated local_field_cache was
 	  empty.
 	* codegen.c: minor refactoring of duplicated code.
+
+2020-06-16  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (print_fields): minor improvement to the symbol listing:
+	  note EXTERNAL and BASED attributes
+
+2020-06-15  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #382 -Wextra instead of -W
+	* warning.def, cobc.c, error.c, field.c, tree.c, typeck.c, parser.y:
+	  renamed cb_warn_extra to cb_warn_additional
+	* warning.def, help.c: define -Wextra with fallback -W
+	* cobc.c: implement -Wno-error[=warning]
 
 2020-06-14  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -166,6 +250,7 @@
 	  warning on MacOS)
 
 2020-06-06  Ron Norman <rjn@inglenet.com>
+
 	* codegen.c: Changes to module entry to better handle
 			C mod calls COBOL mod calls C mod calls COBOL mod
 

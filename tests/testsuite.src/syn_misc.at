@@ -381,19 +381,19 @@ AT_DATA([prog.cob], [
            goback.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[prog.cob:8: warning: literal '99' has more digits than 'x'
-prog.cob:8: warning: expression is always FALSE
-prog.cob:13: warning: literal '00' is longer than 'xx'
-prog.cob:13: warning: expression is always FALSE
-prog.cob:13: warning: literal 'cd' is longer than 'xx'
-prog.cob:13: warning: expression is always FALSE
-prog.cob:24: warning: value size exceeds data size
-prog.cob:24: warning: value size is 2
-prog.cob:11: warning: 'xx' defined here as PIC X
-prog.cob:26: warning: value size exceeds data size
-prog.cob:26: warning: value is 99
-prog.cob:7: warning: 'x' defined here as PIC 9
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option prog.cob], [0], [],
+[prog.cob:8: warning: literal '99' has more digits than 'x' [[-Wconstant-expression]]
+prog.cob:8: warning: expression is always FALSE [[-Wconstant-expression]]
+prog.cob:13: warning: literal '00' is longer than 'xx' [[-Wconstant-expression]]
+prog.cob:13: warning: expression is always FALSE [[-Wconstant-expression]]
+prog.cob:13: warning: literal 'cd' is longer than 'xx' [[-Wconstant-expression]]
+prog.cob:13: warning: expression is always FALSE [[-Wconstant-expression]]
+prog.cob:24: warning: value size exceeds data size [[-Wtruncate]]
+prog.cob:24: note: value size is 2 [[-Wtruncate]]
+prog.cob:11: note: 'xx' defined here as PIC X [[-Wtruncate]]
+prog.cob:26: warning: value size exceeds data size [[-Wtruncate]]
+prog.cob:26: note: value is 99 [[-Wtruncate]]
+prog.cob:7: note: 'x' defined here as PIC 9 [[-Wtruncate]]
 ])
 
 AT_CLEANUP
@@ -774,7 +774,7 @@ AT_CHECK([$COMPILE -frelax-syntax-checks prog3.cob], [0], [],
 [prog3.cob:1: warning: PROGRAM-ID header missing - assumed
 ])
 AT_CHECK([$COBC -frelax-syntax-checks prog3.cob], [0], [],
-[prog3.cob:1: warning: PROGRAM-ID header missing - assumed
+[prog3.cob:1: warning: PROGRAM-ID header missing - assumed [[-Wothers]]
 ])
 
 AT_CLEANUP
@@ -1438,7 +1438,7 @@ prog.cob:76: error: 'SWIT32-OFF' is not defined
 ])
 # FIXME: There should be an additional
 #prog.cob:19: error: duplicate definition of 'SWITCH-25'
-#prog.cob:15: error: 'SWITCH-25' previously defined here
+#prog.cob:15: note: 'SWITCH-25' previously defined here
 #
 AT_CHECK([$COMPILE_ONLY -std=acu-strict -fsystem-name=SW1 -fno-relax-syntax-checks prog.cob], [1], [],
 [prog.cob:33: error: duplicate ON clause
@@ -1446,11 +1446,11 @@ prog.cob:76: error: 'SWIT32-OFF' is not defined
 ])
 # FIXME: There should be an additional
 #prog.cob:19: error: duplicate definition of 'SWITCH-25'
-#prog.cob:15: error: 'SWITCH-25' previously defined here
+#prog.cob:15: note: 'SWITCH-25' previously defined here
 #prog.cob:23: error: duplicate definition of 'SWITCH 25'
-#prog.cob:15: error: 'SWITCH-25' previously defined here
+#prog.cob:15: note: 'SWITCH-25' previously defined here
 #prog.cob:27: error: duplicate definition of 'SWITCH Y'
-#prog.cob:15: error: 'SWITCH-25' previously defined here
+#prog.cob:15: note: 'SWITCH-25' previously defined here
 
 AT_CLEANUP
 
@@ -1698,7 +1698,7 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY -W prog.cob], [0], [],
+AT_CHECK([$COMPILE_ONLY -Wextra prog.cob], [0], [],
 [prog.cob:8: warning: source text after program-text area (column 72)
 ])
 
@@ -1732,19 +1732,19 @@ AT_DATA([prog_tmpl.cob], [
 # AT_DATA workaround via sed:
 AT_CHECK([sed -e 's/_$//' prog_tmpl.cob > prog.cob], [0], [], [])
 
-AT_CHECK([$COMPILE_ONLY -fixed -W prog.cob], [0], [],
+AT_CHECK([$COMPILE_ONLY -fixed -Wextra prog.cob], [0], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:11: warning: source text after program-text area (column 72)
 ])
 
-AT_CHECK([$COMPILE_ONLY -free -W prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY -free -Wextra prog.cob], [1], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: error: unknown statement 'This'
 ])
 
-AT_CHECK([$COMPILE_ONLY -F -W prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY -F -Wextra prog.cob], [1], [],
 [prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
 prog.cob:8: error: unknown statement 'This'
@@ -5604,8 +5604,8 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
 [prog.cob: in paragraph 'MAIN':
 prog.cob:18: warning: value size exceeds data size
-prog.cob:18: warning: value size is 6
-prog.cob:13: warning: 'SHORT-X' defined here as PIC X(5)
+prog.cob:18: note: value size is 6
+prog.cob:13: note: 'SHORT-X' defined here as PIC X(5)
 ])
 
 AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [1], [],
@@ -5619,8 +5619,8 @@ AT_CHECK([$COMPILE_ONLY -std=cobol2014 prog.cob], [1], [],
 [prog.cob:9: error: SYMBOLIC CONSTANT does not conform to COBOL 2014
 prog.cob: in paragraph 'MAIN':
 prog.cob:18: warning: value size exceeds data size
-prog.cob:18: warning: value size is 6
-prog.cob:13: warning: 'SHORT-X' defined here as PIC X(5)
+prog.cob:18: note: value size is 6
+prog.cob:13: note: 'SHORT-X' defined here as PIC X(5)
 ])
 
 AT_CLEANUP
@@ -5719,33 +5719,33 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:15: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:17: error (ignored): offset must be greater than zero
-prog.cob:22: warning: expression '2' EQUALS '3' is always FALSE
-prog.cob:25: warning: expression '1' EQUALS '1' is always TRUE
-prog.cob:29: error (ignored): offset must be greater than zero
-prog.cob:30: warning: expression '1' EQUALS '1' is always TRUE
-prog.cob:35: warning: expression '1' EQUALS '1' is always TRUE
-prog.cob:36: warning: expression '2' EQUALS '1' is always FALSE
-prog.cob:38: error (ignored): offset must be greater than zero
-prog.cob:41: warning: expression '1' EQUALS '3' is always FALSE
-prog.cob:41: warning: PERFORM FOREVER since UNTIL is always FALSE
-prog.cob:45: warning: expression '1' EQUALS '1' is always TRUE
-prog.cob:45: warning: PERFORM NEVER since UNTIL is always TRUE
-prog.cob:47: error (ignored): offset must be greater than zero
-prog.cob:50: warning: expression '1' EQUALS '3' is always FALSE
-prog.cob:50: warning: PERFORM FOREVER since UNTIL is always FALSE
-prog.cob:54: warning: expression '1' EQUALS '1' is always TRUE
-prog.cob:54: warning: PERFORM ONCE since UNTIL is always TRUE
-prog.cob:59: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:61: error (ignored): offset must be greater than zero
-prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE
-prog.cob:71: warning: expression '115' LESS THAN '16' is always FALSE
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option prog.cob], [1], [],
+[prog.cob:15: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:17: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:22: warning: expression '2' EQUALS '3' is always FALSE [[-Wconstant-expression]]
+prog.cob:25: warning: expression '1' EQUALS '1' is always TRUE [[-Wconstant-expression]]
+prog.cob:29: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:30: warning: expression '1' EQUALS '1' is always TRUE [[-Wconstant-expression]]
+prog.cob:35: warning: expression '1' EQUALS '1' is always TRUE [[-Wconstant-expression]]
+prog.cob:36: warning: expression '2' EQUALS '1' is always FALSE [[-Wconstant-expression]]
+prog.cob:38: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:41: warning: expression '1' EQUALS '3' is always FALSE [[-Wconstant-expression]]
+prog.cob:41: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+prog.cob:45: warning: expression '1' EQUALS '1' is always TRUE [[-Wconstant-expression]]
+prog.cob:45: warning: PERFORM NEVER since UNTIL is always TRUE [[-Wadditional]]
+prog.cob:47: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:50: warning: expression '1' EQUALS '3' is always FALSE [[-Wconstant-expression]]
+prog.cob:50: warning: PERFORM FOREVER since UNTIL is always FALSE [[-Wadditional]]
+prog.cob:54: warning: expression '1' EQUALS '1' is always TRUE [[-Wconstant-expression]]
+prog.cob:54: warning: PERFORM ONCE since UNTIL is always TRUE [[-Wadditional]]
+prog.cob:59: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:61: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
+prog.cob:71: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
 prog.cob:73: error: offset must be greater than zero
-prog.cob:74: warning: expression '115' GREATER THAN '16' is always TRUE
-prog.cob:82: warning: expression '15' EQUALS '115' is always FALSE
-prog.cob:85: warning: expression '115' EQUALS '15' is always FALSE
+prog.cob:74: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
+prog.cob:82: warning: expression '15' EQUALS '115' is always FALSE [[-Wconstant-expression]]
+prog.cob:85: warning: expression '115' EQUALS '15' is always FALSE [[-Wconstant-expression]]
 ])
 
 AT_CLEANUP
@@ -5842,15 +5842,15 @@ AT_DATA([prog.cob], [
 
 # note: the last error message comes from program validation
 #       and therefore cannot be raised earlier
-AT_CHECK([$COMPILE_ONLY prog.cob], [0], [],
-[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:13: error (ignored): offset must be greater than zero
-prog.cob:16: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:17: error (ignored): 'notdefined' is not defined
-prog.cob:20: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:24: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:25: error (ignored): 'notdefined' is not defined
-prog.cob:21: error (ignored): 'notdefined' is not defined
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option prog.cob], [0], [],
+[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:13: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:16: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:17: warning: 'notdefined' is not defined [[-Wignored-error]]
+prog.cob:20: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:24: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:25: warning: 'notdefined' is not defined [[-Wignored-error]]
+prog.cob:21: warning: 'notdefined' is not defined [[-Wignored-error]]
 ])
 
 AT_CLEANUP
@@ -5880,9 +5880,9 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
-[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:13: error (ignored): offset must be greater than zero
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option prog.cob], [1], [],
+[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:13: warning: offset must be greater than zero [[-Wignored-error]]
 prog.cob:14: error: syntax error, unexpected IF
 ])
 
@@ -5964,26 +5964,26 @@ AT_DATA([prog.cob], [
 
 # Note: ideally this should not result in a difference compared to the next one
 
-AT_CHECK([$COMPILE_ONLY -C -fno-remove-unreachable prog.cob], [1], [],
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -C -fno-remove-unreachable prog.cob], [1], [],
 [prog.cob: in paragraph 'MAIN-10':
-prog.cob:17: warning: expression '115' GREATER THAN '16' is always TRUE
-prog.cob:17: warning: expression '115' LESS THAN '200' is always TRUE
+prog.cob:17: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
+prog.cob:17: warning: expression '115' LESS THAN '200' is always TRUE [[-Wconstant-expression]]
 prog.cob:20: error: offset must be greater than zero
-prog.cob:23: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:35: warning: expression '3' EQUALS '7' is always FALSE
-prog.cob:60: warning: expression '115' LESS THAN '32' is always FALSE
-prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE
+prog.cob:23: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:35: warning: expression '3' EQUALS '7' is always FALSE [[-Wconstant-expression]]
+prog.cob:60: warning: expression '115' LESS THAN '32' is always FALSE [[-Wconstant-expression]]
+prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
 ])
 
-AT_CHECK([$COMPILE_ONLY -C prog.cob], [0], [],
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -C prog.cob], [0], [],
 [prog.cob: in paragraph 'MAIN-10':
-prog.cob:17: warning: expression '115' GREATER THAN '16' is always TRUE
-prog.cob:17: warning: expression '115' LESS THAN '200' is always TRUE
-prog.cob:20: error (ignored): offset must be greater than zero
-prog.cob:23: warning: expression '115' LESS THAN '16' is always FALSE
-prog.cob:35: warning: expression '3' EQUALS '7' is always FALSE
-prog.cob:60: warning: expression '115' LESS THAN '32' is always FALSE
-prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE
+prog.cob:17: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
+prog.cob:17: warning: expression '115' LESS THAN '200' is always TRUE [[-Wconstant-expression]]
+prog.cob:20: warning: offset must be greater than zero [[-Wignored-error]]
+prog.cob:23: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
+prog.cob:35: warning: expression '3' EQUALS '7' is always FALSE [[-Wconstant-expression]]
+prog.cob:60: warning: expression '115' LESS THAN '32' is always FALSE [[-Wconstant-expression]]
+prog.cob:62: warning: expression '115' GREATER THAN '16' is always TRUE [[-Wconstant-expression]]
 ])
 
 AT_CLEANUP

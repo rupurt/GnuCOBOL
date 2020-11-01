@@ -1,4 +1,10 @@
 
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* atlocal.in, atlocal_valgrind, atlocal_win:
+	  now also unsets cobc related environment variables:
+	  use $() instead of backticks in all places
+
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
 	* atlocal.in, atlocal_valgrind, atlocal_win: replaced COB_HAS_CJSON with

@@ -1822,8 +1822,8 @@ cb_trim_program_id (cb_tree id_literal)
 			_("'%s' literal includes leading spaces which are omitted"), s);
 	}
 	if (s[len - 1] == ' ') {
-		cb_warning_x (cb_warn_extra, id_literal,
-				_("'%s' literal includes trailing spaces which are omitted"), s);
+		cb_warning_x (cb_warn_additional, id_literal,
+			_("'%s' literal includes trailing spaces which are omitted"), s);
 	}
 	while (*s == ' ') {
 		memmove (s, s + 1, len--);
@@ -1914,7 +1914,7 @@ cb_check_word_length (unsigned int length, const char *word)
 			cb_error (_("word length exceeds %d characters: '%s'"),
 				  cb_word_length, word);
 		} else {
-			cb_warning (cb_warn_extra, _("word length exceeds %d characters: '%s'"),
+			cb_warning (cb_warn_additional, _("word length exceeds %d characters: '%s'"),
 				  cb_word_length, word);
 		}
 	}
@@ -1992,7 +1992,7 @@ build_external_assignment_name (cb_tree name)
 	/* Remove (and warn about) labels */
 	name_ptr = remove_labels_from_filename (name_ptr);
 	if (name_ptr != orig_ptr) {
-		cb_warning (cb_warn_extra, _("ASSIGN %s interpreted as '%s'"),
+		cb_warning (cb_warn_additional, _("ASSIGN %s interpreted as '%s'"),
 			orig_ptr, name_ptr);
 	}
 
@@ -2349,7 +2349,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 					cb_error_x (x, _("offset must be greater than zero"));
 				} else if (offset > pseudosize) {
 					if (cb_reference_bounds_check == CB_WARNING) {
-						cb_warning_x (cb_warn_extra, x, _("offset of '%s' out of bounds: %d"), name, offset);
+						cb_warning_x (cb_warn_additional, x, _("offset of '%s' out of bounds: %d"), name, offset);
 					} else
 					if (cb_reference_bounds_check == CB_ERROR) {
 						cb_error_x (x, _("offset of '%s' out of bounds: %d"), name, offset);
@@ -2363,7 +2363,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 					} else if ((length > pseudosize - offset + 1)
 						&& (offset <= pseudosize && offset >= 1) ) {
 						if (cb_reference_bounds_check == CB_WARNING) {
-							cb_warning_x (cb_warn_extra, x, _("length of '%s' out of bounds: %d"),
+							cb_warning_x (cb_warn_additional, x, _("length of '%s' out of bounds: %d"),
 								    name, length);
 						} else
 						if (cb_reference_bounds_check == CB_ERROR) {
@@ -2381,7 +2381,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 				cb_error_x (x, _("length must be greater than zero"));
 			} else if (length > pseudosize) {
 				if (cb_reference_bounds_check == CB_WARNING) {
-					cb_warning_x (cb_warn_extra, x, _("length of '%s' out of bounds: %d"),
+					cb_warning_x (cb_warn_additional, x, _("length of '%s' out of bounds: %d"),
 						    name, length);
 				} else
 				if (cb_reference_bounds_check == CB_ERROR) {
@@ -3227,7 +3227,7 @@ cb_validate_program_environment (struct cb_program *prog)
 			}
 		}
 		if (dupls) {
-			cb_warning_x (cb_warn_extra, CB_VALUE(l),
+			cb_warning_x (cb_warn_additional, CB_VALUE(l),
 					_("duplicate character values in class '%s'"),
 					    cb_name (CB_VALUE(l)));
 			}
@@ -3400,9 +3400,9 @@ validate_record_depending (cb_tree x)
 		{
 			enum cb_support	missing_compiler_config;
 			if (!cb_relaxed_syntax_checks
-			 || cb_warn_extra == COBC_WARN_AS_ERROR) {
+			 || cb_warn_opt_val[cb_warn_additional] == COBC_WARN_AS_ERROR) {
 				missing_compiler_config = CB_ERROR;
-			} else if (cb_warn_extra == COBC_WARN_ENABLED) {
+			} else if (cb_warn_opt_val[cb_warn_additional] == COBC_WARN_ENABLED) {
 				missing_compiler_config = CB_WARNING;
 			} else {
 				missing_compiler_config = CB_OK;
@@ -3532,7 +3532,7 @@ validate_file_status (cb_tree fs)
 			cb_error_x (fs, _("FILE STATUS '%s' may not be a decimal or have a PIC with a P"),
 				    CB_NAME (fs));
 		}
-		cb_warning_x (cb_warn_extra, fs, _("FILE STATUS '%s' is a numeric field, but I-O status codes are not numeric in general"),
+		cb_warning_x (cb_warn_additional, fs, _("FILE STATUS '%s' is a numeric field, but I-O status codes are not numeric in general"),
 			      CB_NAME (fs));
 	} else {
 		cb_error_x (fs, _("FILE STATUS '%s' must be alphanumeric or numeric field"),
@@ -3571,12 +3571,12 @@ create_implicit_assign_dynamic_var (struct cb_program * const prog,
 	cb_tree	x;
 	struct cb_field	*p;
 
-	if (cb_warn_implicit_define) {
-		cb_warning (cb_warn_implicit_define,
-			    _("variable '%s' will be implicitly defined"), CB_NAME (assign));
-	}
-	x = cb_build_implicit_field (assign, COB_SMALL_BUFF);
+	cb_warning (cb_warn_implicit_define,
+		    _("variable '%s' will be implicitly defined"), CB_NAME (assign));
+	x = cb_build_implicit_field (assign, COB_FILE_MAX);
+#if 0
 	CB_FIELD (x)->count++;
+#endif
 	p = prog->working_storage;
 	if (p) {
 		while (p->sister) {
@@ -7301,11 +7301,11 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 #ifndef	_WIN32
 	if (call_conv & CB_CONV_STDCALL) {
 		call_conv &= ~CB_CONV_STDCALL;
-		cb_warning (cb_warn_extra, _("STDCALL not available on this platform"));
+		cb_warning (cb_warn_additional, _("STDCALL not available on this platform"));
 	}
 #elif	defined(_WIN64)
 	if (call_conv & CB_CONV_STDCALL) {
-		cb_warning (cb_warn_extra, _("STDCALL used on 64-bit Windows platform"));
+		cb_warning (cb_warn_additional, _("STDCALL used on 64-bit Windows platform"));
 	}
 #endif
 	if ((call_conv & CB_CONV_STATIC_LINK) && !constant_call_name) {
@@ -8930,7 +8930,7 @@ cb_build_inspect_region_start (void)
 /* MOVE statement */
 
 static void
-warning_destination (cb_tree x)
+warning_destination (const enum cb_warn_opt warning_opt, cb_tree x)
 {
 	struct cb_field		*f;
 	const char *usage;
@@ -8976,27 +8976,27 @@ warning_destination (cb_tree x)
 	} else if (f->usage == CB_USAGE_FP_DEC128) {
 		usage = "FLOAT-DECIMAL-34";
 	} else if (f->pic) {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as PIC %s"),
-			      cb_name (x), f->pic->orig);
+		cb_note_x (warning_opt, x, _("'%s' defined here as PIC %s"),
+			cb_name (x), f->pic->orig);
 		return;
 	} else {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as a group of length %d"),
-			      cb_name (x), f->size);
+		cb_note_x (warning_opt, x, _("'%s' defined here as a group of length %d"),
+			cb_name (x), f->size);
 		return;
 	}
 
 	if (f->flag_internal_register) {
-		cb_warning (COBC_WARN_FILLER, _("internal register '%s' defined as USAGE %s"),
-			    f->name, usage);
+		cb_note_x (warning_opt, x, _("internal register '%s' defined as USAGE %s"),
+			f->name, usage);
 	} else {
-		cb_warning_x (COBC_WARN_FILLER, x, _("'%s' defined here as USAGE %s"),
-			      f->name, usage);
+		cb_note_x (warning_opt, x, _("'%s' defined here as USAGE %s"),
+			f->name, usage);
 	}
 }
 
 static void
 move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
-	      const int warning_flag, const int src_flag, const char *msg)
+	      const enum cb_warn_opt warning_opt, const int src_flag, const char *msg)
 {
 	cb_tree		loc;
 
@@ -9017,25 +9017,25 @@ move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
 		cb_warning_x (COBC_WARN_FILLER, loc, "%s", msg);
 	} else {
 		/* MOVE statement */
-		if (warning_flag) {
-			cb_warning_x (warning_flag, loc, "%s", msg);
+		if (cb_warn_opt_val[warning_opt] != COBC_WARN_DISABLED) {
+			cb_warning_x (warning_opt, loc, "%s", msg);
 			listprint_suppress ();
 			if (src_flag) {
 				/* note: src_flag is -1 for numeric literals,
 				   contains literal size otherwise */
 				if (!CB_LITERAL_P (src)) {
-					warning_destination (src);
+					warning_destination (warning_opt, src);
 				} else if (src_flag == -1) {
 					if (CB_LITERAL_P (src)) {
-						cb_warning_x (warning_flag, dst,
+						cb_note_x (warning_opt, dst,
 							_("value is %s"), CB_LITERAL (src)->data);
 					}
 				} else {
-					cb_warning_x (warning_flag, dst,
+					cb_note_x (warning_opt, dst,
 						_("value size is %d"), src_flag);
 				}
 			}
-			warning_destination (dst);
+			warning_destination (warning_opt, dst);
 			listprint_restore ();
 		}
 	}
@@ -9445,7 +9445,7 @@ validate_move_from_num_lit (cb_tree src, cb_tree dst, const unsigned int is_valu
 		if (!suppress_warn) {
 			return MOVE_INVALID;
 		}
-		cb_warning_x (cb_warn_extra, loc,
+		cb_warning_x (cb_warn_additional, loc,
 			      _("numeric move to ALPHABETIC"));
 		break;
 	default:
@@ -9777,19 +9777,19 @@ warn_overlapping_move (cb_tree loc)
 		break;
 	case 2:
 		if (cb_warn_pos_overlap && !suppress_warn) {
-			cb_warning_x (COBC_WARN_FILLER, loc,
-				      _("overlapping MOVE may occur and produce unpredictable results"));
+			cb_warning_x(cb_warn_pos_overlap, loc,
+				_("overlapping MOVE may occur and produce unpredictable results"));
 		}
 		break;
 	case 3:
-		if ((cb_warn_overlap || cb_warn_pos_overlap) && !suppress_warn) {
-			cb_warning_x (COBC_WARN_FILLER, loc,
-				      _("overlapping MOVE may produce unpredictable results"));
+		if ((cb_warn_overlap) && !suppress_warn) {
+			cb_warning_x (cb_warn_overlap, loc,
+				_("overlapping MOVE may produce unpredictable results"));
 		}
 		break;
 		/* LCOV_EXCL_START */
 	default:
-		cobc_err_msg("unexpected overlap result: %d", (int)overlapping);
+		cobc_err_msg ("unexpected overlap result: %d", (int)overlapping);
 		COBC_ABORT();
 		/* LCOV_EXCL_STOP */
 	}
@@ -10989,7 +10989,8 @@ cb_emit_open (cb_tree file, cb_tree mode, cb_tree sharing)
 	f = CB_FILE (file);
 	open_mode = CB_INTEGER(mode)->val;
 
-	if (open_mode == COB_OPEN_OUTPUT) {
+	if (cb_listing_xref
+	 && open_mode != COB_OPEN_INPUT) {
 		/* add a "receiving" entry for the file */
 		cobc_xref_link (&f->xref, CB_REFERENCE (orig_file)->common.source_line, 1);
 	}
@@ -13422,7 +13423,7 @@ cb_emit_xml_generate (cb_tree out, cb_tree from, cb_tree count,
 	current_program->ml_trees = tree;
 
 	if (with_attrs && !tree->attrs) {
-		cb_warning (cb_warn_extra,
+		cb_warning (cb_warn_additional,
 			_("WITH ATTRIBUTES specified, but no attributes can be generated"));
 	}
 

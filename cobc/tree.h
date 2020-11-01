@@ -572,6 +572,7 @@ cb_tree_source_set( const char func[], int line, cb_tree tree,
 /* xref entries */
 struct cb_xref_elem {
 	struct cb_xref_elem	*next;
+	struct cb_xref_elem	*prev;
 	int			line;
 	int			receive;
 };
@@ -579,7 +580,8 @@ struct cb_xref_elem {
 struct cb_xref {
 	struct cb_xref_elem	*head;
 	struct cb_xref_elem	*tail;
-	int			skip;
+	int		amount;
+	int		skip;
 };
 
 struct cb_call_elem {
@@ -1046,6 +1048,7 @@ struct cb_file {
 	cb_tree			collating_sequence_n;	/* COLLATING FOR NATIONAL*/
 	cb_tree			collating_sequence_keys;	/* list of postponed COLLATING OF */
 	/* FD/SD */
+	cb_tree			description_entry;	/* FD / SD entry rerference for warnings + errors */
 	struct cb_field		*record;		/* Record descriptions */
 	cb_tree			record_depending;	/* RECORD DEPENDING */
 	cb_tree			reports;		/* REPORTS */
@@ -2030,8 +2033,10 @@ extern void			cb_list_system_routines (void);
 extern int			cb_list_map (cb_tree (*) (cb_tree), cb_tree);
 
 /* error.c */
-extern void		cb_warning_x (int, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_warning_x (const enum cb_warn_opt, cb_tree, const char *, ...) COB_A_FORMAT34;
 extern void		cb_warning_dialect_x (const enum cb_support, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_note_x (const enum cb_warn_opt, cb_tree, const char *, ...) COB_A_FORMAT34;
+extern void		cb_inclusion_note (const char *, int);
 extern void		cb_error_x (cb_tree, const char *, ...) COB_A_FORMAT23;
 extern unsigned int	cb_verify (const enum cb_support, const char *);
 extern unsigned int	cb_verify_x (cb_tree, const enum cb_support,
@@ -2334,10 +2339,21 @@ extern struct cb_program	*cb_find_defined_program_by_name (const char *);
 extern struct cb_program	*cb_find_defined_program_by_id (const char *);
 
 /* cobc.c */
+#ifndef COB_EXTERNAL_XREF
+#define COB_INTERNAL_XREF
+#endif
+
+#ifdef COB_INTERNAL_XREF
 extern void			cobc_xref_link (struct cb_xref *, const int, const int);
 extern void			cobc_xref_link_parent (const struct cb_field *);
 extern void			cobc_xref_set_receiving (const cb_tree);
 extern void			cobc_xref_call (const char *, const int, const int, const int);
+#else
+#define cobc_xref_link(x,l,r)
+#define cobc_xref_link_parent(f)
+#define cobc_xref_set_receiving(t)
+#define cobc_xref_call (n l,i,s)
+#endif
 extern unsigned int		cb_correct_program_order;
 
 /* Function defines */

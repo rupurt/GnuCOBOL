@@ -24,7 +24,6 @@
 #include "fileio.h"
 
 #if defined(WITH_ODBC) || defined(WITH_OCI) || defined(WITH_DB) || defined(WITH_LMDB)
-#include "defaults.h"
 /* Routines in fsqlxfd.c common to all Database interfaces */                        
 
 int
@@ -1354,14 +1353,14 @@ cob_load_ddl (struct db_state  *db, struct file_xfd *fx)
 				ctsz += 256;
 			}
 			if (db->isoci) {
-				if ((p=strcasestr(xfdbuf," BIGINT ")) != NULL) {
-					memcpy(p," INT    ",8);
+				if ((p = cob_str_case_str (xfdbuf," BIGINT ")) != NULL) {
+					memcpy (p," INT    ",8);
 				}
-				if ((p=strcasestr(xfdbuf," BINARY(")) != NULL) {
-					memcpy(p,"    RAW(",8);
+				if ((p = cob_str_case_str (xfdbuf," BINARY(")) != NULL) {
+					memcpy (p,"    RAW(",8);
 				} else
-				if ((p=strcasestr(xfdbuf," BINARY ")) != NULL) {
-					memcpy(p,"    RAW ",8);
+				if ((p = cob_str_case_str (xfdbuf," BINARY ")) != NULL) {
+					memcpy (p,"    RAW ",8);
 				}
 			}
 			strcpy(&fx->create_table[fx->lncreate], xfdbuf);

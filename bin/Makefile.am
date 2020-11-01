@@ -26,7 +26,7 @@ dist_man_MANS = cobcrun.1 cob-config.1
 COBCRUN = cobcrun$(EXEEXT)
 gcdiff_SOURCES = gcdiff.c
 
-AM_LDFLAGS = $(COB_EXPORT_DYN)
+# AM_LDFLAGS = $(COB_EXPORT_DYN)
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)/lib -I$(top_srcdir)/lib
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
 cobcrun_LDADD = $(PROGRAMS_LIBS) $(top_builddir)/libcob/libcob.la \

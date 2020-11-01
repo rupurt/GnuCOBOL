@@ -40,7 +40,6 @@
 /* Force symbol exports */
 #define	COB_LIB_EXPIMP
 
-#include "defaults.h"
 #include "fileio.h"
 #ifdef HAVE_DLFCN_H
 #if defined(WITH_CISAM) || defined(WITH_DISAM) || defined(WITH_VBISAM)

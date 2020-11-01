@@ -71,7 +71,7 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:9: error: redefinition of 'file1'
-prog.cob:7: error: 'file1' previously defined here
+prog.cob:7: note: 'file1' previously defined here
 prog.cob:9: error: missing file description for FILE SELECT on line 9
 ])
 AT_CLEANUP
@@ -535,9 +535,9 @@ prog.cob:22: warning: OPEN REVERSED is not implemented
 ])
 
 # note: as soon as implemented: won't be obsolete in GnuCOBOL, but leave message for now...
-AT_CHECK([$COMPILE_ONLY -Werror=obsolete prog.cob], [1], [],
-[prog.cob:18: error [[-Werror]]: OPEN REVERSED is obsolete in GnuCOBOL
-prog.cob:22: error [[-Werror]]: OPEN REVERSED is obsolete in GnuCOBOL
+AT_CHECK([$COMPILE_ONLY -Werror=obsolete -fdiagnostics-show-option prog.cob], [1], [],
+[prog.cob:18: error: OPEN REVERSED is obsolete in GnuCOBOL [[-Werror=obsolete]]
+prog.cob:22: error: OPEN REVERSED is obsolete in GnuCOBOL [[-Werror=obsolete]]
 ])
 
 AT_CLEANUP
@@ -1411,11 +1411,8 @@ prog.cob:39: error: RECORD DELIMITER LINE-SEQUENTIAL only allowed with (LINE) SE
 prog.cob:36: error: RECORD clause is invalid for file 'bad-2' (file type)
 prog.cob:43: error: RECORD DELIMITER BINARY-SEQUENTIAL only allowed with SEQUENTIAL files
 prog.cob:47: error: RECORD DELIMITER STANDARD-1 only allowed with SEQUENTIAL files
-prog.cob:79: warning: RECORD DELIMITER clause on file with fixed-length records used
-prog.cob:82: warning: RECORD DELIMITER clause on file with fixed-length records used
-prog.cob:85: warning: RECORD DELIMITER clause on file with fixed-length records used
+prog.cob:76: warning: RECORD DELIMITER clause on file with fixed-length records used
 prog.cob:88: warning: RECORD DELIMITER clause on file with fixed-length records used
-prog.cob:90: warning: RECORD DELIMITER clause on file with fixed-length records used
 ])
 AT_CLEANUP
 
@@ -1645,8 +1642,8 @@ AT_DATA([prog.cob], [
        01  f4-rec-2 PIC 99.
 ])
 
-AT_CHECK([$COMPILE_ONLY -frecords-mismatch-record-clause=error prog.cob], [1], [],
-[prog.cob:19: error: file 'f1': RECORD VARYING specified without limits, but implied limits are equal
+AT_CHECK([$COMPILE_ONLY -Wadditional prog.cob], [1], [],
+[prog.cob:15: warning: RECORD VARYING specified without limits, but implied limits are equal
 prog.cob:19: error: RECORD clause invalid
 prog.cob:22: error: RECORD clause invalid
 ])
@@ -1691,17 +1688,17 @@ AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
 [prog.cob:21: error: figurative constants not allowed in FROM clause
 prog.cob:21: error: literal in FROM clause must be alphanumeric, national or boolean
 prog.cob:22: warning: numeric value is expected
-prog.cob:13: warning: 'f-rec' defined here as PIC 999999
+prog.cob:13: note: 'f-rec' defined here as PIC 999999
 prog.cob:24: error: figurative constants not allowed in FROM clause
 prog.cob:24: error: literal in FROM clause must be alphanumeric, national or boolean
 prog.cob:25: warning: numeric value is expected
-prog.cob:13: warning: 'f-rec' defined here as PIC 999999
+prog.cob:13: note: 'f-rec' defined here as PIC 999999
 ])
 AT_CHECK([$COMPILE_ONLY -frelax-syntax-checks prog.cob], [0], [],
 [prog.cob:22: warning: numeric value is expected
-prog.cob:13: warning: 'f-rec' defined here as PIC 999999
+prog.cob:13: note: 'f-rec' defined here as PIC 999999
 prog.cob:25: warning: numeric value is expected
-prog.cob:13: warning: 'f-rec' defined here as PIC 999999
+prog.cob:13: note: 'f-rec' defined here as PIC 999999
 ])
 AT_CHECK([$COMPILE_ONLY -std=mf-strict prog.cob], [0], [],
 [prog.cob:22: warning: source is non-numeric - substituting zero

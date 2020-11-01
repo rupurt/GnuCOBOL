@@ -289,9 +289,7 @@
     <None Include="..\..\libcob\system.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\libcob\sysdefines.h" />
     <ClInclude Include="..\config.h" />
-    <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob.h" />
     <ClInclude Include="..\..\tarstamp.h" />
     <ClInclude Include="..\..\cobc\cobc.h" />
@@ -300,6 +298,7 @@
     <ClInclude Include="..\..\cobc\ppparse.h" />
     <ClInclude Include="..\..\libcob\cobgetopt.h" />
     <ClInclude Include="..\..\libcob\common.h" />
+    <ClInclude Include="..\..\libcob\sysdefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\version_cobc.rc" />

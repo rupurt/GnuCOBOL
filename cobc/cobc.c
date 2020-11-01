@@ -24,7 +24,6 @@
 /* #define DEBUG_REPLACE */
 
 #include <config.h>
-#include <defaults.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,6 +70,7 @@
 
 #include "libcob/cobgetopt.h"
 
+#if 0 /* CHECKME: cobc should not need those */
 #ifdef	WITH_DB
 #include <db.h>
 #endif
@@ -84,9 +84,9 @@
 #include <sql.h>
 #include <sqlext.h>
 #endif
+#endif
 
-#if defined (COB_EXPERIMENTAL) || 1
-#define COB_INTERNAL_XREF
+#ifdef COB_INTERNAL_XREF
 enum xref_type {
 	XREF_FIELD,
 	XREF_FILE,
@@ -151,7 +151,7 @@ FILE			*cb_listing_file = NULL;
 						   for COBOL 2002 (removed it) would be 7 */
 #define CB_INDICATOR	CB_MARGIN_A - 1
 #define CB_SEQUENCE	cb_text_column /* the only configuration available...*/
-#define CB_ENDLINE	cb_text_column + cb_indicator_column + 1
+#define CB_ENDLINE	(cb_text_column + cb_indicator_column + 1)
 
 #define CB_MAX_LINES	55
 #define CB_LIST_PICSIZE 80
@@ -237,15 +237,7 @@ int cb_mf_ibm_comp = -1;
 int cb_cob_line_num = 0;
 int cb_all_files_xfd = 0;
 
-#define	CB_ERRWARNDEF(var,name,doc)	int var = COBC_WARN_AS_ERROR;
-#define	CB_NOWARNDEF(var,name,doc)	int var = COBC_WARN_DISABLED;
-#define	CB_ONWARNDEF(var,name,doc)	int var = COBC_WARN_ENABLED;
-#define	CB_WARNDEF(var,name,doc)	int var = COBC_WARN_DISABLED;
-#include "warning.def"
-#undef	CB_ERRWARNDEF
-#undef	CB_NOWARNDEF
-#undef	CB_ONWARNDEF
-#undef	CB_WARNDEF
+int cb_warn_opt_val[COB_WARNOPT_MAX];
 
 /* Local variables */
 
@@ -257,6 +249,14 @@ static struct cobc_mem_struct	*cobc_plexmem_base = NULL;
 
 static const char	*cobc_cc;		/* C compiler */
 static char		*cobc_cflags;		/* C compiler flags */
+#ifdef COB_DEBUG_FLAGS
+static const char		*cobc_debug_flags;		/* C debgging flags */
+#else
+#ifndef	_MSC_VER
+#error		missing definition of COB_DEBUG_FLAGS
+#endif
+#endif
+
 static char		*cobc_libs;		/* -l... */
 static char		*cobc_lib_paths;	/* -L... */
 static char		*cobc_include;		/* -I... */
@@ -274,9 +274,21 @@ static size_t		cobc_libs_len;
 static size_t		cobc_lib_paths_len;
 static size_t		cobc_include_len;
 static size_t		cobc_ldflags_len;
+#ifdef COB_EXPORT_DYN
 static size_t		cobc_export_dyn_len;
+#else
+#define		cobc_export_dyn_len		0
+#endif
+#ifdef COB_SHARED_OPT
 static size_t		cobc_shared_opt_len;
+#else
+#define		cobc_shared_opt_len		0
+#endif
+#ifdef COB_PIC_FLAGS
 static size_t		cobc_pic_flags_len;
+#else
+#define		cobc_pic_flags_len		0
+#endif
 
 static char		*save_temps_dir = NULL;
 static struct strcache	*base_string;
@@ -465,10 +477,17 @@ static const struct option long_options[] = {
 	{"A",			CB_RQ_ARG, NULL, 'A'},
 	{"P",			CB_OP_ARG, NULL, 'P'},
 	{"Xref",		CB_NO_ARG, NULL, 'X'},
-	{"use-extfh",		CB_RQ_ARG, NULL, 9},	/* This is used by COBOL-IT; Same is -fcallfh= */
+	{"use-extfh",		CB_RQ_ARG, NULL, 9},	/* this is used by COBOL-IT; Same is -fcallfh= */
 	{"Wall",		CB_NO_ARG, NULL, 'W'},
+	{"Wextra",		CB_NO_ARG, NULL, 'Y'},		/* this option used to be called -W */
+#if 1
 	{"W",			CB_NO_ARG, NULL, 'Y'},
+#else /* TODO */
+	{"W",			CB_OP_ARG, NULL, 'Y'},
+	{"Wno",			CB_RQ_ARG, NULL, 'y'},		/* just a catch-all for unknown warnings */
+#endif
 	{"Werror",		CB_OP_ARG, NULL, 'Z'},
+	{"Wno-error",		CB_OP_ARG, NULL, 'z'},
 	{"tlines",		CB_RQ_ARG, NULL, '*'},
 	{"tsymbols",		CB_NO_ARG, &cb_listing_symbols, 1},		/* kept for backwards-compatibility */
 
@@ -519,18 +538,18 @@ static const struct option long_options[] = {
 	{"fregister",	CB_RQ_ARG, NULL, '%'},
 	{"fnot-register",	CB_RQ_ARG, NULL, '%'},
 
-#define	CB_WARNDEF(var,name,doc)			\
-	{"W" name,		CB_NO_ARG, &var, COBC_WARN_ENABLED},	\
-	{"Wno-" name,		CB_NO_ARG, &var, COBC_WARN_DISABLED},
-#define	CB_ONWARNDEF(var,name,doc)			\
-	{"W" name,		CB_NO_ARG, &var, COBC_WARN_ENABLED},	\
-	{"Wno-" name,		CB_NO_ARG, &var, COBC_WARN_DISABLED},
-#define	CB_NOWARNDEF(var,name,doc)			\
-	{"W" name,		CB_NO_ARG, &var, COBC_WARN_ENABLED},	\
-	{"Wno-" name,		CB_NO_ARG, &var, COBC_WARN_DISABLED},
-#define	CB_ERRWARNDEF(var,name,doc)			\
-	{"W" name,		CB_NO_ARG, &var, COBC_WARN_ENABLED},	\
-	{"Wno-" name,		CB_NO_ARG, &var, COBC_WARN_DISABLED},
+#define	CB_WARNDEF(opt,name,doc)			\
+	{"W" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_ENABLED},	\
+	{"Wno-" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_DISABLED},
+#define	CB_ONWARNDEF(opt,name,doc)			\
+	{"W" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_ENABLED},	\
+	{"Wno-" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_DISABLED},
+#define	CB_NOWARNDEF(opt,name,doc)			\
+	{"W" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_ENABLED},	\
+	{"Wno-" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_DISABLED},
+#define	CB_ERRWARNDEF(opt,name,doc)			\
+	{"W" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_ENABLED},	\
+	{"Wno-" name,		CB_NO_ARG, &cb_warn_opt_val[opt], COBC_WARN_DISABLED},
 #include "warning.def"
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -547,7 +566,6 @@ static const struct option long_options[] = {
 #undef	CB_OP_ARG
 
 /* Prototype */
-DECLNORET static void COB_A_NORETURN	cobc_abort_terminate (int);
 DECLNORET static void COB_A_NORETURN	cobc_early_exit (int);
 DECLNORET static void COB_A_NORETURN	cobc_err_exit (const char *, ...) COB_A_FORMAT12;
 static void	free_list_file		(struct list_files *);
@@ -818,13 +836,6 @@ cobc_err_msg (const char *fmt, ...)
 	va_end (ap);
 	putc ('\n', stderr);
 	fflush (stderr);
-}
-
-void
-cobc_too_many_errors (void)
-{
-	cobc_err_msg (_("too many errors"));
-	cobc_abort_terminate (0);
 }
 
 /* Output cobc source/line where an internal error occurs and exit */
@@ -1534,6 +1545,227 @@ cobc_check_valid_name (const char *name, const enum cobc_name_type prechk)
 	return 0;
 }
 
+#if 0	/* to be merged */
+/* Turn generation of runtime exceptions on/off */
+
+static void
+turn_ec_for_table (struct cb_exception *table, const size_t table_len,
+		   struct cb_exception ec, const int to_on_off)
+{
+	size_t	i;
+
+	if (ec.code & 0x00FF) {
+		/* Set individual level-1 EC */
+		for (i = 0; i < table_len; ++i) {
+			if (table[i].code == ec.code) {
+				table[i].enable = to_on_off;
+				table[i].explicit_enable_val = 1;
+				break;
+			}
+		}
+	} else if (ec.code != 0) {
+		/*
+		  Simon: ToDo: Group activation; check occurences of
+		  EC-generation
+		*/
+		/* Set all ECs subordinate to level-2 EC */
+		for (i = 0; i < table_len; ++i) {
+			if ((table[i].code & 0xFF00) == ec.code) {
+				table[i].enable = to_on_off;
+				table[i].explicit_enable_val = 1;
+			}
+		}
+	} else {
+		/* EC-ALL; set all ECs */
+		for (i = 0; i < table_len; ++i) {
+			table[i].enable = to_on_off;
+			table[i].explicit_enable_val = 1;
+		}
+	}
+}
+
+
+static unsigned int
+turn_ec_io (struct cb_exception ec_to_turn,
+	    const cob_u32_t to_on_off,
+	    cb_tree loc,
+	    struct cb_text_list ** const ec_list)
+{
+	if (!(*ec_list)->next
+	 || !strncmp ((*ec_list)->next->text, "EC-", 3)) {
+		/* This >>TURN applies globally */
+		turn_ec_for_table (cb_exception_table,
+				   cb_exception_table_len,
+				   ec_to_turn,
+				   to_on_off);
+		return 0;
+	}
+
+	/* The >>TURN applies to a list of files */
+	do {
+		struct cb_file	*f = NULL;
+		cb_tree	l = NULL;
+		*ec_list = (*ec_list)->next;
+
+		/* Find file */
+		for (l = current_program->file_list; l; l = CB_CHAIN (l)) {
+			f = CB_FILE (CB_VALUE (l));
+			if (!strcasecmp (f->name, (*ec_list)->text)) {
+				break;
+			}
+			f = NULL;
+		}
+		/* Error if no file */
+		if (!f) {
+			cb_error_x (loc, _("file '%s' does not exist"), (*ec_list)->text);
+			return 1;
+		}
+		
+		/* Apply to file's exception list */
+		turn_ec_for_table (f->exception_table, cb_io_exception_table_len,
+				   ec_to_turn, to_on_off);
+	} while ((*ec_list)->next && !strncmp ((*ec_list)->next->text, "EC-", 3));
+
+	return 0;
+}
+
+static unsigned int
+ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec,
+	  const cob_u32_t ec_idx, cb_tree loc)
+{
+	struct cb_text_list	*ec_dupchk;
+
+	/* TO-DO: Is duplication a problem? */
+	/* TO-DO: Does this algo work? */
+	for (ec_dupchk = ec_list; ec_dupchk; ec_dupchk = ec_dupchk->next) {
+		if (ec_dupchk == ec) {
+			return 0;
+		}
+		if (ec_dupchk->text
+		    && !strcasecmp(ec->text, ec_dupchk->text)) {
+			cb_error_x (loc, _("duplicate exception '%s'"),
+				    CB_EXCEPTION_NAME (ec_idx));
+			ec_dupchk = NULL;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/*
+  Simon: ToDo: Move save/restore of activated exceptions before
+  preparse; after C generation A dynamic save (only if changed)
+  and restore (only if set) would be nice
+*/
+unsigned int
+cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree loc)
+{
+	cob_u32_t ec_idx, i;
+	struct cb_text_list	*ec;
+	unsigned char *upme;
+
+	if (to_on_off) {
+		/* TO-DO: Only if >>TURN ... ON WITH LOCATION found? */
+		cb_flag_source_location = 1;
+	}
+
+	for (ec = ec_list; ec; ec = ec->next) {
+		/* Extract exception code via text comparison */
+		ec_idx = 0;
+		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
+			if (!strcasecmp (ec->text, CB_EXCEPTION_NAME (i))) {
+				ec_idx = i;
+				break;
+			}
+		}
+
+		/* Error if not a known exception name */
+		/* TO-DO: What about EC-USER? */
+		if (ec_idx == 0) {
+			upme = (unsigned char *)ec->text;
+			for (i = 0; i < strlen(ec->text); ++i) {
+				upme[i] = (cob_u8_t)toupper (upme[i]);
+			}
+			cb_error_x (loc, _("invalid exception-name: %s"),
+				    ec->text);
+			return 1;
+		}
+
+		if (ec_duped (ec_list, ec, ec_idx, loc)) {
+			return 1;
+		}
+
+		if (!strncmp(CB_EXCEPTION_NAME(ec_idx), "EC-I-O", 6)) {
+			if (turn_ec_io (cb_exception_table[ec_idx], to_on_off,
+					loc, &ec)) {
+				return 1;
+			}
+		} else {
+			turn_ec_for_table (cb_exception_table,
+					   cb_exception_table_len,
+					   cb_exception_table[ec_idx], to_on_off);
+		}
+	}
+
+	return 0;
+}
+
+void
+cobc_apply_turn_directives (void)
+{
+	struct cb_tree_common	loc;
+
+	loc.source_file = cb_source_file;
+	loc.source_column = 0;
+	
+	/* Apply all >>TURN directives the scanner has passed */
+	while (cb_turn_list
+	       && cb_turn_list->line <= cb_source_line
+	       && cb_turn_list->line != -1) {
+		if (cb_turn_list->with_location) {
+			cb_flag_source_location = 1;
+		}
+		loc.source_line = cb_turn_list->line;
+		cobc_turn_ec (cb_turn_list->ec_names, cb_turn_list->enable, &loc);
+
+		cb_turn_list = cb_turn_list->next;
+		/* CHECKME: Should head of cb_turn_list be freed? Why doesn't
+		   cobc_plex_free exist? */
+	}
+}
+
+/* set the specified exception-name to the given value,
+   note: exception-name may also specified without EC-prefix here */
+static unsigned int
+cobc_deciph_ec (const char *opt, const cob_u32_t to_on_off)
+{
+	struct cb_text_list	*cb_ec_list = NULL;
+	char	*p;
+	char	*q;
+	char	wrk[COB_MAX_NAMELEN + 1];
+	struct cb_tree_common	loc;
+
+	p = cobc_strdup (opt);
+	q = strtok (p, " ");
+	while (q) {
+		if (strncasecmp (q, "ec-", 3)) {
+			snprintf (wrk, COB_MAX_NAMELEN, "EC-%s", q);
+			CB_TEXT_LIST_ADD (cb_ec_list, wrk);
+		} else {
+			CB_TEXT_LIST_ADD (cb_ec_list, q);
+		}
+		q = strtok (NULL, " ");
+	}
+	cobc_free (p);
+
+	loc.source_file = cb_source_file;
+	loc.source_column = 0;
+	loc.source_line = 0;
+	return cobc_turn_ec (cb_ec_list, to_on_off, &loc);
+}
+#endif	/* to be merged */
+
 /* Local functions */
 
 static void
@@ -1676,7 +1908,7 @@ cobc_getenv_path (const char *env)
 	char	*p;
 
 	p = getenv (env);
-	if (!p || *p == 0 || *p == ' ') {
+	if (!p || *p == 0) {
 		return NULL;
 	}
 	if (strchr (p, PATHSEP_CHAR) != NULL) {
@@ -1973,7 +2205,7 @@ cobc_abort_msg (void)
 
 /* return to OS in case of hard errors after trying to output the error to
    listing file if active */
-DECLNORET static void COB_A_NORETURN
+void
 cobc_abort_terminate (int should_be_reported)
 {
 	/* note we returned 99 for aborts earlier but autotest will
@@ -2051,7 +2283,7 @@ cobc_print_version (void)
 	putchar ('\n');
 	printf (_("Packaged  %s"), COB_TAR_DATE);
 	putchar ('\n');
-	printf (_("C version %s%s"), GC_C_VERSION_PRF, GC_C_VERSION);
+	printf ("%s %s", _("C version"), GC_C_VERSION_PRF GC_C_VERSION);
 	putchar ('\n');
 }
 
@@ -2064,7 +2296,7 @@ cobc_print_shortversion (void)
 	putchar ('\t');
 	printf (_("Packaged  %s"), COB_TAR_DATE);
 	putchar ('\n');
-	printf (_("C version %s%s"), GC_C_VERSION_PRF, GC_C_VERSION);
+	printf ("%s %s", _("C version"), GC_C_VERSION_PRF GC_C_VERSION);
 	putchar ('\n');
 }
 
@@ -2145,10 +2377,22 @@ cobc_var_print (const char *msg, const char *val, const unsigned int env)
 }
 
 static void
+cobc_var_and_envvar_print (const char* name, const char* defined_val)
+{
+	char* s = getenv (name);
+
+	cobc_var_print (name, defined_val, 0);
+
+	if (s && *s) {
+		cobc_var_print (name, s, 1);
+	}
+
+}
+
+static void
 cobc_print_info (void)
 {
 	char	buff[16];
-	char	versbuff[56];
 	char	*s;
 
 	cobc_print_version ();
@@ -2157,52 +2401,34 @@ cobc_print_info (void)
 	cobc_var_print (_("build environment"),	COB_BLD_BUILD, 0);
 	cobc_var_print ("CC", COB_BLD_CC, 0);
 	/* Note: newline because most compilers define a long version string (> 30 characters) */
-	snprintf (versbuff, 55, "%s%s", GC_C_VERSION_PRF, GC_C_VERSION);
-	cobc_var_print ("C version", versbuff, 0);
+	cobc_var_print (_("C version"), GC_C_VERSION_PRF GC_C_VERSION, 0);
 	cobc_var_print ("CPPFLAGS",		COB_BLD_CPPFLAGS, 0);
 	cobc_var_print ("CFLAGS",		COB_BLD_CFLAGS, 0);
 	cobc_var_print ("LD",			COB_BLD_LD, 0);
 	cobc_var_print ("LDFLAGS",		COB_BLD_LDFLAGS, 0);
 	putchar ('\n');
 	puts (_("GnuCOBOL information"));
-	cobc_var_print ("COB_CC",		COB_CC, 0);
-	if ((s = getenv ("COB_CC")) != NULL) {
-		cobc_var_print ("COB_CC",	s, 1);
-	}
-	cobc_var_print ("COB_CFLAGS",		COB_CFLAGS, 0);
-	if ((s = getenv ("COB_CFLAGS")) != NULL) {
-		cobc_var_print ("COB_CFLAGS",	s, 1);
-	}
-	cobc_var_print ("COB_LDFLAGS",		COB_LDFLAGS, 0);
-	if ((s = getenv ("COB_LDFLAGS")) != NULL) {
-		cobc_var_print ("COB_LDFLAGS",	s, 1);
-	}
-	cobc_var_print ("COB_LIBS",		COB_LIBS, 0);
-	if ((s = getenv ("COB_LIBS")) != NULL) {
-		cobc_var_print ("COB_LIBS",	s, 1);
-	}
-	cobc_var_print ("COB_CONFIG_DIR",	COB_CONFIG_DIR, 0);
-	if ((s = getenv ("COB_CONFIG_DIR")) != NULL) {
-		cobc_var_print ("COB_CONFIG_DIR",	s, 1);
-	}
-	cobc_var_print ("COB_COPY_DIR",		COB_COPY_DIR, 0);
-	if ((s = getenv ("COB_COPY_DIR")) != NULL) {
-		cobc_var_print ("COB_COPY_DIR",	s, 1);
-	}
-	cobc_var_print ("COB_SCHEMA_DIR",	COB_SCHEMA_DIR, 0);
-	if ((s = getenv ("COB_SCHEMA_DIR")) != NULL) {
-		cobc_var_print ("COB_SCHEMA_DIR",	s, 1);
-	}
-	if ((s = getenv ("COBCPY")) != NULL) {
+	cobc_var_and_envvar_print ("COB_CC",		COB_CC);
+	cobc_var_and_envvar_print ("COB_CFLAGS",	COB_CFLAGS);
+#ifdef COB_DEBUG_FLAGS
+	cobc_var_and_envvar_print ("COB_DEBUG_FLAGS", COB_DEBUG_FLAGS);
+#endif
+	cobc_var_and_envvar_print ("COB_LDFLAGS",	COB_LDFLAGS);
+	cobc_var_and_envvar_print ("COB_LIBS",		COB_LIBS);
+	cobc_var_and_envvar_print ("COB_CONFIG_DIR",	COB_CONFIG_DIR);
+	cobc_var_and_envvar_print ("COB_COPY_DIR",		COB_COPY_DIR);
+	cobc_var_and_envvar_print ("COB_SCHEMA_DIR",		COB_SCHEMA_DIR);
+	if ((s = getenv ("COBCPY")) != NULL && *s) {
 		cobc_var_print ("COBCPY",	s, 1);
 	}
+	{
+		const char* val;
 #if defined (_MSC_VER)
-	cobc_var_print ("COB_MSG_FORMAT",	"MSC", 0);
+		val = "MSC";
 #else
-	cobc_var_print ("COB_MSG_FORMAT",	"GCC", 0);
+		val = "GCC";
 #endif
-	if ((s = getenv ("COB_MSG_FORMAT")) != NULL) {
-		cobc_var_print ("COB_MSG_FORMAT",	s, 1);
+		cobc_var_and_envvar_print ("COB_MSG_FORMAT", val);
 	}
 	cobc_var_print ("COB_OBJECT_EXT",	COB_OBJECT_EXT, 0);
 	cobc_var_print ("COB_MODULE_EXT",	COB_MODULE_EXT, 0);
@@ -2549,7 +2775,7 @@ process_command_line (const int argc, char **argv)
 	int			error_all_warnings = 0;
 
 	cb_mf_ibm_comp = -1;
-	cb_warn_unsupported = COBC_WARN_AS_ERROR;
+	cb_warn_opt_val[(int)cb_warn_unsupported] = COBC_WARN_AS_ERROR;
 
 #if defined (_WIN32) || defined (__DJGPP__)
 	if (!getenv ("POSIXLY_CORRECT")) {
@@ -2927,6 +3153,9 @@ process_command_line (const int argc, char **argv)
 			cb_flag_stack_check = 1;
 			cb_flag_source_location = 1;
 			cb_flag_remove_unreachable = 0;
+#ifdef COB_DEBUG_FLAGS
+			COBC_ADD_STR (cobc_cflags, " ", cobc_debug_flags, NULL);
+#endif
 			break;
 
 		case 'G':
@@ -3260,11 +3489,11 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 'w':
-			/* -w : Turn off all warnings (disables -W/-Wall if passed later) */
-#define	CB_WARNDEF(var,name,doc)	var = COBC_WARN_DISABLED;
-#define	CB_ONWARNDEF(var,name,doc)	var = COBC_WARN_DISABLED;
-#define	CB_NOWARNDEF(var,name,doc)	var = COBC_WARN_DISABLED;
-#define	CB_ERRWARNDEF(var,name,doc)	var = COBC_WARN_ENABLED;
+			/* -w : Turn off all warnings (disables -Wall/-Wextra if passed later) */
+#define	CB_WARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_DISABLED;
+#define	CB_ONWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_DISABLED;
+#define	CB_NOWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_DISABLED;
+#define	CB_ERRWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
 #include "warning.def"
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -3274,10 +3503,10 @@ process_command_line (const int argc, char **argv)
 
 		case 'W':
 			/* -Wall : Turn on most warnings */
-#define	CB_WARNDEF(var,name,doc)	var = COBC_WARN_ENABLED;
-#define	CB_ONWARNDEF(var,name,doc)
-#define	CB_NOWARNDEF(var,name,doc)
-#define	CB_ERRWARNDEF(var,name,doc)	var = COBC_WARN_AS_ERROR;
+#define	CB_WARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
+#define	CB_ONWARNDEF(opt,name,doc)
+#define	CB_NOWARNDEF(opt,name,doc)
+#define	CB_ERRWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_AS_ERROR;
 #include "warning.def"
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -3286,11 +3515,11 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 'Y':
-			/* -W : Turn on every warning */
-#define	CB_WARNDEF(var,name,doc)	var = COBC_WARN_ENABLED;
-#define	CB_ONWARNDEF(var,name,doc)
-#define	CB_NOWARNDEF(var,name,doc)	var = COBC_WARN_ENABLED;
-#define	CB_ERRWARNDEF(var,name,doc)	var = COBC_WARN_AS_ERROR;
+			/* -Wextra : Turn on every warning that is not dialect related */
+#define	CB_WARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
+#define	CB_ONWARNDEF(opt,name,doc)
+#define	CB_NOWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
+#define	CB_ERRWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_AS_ERROR;
 #include "warning.def"
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -3298,17 +3527,27 @@ process_command_line (const int argc, char **argv)
 #undef	CB_ERRWARNDEF
 			break;
 
+#if 0 /* TODO */
+		case 'y':
+			/* -Wunknown-option, -Wno-unknown-option: ignore with diagnostic */
+			if (verbose_output) {
+				cobc_err_msg (_("unknown warning option '%s'"),
+					cob_optarg);
+			}
+			break;
+#endif
+
 		case 'Z':
 			/* -Werror[=warning] : Treat all/single warnings as errors */
 			if (cob_optarg) {
-#define CB_CHECK_WARNING(var,name)  \
+#define CB_CHECK_WARNING(opt,name)  \
 				if (strcmp (cob_optarg, name) == 0) {	\
-					var = COBC_WARN_AS_ERROR;		\
+					cb_warn_opt_val[opt] = COBC_WARN_AS_ERROR;		\
 				} else
-#define	CB_WARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
-#define	CB_ONWARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
-#define	CB_NOWARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
-#define	CB_ERRWARNDEF(var,name,doc)	CB_CHECK_WARNING(var, name)
+#define	CB_WARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_ONWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_NOWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_ERRWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
 #include "warning.def"
 #undef	CB_CHECK_WARNING
 #undef	CB_WARNDEF
@@ -3322,6 +3561,34 @@ process_command_line (const int argc, char **argv)
 				}
 			} else {
 				error_all_warnings = 1;
+			}
+			break;
+
+		case 'z':
+			/* -Wno-error[=warning] : Treat all/single warnings as errors */
+			if (cob_optarg) {
+#define CB_CHECK_WARNING(opt,name)  \
+				if (strcmp (cob_optarg, name) == 0	\
+				 && cb_warn_opt_val[opt] == COBC_WARN_AS_ERROR) {	\
+					cb_warn_opt_val[opt] = COBC_WARN_ENABLED;		\
+				} else
+#define	CB_WARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_ONWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_NOWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#define	CB_ERRWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt, name)
+#include "warning.def"
+#undef	CB_CHECK_WARNING
+#undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
+#undef	CB_NOWARNDEF
+#undef	CB_ERRWARNDEF
+				/* note: ends block from last CB_CHECK_WARNING */
+				/* else */ if (verbose_output) {
+					cobc_err_msg (_("unknown warning option '%s'"),
+						cob_optarg);
+				}
+			} else {
+				error_all_warnings = 0;
 			}
 			break;
 
@@ -3392,7 +3659,7 @@ process_command_line (const int argc, char **argv)
 			cb_missing_statement = CB_WARNING;
 		}
 		/* FIXME - the warning was only raised if not relaxed */
-		cb_warn_ignored_initial_val = 0;
+		cb_warn_opt_val[(int)cb_warn_ignored_initial_val] = 0;
 	}
 #if 0 /* deactivated as -frelaxed-syntax-checks and other compiler configurations
 		 are available at command line - maybe re-add with another name */
@@ -3407,14 +3674,14 @@ process_command_line (const int argc, char **argv)
 
 	/* Set active warnings to errors, if requested */
 	if (error_all_warnings) {
-#define CB_CHECK_WARNING(var)  \
-		if (var == COBC_WARN_ENABLED) {	\
-				var = COBC_WARN_AS_ERROR;		\
+#define CB_CHECK_WARNING(opt)  \
+		if (cb_warn_opt_val[opt] == COBC_WARN_ENABLED) {	\
+			cb_warn_opt_val[opt] = COBC_WARN_AS_ERROR;		\
 		}
-#define	CB_WARNDEF(var,name,doc)	CB_CHECK_WARNING(var)
-#define	CB_ONWARNDEF(var,name,doc)	CB_CHECK_WARNING(var)
-#define	CB_NOWARNDEF(var,name,doc)	CB_CHECK_WARNING(var)
-#define	CB_ERRWARNDEF(var,name,doc)	CB_CHECK_WARNING(var)
+#define	CB_WARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt)
+#define	CB_ONWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt)
+#define	CB_NOWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt)
+#define	CB_ERRWARNDEF(opt,name,doc)	CB_CHECK_WARNING(opt)
 #include "warning.def"
 #undef	CB_CHECK_WARNING
 #undef	CB_WARNDEF
@@ -3428,7 +3695,7 @@ process_command_line (const int argc, char **argv)
 	}
 
 	if (fatal_errors_flag) {
-		cb_max_errors = 0;
+		cb_max_errors = -1;
 	}
 
 	/* Set postponed options */
@@ -4886,15 +5153,20 @@ set_category (int category, int usage, char *type)
 	}
 }
 
-/* terminate string at first trailing space and return its length */
+/* terminate string at first trailing space ' ' and return its length */
 static int
 terminate_str_at_first_trailing_space (char * const str)
 {
 	int	i;
 
+#if 0 /* Simon: We likely do not need to zero-out the complete memory... */
 	for (i = strlen (str) - 1; i && isspace ((unsigned char)str[i]); i--) {
 		str[i] = '\0';
 	}
+#else
+	for (i = strlen (str) - 1; i && str[i] == ' '; i--);
+	str[i + 1] = '\0';
+#endif
 	return i;
 }
 
@@ -4994,6 +5266,12 @@ print_fields (struct cb_field *top, int *found)
 				pd_off += sprintf (print_data + pd_off, "OCCURS %d", top->occurs_max);
 			}
 		}
+		if (top->flag_external) {
+			pd_off += sprintf (print_data + pd_off, " EXTERNAL");
+		}
+		if (top->flag_item_based) {
+			pd_off += sprintf (print_data + pd_off, " BASED");
+		}
 		if (top->redefines && !top->file) {
 			pd_off += sprintf (print_data + pd_off, ", REDEFINES %s", top->redefines->name);
 		}
@@ -5042,48 +5320,68 @@ print_fields_in_section (struct cb_field *first_field_in_section)
 	return found;
 }
 
+#ifdef COB_INTERNAL_XREF
 /* create xref_elem with line number for existing xref entry */
 void
 cobc_xref_link (struct cb_xref *list, const int line, const int receiving)
 {
-#ifdef COB_INTERNAL_XREF
-	struct cb_xref_elem *elem;
+	struct cb_xref_elem* elem = list->tail;
+	struct cb_xref_elem* new_elem;
 
-	for (elem = list->head; elem; elem = elem->next) {
-		if (elem->line == line) {
-			if (receiving) {
-				elem->receive = 1;
+	/* only search if line is less then last entry ...*/
+	if (elem && elem->line >= line) {
+		for (; elem; elem = elem->prev) {
+			if (elem->line == line) {
+				if (receiving) {
+					elem->receive = 1;
+				}
+				return;
 			}
-			return;
+			if (elem->line < line) {
+				break;
+			}
 		}
 	}
+	/* ... otherwise it is guaranteed to be new */
 
-	elem = cobc_parse_malloc (sizeof (struct cb_xref_elem));
-	elem->line = line;
-	elem->receive = receiving;
+	list->amount++;
+
+	new_elem = cobc_parse_malloc (sizeof (struct cb_xref_elem));
+	new_elem->line = line;
+	new_elem->receive = receiving;
+	new_elem->prev = elem;
 
 	/* add xref_elem to head/tail
 	   remark: if head == NULL, then tail may contain reference to child's
 	   head marking it as "referenced by child" - we don't want to preserve
 	   this information but overwrite it with the actual reference */
 	if (list->head == NULL) {
-		list->head = elem;
+		list->head = new_elem;
 	} else if (list->tail != NULL) {
-		list->tail->next = elem;
+		/* inserting in between, elem is last matched entry */
+		if (list->tail->line > line) {
+			if (!elem) {
+				new_elem->next = list->head;
+				list->head->prev = new_elem;
+				list->head = new_elem;
+			} else {
+				new_elem->next = elem->next;
+				elem->next = new_elem;
+				if (list->tail == elem) {
+					list->tail = new_elem;
+				}
+			}
+			return;
+		}
+		list->tail->next = new_elem;
 	}
-	list->tail = elem;
-#else
-	COB_UNUSED (list);
-	COB_UNUSED (line);
-	COB_UNUSED (receiving);
-#endif
+	list->tail = new_elem;
 }
 
 /* set "referenced by child" (including lvl 88 validation) for field's parents */
 void
 cobc_xref_link_parent (const struct cb_field *field)
 {
-#ifdef COB_INTERNAL_XREF
 	struct cb_field *f;
 	const struct cb_xref *f_xref = &field->xref;
 	struct cb_xref *p_xref;
@@ -5096,16 +5394,12 @@ cobc_xref_link_parent (const struct cb_field *field)
 		}
 		p_xref->tail = f_xref->tail;
 	}
-#else
-	COB_UNUSED (field);
-#endif
 }
 
 /* add a "receiving" entry for a given field reference */
 void
 cobc_xref_set_receiving (const cb_tree target_ext)
 {
-#ifdef COB_INTERNAL_XREF
 	cb_tree	target = target_ext;
 	struct cb_field		*target_fld;
 	int				xref_line;
@@ -5126,15 +5420,11 @@ cobc_xref_set_receiving (const cb_tree target_ext)
 		xref_line = cb_source_line;
 	}
 	cobc_xref_link (&target_fld->xref, xref_line, 1);
-#else
-	COB_UNUSED (target_ext);
-#endif
 }
 
 void
 cobc_xref_call (const char *name, const int line, const int is_ident, const int is_sys)
 {
-#ifdef COB_INTERNAL_XREF
 	struct cb_call_elem	*elem;
 
 	for (elem = current_program->call_xref.head; elem; elem = elem->next) {
@@ -5156,14 +5446,8 @@ cobc_xref_call (const char *name, const int line, const int is_ident, const int 
 		current_program->call_xref.tail->next = elem;
 	}
 	current_program->call_xref.tail = elem;
-#else
-	COB_UNUSED (name);
-	COB_UNUSED (line);
-	COB_UNUSED (is_ident);
-#endif
 }
 
-#ifdef COB_INTERNAL_XREF
 static void
 xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xref_parent)
 {
@@ -5199,19 +5483,21 @@ xref_print (struct cb_xref *xref, const enum xref_type type, struct cb_xref *xre
 	for (elem = xref->head; elem; elem = elem->next) {
 		pd_off += sprintf (print_data + pd_off, " %c%-6u",
 			elem->receive ? '*' : ' ', elem->line);
-		if (++cnt >= maxcnt) {
+		if (++cnt == maxcnt) {
 			cnt = 0;
 			(void)terminate_str_at_first_trailing_space (print_data);
 			print_program_data (print_data);
-			if (elem->next) {
-				pd_off = sprintf (print_data, "%38.38s", " ");
-			}
+			pd_off = sprintf (print_data, "%38.38s", " ");
 		}
 	}
-	if (cnt) {
-		(void)terminate_str_at_first_trailing_space (print_data);
-		print_program_data (print_data);
+	while (++cnt < maxcnt) {
+		pd_off += sprintf (print_data + pd_off, "        ");
 	}
+	pd_off += sprintf (print_data + pd_off, " x%-6u",
+		xref->amount);
+
+	(void)terminate_str_at_first_trailing_space (print_data);
+	print_program_data (print_data);
 }
 
 static void
@@ -5363,7 +5649,7 @@ xref_calls (struct cb_call_xref *list)
 	}
 	return gotone;
 }
-#endif
+#endif /* COB_INTERNAL_XREF */
 
 static void
 print_program_trailer (void)
@@ -5690,9 +5976,17 @@ get_next_listing_line (FILE *fd, char **pline, int fixed)
 	}
 
 	if (fixed) {
+#if 1 /* Simon: that should be portable enough */
+		int size = (unsigned int)CB_ENDLINE - i;
+		if (size > 0) {
+			memset (&out_line[i], ' ', (size_t)size);
+			i = (unsigned int)CB_ENDLINE;
+		}
+#else
 		while (i < (unsigned int)CB_ENDLINE) {
 			out_line[i++] = ' ';
 		}
+#endif
 	} else {
 		out_line[i++] = ' ';
 	}
@@ -5915,7 +6209,7 @@ print_errors_for_line (const struct list_error * const first_error,
 	const unsigned int	max_chars_on_line = cb_listing_wide ? 120 : 80;
 	size_t msg_off;
 
-	for (err = first_error; err; err = err->next) {
+	for (err = first_error; err && err->line <= line_num; err = err->next) {
 		if (err->line == line_num) {
 			pd_off = snprintf (print_data, max_chars_on_line, "%s%s", err->prefix, err->msg);
 			if (pd_off == -1) {	/* snprintf returns -1 in MS and on HPUX if max is reached */
@@ -6799,21 +7093,6 @@ print_replace_main (struct list_files *cfile, FILE *fd,
 	return pline_cnt;
 }
 
-static struct list_error *
-list_error_reverse (struct list_error *p)
-{
-	struct list_error	*next;
-	struct list_error	*last;
-
-	last = NULL;
-	for (; p; p = next) {
-		next = p->next;
-		p->next = last;
-		last = p;
-	}
-	return last;
-}
-
 /*
 Print the listing for the file in cfile, with copybooks expanded and
 after text has been REPLACE'd.
@@ -6994,10 +7273,6 @@ print_program (struct list_files *cfile, int in_copy)
 {
 	struct list_error	*err;
 	struct list_files	*cur;
-
-	if (cfile->err_head) {
-		cfile->err_head = list_error_reverse (cfile->err_head);
-	}
 
 	if (cb_listing_with_source) {
 		/* actual printing of program code, copybooks included */
@@ -7288,7 +7563,7 @@ process_compile (struct filename *fn)
 #ifdef	_MSC_VER
 	sprintf (cobc_buffer, gflag_set ?
 		"%s /c %s %s /Od /MDd /Zi /FR /c /Fa\"%s\" /Fo\"%s\" \"%s\"" :
-		"%s /c %s %s /MD /c /Fa\"%s\" /Fo\"%s\" \"%s\"",
+		"%s /c %s %s     /MD          /c /Fa\"%s\" /Fo\"%s\" \"%s\"",
 			cobc_cc, cobc_cflags, cobc_include, name,
 			name, fn->translate);
 	if (verbose_output > 1) {
@@ -7311,7 +7586,6 @@ process_compile (struct filename *fn)
 	}
 	return process(cobc_buffer);
 #endif
-
 }
 
 /* Create single-element assembled object */
@@ -7543,8 +7817,7 @@ process_module (struct filename *fn)
 #endif
 
 	size = strlen (name);
-	bufflen = cobc_cc_len
-			+ cobc_shared_opt_len
+	bufflen = cobc_cc_len + cobc_shared_opt_len
 			+ cobc_pic_flags_len + cobc_export_dyn_len
 			+ size + fn->object_len
 #ifdef	_MSC_VER
@@ -7884,7 +8157,7 @@ set_cobc_defaults (void)
 	char			*p;
 
 	cobc_cc = cobc_getenv_path ("COB_CC");
-	if (cobc_cc == NULL) {
+	if (cobc_cc == NULL ) {
 		cobc_cc = COB_CC;
 	}
 
@@ -7910,6 +8183,15 @@ set_cobc_defaults (void)
 	} else {
 		COBC_ADD_STR (cobc_ldflags, COB_LDFLAGS, NULL, NULL);
 	}
+
+#ifdef COB_DEBUG_FLAGS
+	p = cobc_getenv ("COB_DEBUG_FLAGS");
+	if (p && *p) {
+		cobc_debug_flags = (const char *)p;
+	} else {
+		cobc_debug_flags = COB_DEBUG_FLAGS;
+	}
+#endif
 
 	p = cobc_getenv ("COB_LIBS");
 	if (p) {
@@ -8027,9 +8309,15 @@ finish_setup_compiler_env (void)
 	cobc_cc_len = strlen (cobc_cc);
 	cobc_cflags_len = strlen (cobc_cflags);
 	cobc_include_len = strlen (cobc_include);
+#ifdef COB_SHARED_OPT
 	cobc_shared_opt_len = strlen (COB_SHARED_OPT);
+#endif
+#ifdef COB_PIC_FLAGS
 	cobc_pic_flags_len = strlen (COB_PIC_FLAGS);
+#endif
+#ifdef COB_EXPORT_DYN
 	cobc_export_dyn_len = strlen (COB_EXPORT_DYN);
+#endif
 	cobc_ldflags_len = strlen (cobc_ldflags);
 	cobc_lib_paths_len = strlen (cobc_lib_paths);
 	cobc_libs_len = strlen (cobc_libs);
@@ -8074,6 +8362,17 @@ begin_setup_internal_and_compiler_env (void)
 	setlocale (LC_ALL, "");
 	setlocale (LC_NUMERIC, "C");
 #endif
+
+	/* initial values for warning options */
+#define	CB_WARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_DISABLED;
+#define	CB_ONWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
+#define	CB_NOWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_DISABLED;
+#define	CB_ERRWARNDEF(opt,name,doc)	cb_warn_opt_val[opt] = COBC_WARN_ENABLED;
+#include "warning.def"
+#undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
+#undef	CB_NOWARNDEF
+#undef	CB_ERRWARNDEF
 
 	/* minimal initialization of the environment like binding textdomain,
 	   allowing test to be run under WIN32 (implied in cob_init(),

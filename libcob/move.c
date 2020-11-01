@@ -53,6 +53,16 @@ static const cob_field_attr	const_alpha_attr =
 static const cob_field_attr	const_binll_attr =
 				{COB_TYPE_NUMERIC_BINARY, 20, 0,
 				 COB_FLAG_HAVE_SIGN, NULL};
+static const cob_field_attr	all_display_attr =
+				{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
+static const cob_field_attr	all_numeric_display_attr =
+				{COB_TYPE_NUMERIC_DISPLAY, COB_MAX_DIGITS, 0,
+				 0, NULL};
+
+static unsigned char all_numeric_data[COB_MAX_DIGITS];
+static const cob_field	all_numeric_field  = 
+				{COB_MAX_DIGITS, all_numeric_data,
+				 &all_numeric_display_attr};
 
 static const int	cob_exp10[10] = {
 	1,
@@ -1132,15 +1142,14 @@ static void
 cob_move_all (cob_field *src, cob_field *dst)
 {
 	unsigned char		*p;
-	size_t			i;
 	size_t			digcount;
 	cob_field		temp;
-	cob_field_attr		attr;
 
 	if (likely(COB_FIELD_IS_ALNUM(dst))) {
 		if (likely(src->size == 1)) {
 			memset (dst->data, src->data[0], dst->size);
 		} else {
+			size_t			i;
 			digcount = src->size;
 			for (i = 0; i < dst->size; ++i) {
 				dst->data[i] = src->data[i % digcount];
@@ -1148,21 +1157,24 @@ cob_move_all (cob_field *src, cob_field *dst)
 		}
 		return;
 	}
-	COB_ATTR_INIT (COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL);
-	if (COB_FIELD_IS_NUMERIC(dst)) {
-		digcount = COB_MAX_DIGITS;
-		attr.type = COB_TYPE_NUMERIC_DISPLAY;
-		attr.digits = COB_MAX_DIGITS;
-	} else {
+	if (!COB_FIELD_IS_NUMERIC(dst)) {
+		temp.attr = &all_display_attr;
 		digcount = dst->size;
+	} else if (likely(src->size == 1)) {
+		memset (all_numeric_data, src->data[0], COB_MAX_DIGITS);
+		cob_move ((cob_field *)&all_numeric_field, dst);
+		return;
+	} else {
+		temp.attr = &all_numeric_display_attr;
+		digcount = COB_MAX_DIGITS;	/* CHECKME: when do we enter here? */
 	}
 	p = cob_malloc (digcount);
 	temp.size = digcount;
 	temp.data = p;
-	temp.attr = &attr;
 	if (likely(src->size == 1)) {
 		memset (p, src->data[0], digcount);
 	} else {
+		size_t			i;
 		for (i = 0; i < digcount; ++i) {
 			p[i] = src->data[i % src->size];
 		}
@@ -1484,7 +1496,7 @@ cob_move (cob_field *src, cob_field *dst)
 		case COB_TYPE_NUMERIC_FP_DEC64:
 		case COB_TYPE_NUMERIC_FP_DEC128:
 			indirect_move (cob_move_alphanum_to_display, src, dst,
-					(size_t)(2* COB_MAX_DIGITS),
+					(size_t)(2 * COB_MAX_DIGITS),
 					COB_MAX_DIGITS);
 			return;
 		case COB_TYPE_ALPHANUMERIC_EDITED:
