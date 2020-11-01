@@ -42,9 +42,9 @@ static const char	*last_error_file = "unknown";	/* no gettext for static initial
 static FILE			*sav_lst_file = NULL;
 static int		ignore_error = 0;
 
-#define COBC_ERRBUF_SIZE		1024
-
 size_t				cb_msg_style;
+
+DECLNORET static void		cobc_too_many_errors (void) COB_A_NORETURN;
 
 static void
 print_error_prefix (const char *file, int line, const char *prefix)
@@ -67,9 +67,9 @@ print_error_prefix (const char *file, int line, const char *prefix)
 
 static void
 print_error (const char *file, int line, const char *prefix,
-	     const char *fmt, va_list ap)
+	     const char *fmt, va_list ap, const char *diagnostic_option)
 {
-	char	errmsg[COB_SMALL_BUFF];
+	static char errmsg[COB_SMALL_BUFF];
 
 	if (!file) {
 		file = cb_source_file;
@@ -104,13 +104,54 @@ print_error (const char *file, int line, const char *prefix,
 
 	/* Print the error */
 	print_error_prefix (file, line, prefix);
-	vsprintf (errmsg, fmt, ap);
-	fprintf (stderr, "%s\n", errmsg);
+	vsnprintf (errmsg, COB_SMALL_MAX, fmt, ap);
+	if (diagnostic_option) {
+		fprintf (stderr, "%s [%s]\n", errmsg, diagnostic_option);
+	} else {
+		fprintf (stderr, "%s\n", errmsg);
+	}
 
 	if (cb_src_list_file) {
 		cb_add_error_to_listing (file, line, prefix, errmsg);
 	}
 }
+
+static void
+cobc_too_many_errors (void)
+{
+	if (cb_diagnostic_show_option) {
+		char diagnostic_option[COB_MINI_BUFF];
+		if (cb_max_errors == -1) {
+			snprintf (diagnostic_option, COB_MINI_MAX,
+				"-Wfatal-errors");
+		} else {
+			snprintf (diagnostic_option, COB_MINI_MAX,
+				"-fmax-errors=%d", cb_max_errors);
+		}
+		fprintf (stderr, "cobc: %s [%s]\n", _("too many errors"), diagnostic_option);
+	} else {
+		fprintf (stderr, "cobc: %s\n", _("too many errors"));
+	}
+	cobc_abort_terminate (0);
+}
+
+
+void
+cb_inclusion_note (const char *file, int line)
+{
+	/* Print the inclusion error */
+	fprintf (stderr, _("in file included from "));
+	if (line > 0) {
+		if (cb_msg_style == CB_MSG_STYLE_MSC) {
+			fprintf (stderr, "%s(%d):\n", file, line);
+		} else {
+			fprintf (stderr, "%s:%d:\n", file, line);
+		}
+	} else {
+		fprintf (stderr, "%s:\n", file);
+	}
+}
+
 static void
 configuration_error_head (void)
 {
@@ -130,8 +171,8 @@ cb_get_strerror (void)
 	return (char *)cobc_main_strdup (strerror (errno));
 #else
 	char * msg;
-	msg = cobc_main_malloc ((size_t)COBC_ERRBUF_SIZE);
-	snprintf (msg, COBC_ERRBUF_SIZE - 1, _("system error %d"), errno);
+	msg = cobc_main_malloc (COB_SMALL_BUFF);
+	snprintf (msg, COB_SMALL_MAX, _("system error %d"), errno);
 	return msg;
 #endif
 }
@@ -179,11 +220,11 @@ cb_add_error_to_listing (const char *file, int line,
 		/* set correct listing entry for this file */
 		cfile = cb_current_file;
 		if (!cfile->name
-			|| (file && strcmp (cfile->name, file))) {
+		 || (file && strcmp (cfile->name, file))) {
 			cfile = cfile->copy_head;
 			while (cfile) {
 				if (file && cfile->name
-					&& !strcmp (cfile->name, file)) {
+				 && !strcmp (cfile->name, file)) {
 					break;
 				}
 				cfile = cfile->next;
@@ -193,9 +234,51 @@ cb_add_error_to_listing (const char *file, int line,
 		if (!cfile) {
 			cfile = cb_current_file;
 		}
-		/* add error to listing entry */
-		err->next = cfile->err_head;
-		cfile->err_head = err;
+		/* add error to listing entry - in order */
+#if 0	/* note: we don't need to check 'file' here because of cfile's scope */
+		if (!err->file) {
+			struct list_error	*old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (old_err->file) {
+					continue;
+				}
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		} else {
+			struct list_error* old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (!old_err
+				 || strcmp (old_err->file, err->file)) {
+					continue;
+				}
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		}
+#else
+		{
+			struct list_error* old_err;
+			for (old_err = cfile->err_head; old_err; old_err = old_err->next) {
+				if (old_err->line > err->line) {
+					break;
+				}
+				err->prev = old_err;
+			}
+		}
+#endif
+
+		if (!err->prev) {
+			err->next = cfile->err_head;
+			cfile->err_head = err;
+		} else {
+			err->next = err->prev->next;
+			err->prev->next = err;
+		}
 
 		/* Otherwise, just write error to the listing file */
 	} else {
@@ -217,19 +300,54 @@ cb_add_error_to_listing (const char *file, int line,
 	}
 }
 
+static char warning_option_buff[COB_MINI_BUFF];
+static char *warning_option_text (const enum cb_warn_opt opt, const enum cb_warn_val pref)
+{
+	const char *opt_name;
+
+	if (!cb_diagnostic_show_option) {
+		return NULL;
+	}
+	switch (opt) {
+#define	CB_WARNDEF(opt_val,name,doc)	case opt_val: opt_name = name; break;
+#define	CB_ONWARNDEF(opt_val,name,doc)	case opt_val: opt_name = name; break;
+#define	CB_NOWARNDEF(opt_val,name,doc)	case opt_val: opt_name = name; break;
+#define	CB_ERRWARNDEF(opt_val,name,doc)	case opt_val: opt_name = name; break;
+#include "warning.def"
+#undef	CB_WARNDEF
+#undef	CB_ONWARNDEF
+#undef	CB_NOWARNDEF
+#undef	CB_ERRWARNDEF
+		/* LCOV_EXCL_START */
+	case COB_WARNOPT_NONE:
+	case COB_WARNOPT_MAX:
+	default:
+		/* This should never happen (and therefore doesn't get a translation) */
+		cobc_err_msg ("unexpected warning option value: %d", opt);
+		COBC_ABORT ();
+		/* LCOV_EXCL_STOP */
+	};
+	sprintf (warning_option_buff, "%s%s",
+		pref != COBC_WARN_AS_ERROR ? "-W" : "-Werror=", opt_name);
+	return warning_option_buff;
+}
+
 void
-cb_warning (int pref, const char *fmt, ...)
+cb_warning (const enum cb_warn_opt opt, const char *fmt, ...)
 {
 	va_list ap;
+	const enum cb_warn_val pref = cb_warn_opt_val[opt];
 
-	if (!pref) {
+	if (pref == COBC_WARN_DISABLED) {
 		return;
 	}
 
 	va_start (ap, fmt);
-	print_error (NULL, 0,
-		(pref == COBC_WARN_AS_ERROR) ? _("error [-Werror]: ") : _("warning: "),
-		fmt, ap);
+	if (pref != COBC_WARN_AS_ERROR) {
+		print_error (NULL, 0, _("warning: "),  fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (NULL, 0, _("error: "),  fmt, ap, warning_option_text (opt, pref));
+	}
 	va_end (ap);
 
 	if (sav_lst_file) {
@@ -251,7 +369,7 @@ cb_error_always (const char *fmt, ...)
 
 	cobc_in_repository = 0;
 	va_start (ap, fmt);
-	print_error (NULL, 0, _("error: "), fmt, ap);
+	print_error (NULL, 0, _("error: "), fmt, ap, NULL);
 	va_end (ap);
 
 	if (sav_lst_file) {
@@ -267,17 +385,29 @@ void
 cb_error (const char *fmt, ...)
 {
 	va_list ap;
+	const enum cb_warn_opt	opt = cb_warn_ignored_error;
+	const enum cb_warn_val	pref = cb_warn_opt_val[opt];
 
 	cobc_in_repository = 0;
+
+	if (ignore_error && pref == COBC_WARN_DISABLED) {
+		return;
+	}
+
 	va_start (ap, fmt);
-	print_error (NULL, 0, ignore_error ?
-		_("error (ignored): "):_("error: "), fmt, ap);
+	if (!ignore_error) {
+		print_error (NULL, 0, _("error: "), fmt, ap, NULL);
+	} else if (pref == COBC_WARN_AS_ERROR) {
+		print_error (NULL, 0, _("error: "), fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (NULL, 0, _("warning: "), fmt, ap, warning_option_text (opt, pref));
+	}
 	va_end (ap);
 
 	if (sav_lst_file) {
 		return;
 	}
-	if (ignore_error) {
+	if (ignore_error && pref != COBC_WARN_AS_ERROR) {
 		warningcount++;
 	} else {
 		if (++errorcount > cb_max_errors) {
@@ -296,7 +426,7 @@ cb_perror (const int config_error, const char *fmt, ...)
 	}
 
 	va_start (ap, fmt);
-	print_error (NULL, 0, "", fmt, ap);
+	print_error (NULL, 0, "", fmt, ap, NULL);
 	va_end (ap);
 
 
@@ -310,18 +440,21 @@ cb_perror (const int config_error, const char *fmt, ...)
 /* cb_source_line needs to be adjusted by newline_count in pplex.l */
 
 void
-cb_plex_warning (int pref, const size_t sline, const char *fmt, ...)
+cb_plex_warning (const enum cb_warn_opt opt, const size_t sline, const char *fmt, ...)
 {
 	va_list ap;
+	const enum cb_warn_val pref = cb_warn_opt_val[opt];
 
-	if (!pref) {
+	if (pref == COBC_WARN_DISABLED) {
 		return;
 	}
 
 	va_start (ap, fmt);
-	print_error (NULL, (int)(cb_source_line + sline),
-		(pref == COBC_WARN_AS_ERROR) ? _("error [-Werror]: ") : _("warning: "),
-		fmt, ap);
+	if (pref != COBC_WARN_AS_ERROR) {
+		print_error (NULL, cb_source_line + (int)sline, _("warning: "), fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (NULL, cb_source_line + (int)sline, _("error: "), fmt, ap, warning_option_text (opt, pref));
+	}
 	va_end (ap);
 
 	if (sav_lst_file) {
@@ -342,7 +475,7 @@ cb_plex_error (const size_t sline, const char *fmt, ...)
 	va_list ap;
 
 	va_start (ap, fmt);
-	print_error (NULL, (int)(cb_source_line + sline), ("error: "), fmt, ap);
+	print_error (NULL, cb_source_line + (int)sline, ("error: "), fmt, ap, NULL);
 	va_end (ap);
 
 	if (sav_lst_file) {
@@ -374,7 +507,7 @@ cb_plex_verify (const size_t sline, const enum cb_support tag,
 	case CB_SKIP:
 		return 0;
 	case CB_IGNORE:
-		cb_plex_warning (cb_warn_extra, sline, _("%s ignored"), feature);
+		cb_plex_warning (cb_warn_additional, sline, _("%s ignored"), feature);
 		return 0;
 	case CB_ERROR:
 		cb_plex_error (sline, _("%s used"), feature);
@@ -401,7 +534,7 @@ configuration_warning (const char *fname, const int line, const char *fmt, ...)
 
 	/* Prefix */
 	if (fname != last_error_file
-		|| line != last_error_line) {
+	 || line != last_error_line) {
 		last_error_file = fname;
 		last_error_line = line;
 		print_error_prefix (fname, line, NULL);
@@ -432,7 +565,7 @@ configuration_error (const char *fname, const int line,
 
 	/* Prefix */
 	if (fname != last_error_file
-		|| line != last_error_line) {
+	 || line != last_error_line) {
 		last_error_file = fname;
 		last_error_line = line;
 		print_error_prefix (fname, line, NULL);
@@ -465,18 +598,21 @@ configuration_error (const char *fname, const int line,
 
 /* Generic warning/error routines */
 void
-cb_warning_x (int pref, cb_tree x, const char *fmt, ...)
+cb_warning_x (const enum cb_warn_opt opt, cb_tree x, const char *fmt, ...)
 {
 	va_list ap;
+	const enum cb_warn_val pref = cb_warn_opt_val[opt];
 
-	if (!pref) {
+	if (pref == COBC_WARN_DISABLED) {
 		return;
 	}
 
 	va_start (ap, fmt);
-	print_error (x->source_file, x->source_line,
-		(pref == COBC_WARN_AS_ERROR) ? _("error [-Werror]: ") : _("warning: "),
-		fmt, ap);
+	if (pref != COBC_WARN_AS_ERROR) {
+		print_error (x->source_file, x->source_line, _ ("warning: "), fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (x->source_file, x->source_line, _ ("error: "), fmt, ap, warning_option_text (opt, pref));
+	}
 	va_end (ap);
 
 	if (sav_lst_file) {
@@ -491,25 +627,32 @@ cb_warning_x (int pref, cb_tree x, const char *fmt, ...)
 	}
 }
 
+/* raise a warning (or error, or nothing) depending on a dialect option */
 void
 cb_warning_dialect_x (const enum cb_support tag, cb_tree x, const char *fmt, ...)
 {
-	va_list ap;
+	const char	*file = NULL;
+	int		line = 0;
+	va_list 	ap;
 
 	if (tag == CB_OK) {
 		return;
 	}
 
+	if (x) {
+		file = x->source_file;
+		line = x->source_line;
+	}
+
 	va_start (ap, fmt);
-	print_error (x->source_file, x->source_line,
-		(tag == CB_ERROR) ? _("error: ") : _("warning: "),
-		fmt, ap);
+	print_error (file, line, (tag == CB_ERROR || tag == CB_UNCONFORMABLE) ? _("error: ") : _("warning: "),
+		fmt, ap, NULL);
 	va_end (ap);
 
 	if (sav_lst_file) {
 		return;
 	}
-	if (tag == CB_ERROR) {
+	if (tag == CB_ERROR || tag == CB_UNCONFORMABLE) {
 		if (++errorcount > cb_max_errors) {
 			cobc_too_many_errors ();
 		}
@@ -519,19 +662,53 @@ cb_warning_dialect_x (const enum cb_support tag, cb_tree x, const char *fmt, ...
 }
 
 void
-cb_error_x (cb_tree x, const char *fmt, ...)
+cb_note_x (const enum cb_warn_opt opt, cb_tree x, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start (ap, fmt);
-	print_error (x->source_file, x->source_line, ignore_error ?
-		_("error (ignored): "):_("error: "), fmt, ap);
+	if (opt != COB_WARNOPT_NONE) {
+		const enum cb_warn_val	pref = cb_warn_opt_val[opt];
+		if (pref == COBC_WARN_DISABLED) {
+			return;
+		}
+		print_error (x->source_file, x->source_line, _("note: "),
+			fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (x->source_file, x->source_line, _("note: "),
+			fmt, ap, NULL);
+	}
+	va_end (ap);
+}
+
+void
+cb_error_x (cb_tree x, const char *fmt, ...)
+{
+	va_list ap;
+	const enum cb_warn_opt	opt = cb_warn_ignored_error;
+	const enum cb_warn_val	pref = cb_warn_opt_val[opt];
+
+	if (ignore_error && pref == COBC_WARN_DISABLED) {
+		return;
+	}
+
+	va_start (ap, fmt);
+	if (!ignore_error) {
+		print_error (x->source_file, x->source_line, _("error: "),
+			fmt, ap, NULL);
+	} else if (pref == COBC_WARN_AS_ERROR) {
+		print_error (x->source_file, x->source_line, _("error: "),
+			fmt, ap, warning_option_text (opt, pref));
+	} else {
+		print_error (x->source_file, x->source_line, _("warning: "),
+			fmt, ap, warning_option_text (opt, pref));
+	}
 	va_end (ap);
 
 	if (sav_lst_file) {
 		return;
 	}
-	if (ignore_error) {
+	if (ignore_error && pref != COBC_WARN_AS_ERROR) {
 		warningcount++;
 	} else {
 		if (++errorcount > cb_max_errors) {
@@ -573,7 +750,7 @@ cb_verify_x (cb_tree x, const enum cb_support tag, const char *feature)
 	case CB_SKIP:
 		return 0;
 	case CB_IGNORE:
-		cb_warning_x (cb_warn_extra, x, _("%s ignored"), feature);
+		cb_warning_x (cb_warn_additional, x, _("%s ignored"), feature);
 		return 0;
 	case CB_ERROR:
 		/* Fall-through */
@@ -624,8 +801,8 @@ redefinition_error (cb_tree x)
 			return;
 		}
 		listprint_suppress ();
-		cb_error_x (CB_VALUE (w->items),
-			    _("'%s' previously defined here"), w->name);
+		cb_note_x (cb_warn_redefinition, CB_VALUE (w->items),
+			_("'%s' previously defined here"), w->name);
 		listprint_restore ();
 	}
 }
@@ -636,8 +813,18 @@ redefinition_warning (cb_tree x, cb_tree y)
 	struct cb_word	*w;
 	cb_tree		z;
 
+	/* early exit if warning disabled */
+	{
+		const enum cb_warn_opt	opt = cb_warn_redefinition;
+		const enum cb_warn_val	pref = cb_warn_opt_val[opt];
+		if (pref == COBC_WARN_DISABLED) {
+			return;
+		}
+	}
+
 	w = CB_REFERENCE (x)->word;
-	cb_warning_x (cb_warn_extra, x, _("redefinition of '%s'"), w->name);
+	cb_warning_x (cb_warn_redefinition, x, _("redefinition of '%s'"), w->name);
+
 	z = NULL;
 	if (y) {
 		z = y;
@@ -650,7 +837,7 @@ redefinition_warning (cb_tree x, cb_tree y)
 			return;
 		}
 		listprint_suppress ();
-		cb_warning_x (cb_warn_extra, z, _("'%s' previously defined here"), w->name);
+		cb_note_x (cb_warn_redefinition, z, _("'%s' previously defined here"), w->name);
 		listprint_restore ();
 	}
 }
@@ -686,7 +873,7 @@ undefined_error (cb_tree x)
 	}
 
 	if (r->flag_optional) {
-		cb_warning_x (cb_warn_extra, x, error_message, errnamebuff);
+		cb_warning_x (cb_warn_additional, x, error_message, errnamebuff);
 	} else {
 		cb_error_x (x, error_message, errnamebuff);
 	}
@@ -743,7 +930,7 @@ ambiguous_error (cb_tree x)
 				continue;
 			}
 			listprint_suppress ();
-			cb_error_x (y, _("'%s' defined here"), errnamebuff);
+			cb_note_x (COB_WARNOPT_NONE, y, _("'%s' defined here"), errnamebuff);
 			listprint_restore ();
 		}
 	}

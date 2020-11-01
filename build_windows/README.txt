@@ -1,5 +1,6 @@
 The following was written for using the Microsoft Visual C++ compiler in the
-rare circumstances where a GCC build (for example via MSYS/MinGW) cannot be used.
+rare circumstances where neither a GCC build (for example via MSYS/MinGW)
+nor another native compiler like OrangeC can be used.
 
 Most of this applies to other C compilers for Microsoft Windows, too - please
 report any issues and working solutions with other compilers.
@@ -9,11 +10,10 @@ very old compilers may lack support for this (like Visual C++ 2003 and older).
 
 How to build in native Windows environments:
 
-* get/build necessary prerequisites and place them in build_windows
-  Note: for convenience you can get the essential ones (MPIR, pdcurses, VBISAM,
-  BDB) from https://sourceforge.net/projects/open-cobol/files/win_prerequisites/
-  As of January 2019, libxml2 binaries (and its dependents) are available at
-  https://www.zlatkovic.com/pub/libxml/64bit/ (also for 32bit!), courtesy of Igor Zlatkovic.
+* get/build necessary prerequisites and place them in build_windows or
+  integrate them in your installation
+  Note: for convenience you can get the essential and some additional ones
+  from https://sourceforge.net/projects/gnucobol/files/dependencies/windows/
   For a manual approach:
   * headers        --> build_windows (cJSON and libxml use sub-folders)
   * link libraries --> build_windows or build_windows\$(Platform)[\$(Configuration)]
@@ -22,13 +22,12 @@ How to build in native Windows environments:
   * if you don't want to build with VBISAM change CONFIGURED_ISAM
   * if you don't want to build with screenio (PDCurses) change CONFIGURED_CURSES
   * if you want to build with additional support change the appropriate defines
+  * change COB_MAIN_DIR according to your local path and/or set MAKE_DIST
   * you may want to change the PATCHLEVEL, too
-* copy build_windows\defaults.h.in to build_windows\defaults.h,
-  change COB_MAIN_DIR according to your local path and/or set MAKE_DIST
 * you may want to change version information in build_windows\version_*.rc
 * if you compile from a development snapshot or changed these files you need
   to (re-)generate the bison and flex sources, the easiest way:
-  https://sourceforge.net/projects/winflexbison/files/win_flex_bison-latest.zip
+  https://github.com/lexxmark/winflexbison/releases/latest
     set PATH=X:\path\to\winflexbison;%PATH%
     X:\path\to\gnucobol\build_windows\makebisonflex.bat
 * compile with your environment, for example via IDE by opening the solution
@@ -56,15 +55,17 @@ How to use the dist package:
 How to test the native builds:
 
 * currently you will need a GNU/Linux-like environment for running the
-  testsuite (normally Cygwin or MinGW with MSYS)
+  testsuite (normally MinGW with MSYS, MSYS2 or Cygwin)
 * if you want to run the NIST testsuite you need a perl binary installed and
   in PATH
-* if you've set MAKE_DIST in defaults.h copy the dist package to the place
-  cobc --info says (for example to C:\GnuCOBOL_2.3)
+* if you've set MAKE_DIST in config.h copy the dist package to the place
+  cobc --info says (for example to C:\GnuCOBOL_3.1)
 * start the VS command prompt that matches the version you want to test
 * do the following commands:
- set COB_UNIX_LF=YES
- set COB_MSG_FORMAT=GCC
+  set COB_UNIX_LF=YES
+  set COB_MSG_FORMAT=GCC
+  pushd X:\path\to\gnucobol\build_windows\%PLATFORM%\%CONFIGURATION%
+  cobc -v ..\..\..\extras\CBL_OC_DUMP.cob
 * start the GNU/Linux-like environment from within the VS command prompt
   (for example by dropping its shortcut on the cmd window and pressing ENTER)
 * do the following commands:
@@ -74,12 +75,8 @@ How to test the native builds:
               # this will create the necessary Makefiles for you
 * rename tests/atlocal to tests/atlocal_gnu
 * rename tests/atlocal_win to tests/atlocal
-* do the following commands:
-  cd extras
-  make -e
-  cd ../tests
-  make check # but cancel after generating the testsuite has completed, check
-  # for "autom4te --lang=autotest -o testsuite testsuite.at" 
+* if created from a vsc-checkout or testsuite was adjusted, do the following commands:
+  make -C tests testsuite # check for "autom4te --lang=autotest -o testsuite testsuite.at" 
 * do the following commands:
   make -j2 -e checkall # or make -j2 -e check if you don't want to run the NIST
                        # testsuite; instead of -j2 you may set -j7, depending on

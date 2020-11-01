@@ -294,6 +294,7 @@ enum cobc_name_type {
 /* List of error messages */
 struct list_error {
 	struct list_error	*next;
+	struct list_error	*prev;
 	int			line;		/* Line number for error */
 	char			*file;		/* File name */
 	char			*prefix;	/* Error prefix */
@@ -380,20 +381,31 @@ extern struct cb_exception	cb_exception_table[];
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
 
-#define	CB_WARNDEF(var,name,doc)	extern int var;
-#define	CB_ONWARNDEF(var,name,doc)	extern int var;
-#define	CB_NOWARNDEF(var,name,doc)	extern int var;
-#define	CB_ERRWARNDEF(var,name,doc)	extern int var;
+
+#define	CB_WARNDEF(opt,name,doc)	opt,
+#define	CB_ONWARNDEF(opt,name,doc)	opt,
+#define	CB_NOWARNDEF(opt,name,doc)	opt,
+#define	CB_ERRWARNDEF(opt,name,doc)	opt,
+enum cb_warn_opt
+{
+	COB_WARNOPT_NONE = 0,
 #include "warning.def"
+	COB_WARNOPT_MAX
+};
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
 #undef	CB_NOWARNDEF
 #undef	CB_ERRWARNDEF
 
 #define COBC_WARN_FILLER  cb_warn_filler
-#define COBC_WARN_DISABLED 0
-#define COBC_WARN_ENABLED  1
-#define COBC_WARN_AS_ERROR 2
+
+enum cb_warn_val {
+	COBC_WARN_DISABLED = 0,
+	COBC_WARN_ENABLED  = 1,
+	COBC_WARN_AS_ERROR = 2
+};
+
+extern int cb_warn_opt_val[COB_WARNOPT_MAX];
 
 
 #define	CB_OPTIM_DEF(x)			x,
@@ -507,7 +519,8 @@ extern void			cobc_err_msg (const char *, ...) COB_A_FORMAT12;
 
 DECLNORET extern void		cobc_abort (const char *,
 					    const int) COB_A_NORETURN;
-DECLNORET extern void		cobc_too_many_errors (void) COB_A_NORETURN;
+DECLNORET extern void		cobc_abort_terminate (int) COB_A_NORETURN;
+
 
 extern size_t			cobc_check_valid_name (const char *,
 						       const enum cobc_name_type);
@@ -624,11 +637,11 @@ extern void		cb_init_codegen (void);
 
 extern size_t		cb_msg_style;
 
-extern void		cb_warning (int, const char *, ...) COB_A_FORMAT23;
+extern void		cb_warning (const enum cb_warn_opt, const char *, ...) COB_A_FORMAT23;
 extern void		cb_error (const char *, ...) COB_A_FORMAT12;
 extern void		cb_error_always (const char *, ...) COB_A_FORMAT12;
 extern void		cb_perror (const int, const char *, ...) COB_A_FORMAT23;
-extern void		cb_plex_warning (int, const size_t,
+extern void		cb_plex_warning (const enum cb_warn_opt, const size_t,
 					 const char *, ...) COB_A_FORMAT34;
 extern void		cb_plex_error (const size_t,
 					 const char *, ...) COB_A_FORMAT23;

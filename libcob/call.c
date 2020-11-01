@@ -20,7 +20,6 @@
 
 
 #include <config.h>
-#include <defaults.h>
 
 #ifndef	_GNU_SOURCE
 #define _GNU_SOURCE	1
@@ -284,13 +283,29 @@ set_resolve_error (void)
 	cob_set_exception (COB_EC_PROGRAM_NOT_FOUND);
 }
 
-static void
-cob_set_library_path (const char *path)
+static int last_entry_is_working_directory (const char *buff, const char *pstr)
 {
+	const size_t pos = pstr - buff;	/* always > 2 */
+	if (buff[pos - 1] == '.'
+	 && buff[pos - 2] == PATHSEP_CHAR) {
+		return 1;
+	}
+	return 0;
+}
+
+/* resolves the actual library path used from
+   * COB_LIBRARY_PATH runtime setting
+   * "." as current working direktory [if not included already: prefixed]
+   * COB_LIBRARY_PATH inbuilt (which normally includes modules
+     like CBL_OC_DUMP) [if not included already: appended]
+*/
+static void
+cob_set_library_path ()
+{
+	char		buff[COB_MEDIUM_BUFF];
 	char		*p;
 	char		*pstr;
 	size_t		i;
-	size_t		size;
 	struct stat	st;
 
 	int 		flag;
@@ -301,59 +316,110 @@ cob_set_library_path (const char *path)
 		cob_free (resolve_alloc);
 	}
 
-	/* Count the number of separators */
+	/* setup buffer and count number of separators,
+	   check for "." */
 	i = 1;
-	size = 0;
-	for (p = (char *)path; *p; p++, size++) {
-		if (*p == PATHSEP_CHAR) {
-			i++;
+	pstr = buff + 2; /* leaving place for prefixing the working directory */
+	buff[0] = ' ';
+	buff[1] = PATHSEP_CHAR;
+	flag = 0;
+	if (cobsetptr->cob_library_path != NULL
+	 && strcmp (cobsetptr->cob_library_path, ".") != 0) {
+		for (p = cobsetptr->cob_library_path; *p; p++, pstr++) {
+#ifdef	_WIN32
+			if (*p == '/') {
+				*pstr = '\\';
+				continue;
+			}
+#else
+			if (*p == '\\') {
+				*pstr = '/';
+				continue;
+			}
+#endif
+			if (*p == PATHSEP_CHAR) {
+				i++;
+				flag |= last_entry_is_working_directory (buff, pstr);
+			}
+			*pstr = *p;
 		}
+		*pstr = PATHSEP_CHAR;
+		i++;
+		flag |= last_entry_is_working_directory (buff, pstr);
+		pstr++;
 	}
 
-	/* Build path array */
-	size++;
-	resolve_alloc = cob_malloc (size);
-	pstr = resolve_alloc;
-	for (p = (char *)path; *p; p++, pstr++) {
+#ifdef COB_LIBRARY_PATH
+	if (COB_LIBRARY_PATH[0] != 0
+	 && strcmp (COB_LIBRARY_PATH, ".") != 0) {
+		for (p = (char *)COB_LIBRARY_PATH; *p; p++, pstr++) {
 #ifdef	_WIN32
-		if (*p == (unsigned char)'/') {
-			*pstr = (unsigned char)'\\';
-			continue;
-		}
+			if (*p == '/') {
+				*pstr = '\\';
+				continue;
+			}
 #else
-		if (*p == (unsigned char)'\\') {
-			*pstr = (unsigned char)'/';
-			continue;
-		}
+			if (*p == '\\') {
+				*pstr = '/';
+				continue;
+			}
 #endif
-		*pstr = *p;
+			if (*p == PATHSEP_CHAR) {
+				i++;
+			}
+			*pstr = *p;
+		}
 	}
+#endif
+	*pstr = 0;
+
+	/* prefix working directory if missing */
+	if (!flag) {
+		buff[0] = '.';
+		i++;
+		p = buff;
+	} else {
+		p = buff + 2;
+	}
+	/* Build path array */
+	resolve_alloc = cob_strdup (p);
+	pstr = resolve_alloc;
 
 	resolve_path = cob_malloc (sizeof (char *) * i);
 	resolve_size = 0;
 	pstr = resolve_alloc;
+
 	for (; ; ) {
 		p = strtok (pstr, PATHSEP_STR);
 		if (!p) {
 			break;
 		}
 		pstr = NULL;
+
+		/* check if directory
+		   (note: entries like X:\ _must_ be specified with trailing slash !) */
 		if (stat (p, &st) || !(S_ISDIR (st.st_mode))) {
+			/* possibly raise a warning, maybe only if explicit asked */
 			continue;
 		}
 
-		/*
-		 * look if we already have this path
-		 */
+		/* remove trailing slash from entry (always added on use) */
+		i = strlen (p) - 1;
+		if (p[i] == SLASH_CHAR) {
+			p[i] = 0;
+		}
+
+		/* check if we have this path already */
 		flag = 0;
 		for (i = 0; i < resolve_size; i++) {
-			if(strcmp(resolve_path[i], p) == 0) {
+			if (strcmp (resolve_path[i], p) == 0) {
 				flag = 1;
 				break;
 			}
 		}
 
-		if (!flag) {
+		/* finally: new entry for the resolve path */
+		if (flag == 0) {
 			resolve_path[resolve_size++] = p;
 		}
 	}
@@ -1644,6 +1710,7 @@ cob_exit_call (void)
 	if (resolve_path) {
 		cob_free (resolve_path);
 		resolve_path = NULL;
+		resolve_size = 0;
 	}
 
 #ifndef	COB_ALT_HASH
@@ -1715,7 +1782,6 @@ cob_exit_call (void)
 void
 cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 {
-	char				*buff;
 	char				*s;
 	char				*p;
 	size_t				i;
@@ -1755,27 +1821,8 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 	call_table = NULL;
 #endif
 
-	call_filename_buff = cob_malloc ((size_t)COB_NORMAL_BUFF);
-
-	buff = cob_fast_malloc ((size_t)COB_MEDIUM_BUFF);
-	if (cobsetptr->cob_library_path == NULL
-	 || strcmp(cobsetptr->cob_library_path, ".") == 0) {
-		if (strcmp(COB_LIBRARY_PATH, ".") == 0) {
-			snprintf (buff, (size_t)COB_MEDIUM_MAX, ".");
-		} else {
-			snprintf (buff, (size_t)COB_MEDIUM_MAX, ".%c%s",
-				  PATHSEP_CHAR, COB_LIBRARY_PATH);
-		}
-	} else {
-		if (strcmp(COB_LIBRARY_PATH, ".") == 0) {
-			snprintf (buff, (size_t)COB_MEDIUM_MAX, "%s%c.",
-				  cobsetptr->cob_library_path, PATHSEP_CHAR);
-		} else {
-			snprintf (buff, (size_t)COB_MEDIUM_MAX, "%s%c.%c%s",
-				  cobsetptr->cob_library_path, PATHSEP_CHAR, PATHSEP_CHAR, COB_LIBRARY_PATH);
-		}
-	}
-	cob_set_library_path (buff);
+	/* set static vars resolve_path (data in resolve_alloc) and resolve_size */
+	cob_set_library_path ();
 
 	lt_dlinit ();
 
@@ -1790,8 +1837,9 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 	}
 #endif
 
-	if (cobsetptr->cob_preload_str != NULL
-	 && resolve_path != NULL) {
+	call_filename_buff = cob_malloc ((size_t)COB_NORMAL_BUFF);
+
+	if (cobsetptr->cob_preload_str != NULL) {
 
 		p = cob_strdup (cobsetptr->cob_preload_str);
 
@@ -1800,6 +1848,7 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 
 		s = strtok (p, PATHSEP_STR);
 		for (; s; s = strtok (NULL, PATHSEP_STR)) {
+			char		buff[COB_MEDIUM_BUFF];
 #ifdef __OS400__
 			for (t = s; *t; ++t) {
 				*t = toupper (*t);
@@ -1807,7 +1856,6 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 			cache_preload (t);
 #else
 			for (i = 0; i < resolve_size; ++i) {
-				buff[COB_MEDIUM_MAX] = 0;
 				snprintf (buff, (size_t)COB_MEDIUM_MAX,
 					  "%s%c%s.%s",
 					  resolve_path[i], SLASH_CHAR, s, COB_MODULE_EXT);
@@ -1815,7 +1863,7 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 					break;
 				}
 			}
-			/* If not found, try just using the name */
+			/* If not found, try just using the name as-is */
 			if (i == resolve_size) {
 				(void)cache_preload (s);
 			}
@@ -1823,7 +1871,6 @@ cob_init_call (cob_global *lptr, cob_settings* sptr, const int check_mainhandle)
 		}
 		cob_free (p);
 	}
-	cob_free (buff);
 	call_buffer = cob_fast_malloc ((size_t)CALL_BUFF_SIZE);
 	call_lastsize = CALL_BUFF_SIZE;
 }
@@ -2135,6 +2182,173 @@ cob_get_picx_param (int n, void *char_field, size_t char_len)
 	}
 	return cob_get_picx (f->data, f->size, char_field, char_len);
 }
+
+#if 0 /* to be merged */
+
+int
+cob_get_field_type (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	if (f->attr->type == COB_TYPE_NUMERIC_BINARY) {
+		if (COB_FIELD_REAL_BINARY (f)) {
+			return COB_TYPE_NUMERIC_COMP5;
+		}
+#ifndef WORDS_BIGENDIAN
+		if (!COB_FIELD_BINARY_SWAP (f)) {
+			return COB_TYPE_NUMERIC_COMP5;
+		}
+#endif
+	}
+	return (int)f->attr->type;
+}
+
+int
+cob_get_field_size (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	return (int)f->size;
+}
+
+int
+cob_get_field_sign (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	return COB_FIELD_HAVE_SIGN (f);
+}
+
+int
+cob_get_field_scale (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	return (int)f->attr->scale;
+}
+
+int
+cob_get_field_digits (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	return (int)f->attr->digits;
+}
+
+int
+cob_get_field_constant (const cob_field *f)
+{
+	if (f == NULL) {
+		return -1;
+	}
+	return COB_FIELD_CONSTANT (f);
+}
+
+const char *
+cob_get_field_str (const cob_field *f, char *buffer, size_t size)
+{
+	if (unlikely (f == NULL)) {
+		return _("NULL field");
+	}
+	/* variable field's and empty literals may be of zero size */
+	if (unlikely (f->size == 0)) {
+		return "";
+	}
+	/* check if field has data assigned (may be a BASED / LINKAGE item) */
+	if (unlikely (f->data == NULL)) {
+		return _("field not allocated");
+	}
+	if (!buffer || !size) {
+		cob_runtime_warning_external ("cob_get_field_str", 0, "bad buffer/size");
+		return "";
+	}
+	{
+		FILE *fp;
+#ifdef HAVE_FMEMOPEN
+		fp = fmemopen (buffer, size, "w");
+#else
+		fp = cob_create_tmpfile ("display");
+#endif
+		if (fp) {
+			unsigned char pretty = COB_MODULE_PTR->flag_pretty_display;
+			COB_MODULE_PTR->flag_pretty_display = 1;
+			cob_display_common (f, fp);
+#ifndef HAVE_FMEMOPEN
+			{
+				int cur_pos = ftell (fp);
+				if (cur_pos >= 0) {
+					size_t	pos = (size_t) cur_pos;
+					fseek (fp, 0, SEEK_SET);
+					fread ((void*)buffer, 1, pos, fp);
+					if (size > pos) buffer[pos] = 0;
+				}
+			}
+#endif
+			fclose (fp);
+			COB_MODULE_PTR->flag_pretty_display = pretty;
+		}
+	}
+	return buffer;
+}
+
+const char *
+cob_get_field_str_buffered (const cob_field *f)
+{
+	char	*buff = NULL;
+	size_t	size = cob_get_field_size (f) + 1;
+
+	if (size > 0) {
+		if (size < 32) {
+			size = 32;
+		}
+		buff = cob_get_buff (size);
+	}
+	return cob_get_field_str (f, buff, size);
+}
+
+int
+cob_put_field_str (const cob_field *dst, const char *str)
+{
+	const cob_field_attr	const_alpha_attr =
+			{COB_TYPE_ALPHANUMERIC, 0, 0, 0, NULL};
+	cob_field wrk;
+
+	if (!dst ||!str) return EINVAL;
+
+	/* come back later for DYNAMIC LENGTH fields */
+	if (dst->size <= 0) return EINVAL;
+
+	if (COB_FIELD_CONSTANT (dst)) {
+		cob_runtime_warning_external ("cob_put_field_str", 0,
+			_ ("attempt to over-write constant field with '%s'"),
+			str);
+		return EINVAL;
+	}
+
+
+	wrk.attr = &const_alpha_attr;
+	wrk.size = strlen (str);
+	wrk.data = (unsigned char *)str;
+
+	if (COB_FIELD_IS_NUMERIC (dst)) {
+		if (COB_FIELD_TYPE (dst) & COB_TYPE_NUMERIC_FLOAT
+		 || COB_FIELD_TYPE (dst) & COB_TYPE_NUMERIC_DOUBLE) {
+			if (cob_check_numval_f (&wrk)) return 1;
+			wrk = *cob_intr_numval_f (&wrk);
+		} else {
+			if (cob_check_numval (&wrk, NULL, 0, 1)) return 1;
+			wrk = *cob_intr_numval (&wrk);
+		}
+	}
+	cob_move (&wrk, (cob_field *)dst);
+	return 0;
+}
+#endif /* to be merged */
 
 void
 cob_put_s64_param (int n, cob_s64_t val)

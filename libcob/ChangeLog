@@ -1,10 +1,47 @@
 
+2020-11-01  Ron Norman <rjn@inglenet.com>
+
+	* fsqlxfd.c: use cob_str_case_str instead of strcasestr
+
+2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.h, common.c: external version defintion via new defines
+	  __LIBCOB_VERSION, __LIBCOB_VERSION_MINOR, __LIBCOB_VERSION_PATCHLEVEL,
+	  __LIBCOB_RELEASE and functions libcob_version, set_libcob_version to
+	  query and/or compare these;
+	  note: __LIBCOB_VERSION_PATCHLEVEL is _not_ the package's PATCHLEVEL 
+	* common.c: extracted set_cob_build_stamp from print_version
+	* common.c, common.h: new function print_version_summary providing a two line
+	  output for GnuCOBOL + C compiler and used libraries
+	* common.c (print_runtime_conf): additional output of LOCALEDIR
+
+2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
+
+	* call.c, common.c: defaults.h removed
+	* call.c: allow omitting the definition for COB_LIBRARY_PATH via config.h
+	* call.c (cob_get_field_str): check return code of ftell before use
+	* Makefile.am: pass LOCALEDIR via define
+
 2020-10-24  Ron Norman <rjn@inglenet.com>
 
 	* fbdb.c:    More code for 'dups_ahead' options for INDEXED files
 	* foci.c:    More code for 'dups_ahead' options for INDEXED files
 	* fodbc.c:   More code for 'dups_ahead' options for INDEXED files
 	* fsqlxfd.c: More code for 'dups_ahead' options for INDEXED files
+
+2020-10-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* call.c (cob_set_library_path, cob_init_call): completely reworked
+	  reading in COB_LIBRARY_PATH: have working-directory prefixed only
+	  if not part of environment setting COB_LIBRARY_PATH already,
+	  always suffix internal default COB_LIBRARY_PATH,
+	  remove trailing spaces from entries
+	* common.c (get_math_info): use return of snprintf instead of extra strlen
+
+2020-10-20  Simon Sobisch <simonsobisch@gnu.org>
+
+	* move.c (cob_move_all): optimization by removing unnecessary malloc/free
+	  for most executions and using constant attributes
 
 2020-10-19  Ron Norman <rjn@inglenet.com>
 
@@ -18,6 +55,11 @@
 	* fbdb.c:   Add code to check or not for 'dups_ahead' options for INDEXED files
 	            Now returns '21' if doing a REWRITE and the record does not
 				exist (used to be '23')
+
+2020-10-13  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (cob_runtime_hint): replaced leading tab by "note"
+	  to harmonize with cobc
 
 2020-10-12  Ron Norman <rjn@inglenet.com>
 

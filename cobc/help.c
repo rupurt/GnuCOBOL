@@ -134,16 +134,16 @@ void
 cobc_print_usage_warnings (void)
 {
 	puts (_("Warning options:"));
-	puts (_("  -W                    enable all warnings"));
 	puts (_("  -Wall                 enable most warnings (all except as noted below)"));
-	puts (_("  -Wno-<warning>        disable warning enabled by default, -W or -Wall"));
-#define	CB_WARNDEF(var,name,doc)		\
+	puts (_("  -Wextra               like -Wall but enable some extra warning flags"));
+	puts (_("  -Wno-<warning>        disable warning enabled by default, -Wall or -Wextra"));
+#define	CB_WARNDEF(opt,name,doc)		\
 	puts (doc);
-#define	CB_ONWARNDEF(var,name,doc)		\
+#define	CB_ONWARNDEF(opt,name,doc)		\
 	puts (doc);							\
 	/* TRANSLATORS: This msgid is appended to msgid for -Wno-pending and others */ \
 	puts (_("                        * ALWAYS active"));
-#define	CB_NOWARNDEF(var,name,doc)		\
+#define	CB_NOWARNDEF(opt,name,doc)		\
 	puts (doc);							\
 	/* TRANSLATORS: This msgid is appended to msgid for -Wpossible-truncate and others */ \
 	puts (_("                        * NOT set with -Wall"));
@@ -157,7 +157,9 @@ cobc_print_usage_warnings (void)
 #undef	CB_NOWARNDEF
 #undef	CB_ERRWARNDEF
 	puts (_("  -Werror               treat all warnings as errors"));
+	puts (_("  -Wno-error            don't treat warnings as errors"));
 	puts (_("  -Werror=<warning>     treat specified <warning> as error"));
+	puts (_("  -Wno-error=<warning>  don't treat specified <warning> as error"));
 	putchar ('\n');
 }
 

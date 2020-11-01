@@ -328,6 +328,10 @@ sub run_test {
 		$compile_current = "$compile_current -debug";
 	}
 	$compile_current = "$compile_current $in";
+	if ($raw_input{$exe}) {
+		$cmd = "$cmd < $exe.inp";
+		system ("echo \"$raw_input{$exe}\" > $exe.inp");
+	}
 	if ($comp_only{$exe}) {
 		print "$compile_current\n";
 	} else {
@@ -397,10 +401,6 @@ sub run_test {
 		$ENV{"DD_XXXXX049"} = "$exe.rep";
 	}
 	$ENV{"REPORT"} = "$exe.log";
-	if ($raw_input{$exe}) {
-		$cmd = "$cmd < $exe.inp";
-		system ("echo \"$raw_input{$exe}\" > $exe.inp");
-	}
 
 testrepeat:
 	if (!$to_kill{$exe}) {

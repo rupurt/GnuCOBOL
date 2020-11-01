@@ -19,7 +19,6 @@
 */
 
 #include <config.h>
-#include <defaults.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -257,7 +256,7 @@ process_command_line (int argc, char *argv[])
 		while (++argnum < argc) {
 			if (strrchr(argv[argnum], '/') == argv[argnum]) {
 				if (argv[argnum][1] == '?' && !argv[argnum][2]) {
-					argv[argnum] = "--help";
+					argv[argnum] = (char *)"--help";
 					continue;
 				}
 				argv[argnum][0] = '-';
@@ -329,6 +328,10 @@ process_command_line (int argc, char *argv[])
 			cobcrun_print_version ();
 			putchar ('\n');
 			print_version ();
+			if (verbose_output) {
+				putchar ('\n');
+				print_version_summary ();
+			}
 			exit (EXIT_SUCCESS);
 
 		case 'M':

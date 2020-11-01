@@ -301,7 +301,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\libcob\sysdefines.h" />
     <ClInclude Include="..\config.h" />
-    <ClInclude Include="..\defaults.h" />
     <ClInclude Include="..\..\libcob.h" />
     <ClInclude Include="..\..\tarstamp.h" />
     <ClInclude Include="..\..\cobc\cobc.h" />

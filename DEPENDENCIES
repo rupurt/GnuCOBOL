@@ -1,7 +1,7 @@
 
 		                 GnuCOBOL
 		https://www.gnu.org/software/gnucobol/
-		https://sourceforge.net/projects/open-cobol
+		https://sourceforge.net/projects/gnucobol
 		https://savannah.gnu.org/projects/gnucobol
 
 ============
@@ -136,7 +136,6 @@ The following libraries ARE required WHEN :
   o JSON-C >= 0.12 - https://github.com/json-c/json-c
 
     JSON-C is distributed under Expat License.
-
 
 
 See HACKING if you wish to hack the GnuCOBOL source or build directly

@@ -802,7 +802,7 @@ valid_const_date_time_args (const cb_tree tree, const struct cb_intrinsic_table 
 		}
 		return 1;
 	}
-	cb_warning_x (cb_warn_extra, tree,
+	cb_warning_x (cb_warn_additional, tree,
 		_("FUNCTION '%s' has format in variable"), intr->name);
 	return 1;
 }
@@ -4043,7 +4043,7 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 			/* force generation of report source field */
 			fld = CB_FIELD_PTR (p->report_source);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 			if (CB_TREE_TAG (p->report_source) == CB_TAG_REFERENCE) {
 				ref = CB_REFERENCE (p->report_source);
@@ -4058,14 +4058,14 @@ finalize_report (struct cb_report *r, struct cb_field *records)
 		 && CB_REF_OR_FIELD_P (p->report_sum_counter)) {
 			fld = CB_FIELD_PTR (p->report_sum_counter);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 		}
 		if (p->report_control
 		 && CB_REF_OR_FIELD_P (p->report_control)) {
 			fld = CB_FIELD_PTR (p->report_control);
 			if (fld->count == 0) {
-				fld->count++;
+				fld->count = 1;
 			}
 		}
 		if (p->children) {
@@ -4337,6 +4337,16 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	
 	/* Validate and set max and min record size */
 	for (p = records; p; p = p->sister) {
+		if (f->organization == COB_ORG_INDEXED
+		 && p->size > MAX_FD_RECORD_IDX) {
+			cb_error_x (CB_TREE (p),
+				_("RECORD size (IDX) exceeds maximum allowed (%d)"), MAX_FD_RECORD_IDX);
+			p->size = MAX_FD_RECORD_IDX;
+		} else if (p->size > MAX_FD_RECORD) {
+			cb_error_x (CB_TREE (p),
+				_("RECORD size exceeds maximum allowed (%d)"), MAX_FD_RECORD);
+			p->size = MAX_FD_RECORD;
+		}
 		if (f->record_min > 0) {
 			if (p->size < f->record_min) {
 				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
@@ -4357,18 +4367,10 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 				cb_warning_dialect_x (cb_records_mismatch_record_clause, CB_TREE (p),
 					_("size of record '%s' (%d) larger than maximum of file '%s' (%d)"),
 				 	  p->name, p->size, f->name, f->record_max);
-				if (cb_warn_extra
+				if (cb_warn_additional
 				 && cb_records_mismatch_record_clause != CB_ERROR
 				 && cb_records_mismatch_record_clause != CB_OK) {
 					cb_warning_x (COBC_WARN_FILLER, CB_TREE (p), _("file size adjusted"));
-				}
-				if (f->organization == COB_ORG_INDEXED
-				 && p->size > MAX_FD_RECORD_IDX) {
-					cb_error (_("RECORD size (IDX) exceeds maximum allowed (%d)"), MAX_FD_RECORD_IDX);
-					p->size = MAX_FD_RECORD_IDX;
-				} else if (p->size > MAX_FD_RECORD) {
-					cb_error (_("RECORD size exceeds maximum allowed (%d)"), MAX_FD_RECORD);
-					p->size = MAX_FD_RECORD;
 				}
 				f->record_max = p->size;
 			}
@@ -4376,12 +4378,9 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	}
 
 	/* Compute the record size */
-	if (f->record_min == 0) {
-		if (records) {
-			f->record_min = records->size;
-		} else {
-			f->record_min = 0;
-		}
+	if (f->record_min == 0
+	 && records) {
+		f->record_min = records->size;
 	}
 	for (p = records; p; p = p->sister) {
 		v = cb_field_variable_size (p);
@@ -4397,26 +4396,21 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	}
 
 	if (f->flag_check_record_varying_limits
-	    && f->record_min == f->record_max) {
-		cb_error (_("file '%s': RECORD VARYING specified without limits, but implied limits are equal"),
-			  f->name);
-	}
-
-	if (f->organization == COB_ORG_INDEXED) {
-		if (f->record_max > MAX_FD_RECORD_IDX) {
-			f->record_max = MAX_FD_RECORD_IDX;
-			cb_error (_("file '%s': record size (IDX) %d exceeds maximum allowed (%d)"),
-				f->name, f->record_max, MAX_FD_RECORD_IDX);
-		}
-	} else if (f->record_max > MAX_FD_RECORD)  {
-		cb_error (_("file '%s': record size %d exceeds maximum allowed (%d)"),
-			f->name, f->record_max, MAX_FD_RECORD);
+	 && f->record_min == f->record_max) {
+		cb_warning_x (cb_warn_additional, f->description_entry,
+			_("RECORD VARYING specified without limits, but implied limits are equal"));
+#if 0	/* CHECKME: Do we want this warning, possibly with a separate flag? */
+		cb_warning (cb_warn_additional, _("%s clause ignored"), "RECORD VARYING");
+#endif
+		f->flag_check_record_varying_limits = 0;
 	}
 
 	if (f->flag_delimiter && f->record_min > 0
-	    && f->record_min == f->record_max) {
-		cb_verify (cb_record_delim_with_fixed_recs,
-			   _("RECORD DELIMITER clause on file with fixed-length records"));
+	 && f->record_min == f->record_max) {
+		/* we have both SELECT (RECORD DELIMITER) and FD (records), first one
+		   may contain much more entries so using the position of the second */
+		cb_verify_x (f->description_entry, cb_record_delim_with_fixed_recs,
+			_("RECORD DELIMITER clause on file with fixed-length records"));
 	}
 
 	/* Apply SAME clause */
@@ -4457,6 +4451,8 @@ finalize_file (struct cb_file *f, struct cb_field *records)
 	if (!scratch_buff) {
 		scratch_buff = cobc_main_malloc ((size_t)COB_MINI_BUFF);
 	}
+	/* FIXME: when this text is changed test DEPENDING ON with ODOSLIDE fails
+	          --> describe the issue here and use at least a define */
 	snprintf (scratch_buff, (size_t)COB_MINI_MAX, "%s Record", f->name);
 	f->record = CB_FIELD (cb_build_implicit_field (cb_build_reference (scratch_buff),
 				f->record_max));
@@ -6035,14 +6031,14 @@ cb_build_perform_varying (cb_tree name, cb_tree from, cb_tree by, cb_tree until)
 	p->from = from;
 	p->until = until;
 	if (until == cb_false) {
-		cb_warning_x (cb_warn_extra, until,
+		cb_warning_x (cb_warn_additional, until,
 			_("PERFORM FOREVER since UNTIL is always FALSE"));
 	} else if (until == cb_true) {
 		if (after_until) {
-			cb_warning_x (cb_warn_extra, until,
+			cb_warning_x (cb_warn_additional, until,
 			_("PERFORM ONCE since UNTIL is always TRUE"));
 		} else {
-			cb_warning_x (cb_warn_extra, until,
+			cb_warning_x (cb_warn_additional, until,
 			_("PERFORM NEVER since UNTIL is always TRUE"));
 		}
 	}

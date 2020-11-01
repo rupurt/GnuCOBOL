@@ -32,7 +32,7 @@ COBCRUN_DIRECT="" # used for running created executables through tools
 # prepend PATH with the actual binaries to let the testsuite find them for
 # general check and version output, otherwise not needed
 #PATH="${abs_top_builddir}/libcob/.libs:${PATH}"
-PATH="${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
+PATH="${abs_top_builddir}:${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
 export PATH
 ABS_COBC="${abs_top_builddir}/cobc/cobc@COB_EXE_EXT@"
 ABS_COBCRUN="${abs_top_builddir}/bin/cobcrun@COB_EXE_EXT@"
@@ -68,7 +68,9 @@ else
 fi
 export at_group
 
-VG_LOG_PREFIX="${abs_builddir}/valgrind/%q{at_group}_%p"
+VL_LOG_DIR="${abs_builddir}/valgrind"
+mkdir -f $VL_LOG_DIR
+VG_LOG_PREFIX="$VL_LOG_DIR/%q{at_group}_%p"
 
 VG_COBC_LOG="$VG_LOG_PREFIX-cobc.log"
 VG_COBCRUN_LOG="$VG_LOG_PREFIX-cobcrun.log"
@@ -80,7 +82,7 @@ VG_COBCRUN_DIRECT_LOG="$VG_LOG_PREFIX-cobcrun_direct.log"
 MEMCHECK="valgrind --tool=memcheck --read-var-info=yes --track-origins=yes --leak-check=full --show-leak-kinds=all $VG_SUPPR"
 SGCHECK="valgrind --tool=exp-sgcheck --read-var-info=yes $VG_SUPPR"
 
-# cobol85 test use environment from a new perl process --> export needed
+# NIST tests (tests/cobol85) are executed in a separate perl process with a new environment --> export needed
 COBC="libtool --mode=execute $MEMCHECK --log-file=$VG_COBC_LOG ${COBC}"
 COBCRUN="libtool --mode=execute $MEMCHECK --log-file=$VG_COBCRUN_LOG ${COBCRUN}"
 COBCRUN_DIRECT="$MEMCHECK --log-file=$VG_COBCRUN_DIRECT_LOG ${COBCRUN_DIRECT}"
@@ -91,7 +93,9 @@ COBCRUN_DIRECT="$MEMCHECK --log-file=$VG_COBCRUN_DIRECT_LOG ${COBCRUN_DIRECT}"
 LC_ALL=C
 export LC_ALL
 
-FLAGS="-debug -Wall ${COBOL_FLAGS}"
+# workaround to adjust the testsuite later:
+# FLAGS="-debug -Wall ${COBOL_FLAGS}"
+FLAGS="-debug -Wall ${COBOL_FLAGS} -fno-diagnostics-show-option"
 COMPILE="${COBC} -x ${FLAGS}"
 COMPILE_ONLY="${COBC} -fsyntax-only ${FLAGS}"
 COMPILE_MODULE="${COBC} -m ${FLAGS}"
@@ -102,11 +106,15 @@ UNIFY_LISTING="${abs_srcdir}/listings-sed.sh"
 # test runner for manual tests, content may be changed by the user
 RUN_PROG_MANUAL="${abs_builddir}/run_prog_manual.sh"
 
-# unset option if not internally set
+# unset option if not internally set in this script
 _unset_option () {
 	if test "$1" != "COB_CONFIG_DIR" \
+	     -a "$1" != "COB_COPY_DIR" \
 	     -a "$1" != "COB_RUNTIME_CONFIG" \
-	     -a "$1" != "COB_LIBRARY_PATH"; then
+	     -a "$1" != "COB_LIBRARY_PATH" \
+	     -a "$1" != "COB_CFLAGS" \
+	     -a "$1" != "COB_LIBS" \
+	     -a "$1" != "COB_UNIX_LF"; then
 		unset $1
 	fi
 }
@@ -130,7 +138,6 @@ export PATHSEP
 exec_prefix="@prefix@" # this is is likely referenced in the LIBS entries below
 
 COB_CFLAGS="-I${abs_top_srcdir} @COB_CFLAGS@"
-COB_LDFLAGS="@COB_LDFLAGS@"
 COB_LIBS="-L${abs_top_builddir}/libcob/.libs @COB_LIBS@"
 COB_CONFIG_DIR="${abs_top_srcdir}/config"
 COB_COPY_DIR="${abs_top_srcdir}/copy"
@@ -140,7 +147,7 @@ SHLIB_PATH="${abs_top_builddir}/libcob/.libs:$SHLIB_PATH"
 LIBPATH="${abs_top_builddir}/libcob/.libs:$LIBPATH"
 COB_LIBRARY_PATH="${abs_top_builddir}/extras"
 
-export COB_CFLAGS COB_LDFLAGS COB_LIBS
+export COB_CFLAGS COB_LIBS
 export COB_CONFIG_DIR COB_COPY_DIR
 export LD_LIBRARY_PATH DYLD_LIBRARY_PATH SHLIB_PATH LIBPATH
 export COB_LIBRARY_PATH
@@ -148,28 +155,72 @@ COB_UNIX_LF=1
 export COB_UNIX_LF
 
 # unset all environment variables that are used in libcob
-# for runtime configuration
+# for runtime configuration ...
 COB_RUNTIME_CONFIG="${abs_top_srcdir}/config/runtime_empty.cfg"
 export COB_RUNTIME_CONFIG
-for cobenv in `"${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1`; \
+for cobenv in $("${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1); \
+	do _unset_option $cobenv; \
+done
+
+# prevent multiple calls by caching the output
+"${abs_top_builddir}/pre-inst-env" ${COBC} --info > info.out
+
+# ... and also unset for the compiler
+for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
 	do _unset_option $cobenv; \
 done
 
 
-COB_OBJECT_EXT="@COB_OBJECT_EXT@"
-COB_EXE_EXT="@COB_EXE_EXT@"
-COB_BIGENDIAN="@COB_BIGENDIAN@"
-COB_HAS_ISAM="@COB_HAS_ISAM@"
-COB_HAS_XML2="@COB_HAS_XML2@"
-COB_HAS_JSON="@COB_HAS_JSON@"
-COB_HAS_CURSES="@COB_HAS_CURSES@"
-COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
+# different flags checked in the testsuite
+if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
+	COB_OBJECT_EXT="@COB_OBJECT_EXT@"
+	COB_EXE_EXT="@COB_EXE_EXT@"
+	COB_BIGENDIAN="@COB_BIGENDIAN@"
+	COB_HAS_ISAM="@COB_HAS_ISAM@"
+	COB_HAS_XML2="@COB_HAS_XML2@"
+	COB_HAS_JSON="@COB_HAS_JSON@"
+	COB_HAS_CURSES="@COB_HAS_CURSES@"
+	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
+else
+
+	COB_OBJECT_EXT="$(grep COB_OBJECT_EXT info.out | cut -d: -f2 | cut -b2-)"
+	COB_EXE_EXT="$(grep COB_EXE_EXT info.out | cut -d: -f2 | cut -b2-)"
+
+	if test $(grep -i -c "little-endian" info.out) = 0; then
+		COB_BIGENDIAN="yes"
+	else
+		COB_BIGENDIAN="no"
+	fi
+
+	COB_HAS_64_BIT_POINTER=$(grep "64bit-mode" info.out | cut -d: -f2 | cut -b2-)
+	cob_indexed=$(grep -i "indexed file" info.out | cut -d: -f2)
+	case $(grep -i "indexed file" info.out | cut -d: -f2) in
+	" disabled")	COB_HAS_ISAM="no";;
+	" BDB") 		COB_HAS_ISAM="db";;
+	" VBISAM"*)	COB_HAS_ISAM="vbisam";;
+	" D-ISAM")	COB_HAS_ISAM="disam";;
+	" C-ISAM")	COB_HAS_ISAM="cisam";;
+	" EXTFH")	COB_HAS_ISAM="index_extfh";;
+	*)		echo "unknown entry -$cob_indexed- please report" && exit 1;;
+	esac
+	if test $(grep -i -c "XML library.*disabled" info.out) = 0; then
+		COB_HAS_XML2="yes"
+	else
+		COB_HAS_XML2="no"
+	fi
+	if test $(grep -i -c "JSON library.*disabled" info.out) = 0; then
+		COB_HAS_JSON="yes"
+	else
+		COB_HAS_JSON="no"
+	fi
+fi
 if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 	# running MSYS builds as not-visible child processes result in
 	# "Redirection is not supported" (old PDcurses) and exit 127 (NCurses)
 	# --> disabling the tests for this feature
 	COB_HAS_CURSES="no"
 fi
+
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT

@@ -292,10 +292,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\defaults.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libcob\exception.def"
 				>
 			</File>

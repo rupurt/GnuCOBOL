@@ -52,7 +52,7 @@ libcob_la_SOURCES = common.c move.c numeric.c strings.c \
 #COBCRUN = cobcrun$(EXEEXT)
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)/lib -I$(top_srcdir)/lib \
-	$(LIBCOB_CPPFLAGS)
+	$(LIBCOB_CPPFLAGS) -DLOCALEDIR=\"$(localedir)\"
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
 libcob_la_LIBADD = $(LIBCOB_LIBS) $(top_builddir)/lib/libsupport.a \
 	$(CODE_COVERAGE_LIBS)
