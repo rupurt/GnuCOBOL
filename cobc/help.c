@@ -58,14 +58,15 @@ cobc_print_usage_common_options (void)
 	puts (_("Options:"));
 	puts (_("  -h, -help             display this help and exit"));
 	puts (_("  -V, -version          display compiler version and exit"));
-	puts (_("  -i, -info             display compiler information (build/environment)\n" \
+	puts (_("  -i, -info             display compiler information (build/environment)\n" 
 	        "                        and exit"));
-	puts (_("  -v, -verbose          display compiler version and the commands\n" \
-	        "                        invoked by the compiler"));
-	puts (_("  -vv, -verbose=2       like -v but additional pass verbose option\n" \
-	        "                        to assembler/compiler"));
-	puts (_("  -vvv, -verbose=3      like -vv but additional pass verbose option\n" \
-	        "                        to linker"));
+	puts (_("  -v, -verbose          verbose mode, display additional information;\n"
+		    "                        multiple -v options increase the verbosity,\n"   
+		    "                        the maximum is 3 as follows:\n"                  
+		    "                        (1) display compiler version and the commands\n" 
+	        "                        invoked by the compiler,\n"                      
+		    "                        (2) pass verbose option to assembler/compiler\n" 
+		    "                        (3) pass verbose option to linker"));
 	puts (_("  -q, -brief            reduced displays, commands invoked not shown"));
 	puts (_("  -###                  like -v but commands not executed"));
 	puts (_("  -x                    build an executable program"));
@@ -82,8 +83,15 @@ cobc_print_usage_common_options (void)
 	puts (_("  -fixed                use fixed source format (default)"));
 	puts (_("  -O, -O2, -O3, -Os     enable optimization"));
 	puts (_("  -O0                   disable optimization"));
-	puts (_("  -g                    enable C compiler debug / stack check / trace"));
-	puts (_("  -d, -debug            enable all run-time error checking"));
+	puts (_("  -g                    enable C compiler debug and stack check"));
+	puts (_("  -d, -debug            enable all run-time error checking,\n"
+	        "                        equal to -fstack-check -fec=EC-ALL"));
+# if 0 /* not yet merged */
+	/* duplicated here from flags.def to place it next to -debug */
+	puts (_("  -fec=<exception-name>\tenable code generation for <exception-name>,\n"
+	        "                        sets -fsource-location"));
+	puts (_("  -fno-ec=<exception-name>\tdisable code generation for <exception-name>"));
+#endif
 	puts (_("  -o <file>             place the output into <file>"));
 	puts (_("  -b                    combine all input files into a single\n"
 	        "                        dynamically loadable module"));

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2017 Free Software Foundation, Inc.
+   Copyright (C) 2017, 2020 Free Software Foundation, Inc.
    Written by Ron Norman, Simon Sobisch
 
    This file is part of GnuCOBOL.
@@ -22,7 +22,7 @@
      Program:  gcdiff.c
 
      Function: This program is used to compare GnuCOBOL test results 
-	           and handle expected difference such as Date/Time
+               and handle expected difference such as Date/Time
 */
 
 #include	"config.h"

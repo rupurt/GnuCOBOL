@@ -34,6 +34,10 @@
 
 	* fileio.h, fodbc.c: tested using PostgreSQL
 
+2020-10-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* call.c: define fmemopen if available but declaration missing
+
 2020-09-23  Simon Sobisch <simonsobisch@gnu.org>
 
 	* Makefile.am (install-data-hook): removed as per initial patch from
@@ -44,6 +48,7 @@
 	* Makefile.am [LOCAL_CJSON]: moved to "lib"
 	* Makefile.am: fixed inclusion of libsupport
 	* coblocal.h: include gettext without lib prefix
+	* call.c, common.c: use EXIT_SUCCESS and EXIT_FAILURE instead of exit(0/1)
 
 2020-09-29  Simon Sobisch <simonsobisch@gnu.org>
 
@@ -55,6 +60,20 @@
 2020-09-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c, common.h: removed support for VC older than VC 2008
+
+2020-08-31  Simon Sobisch <simonsobisch@gnu.org>
+
+	* strings.c: huge performance improvements for INSPECT by splitting
+	  the internal pseudo-marker into separate marker+replacement
+
+2020-08-24  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (set_config_val): only create a new trace file if we already
+	  have one open before
+
+2020-07-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c: minimal adjustments to --info output
 
 2020-07-25  Edward Hart <edward.dan.hart@gmail.com>
 
