@@ -9296,6 +9296,22 @@ libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
  Last statement of prog was at line 118 of prog.cob
 ])
 
+AT_CHECK([$COMPILE -fdump=ALL -fno-dump prog.cob], [0], [], [])
+
+# also checking that a dump file without anything to dump does not do anything
+AT_CHECK([COB_STACKTRACE=1 COB_DUMP_FILE=tstdump.dump \
+$COBCRUN_DIRECT ./prog], [1],
+[X is 000000001
+X is 000005441
+],
+[libcob: cpyabrt:4: error: LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
+libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
+
+ Last statement of sub1 was at line 4 of cpyabrt
+ Last statement of sub2 was at line 251 of prog.cob
+ Last statement of prog was at line 118 of prog.cob
+])
+
 AT_CHECK([$COMPILE -fdump=ALL prog.cob], [0], [], [])
 
 AT_CHECK([COB_DUMP_FILE=tstdump.dump \

@@ -3,6 +3,8 @@
 
 	* codegen.c (output_initialize_compound): resolve occurs_max only once
 	* cobc.c, flag.def: added -fno-dump=<scope>
+	* flag.def, cobc.c, cobc.h, help.c: added CB_FLAG_OP for flags
+	  with optional parameter
 
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 

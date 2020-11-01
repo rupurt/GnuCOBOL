@@ -318,11 +318,13 @@ struct cb_turn_list	*cb_turn_list = NULL;
 #define	CB_FLAG_ON(var,print_help,name,doc)	int var = 1;
 #define	CB_FLAG_RQ(var,print_help,name,def,opt,doc)	int var = def;
 #define	CB_FLAG_NQ(print_help,name,opt,doc)
+#define	CB_FLAG_OP(print_help,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
 int cb_mf_ibm_comp = -1;
 
 /* Flag to emit Old style: cob_set_location, cob_trace_section */
@@ -593,11 +595,14 @@ static const struct option long_options[] = {
 	{"f" name,		CB_RQ_ARG, NULL, opt},
 #define	CB_FLAG_NQ(print_help,name,opt,doc)			\
 	{"f" name,		CB_RQ_ARG, NULL, opt},
+#define	CB_FLAG_OP(print_help,name,opt,doc)			\
+	{"f" name,		CB_OP_ARG, NULL, opt},
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
 	{"fibmcomp",		CB_NO_ARG, &cb_mf_ibm_comp, 1},
 	{"fno-ibmcomp",		CB_NO_ARG, &cb_mf_ibm_comp, 0},
 
@@ -3491,7 +3496,7 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 7:
-			/* -fmax-errors=<xx> : maximum errors until abort */
+			/* -fmax-errors=<xx> : Maximum errors until abort */
 			n = cobc_deciph_optarg (cob_optarg, 0);
 			if (n < 0) {
 				cobc_err_exit (COBC_INV_PAR, "-fmax-errors");
@@ -3500,17 +3505,21 @@ process_command_line (const int argc, char **argv)
 			break;
 
 		case 8:
-			/* -fdump=<scope> : sections to generate dump code */
+			/* -fdump=<scope> : Add sections for dump code generation */
 			cobc_def_dump_opts (cob_optarg, 1);
 			break;
 
 		case 13:
-			/* -fno-dump=<scope> : sections to generate dump code */
-			cobc_def_dump_opts (cob_optarg, 0);
+			/* -fno-dump=<scope> : Suppress sections in dump code generation */
+			if (cob_optarg) {
+				cobc_def_dump_opts (cob_optarg, 0);
+			} else {
+				cb_flag_dump = COB_DUMP_NONE;
+			}
 			break;
 
 		case 9:
-			/* -fcallfh=<func> : function for EXTFH */
+			/* -fcallfh=<func> : Function-name for EXTFH */
 			cb_call_extfh = cobc_main_strdup (cob_optarg);
 			break;
 

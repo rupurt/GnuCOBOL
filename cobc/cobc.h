@@ -396,6 +396,8 @@ extern struct cb_turn_list	*cb_turn_list;
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
+#undef	CB_FLAG_NO
 
 #undef	CB_WARNDEF
 #undef	CB_ONWARNDEF
@@ -416,11 +418,15 @@ extern struct cb_turn_list	*cb_turn_list;
 #define	CB_FLAG_ON(var,print_help,name,doc)		extern int var;
 #define CB_FLAG_RQ(var,print_help,name,def,opt,doc)	extern int var;
 #define CB_FLAG_NQ(print_help,name,opt,doc)
+#define CB_FLAG_OP(print_help,name,opt,doc)
+#define CB_FLAG_NO(print_help,name,opt,doc)
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
+#undef	CB_FLAG_NO
 
 /* Flag to emit Old style: cob_set_location, cob_trace_section */
 extern int cb_old_trace;

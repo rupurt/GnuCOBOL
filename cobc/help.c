@@ -178,11 +178,14 @@ cobc_print_usage_flags (void)
 	cobc_print_active (doc, print_help);
 #define	CB_FLAG_NQ(print_help,name,opt,doc)		\
 	cobc_print_active (doc, print_help);
+#define	CB_FLAG_OP(print_help,name,opt,doc)		\
+	cobc_print_active (doc, print_help);
 #include "flag.def"
 #undef	CB_FLAG
 #undef	CB_FLAG_ON
 #undef	CB_FLAG_RQ
 #undef	CB_FLAG_NQ
+#undef	CB_FLAG_OP
 	cobc_print_active (
 	_("  -fibmcomp             sets -fbinary-size=2-4-8 -fsynchronized-clause=ok\n"
 	  "  -fno-ibmcomp          sets -fbinary-size=1--8  -fsynchronized-clause=ignore"), 0);
