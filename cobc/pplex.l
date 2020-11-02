@@ -1180,7 +1180,7 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 	}
 
 	/* TODO: open with path relative to the current file's path,
-	         if any (applies both to with and without "lib" */
+	         if any (applies both to with and without "lib") */
 
 	/* Locate and open COPY file */
 	if (lib) {
