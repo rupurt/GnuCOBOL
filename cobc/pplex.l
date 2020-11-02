@@ -1199,6 +1199,8 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 
 			if (lib_env) {
 				if (*lib_env) {
+					/* TODO: if lib_env is not a full path:
+					   prefix by current active file */
 					snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s",
 						lib_env, SLASH_CHAR, name);
 					plexbuff1[COB_SMALL_MAX] = 0;
@@ -1210,6 +1212,8 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 		}
 		/* check for library-name as directory-name */
 		if (!filename && !lib_env) {
+			/* TODO: if lib is not a full path:
+			   prefix by current active file */
 			snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s",
 				lib, SLASH_CHAR, name);
 			plexbuff1[COB_SMALL_MAX] = 0;

@@ -147,21 +147,20 @@ AT_DATA([SUB/SUB2/SUB3/copy2.inc], [
        77  TEST-VAR     PIC X VALUE '1'.
        COPY "copy3.inc".
 ])
-# for compatibility reasons the current working directory
-# is also to be checked ...
+# for compatibility reasons (older GC versions) it was considered to add
+# the current working directory, but this idea was dropped:
+# explicit add via -I. or COB_COPY_DIR/COBCPY (where both "empty" and "." work)
 AT_DATA([copy3.inc], [
        COPY "copy4.inc" IN "SUBX".
 ])
-# ... which also applies to -I
-AT_CHECK([mkdir -p SUBX/SUBY], [0], [], [])
+AT_CHECK([mkdir -p SUBX], [0], [], [])
 AT_DATA([SUBX/copy4.inc], [
-       COPY "copy5.inc".
-])
-AT_DATA([SUBX/SUBY/copy5.inc], [
        77  TEST-VAR2    PIC X VALUE '2'.
 ])
 
-AT_CHECK([$COMPILE_ONLY -I SUBY SUB/prog.cob], [0], [], [])
+AT_CHECK([$COMPILE_ONLY -I. SUB/prog.cob], [0], [], [])
+AT_CHECK([COB_COPY_DIR="." $COMPILE_ONLY SUB/prog.cob], [0], [], [])
+AT_CHECK([COB_COPY_DIR=":" $COMPILE_ONLY SUB/prog.cob], [0], [], [])
 
 AT_CLEANUP
 

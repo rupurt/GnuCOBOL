@@ -9,6 +9,7 @@
 	  for compatibility to earlier GnuCOBOL and MF versions
 	* pplex.l: don't add extension if already part of the copybook-name,
 	  for compatibility: can be disabled by defining COB_MULTI_EXTENSION
+	* cobc. (process_env_copy_path): handle empty entry as "." (MF-compat)
 
 2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
 
