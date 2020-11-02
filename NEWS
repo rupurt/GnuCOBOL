@@ -1,6 +1,6 @@
 NEWS - user visible changes				-*- outline -*-
 
- GnuCOBOL 3.1 final to be released (end of October 2020)
+ GnuCOBOL 3.1 final to be released (asap, was planned for end of October 2020)
  
 * TOBEDONE:
   
@@ -38,6 +38,14 @@ NEWS - user visible changes				-*- outline -*-
   ** the interal listing got a speedup and has all error references in
      ascending order now
 
+  ** COPY statement handling:
+     * copybook names that contain an extension aren't search with additional
+       extensions [as post-rc1-change this may be set to old behaviour by
+       defining COB_MULTI_EXTENSION when building GnuCOBOL/cobc]
+     * library names are now tested for environment "COB_COPY_LIB_libname",
+       allowing the directory to specified externally (also as no-directory 
+       by exporting with empty value) and has a fallback (with a warning) to
+       be effectively ignored (as previous versions did this)
 
 ** adjustments to cobc's warning options:
    -Wdangling-text "new" option to enable "source text after program area",

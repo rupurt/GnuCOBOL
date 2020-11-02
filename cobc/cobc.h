@@ -280,10 +280,10 @@ struct local_filename {
 struct filename {
 	struct filename		*next;
 	const char		*source;		/* foo.cob (path from command line) */
-	const char		*preprocess;		/* foo.i / foo.cob (full path) */
-	const char		*translate;		/* foo.c (full path) */
-	const char		*trstorage;		/* foo.c.h (full path) */
-	const char		*object;		/* foo.o (full path) */
+	const char		*preprocess;		/* foo.i / foo.cob (possibly full path) */
+	const char		*translate;		/* foo.c (possibly full path) */
+	const char		*trstorage;		/* foo.c.h (possibly full path) */
+	const char		*object;		/* foo.o (possibly full path) */
 	const char		*demangle_source;	/* foo */
 	const char		*listing_file;		/* foo.lst */
 	struct local_filename	*localfile;		/* foo.c.l[n].h */

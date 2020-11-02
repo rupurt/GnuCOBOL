@@ -1,4 +1,15 @@
 
+2020-11-02  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pplex.l (ppcopy_find_file): extracted from (ppcopy)
+	* pplex.l (ppcopy): reordered to remove need for goto
+	* pplex.l (ppcopy): for COPY copybook-name IN library-name
+	  try to resolve library-name via environment COB_COPY_LIB_library-name
+	  before testing as-is and additional fallback to "ignore library-name"
+	  for compatibility to earlier GnuCOBOL and MF versions
+	* pplex.l: don't add extension if already part of the copybook-name,
+	  for compatibility: can be disabled by defining COB_MULTI_EXTENSION
+
 2020-10-31  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_initialize_compound): resolve occurs_max only once
