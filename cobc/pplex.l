@@ -1084,88 +1084,172 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 }
 
 static const char *
-ppcopy_try_open (const char *dir, const char *name)
+ppcopy_try_open (const char *dir, const char *name, int has_ext)
 {
 	struct cb_text_list	*el = cb_extension_list;
-	const char		*test_next = "";
+	const char		*extension = "";
 
 	for (;;) {
 		if (dir) {
 			snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%c%s%s",
-				dir, SLASH_CHAR, name, test_next);
+				dir, SLASH_CHAR, name, extension);
 		} else {
 			snprintf (plexbuff2, (size_t)COB_SMALL_MAX, "%s%s",
-				name, test_next);
+				name, extension);
 		}
 		plexbuff2[COB_SMALL_MAX] = 0;
-#if 0	/* TODO: output in (very?) verbose mode */
-		printf ("checking COPY file: %s\n", plexbuff2);
+#if 0	/* TODO: output in separate COB_DEBUG_LOG */
+		printf ("checking COPY file: %s... ", plexbuff2);
 #endif
 		if (access (plexbuff2, R_OK) == 0) {
+#if 0	/* TODO: output in separate COB_DEBUG_LOG */
+			printf ("Found!\n");
+#endif
 			return plexbuff2;
+#if 0	/* TODO: output in separate COB_DEBUG_LOG */
+		} else {
+			printf ("%s\n", cb_get_strerror ());
+#endif
 		}
+#ifdef COB_MULTI_EXTENSION	/* compat to older GC versions */
+		COB_UNUSED (has_ext):
+#else
+		if (has_ext) {
+			break;
+		}
+#endif
 		if (!el) {
 			break;
 		}
-		test_next = el->text;
+		extension = el->text;
 		el = el->next;
 	}
+	return NULL;
+}
+
+/* try to locate the file by searching,
+   each with all known copybook extensions:
+   1 - as is
+   2 - all known copybook directories */
+static const char *
+ppcopy_find_file (const char *name, int has_ext)
+{
+	const char* filename;
+
+	/* try name as is + extensions ... */
+	filename = ppcopy_try_open (NULL, name, has_ext);
+	if (filename) {
+		return filename;
+	}
+
+	/* ... if not found, try in copybook directories  */
+	if (*name != SLASH_CHAR
+#if defined (_WIN32) || defined (__DJGPP__)
+	 && *name != '/' && *(name + 1) != ':'
+#endif
+		) {
+		struct cb_text_list* il;
+		for (il = cb_include_list; il; il = il->next) {
+			filename = ppcopy_try_open (il->text, name, has_ext);
+			if (filename) {
+				return filename;
+			}
+		}
+	}
+
+	/* no candidate found */
 	return NULL;
 }
 
 int
 ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 {
-	struct cb_text_list	*il;
-	int ret;
 	const char		*s;
-	const char		*filename;
+	const char		*filename = NULL;
+	const int 		has_ext = (strchr (name, '.') != NULL);
 
 	if (cb_current_file) {
 		cb_current_file->copy_line = cb_source_line;
 	}
 
+	/* TODO: open with path relative to the current file's path,
+	         if any (applies both to with and without "lib") */
+
 	/* Locate and open COPY file */
 	if (lib) {
-		snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s", lib, SLASH_CHAR, name);
-		plexbuff1[COB_SMALL_MAX] = 0;
+		const char *lib_env = NULL;
 		s = plexbuff1;
-	} else {
-		s = name;
-	}
 
-	/* Find the file */
+		/* check for library-name with directory-name via environment
+		   (as emulation of specifying a library-name via JCL) */
+		if (*lib >= 'A' && *lib <= 'Z') {
+			const char* lib_env;
+			char envname[COB_MINI_BUFF];
 
-	/* try name as is + extensions ... */
-	filename = ppcopy_try_open (NULL, s);
-	/* ... if not found, try in copybook directories  */
-	if (!filename
-	 && *s != SLASH_CHAR
-#if defined (_WIN32) || defined (__DJGPP__)
-	 && *s != '/' && *(s + 1) != ':'
-#else
-#endif
-	) {
-		for (il = cb_include_list; il; il = il->next) {
-			filename = ppcopy_try_open (il->text, s);
-			if (filename) {
-				break;
+			snprintf (envname, (size_t)COB_MINI_MAX, "COB_COPY_LIB_%s", lib);
+			envname[COB_MINI_MAX] = 0;
+			lib_env = getenv (envname);
+
+			if (lib_env) {
+				if (*lib_env) {
+					/* TODO: if lib_env is not a full path:
+					   prefix by current active file */
+					snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s",
+						lib_env, SLASH_CHAR, name);
+					plexbuff1[COB_SMALL_MAX] = 0;
+					filename = ppcopy_find_file (s, has_ext);
+				} else {
+					filename = ppcopy_find_file (name, has_ext);
+				}
 			}
 		}
+		/* check for library-name as directory-name */
+		if (!filename && !lib_env) {
+			/* TODO: if lib is not a full path:
+			   prefix by current active file */
+			snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s",
+				lib, SLASH_CHAR, name);
+			plexbuff1[COB_SMALL_MAX] = 0;
+			filename = ppcopy_find_file (s, has_ext);
+		}
+
+		/* try without library name, if not resolved by env */
+		if (!filename && !lib_env) {
+			filename = ppcopy_find_file (name, has_ext);
+			if (filename) {
+				cb_plex_warning (COBC_WARN_FILLER, 0,
+					_("copybook not found in library '%s', library-name ignored"),
+					lib);
+			}
+		}
+
+		/* restore original name for error handling */
+		if (!filename) {
+			snprintf (plexbuff1, (size_t)COB_SMALL_MAX, "%s%c%s",
+				lib, SLASH_CHAR, name);
+			plexbuff1[COB_SMALL_MAX] = 0;
+		}
+	} else {
+		s = name;
+		filename = ppcopy_find_file (s, has_ext);
 	}
 	
-	if (filename) {
+	/* expected case: filename found */
+	if (likely (filename)) {
+		int ret;
 		ret = ppopen (filename, replace_list);
-		if (ret == 0) return 0;	/* LCOV_EXCL_BR_LINE */
-		goto err_handling;	/* LCOV_EXCL_LINE */
+		/* expected case: copybook could be processed */
+		if (likely (ret == 0)) {
+			return 0;
+		}
+		/* otherwise fall-trough to error handling */
+	} else {
+		/* ensure to have errno from name as specified, not from another file */
+		(void)access (s, R_OK);
+		/* pass file error as we have no more places to check */
+		cb_error ("%s: %s", s, cb_get_strerror ());
 	}
 
-	/* ensure to have errno from name as specified, not rom another file */
-	(void)access (s, R_OK);
-	/* pass file error as we have no more places to check */
-	cb_error ("%s: %s", s, cb_get_strerror ());
-
-err_handling:
 	/* On COPY, open error restore old file */
 	cb_current_file = old_list_file;
 	fprintf (yyout, "#line %d \"%s\"\n", cb_source_line, cb_source_file);

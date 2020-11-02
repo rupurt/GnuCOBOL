@@ -3837,8 +3837,13 @@ process_env_copy_path (const char *p)
 	/* Tokenize for path sep. */
 	token = strtok (value, PATHSEP_STR);
 	while (token) {
-		if (!stat (token, &st) && (S_ISDIR (st.st_mode))) {
-			CB_TEXT_LIST_CHK (cb_include_list, token);
+		const char* path = token;
+		/* special case (MF-compat): empty evaluates to "." */
+		if (*path == 0) {
+			path = ".";
+		}
+		if (!stat (path, &st) && (S_ISDIR (st.st_mode))) {
+			CB_TEXT_LIST_CHK (cb_include_list, path);
 		}
 		token = strtok (NULL, PATHSEP_STR);
 	}

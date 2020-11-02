@@ -124,6 +124,15 @@ NEWS - user visible changes				-*- outline -*-
       error and only allowed because they are never executed
    -Wimplicit-define and -Wcorresponding are now enabled by default
 
+  ** COPY statement handling:
+     * copybook names that contain an extension aren't search with additional
+       extensions [as post-rc1-change this may be set to old behaviour by
+       defining COB_MULTI_EXTENSION when building GnuCOBOL/cobc]
+     * library names are now tested for environment "COB_COPY_LIB_libname",
+       allowing the directory to specified externally (also as no-directory 
+       by exporting with empty value) and has a fallback (with a warning) to
+       be effectively ignored (as previous versions did this)
+
   ** fixes and enhancements for dump generation
 
   ** tested and adjusted to work on more systems (OS + compilers)
