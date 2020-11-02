@@ -7158,7 +7158,6 @@ CAPI (void *p1, ...)
          cob_put_field_str (fld, "Bye-Bye Birdie!");
          str = (char *) cob_get_field_str_buffered (fld);
          printf (" --> '%.*s'",size,str);
-         cob_free ((void*)str);
       } else if (type == COB_TYPE_NUMERIC_EDITED) {
          if (scale > 0) {
             sprintf (pic,"%s9(%d)V9(%d)",sign?"S":"",digits-scale,scale);
