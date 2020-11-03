@@ -128,6 +128,7 @@ doc/cbrunt.tex.gen -text
 doc/cobcinfo.sh eol=lf
 doc/fdl.texi eol=lf
 doc/gnucobol.texi eol=lf
+doc/os.db.gen -text
 extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf

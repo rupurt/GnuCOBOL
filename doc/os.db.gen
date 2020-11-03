@@ -1,0 +1,39 @@
+#! /bin/sh
+
+db="$1"
+
+if [ -z "$db" ]
+then
+    db=os.db
+fi
+
+sqlite3 -column -header $db <<EOF
+drop table if exists OSes;
+
+create table OSes (
+    OS text not NULL primary key
+);
+
+insert into OSes values 
+    ( 'Ubuntu' ), 
+    ( 'Windows Server' ), 
+    ( 'Windows' )
+;
+
+drop table if exists platforms;
+
+create table platforms (
+    OS text not NULL,
+    version text not NULL,
+    primary key( OS, version ), 
+    foreign key (OS) references OSes (OS)
+);
+
+insert into platforms values
+    ( 'Ubuntu', '16.04' ),
+    ( 'Windows Server', '2019' )
+;
+
+.width 15
+select * from platforms;
+EOF
