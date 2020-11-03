@@ -1,4 +1,8 @@
 
+2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* parser.y, ppparse.y: actually %require bison 3.0 (see 2020-02-02)
+
 2020-11-02  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pplex.l (ppcopy_find_file): extracted from (ppcopy)
