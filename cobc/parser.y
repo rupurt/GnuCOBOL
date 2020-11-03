@@ -19,6 +19,8 @@
    along with GnuCOBOL.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+%require "3.1"
+
 %expect 0
 
 %defines
