@@ -1,4 +1,14 @@
 
+2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c, tree.h, cobc.c: added cb_wants_dump_comments variable,
+	  set by cobc if COBC_GEN_DUMP_COMMENTS is set
+	* codegen.c: depending on cb_wants_dump_comments generate additional
+	  dump code *as comment*: REDEFINES and lvl 66/78 fields, fields that
+	  should not be dumped and information about field attributes
+	* codegen.c (output_display_fields): removed duplicate code,
+	  use of output_block_open/output_block_close
+
 2020-11-02  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pplex.l (ppcopy_find_file): extracted from (ppcopy)

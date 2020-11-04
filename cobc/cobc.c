@@ -8379,6 +8379,10 @@ finish_setup_compiler_env (void)
 	cobc_ldflags_len = strlen (cobc_ldflags);
 	cobc_lib_paths_len = strlen (cobc_lib_paths);
 	cobc_libs_len = strlen (cobc_libs);
+
+	if (getenv ("COBC_GEN_DUMP_COMMENTS")) {
+		cb_wants_dump_comments = 1;
+	}
 }
 
 

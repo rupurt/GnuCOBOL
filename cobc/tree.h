@@ -2273,6 +2273,7 @@ extern cb_tree		cobc_tree_cast_check (const cb_tree, const char *,
 
 /* codegen.c */
 extern void		codegen (struct cb_program *, const char *);
+extern int		cb_wants_dump_comments;	/* likely to be removed later */
 
 /* scanner.l */
 extern void		cb_unput_dot (void);
