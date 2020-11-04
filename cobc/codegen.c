@@ -159,7 +159,7 @@ struct base_list {
 /* variable set in cobc.c from environment COBC_GEN_DUMP_COMMENTS
    which will lead to generated comments about the internal field details,
    as comment
-   note: the code using this varialbe is considered temporary
+   note: the code using this variable is considered temporary
          and likely be removed once we provide better ways of
          field access */
 int		cb_wants_dump_comments;
@@ -11456,7 +11456,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			sprintf (fdname, "%s %s",
 				fl->organization != COB_ORG_SORT ? "FD" : "SD",
 				fl->name);
-			output_line ("/* Dump %s  (informational) */", fdname);
+			output_line ("/* Dump %s (informational) */", fdname);
 			output_line ("/* cob_dump_file (\"%s\", %s%s); */",
 							fdname, CB_PREFIX_FILE, fl->cname);
 			output_as_comment++;
@@ -11559,7 +11559,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 			output_display_fields (prog->linkage_storage, 0, 0);
 			output_newline ();
 		} else if (cb_wants_dump_comments) {
-			output_line ("/* Dump LINKAGEE SECTION (informational) */");
+			output_line ("/* Dump LINKAGE SECTION (informational) */");
 			output_line ("/* cob_dump_output(\"%s\"); */", "LINKAGE");
 			output_as_comment++;
 			output_display_fields (prog->linkage_storage, 0, 0);
