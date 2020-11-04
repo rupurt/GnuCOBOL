@@ -15,6 +15,12 @@ create table OSes (
 );
 
 insert into OSes values 
+    ( 'Centos' ), 
+    ( 'MACOS' ), 
+    ( 'HPUX Pa-Risc' ), 
+    ( 'HPUX Itanium' ), 
+    ( 'SunOS' ), 
+    ( 'AIX' ), 
     ( 'Ubuntu' ), 
     ( 'Windows Server' ), 
     ( 'Windows' )
@@ -30,6 +36,16 @@ create table platforms (
 );
 
 insert into platforms values
+    ( 'Centos', '5.2' ), 
+    ( 'Centos', '6.8' ), 
+    ( 'Centos', '6.5' ), 
+    ( 'Centos', '7.0' ), 
+    ( 'Centos', '8.0' ), 
+    ( 'MACOS', 'Darwin' ), 
+    ( 'HPUX Pa-Risc', '11.11' ), 
+    ( 'HPUX Itanium', '11.23' ), 
+    ( 'SunOS sparc', '5.8' ), 
+    ( 'AIX powerpc', '7.1' ), 
     ( 'Ubuntu', '16.04' ),
     ( 'Windows Server', '2019' )
 ;
