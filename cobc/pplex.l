@@ -89,6 +89,10 @@ static int ppwrap (void) {
 #include "tree.h"
 #include <ppparse.h>
 
+#ifdef	_WIN32
+#include <io.h>	/* for access */
+#endif
+
 /* ignore unused functions here as flex generates unused ones */
 #ifdef	__GNUC__
 #if	defined (__clang__) || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)

@@ -1355,7 +1355,7 @@ find_field_by_pos (const int initial_curs, const int line, const int column) {
 		if (line == sline
 		 && column >= scolumn
 		 && column <= right_pos) {
-			return idx;
+			return (int)idx;
 		}
 	}
 	return -1;

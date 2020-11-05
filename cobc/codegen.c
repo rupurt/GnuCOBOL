@@ -4979,68 +4979,104 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 		switch (type) {
 		case INITIALIZE_NONE:
 			break;
-		case INITIALIZE_DEFAULT: {
-			int		last_char;
-			last_field = f;
-			last_char = initialize_uniform_char (f, p);
+		case INITIALIZE_DEFAULT:
+			{
+				int		last_char;
+				last_field = f;
+				last_char = initialize_uniform_char (f, p);
 
-			if (last_char != -1) {
-				if (f->flag_occurs) {
-					CB_REFERENCE (c)->subs =
-					    CB_BUILD_CHAIN (cb_int1,
-						      CB_REFERENCE (c)->subs);
-				}
+				if (last_char != -1) {
+					if (f->flag_occurs) {
+						CB_REFERENCE (c)->subs =
+							CB_BUILD_CHAIN (cb_int1,
+								CB_REFERENCE (c)->subs);
+					}
 
-				for (; f->sister; f = f->sister) {
-					if (!f->sister->redefines) {
-						if (deduce_initialize_type (p, f->sister, 0) != INITIALIZE_DEFAULT ||
-						    initialize_uniform_char (f->sister, p) != last_char) {
-							break;
+					for (; f->sister; f = f->sister) {
+						if (!f->sister->redefines) {
+							if (deduce_initialize_type (p, f->sister, 0) != INITIALIZE_DEFAULT ||
+								initialize_uniform_char (f->sister, p) != last_char) {
+								break;
+							}
 						}
 					}
-				}
-				{
-					int		size;
-					if (f->sister) {
-						size = f->sister->offset - last_field->offset;
-					} else {
-						size = ff->offset + ff->size - last_field->offset;
-					}
+					{
+						int		size;
+						if (f->sister) {
+							size = f->sister->offset - last_field->offset;
+						} else {
+							size = ff->offset + ff->size - last_field->offset;
+						}
 
-					output_initialize_uniform (c, last_char, size);
+						output_initialize_uniform (c, last_char, size);
+					}
+					break;
 				}
-				break;
 			}
-		}
 		/* Fall through */
 		default:
-			if (f->flag_occurs) {
-				/* Begin occurs loop */
-				int		i = f->indexes;
-				i_counters[i] = 1;
+			if (!f->flag_occurs) {
+				if (type == INITIALIZE_ONE) {
+					output_initialize_one (p, c);
+				} else {
+					output_initialize_compound (p, c);
+				}
+			} else {
+				const int		idx = f->indexes;
+				struct cb_reference* ref = CB_REFERENCE (c);
+				cb_tree			save_check;
+
+				/* Output initialization for the first record */
+				output_line ("i%d = 1;", idx);
+				i_counters[idx] = 1;
+				ref->subs = CB_BUILD_CHAIN (cb_i[idx], ref->subs);
+				if (type == INITIALIZE_ONE) {
+					output_initialize_one (p, c);
+				} else {
+					output_initialize_compound (p, c);
+				}
+
+				/* all exceptions should have been raised above,
+				   so temporarily detach from the reference */
+				save_check = ref->check;
+				ref->check = NULL;
+
+				/* copy record for all other records */
+				output_block_open ();
+				output_line ("/* copy initialized record for %s to later occurences */", f->name);
+
+				output_prefix ();
+				output ("const void *first%d = ", idx);
+				output_data (c);
+				output (";");
+				output_newline ();
+
+				output_prefix ();
+				output ("const int size%d = ", idx);
+				output_size (c);
+				output (";");
+				output_newline ();
+
+				output_prefix ();
+				output ("const int max_i%d = ", idx);
+				output_occurs (f);
+				output (";");
+				output_newline ();
+
+				output_line ("for (i%d = 2; i%d <= max_i%d; i%d++)", idx, idx, idx, idx);
 				output_block_open ();
 				output_prefix ();
-				output ("const int max_i%d = ", i);
-				output_occurs (f);
-				output (" + 1;");
+				output ("memcpy (");
+				output_data (c);
+				output (", first%d, size%d);", idx, idx);
 				output_newline ();
-				output_line ("for (i%d = 1; i%d < max_i%d; i%d++)", i, i, i, i);
-				output_block_open ();
-				CB_REFERENCE (c)->subs =
-				    CB_BUILD_CHAIN (cb_i[i], CB_REFERENCE (c)->subs);
-			}
-
-			if (type == INITIALIZE_ONE) {
-				output_initialize_one (p, c);
-			} else {
-				output_initialize_compound (p, c);
-			}
-
-			if (f->flag_occurs) {
-				/* Close loop */
-				CB_REFERENCE (c)->subs = CB_CHAIN (CB_REFERENCE (c)->subs);
 				output_block_close ();
+
+				ref->subs = CB_CHAIN (ref->subs);
 				output_block_close ();
+
+				/* restore previous exception-checks for the reference */
+				ref->check = save_check;
 			}
 		}
 	}
@@ -9978,7 +10014,7 @@ output_display_fields (struct cb_field *f, int offset, int idx)
 				output_prefix ();
 				output ("/* ");
 			}
-			output ("const int m_%d = ", idx);
+			output ("const int max_%d = ", idx);
 			if (p->depending) {
 				output_integer (p->depending);
 			} else {
@@ -9988,12 +10024,11 @@ output_display_fields (struct cb_field *f, int offset, int idx)
 			if (output_as_comment) {
 				output (" */");
 				output_newline ();
-				output_block_open ();
 			} else {
 				output_newline ();
-				output_line ("for (i_%d=0; i_%d < m_%d; i_%d++) {",idx,idx,idx,idx);
-				output_indent_level += indent_adjust_level;
+				output_line ("for (i_%d=0; i_%d < max_%d; i_%d++)", idx,idx,idx,idx);
 			}
+			output_block_open ();
 			field_subscript[idx-1] = -idx;
 			size_subscript[idx-1] = p->size;
 			if (p->children) {

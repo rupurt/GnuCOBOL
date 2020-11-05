@@ -54,7 +54,7 @@
 #undef MOUSE_MOVED
 #include <process.h>
 #include <io.h>
-#include <fcntl.h>
+#include <fcntl.h>	/* for _O_BINARY only */
 #endif
 
 #ifdef	HAVE_SIGNAL_H
@@ -5380,7 +5380,7 @@ cob_sys_waitpid (const void *p_id)
 		*/
 #if defined (PROCESS_QUERY_LIMITED_INFORMATION)
 		process = OpenProcess (SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-#if !defined (_MSC_VER) || !COB_USE_VC2012_OR_GREATER /* only try a higher level if we possibly compile on XP/2003 */
+#if !defined (_MSC_VER) || COB_USE_VC2012_OR_GREATER /* only try a higher level if we possibly compile on XP/2003 */
 		/* TODO: check what happens on WinXP / 2003 as PROCESS_QUERY_LIMITED_INFORMATION isn't available there */
 		if (!process && GetLastError () == ERROR_ACCESS_DENIED) {
 			process = OpenProcess (SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pid);

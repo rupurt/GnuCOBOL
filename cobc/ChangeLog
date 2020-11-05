@@ -1,6 +1,10 @@
-2020-11-04  Bob Dubner <rdubner@symas.com?
 
-	* codegen.c: Fixed a couple of typos.
+2020-11-04  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_initialize_compound): adjusted OCCURS initialization
+	  to only do the initialization (and runtime checks) once and then
+	  memcpy to all other occurences
+	* tree.c: preparation for all-upper-case names (post 3.1)
 
 2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
 

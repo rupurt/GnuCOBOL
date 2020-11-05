@@ -711,7 +711,7 @@ bdb_findkey (cob_file *f, cob_field *kf, int *fullkeylen, int *partlen)
 				} else {
 					*partlen = *fullkeylen;
 				}
-				return k;
+				return (int)k;
 			}
 		}
 	}
@@ -755,7 +755,7 @@ bdb_savekey (cob_file *f, unsigned char *keyarea, unsigned char *record, int idx
 		return totlen;
 	}
 	memcpy (keyarea, record + f->keys[idx].offset, f->keys[idx].field->size);
-	return f->keys[idx].field->size;
+	return (int)f->keys[idx].field->size;
 }
 
 static void
@@ -1407,6 +1407,20 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 			}
 		}
 	}
+#elif defined _WIN32
+	{
+		HANDLE osHandle = (HANDLE)_get_osfhandle (fd);
+		if (osHandle != INVALID_HANDLE_VALUE) {
+			DWORD flags = LOCKFILE_FAIL_IMMEDIATELY;
+			OVERLAPPED fromStart = {0};
+			if (mode != COB_OPEN_INPUT) flags |= LOCKFILE_EXCLUSIVE_LOCK;
+			if (!LockFileEx (osHandle, flags, 0, MAXDWORD, MAXDWORD, &fromStart)) {
+				f->open_mode = COB_OPEN_CLOSED;
+				close (fd);
+				return COB_STATUS_61_FILE_SHARING;
+			}
+		}
+	}
 #endif
 	f->fd = fd;
 	if (f->flag_optional && nonexistent) {
@@ -1428,6 +1442,7 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 	switch (ret) {
 	case COB_NOT_CONFIGURED:
 		cob_chk_file_mapping ();
+		errno = 0;
 		if (access (filename, F_OK) && errno == ENOENT) {
 			if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
 				return COB_STATUS_35_NOT_EXISTS;
@@ -1602,6 +1617,7 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 		lock.l_whence = SEEK_SET;
 		lock.l_start = 0;
 		lock.l_len = 0;
+		errno = 0;
 		if (fcntl (f->fd, F_SETLK, &lock) < 0) {
 			int ret = errno;
 			f->open_mode = COB_OPEN_CLOSED;
@@ -1616,6 +1632,21 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 				return COB_STATUS_61_FILE_SHARING;
 			default:
 				return COB_STATUS_30_PERMANENT_ERROR;
+			}
+		}
+	}
+#elif defined _WIN32
+	{
+		HANDLE osHandle = (HANDLE)_get_osfhandle (f->fd);
+		if (osHandle != INVALID_HANDLE_VALUE) {
+			DWORD flags = LOCKFILE_FAIL_IMMEDIATELY;
+			OVERLAPPED fromStart = {0};
+			if (mode != COB_OPEN_INPUT) flags |= LOCKFILE_EXCLUSIVE_LOCK;
+			if (!LockFileEx (osHandle, flags, 0, MAXDWORD, MAXDWORD, &fromStart)) {
+				f->open_mode = COB_OPEN_CLOSED;
+				f->fd = -1;
+				fclose (fp);
+				return COB_STATUS_61_FILE_SHARING;
 			}
 		}
 	}
@@ -1667,11 +1698,25 @@ cob_file_close (cob_file *f, const int opt)
 			lock.l_whence = SEEK_SET;
 			lock.l_start = 0;
 			lock.l_len = 0;
+			errno = 0;
 			if (fcntl (f->fd, F_SETLK, &lock) == -1) {
 #if 1 /* CHECKME - What is the correct thing to do here? */
 				/* not translated as "testing only" */
 				cob_runtime_warning ("issue during unlock (%s), errno: %d", "cob_file_close", errno);
 #endif
+			}
+		}
+#elif defined _WIN32
+		{
+			HANDLE osHandle = (HANDLE)_get_osfhandle (f->fd);
+			if (osHandle != INVALID_HANDLE_VALUE) {
+				if (!UnlockFile (osHandle, 0, 0, MAXDWORD, MAXDWORD)) {
+#if 1 /* CHECKME - What is the correct thing to do here? */
+					/* not translated as "testing only" */
+					cob_runtime_warning ("issue during UnLockFile (%s), lastError: " CB_FMT_LLU,
+						"cob_file_close", (cob_u64_t)GetLastError ());
+#endif
+				}
 			}
 		}
 #endif
@@ -1978,6 +2023,7 @@ lineseq_write (cob_file *f, const int opt)
 				COB_CHECKED_PUTC ((*p), (FILE *)f->file);
 			}
 		} else {
+			errno = 0;
 			ret = fwrite (f->record->data, size, (size_t)1, (FILE *)f->file);
 			/* LCOV_EXCL_START */
 			if (unlikely (ret != 1)) {
@@ -3204,6 +3250,7 @@ indexed_file_delete (cob_file *f, const char *filename)
 				  filename, (int)i);
 		}
 		file_open_buff[COB_FILE_MAX] = 0;
+		errno = 0;
 		unlink (file_open_buff);
 	}
 #else
@@ -3227,6 +3274,7 @@ indexed_open (cob_file *f, char *filename, const int mode, const int sharing)
 	switch (ret) {
 	case COB_NOT_CONFIGURED:
 		cob_chk_file_mapping ();
+		errno = 0;
 		if (access (filename, F_OK) && errno == ENOENT) {
 			if (mode != COB_OPEN_OUTPUT && f->flag_optional == 0) {
 				return COB_STATUS_35_NOT_EXISTS;
@@ -4971,6 +5019,19 @@ cob_file_unlock (cob_file *f)
 						/* not translated as "testing only" */
 						cob_runtime_warning ("issue during unlock (%s), errno: %d",
 							"cob_file_unlock", errno);
+#endif
+					}
+				}
+			}
+#elif defined _WIN32
+			{
+				HANDLE osHandle = (HANDLE)_get_osfhandle (f->fd);
+				if (osHandle != INVALID_HANDLE_VALUE) {
+					if (!UnlockFile (osHandle, 0, 0, MAXDWORD, MAXDWORD)) {
+#if 1 /* CHECKME - What is the correct thing to do here? */
+						/* not translated as "testing only" */
+						cob_runtime_warning ("issue during UnLockFile (%s), lastError: " CB_FMT_LLU,
+							"cob_file_unlock", (cob_u64_t)GetLastError());
 #endif
 					}
 				}

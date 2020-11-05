@@ -31,6 +31,10 @@
 #include "cobc.h"
 #include "tree.h"
 
+#ifdef	_WIN32
+#include <io.h>	/* for access */
+#endif
+
 enum cb_config_type {
 	CB_ANY = 0,
 	CB_INT,			/* integer */

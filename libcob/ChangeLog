@@ -1,4 +1,12 @@
 
+2020-11-05  Simon Sobisch <simonsobisch@gnu.org>
+
+	* fileio.c: initialize errno in all places where it is checked afterwards
+	* fileio.c [_WIN32]: implemented file locking via LockFileEx/UnlockFile
+	* common.c (cob_sys_waitpid) [_WIN32]: fixed logic error in #if, allowing
+	  the best process synchronization possible on that platform
+	* common.h [_MSC_VER]: removed unused global includes
+
 2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.h, common.c: external version defintion via new defines

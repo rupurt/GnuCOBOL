@@ -46,7 +46,6 @@
 #include <windows.h>
 #undef MOUSE_MOVED
 #include <io.h>
-#include <fcntl.h>
 #endif
 
 #ifdef	HAVE_LOCALE_H
@@ -1753,7 +1752,6 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 {
 	cob_u32_t ec_idx, i;
 	struct cb_text_list	*ec;
-	unsigned char *upme;
 
 	if (to_on_off) {
 		/* TO-DO: Only if >>TURN ... ON WITH LOCATION found? */
@@ -1761,10 +1759,16 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 	}
 
 	for (ec = ec_list; ec; ec = ec->next) {
-		/* Extract exception code via text comparison */
+		/* upper-case exception name */
+		size_t len = strlen (ec->text);
+		unsigned char *upme = (unsigned char*)ec->text;
+		for (i = 0; i < len; ++i) {
+			upme[i] = (cob_u8_t)toupper (upme[i]);
+		}
+		/* extract exception code via text comparison */
 		ec_idx = 0;
 		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
-			if (!strcasecmp (ec->text, CB_EXCEPTION_NAME (i))) {
+			if (!strcmp (ec->text, CB_EXCEPTION_NAME (i))) {
 				ec_idx = i;
 				break;
 			}
@@ -1773,10 +1777,6 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 		/* Error if not a known exception name */
 		/* TO-DO: What about EC-USER? */
 		if (ec_idx == 0) {
-			upme = (unsigned char *)ec->text;
-			for (i = 0; i < strlen(ec->text); ++i) {
-				upme[i] = (cob_u8_t)toupper (upme[i]);
-			}
 			cb_error_x (loc, _("invalid exception-name: %s"),
 				    ec->text);
 			return 1;

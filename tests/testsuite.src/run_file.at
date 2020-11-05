@@ -291,40 +291,40 @@ AT_DATA([prog.cob], [
       *
       *>   DELETE FILE FILE-OPT
       *>    ON EXCEPTION
-      *>     DISPLAY "STATUS DELETE FILE (missing) - EXCEPTION:" WSFS
+      *>     DISPLAY "STATUS DELETE FILE (missing) - EXCEPTION: " WSFS
       *>     END-DISPLAY
       *>    NOT ON EXCEPTION
       *>      IF WSFS NOT = "05"
-      *>         DISPLAY "STATUS DELETE FILE (missing):" WSFS
+      *>         DISPLAY "STATUS DELETE FILE (missing): " WSFS
       *>      END-IF
       *>   END-DELETE
            OPEN I-O FILE-OPT
            IF WSFS NOT = "05"
-              DISPLAY "STATUS I-O, missing optional file:" WSFS.
+              DISPLAY "STATUS I-O, missing optional file: " WSFS.
            CLOSE FILE-OPT
            IF WSFS NOT = "00"
-              DISPLAY "STATUS CLOSE:" WSFS.
+              DISPLAY "STATUS CLOSE: " WSFS.
            OPEN I-O FILE-OPT
            IF WSFS NOT = "00"
-              DISPLAY "STATUS I-O, empty file:" WSFS.
+              DISPLAY "STATUS I-O, empty file: " WSFS.
            DELETE FILE FILE-OPT
       *>     ON EXCEPTION
               IF WSFS NOT = "41"
-                 DISPLAY "STATUS DELETE FILE (OPENED):" WSFS
+                 DISPLAY "STATUS DELETE FILE (opened): " WSFS
               END-IF
       *>    NOT ON EXCEPTION
-      *>     DISPLAY "STATUS DELETE FILE (OPENED) - NO EXCEPTION:" WSFS
+      *>     DISPLAY "STATUS DELETE FILE (opened) - NO EXCEPTION: " WSFS
       *>   END-DELETE
            CLOSE FILE-OPT
            IF WSFS NOT = "00"
-              DISPLAY "STATUS CLOSE #2:" WSFS.
+              DISPLAY "STATUS CLOSE #2: " WSFS.
            DELETE FILE FILE-OPT
       *>     ON EXCEPTION
-      *>      DISPLAY "STATUS DELETE FILE (closed) - EXCEPTION:" WSFS
+      *>      DISPLAY "STATUS DELETE FILE (closed) - EXCEPTION: " WSFS
       *>      END-DISPLAY
       *>     NOT ON EXCEPTION
               IF WSFS NOT = "00"
-                 DISPLAY "STATUS DELETE FILE (closed):" WSFS
+                 DISPLAY "STATUS DELETE FILE (closed): " WSFS
               END-IF
       *>   END-DELETE
       *
@@ -4911,12 +4911,12 @@ AT_DATA([prog2.cob], [
        procedure division.
            open i-o file1.
            if fs not = "61"
-              display "FAILED: " fs
+              display "FAILED 1: " fs
               close file1
            end-if.
            open input file1.
            if fs not = "00"
-              display "FAILED: " fs
+              display "FAILED 2: " fs
            else
               close file1
            end-if.

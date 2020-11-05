@@ -321,9 +321,6 @@ Note: also defined together with __clang__ in both frontends:
 #ifndef	_CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE	1
 #endif
-#include <malloc.h>
-#include <io.h>
-#include <fcntl.h>
 
 /* Disable certain warnings */
 /* Deprecated functions */

@@ -1,4 +1,12 @@
 
+2020-11-04  Simon Sobisch <simonsobisch@gnu.org>
+
+	* atlocal.in, atlocal_valgrind, atlocal_win:
+	  fix unsetting of variables which values contain "COB";
+	  allow screenio-tests to be run on cygwin/msys with ncurses
+	  out-of-the box; fixed TEST_LOCAL (may not use pre-inst-env)
+	  and "external" versions with old indexed file msgid
+
 2020-10-26  Simon Sobisch <simonsobisch@gnu.org>
 
 	* atlocal.in, atlocal_valgrind, atlocal_win:

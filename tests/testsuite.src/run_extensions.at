@@ -2270,9 +2270,11 @@ AT_CHECK([COB_FILE_PATH="../" $COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([test -f "../FILENAMEX" && rm -f "../FILENAMEX"], [0], [], [])
 
 # FIXME: on OPEN we should also output the full filename (if any) leading to the error
-AT_CHECK([COB_FILE_PATH="./nosubhere" $COBCRUN_DIRECT ./prog], [1], [],
+AT_CHECK([COB_FILE_PATH="./nosubhere" $COBCRUN_DIRECT ./prog 2>prog.err], [1], [], [])
+# workaround for testing windows-builds...
+AT_CHECK([cat prog.err | tr '\\' '/'], [0],
 [libcob: prog.cob:13: error: permanent file error (status = 30) for file TEST-FILE ('FILENAMEX' => ./nosubhere/FILENAMEX) on OPEN
-])
+], [])
 
 AT_CLEANUP
 

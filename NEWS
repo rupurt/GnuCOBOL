@@ -38,6 +38,9 @@ NEWS - user visible changes				-*- outline -*-
   ** the interal listing got a speedup and has all error references in
      ascending order now
 
+  ** execution times of INSPECT (libcob) and INITIALIZE (needs recompile)
+     were heavily cut down
+
   ** COPY statement handling:
      * copybook names that contain an extension aren't search with additional
        extensions [as post-rc1-change this may be set to old behaviour by
@@ -47,7 +50,7 @@ NEWS - user visible changes				-*- outline -*-
        by exporting with empty value) and has a fallback (with a warning) to
        be effectively ignored (as previous versions did this)
 
-** adjustments to cobc's warning options:
+  ** adjustments to cobc's warning options:
    -Wdangling-text "new" option to enable "source text after program area",
       not included in -Wall any more
    -Wno-ignored-error allows to suppress messages that normally would be an
@@ -55,6 +58,8 @@ NEWS - user visible changes				-*- outline -*-
    -Wimplicit-define and -Wcorresponding are now enabled by default
 
   ** fixes and enhancements for dump generation
+
+  ** first-time file-locking under Win32
 
   ** tested and adjusted to work on more systems (OS + compilers)
 
