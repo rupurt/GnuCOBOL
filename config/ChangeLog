@@ -1,4 +1,9 @@
 
+2020-11-06  Simon Sobisch <simonsobisch@gnu.org>
+
+	* default.conf, mf-strict.conf, acu-strict.conf, lax.conf-inc:
+	  vsam-status as ignored
+
 2020-08-18  Simon Sobisch <simonsobisch@gnu.org>
 
 	* bs2000-strict.conf, cobol85.conf, cobol2002.conf, cobol2014.conf:

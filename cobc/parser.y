@@ -8863,6 +8863,7 @@ screen_option:
   }
 | PROMPT CHARACTER _is id_or_lit
   {
+	/* FIXME: ACUCOBOL and (undocumented) MF have CHARACTER as optional here */
 	set_screen_attr ("PROMPT", COB_SCREEN_PROMPT);
 	current_field->screen_prompt = $4;
   }
@@ -10823,8 +10824,9 @@ accp_attr:
 	check_repeated ("OVERLINE", SYN_CLAUSE_16, &check_duplicate);
 	set_dispattr (COB_SCREEN_OVERLINE);
   }
-| PROMPT CHARACTER _is id_or_lit
+| PROMPT _character _is id_or_lit
   {
+	/* Note: CHARACTER optional in ACUCOBOL, required by others */
 	check_repeated ("PROMPT", SYN_CLAUSE_17, &check_duplicate);
 	set_attribs (NULL, NULL, NULL, NULL, $4, NULL, COB_SCREEN_PROMPT);
   }
