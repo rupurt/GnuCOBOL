@@ -6385,6 +6385,7 @@ cb_build_intrinsic (cb_tree func, cb_tree args, cb_tree refmod,
 	case CB_INTR_SIN:
 	case CB_INTR_SQRT:
 	case CB_INTR_TAN:
+	/* Fixme: should validate following are taking integers */
 	case CB_INTR_TEST_DATE_YYYYMMDD:
 	case CB_INTR_TEST_DAY_YYYYDDD:
 		x = CB_VALUE (args);

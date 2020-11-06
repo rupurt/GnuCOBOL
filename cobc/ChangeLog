@@ -261,6 +261,10 @@
 	* parser.y, cobc.h, reserved.c, tree.c, tree.h: added partial
 	  support for EXHIBIT (full parsing, without CHANGED + UPON)
 
+2020-07-05  Edward Hart <edward.dan.hart@gmail.com>
+
+	* parser.y, config.def: added vsam-status config option.
+
 2020-07-03  Edward Hart <edward.dan.hart@gmail.com>
 
 	* parser.y (file_status_clause): only ignore VSAM status, pending proper

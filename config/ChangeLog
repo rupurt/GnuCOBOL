@@ -12,6 +12,10 @@
 
 	* general: added option dpc-in-data
 
+2020-07-05  Edward Hart <edward.dan.hart@gmail.com>
+
+	* general: added option vsam-status
+
 2020-05-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* general: added options type-to-clause and usage-type
