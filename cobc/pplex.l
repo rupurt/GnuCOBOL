@@ -213,9 +213,15 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 }
 
 ^[ ]*">>"[ ]?"DISPLAY"[ ]+ {
-	/* OpenCOBOL/GnuCOBOL 2.x extension: display message during compilation */
+	/* OpenCOBOL/GnuCOBOL 2.x extension, 202x: display message during compilation */
 	display_msg[0] = 0;
 	BEGIN DISPLAY_DIRECTIVE_STATE;
+}
+
+^[ ]*">>"[ ]?"REF-MOD-ZERO-LENGTH"	{
+	/* 202x: directive to allow zero ref-mod */
+	BEGIN ON_OFF_DIRECTIVE_STATE;
+	return REFMOD_DIRECTIVE;
 }
 
 ^[ ]*">>D"		{
@@ -356,8 +362,9 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 	BEGIN ELSE_DIRECTIVE_STATE;
 	return ELSE_DIRECTIVE;
 }
-^[ ]*"$END"		{
-	/* MF extension: conditional compilation */
+^[ ]*"$END"		|
+^[ ]*"$END-IF"	{
+	/* MF extension: conditional compilation, second undocumented */
 	BEGIN ENDIF_DIRECTIVE_STATE;
 	return ENDIF_DIRECTIVE;
 }
@@ -401,7 +408,7 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 	skip_to_eol ();
 }
 
-"COPY"			{
+"COPY"/[ ,;\n]			{
 	yy_push_state (COPY_STATE);
 	if (cb_src_list_file) {
 		get_new_listing_file ();
@@ -409,7 +416,7 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 	return COPY;
 }
 
-"INCLUDE"		{
+"INCLUDE"/[ ,;\n]		{
 	/* Note: ++INCLUDE/-INC (include only the data records,
 	   must be specified in column 8/1) and are not implemented yet */
 	yy_push_state (COPY_STATE);
@@ -419,7 +426,7 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 	return COPY;
 }
 
-"REPLACE"		{
+"REPLACE"/[ ,;\n]		{
 	yy_push_state (COPY_STATE);
 	return REPLACE;
 }
@@ -436,19 +443,19 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 	ppecho (yytext, 0, (int)yyleng);
 }
 
-"PROGRAM-ID"	{
+"PROGRAM-ID"/[ .,;\n]	{
 	/* Allow comment sentences/paragraphs */
 	comment_allowed = 1;
 	ppecho (yytext, 0, (int)yyleng);
 }
 
-"DIVISION"	{
+"DIVISION"/[ .,;\n]	{
 	/* Disallow comment sentences/paragraphs */
 	comment_allowed = 0;
 	ppecho (yytext, 0, (int)yyleng);
 }
 
-"SECTION"	{
+"SECTION"/[ .,;\n]	{
 	/* Disallow comment sentences/paragraphs */
 	comment_allowed = 0;
 	ppecho (yytext, 0, (int)yyleng);
@@ -638,68 +645,68 @@ CONTROL_STATEMENT_STATE>{
 }
 
 <SET_DIRECTIVE_STATE>{
-  "ADDRSV" |
-  "ADD-RSV"		{
+  "ADDRSV"	|
+  "ADD-RSV"	{
 	return ADDRSV;
   }
-  "ADDSYN" |
-  "ADD-SYN"		{
+  "ADDSYN"	|
+  "ADD-SYN"	{
 	return ADDSYN;
   }
-  "ASSIGN"		{
+  "ASSIGN"	{
 	return ASSIGN;
   }
-  "BOUND"		{
+  "BOUND"	{
 	 return BOUND;
   }
-  "CALLFH"		{
+  "CALLFH"	{
 	return CALLFH;
   }
-  "COMP1" |
-  "COMP-1"		{
+  "COMP1"	|
+  "COMP-1"	{
 	return COMP1;
   }
-  "CONSTANT"		{
+  "CONSTANT"	{
 	return CONSTANT;
   }
-  "DPCINDATA" |
-  "DPC-IN-DATA"		{
+  "DPCINDATA"	|
+  "DPC-IN-DATA"	{
 	return DPC_IN_DATA;
   }
-  "FOLDCOPYNAME" |
+  "FOLDCOPYNAME"	|
   "FOLD-COPY-NAME"	{
 	return FOLDCOPYNAME;
   }
-  "MAKESYN" |
-  "MAKE-SYN"		{
+  "MAKESYN" 	|
+  "MAKE-SYN"	{
 	return MAKESYN;
   }
   "NOBOUND" |
   "NO-BOUND"		{
 	return NOBOUND;
   }
-  "NODPCINDATA" |
-  "NO-DPCINDATA" |
-  "NODPC-IN-DATA" |
-  "NO-DPC-IN-DATA" {
+  "NODPCINDATA" 	|
+  "NO-DPCINDATA"	|
+  "NODPC-IN-DATA"	|
+  "NO-DPC-IN-DATA"	{
 	return NODPC_IN_DATA;
   }
-  "NOFOLDCOPYNAME" |
-  "NOFOLD-COPY-NAME" |
+  "NOFOLDCOPYNAME"  	|
+  "NOFOLD-COPY-NAME"	|
   "NO-FOLD-COPY-NAME"	{
 	return NOFOLDCOPYNAME;
   }
-  "NOSSRANGE" |
-  "NO-SSRANGE"		{
+  "NOSSRANGE"	|
+  "NO-SSRANGE"	{
 	return NOSSRANGE;
   }
-  "OVERRIDE"		{
+  "OVERRIDE"	{
 	return OVERRIDE;
   }
   "REMOVE"		{
 	return REMOVE;
   }
-  "SSRANGE"		{
+  "SSRANGE"	{
 	return SSRANGE;
   }
   "SOURCEFORMAT" |
@@ -709,8 +716,8 @@ CONTROL_STATEMENT_STATE>{
   /*"AS"			{ - not available with MF compilers -
 	return AS;
   }*/
-  {DEFNUM_LITERAL} |
-  {ALNUM_LITERAL} |
+  {DEFNUM_LITERAL}	|
+  {ALNUM_LITERAL}	|
   {SET_PAREN_LIT}	{
 	pplval.s = cobc_plex_strdup (yytext);
 	return LITERAL;

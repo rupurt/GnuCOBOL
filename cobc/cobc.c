@@ -4746,6 +4746,7 @@ preprocess (struct filename *fn)
 	int			save_source_format;
 	int			save_fold_copy;
 	int			save_fold_call;
+	int			save_ref_mod_zero_length;
 #ifndef COB_INTERNAL_XREF
 #ifdef	_WIN32
 	const char *envname = "%PATH%";
@@ -4804,6 +4805,7 @@ preprocess (struct filename *fn)
 	save_source_format = cb_source_format;
 	save_fold_copy = cb_fold_copy;
 	save_fold_call = cb_fold_call;
+	save_ref_mod_zero_length = cb_ref_mod_zero_length;
 
 	/* Preprocess */
 	ppparse ();
@@ -4813,6 +4815,7 @@ preprocess (struct filename *fn)
 	cb_source_format = save_source_format;
 	cb_fold_copy = save_fold_copy;
 	cb_fold_call = save_fold_call;
+	cb_ref_mod_zero_length = save_ref_mod_zero_length;
 
 	if (ppin) {
 		fclose (ppin);

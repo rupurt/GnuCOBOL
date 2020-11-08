@@ -616,6 +616,8 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %token PARAMETER
 %token OVERRIDE
 
+%token REFMOD_DIRECTIVE
+
 %token SET_DIRECTIVE
 %token ADDRSV
 %token ADDSYN
@@ -720,6 +722,7 @@ directive:
   SOURCE_DIRECTIVE source_directive
 | DEFINE_DIRECTIVE define_directive
 | SET_DIRECTIVE set_directive
+| REFMOD_DIRECTIVE refmod_directive
 | TURN_DIRECTIVE turn_directive
 | LISTING_DIRECTIVE listing_directive
 | LEAP_SECOND_DIRECTIVE leap_second_directive
@@ -955,32 +958,37 @@ set_choice:
 | SSRANGE _literal
   {
 	char	*p = $2;
-	size_t	size;
+	char	ep = 0;
 	struct cb_text_list	*txt;
-
 	
 	/* Remove surrounding quotes/brackets */
 	if (p) {
+		size_t	size;
 		++p;
 		size = strlen (p) - 1;
 		p[size] = '\0';
+		if (size == 1 && *p >= '1' && *p <= '3') {
+			ep = *p;
+		}
+	} else {
+		ep = '2';
 	}
 
 	/* Enable EC-BOUND-SUBSCRIPT and -REF-MOD checking */
-	if (p && !strcasecmp (p, "1")) {
-		/* At runtime only */
-		CB_PENDING ("SSRANGE(1)");
-	} else if (!p || !strcasecmp (p, "2")) {
-		/*  At compile- and runtime */
+	if (ep) {
+		if (ep == '3') {
+			/* SSRANGE"3": REF-MOD, with zero length allowed (at runtime) */
+			fprintf (ppout, "#REFMOD_ZERO 1\n");
+		} else if (ep == '2') {
+			/* SSRANGE"2": REF-MOD, zero length not allowed */
+			fprintf (ppout, "#REFMOD_ZERO 0\n");
+		} else /* if (ep == '1') */ {
+			/* SSRANGE"1": REF-MOD minimal - check only for zero/negative */
+			fprintf (ppout, "#REFMOD_ZERO 2\n");
+		}
 		txt = ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT");
 		txt = ppp_list_add (txt, "EC-BOUND-REF-MOD");
 		append_to_turn_list (txt, 1, 0);
-	} else if (p && !strcasecmp (p, "3")) {
-		/*
-		  At compile- and runtime, and allowing zero-length ref mod at
-		  runtime
-		*/
-		CB_PENDING ("SSRANGE(3)");
 	} else {
 		ppp_error_invalid_option ("SSRANGE", p);
 	}
@@ -1022,6 +1030,19 @@ set_options:
 | _as LITERAL
   {
 	fprintf (ppout, "#OPTION %s %s\n", $<s>0, $2);
+  }
+;
+
+refmod_directive:
+  _on
+  {
+	cb_ref_mod_zero_length = 1;
+	fprintf (ppout, "#OPTION REFMOD_ZERO 1\n");
+  }
+| OFF
+  {
+	cb_ref_mod_zero_length = 0;
+	fprintf (ppout, "#OPTION REFMOD_ZERO 0\n");
   }
 ;
 
@@ -1617,6 +1638,7 @@ _as:		| AS ;
 _format:	| FORMAT ;
 _is:		| IS ;
 _printing:	| PRINTING ;
+_on:		| ON ;
 _than:		| THAN ;
 _to:		| TO ;
 

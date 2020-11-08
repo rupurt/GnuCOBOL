@@ -359,6 +359,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libcob\exception.def"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcob\exception-io.def"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libcob\system.def"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libcob.h"
 				>
 			</File>

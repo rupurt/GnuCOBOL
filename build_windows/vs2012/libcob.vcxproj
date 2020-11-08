@@ -181,6 +181,7 @@
     <ClCompile Include="..\..\libcob\termio.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\libcob\exception-io.def" />
     <None Include="..\..\libcob\exception.def" />
     <None Include="..\..\libcob\system.def" />
     <None Include="..\..\libcob\ChangeLog" />

@@ -428,6 +428,7 @@ test.conf: missing definitions:
 	no definition of 'indirect-redefines'
 	no definition of 'larger-redefines-ok'
 	no definition of 'relax-syntax-checks'
+	no definition of 'ref-mod-zero-length'
 	no definition of 'relax-level-hierarchy'
 	no definition of 'select-working'
 	no definition of 'local-implies-recursive'

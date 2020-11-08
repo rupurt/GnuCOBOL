@@ -3300,9 +3300,11 @@ cob_check_subscript (const int i, const int max,
 }
 
 void
-cob_check_ref_mod (const int offset, const int length,
-		   const int size, const char *name)
+cob_check_ref_mod_detailed (const char *name, const int abend, const int zero_allowed,
+	const int size, const int offset, const int length)
 {
+	const int minimal_length = zero_allowed ? 0 : 1;
+
 	/* Check offset */
 	if (offset < 1 || offset > size) {
 		cob_set_exception (COB_EC_BOUND_REF_MOD);
@@ -3313,20 +3315,24 @@ cob_check_ref_mod (const int offset, const int length,
 			cob_runtime_error (_("offset of '%s' out of bounds: %d, maximum: %d"),
 			   name, offset, size);
 		}
-		cob_stop_run (1);
+		if (abend) {
+			cob_stop_run (1);
+		}
 	}
 
 	/* Check plain length */
-	if (length < 1 || length > size) {
+	if (length < minimal_length || length > size) {
 		cob_set_exception (COB_EC_BOUND_REF_MOD);
-		if (length < 1) {
+		if (length < minimal_length) {
 			cob_runtime_error (_("length of '%s' out of bounds: %d"),
 			   name, length);
 		} else {
 			cob_runtime_error (_("length of '%s' out of bounds: %d, maximum: %d"),
 			   name, length, size);
 		}
-		cob_stop_run (1);
+		if (abend) {
+			cob_stop_run (1);
+		}
 	}
 
 	/* Check length with offset */
@@ -3334,6 +3340,36 @@ cob_check_ref_mod (const int offset, const int length,
 		cob_set_exception (COB_EC_BOUND_REF_MOD);
 		cob_runtime_error (_("length of '%s' out of bounds: %d, starting at: %d, maximum: %d"),
 			name, length, offset, size);
+		if (abend) {
+			cob_stop_run (1);
+		}
+	}
+}
+
+/* kept for 2.2-3.1-rc1 compat only */
+void
+cob_check_ref_mod (const int offset, const int length,
+	const int size, const char* name)
+{
+	cob_check_ref_mod_detailed (name, 1, 0, size, offset, length);
+}
+
+void
+cob_check_ref_mod_minimal (const char* name, const int offset, const int length)
+{
+	/* Check offset */
+	if (offset < 1) {
+		cob_set_exception (COB_EC_BOUND_REF_MOD);
+		cob_runtime_error (_("offset of '%s' out of bounds: %d"),
+			name, offset);
+		cob_stop_run (1);
+	}
+
+	/* Check length */
+	if (length < 1) {
+		cob_set_exception (COB_EC_BOUND_REF_MOD);
+		cob_runtime_error (_("length of '%s' out of bounds: %d"),
+			name, length);
 		cob_stop_run (1);
 	}
 }

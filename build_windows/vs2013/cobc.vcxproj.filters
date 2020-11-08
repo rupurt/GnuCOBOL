@@ -87,6 +87,12 @@
     <None Include="..\..\libcob\system.def">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\..\libcob\exception-io.def">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\..\libcob\exception.def">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libcob\cobgetopt.h">

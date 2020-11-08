@@ -273,9 +273,12 @@ static void *	copy_literal (cb_tree l);
 	cobc_free (word);
 }
 
-<*>^[ ]?"#ASSIGN".*\n {
-	char	*text = cobc_parse_strdup (yytext);
-	cb_assign_type_default = (enum cb_assign_type)(text[1] - '0');
+<*>^[ ]?"#REFMOD_ZERO "[0-9]\n {
+	cb_ref_mod_zero_length = (yytext[13] - '0');
+}
+
+<*>^[ ]?"#ASSIGN "[0-9]\n {
+	cb_assign_type_default = (enum cb_assign_type)(yytext[8] - '0');
 }
 
 <*>^[ ]?"#TURN".*\n {

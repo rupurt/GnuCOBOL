@@ -4,8 +4,6 @@ NEWS - user visible changes				-*- outline -*-
  
 * TOBEDONE:
   
-  ** allow ref-mod with zero-length, also with runtime checks enabled
-
   ** file-name handling issues (MF-compat)
 
 * Changes since 3.1-rc1
@@ -17,7 +15,7 @@ NEWS - user visible changes				-*- outline -*-
      hardening options or leave as-is, or disable (which previous versions
      effectively did)
 
- **  ensure runtime checks are generated - nder some conditions the
+  ** ensure runtime checks are generated - nder some conditions the
      generated code had excluded runtime checks, permitting out-of-bounds or
      null-pointer accesses
 
@@ -38,8 +36,11 @@ NEWS - user visible changes				-*- outline -*-
   ** the interal listing got a speedup and has all error references in
      ascending order now
 
-  ** execution times of INSPECT (libcob) and INITIALIZE (needs recompile)
-     were heavily cut down
+  ** execution times of INSPECT and INITIALIZE with OCCURS were heavily cut down
+
+  ** dialect option to allow ref-mod with zero-length (active with -std=default),
+     with runtime checks enabled; also set by directives
+     REF-MOD-ZERO-LENGTH (COBOL202x) and SSRANGE (MF) as appropriate
 
   ** COPY statement handling:
      * copybook names that contain an extension aren't search with additional
@@ -69,7 +70,7 @@ NEWS - user visible changes				-*- outline -*-
 
 ** new COBOL compiler (cobc) options:
    -f[no]-diagnostics-show-option, enabled by default, shows the
-       command line option responsible for the diagnostic message
+    command line option responsible for the diagnostic message
 
 **  EXHIBIT and EXHIBIT NAMED implemented
 
@@ -90,7 +91,7 @@ NEWS - user visible changes				-*- outline -*-
     * compiler outputs (assembler)
     * function with variable-length RETURNING item
 
-** the recent additions of ">> TURN" and "variable LIKE variable" do not work
+** the recent additions of ">> TURN" and "variable LIKE variable" may not work
    as expected in all cases
 
  

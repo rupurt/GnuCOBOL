@@ -1,4 +1,8 @@
 
+2020-11-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* general: added ref-mod-zero-length, only active for default.conf
+
 2020-11-06  Simon Sobisch <simonsobisch@gnu.org>
 
 	* default.conf, mf-strict.conf, acu-strict.conf, lax.conf-inc:

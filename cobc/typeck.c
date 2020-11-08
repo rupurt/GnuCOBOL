@@ -2056,15 +2056,27 @@ cb_build_identifier (cb_tree x, const int subchk)
 		if (CB_EXCEPTION_ENABLE (COB_EC_BOUND_REF_MOD)) {
 			if (f->flag_any_length || !CB_LITERAL_P (r->offset) ||
 			    (r->length && !CB_LITERAL_P (r->length))) {
-				e1 = CB_BUILD_FUNCALL_4 ("cob_check_ref_mod",
-							 cb_build_cast_int (r->offset),
-							 r->length ?
-							  cb_build_cast_int (r->length) :
-							  cb_int1,
-							 f->flag_any_length ?
-							  CB_BUILD_CAST_LENGTH (v) :
-							  cb_int (pseudosize),
-							 CB_BUILD_STRING0 (f->name));
+				/* allow everything but negative/zero */
+				if (cb_ref_mod_zero_length == 2) {
+					e1 = CB_BUILD_FUNCALL_3 ("cob_check_ref_mod_minimal",
+								 CB_BUILD_STRING0 (f->name),
+								 cb_build_cast_int (r->offset),
+								 r->length ?
+								  cb_build_cast_int (r->length) :
+								  cb_int1);
+				} else {
+					e1 = CB_BUILD_FUNCALL_6 ("cob_check_ref_mod_detailed",
+								 CB_BUILD_STRING0 (f->name),
+								 cb_int1,	/* abend */
+								 cb_int (cb_ref_mod_zero_length),
+								 f->flag_any_length ?
+								  CB_BUILD_CAST_LENGTH (v) :
+								  cb_int (pseudosize),
+								 cb_build_cast_int (r->offset),
+								 r->length ?
+								  cb_build_cast_int (r->length) :
+								  cb_int1);
+				}
 				r->check = cb_list_add (r->check, e1);
 			}
 		}

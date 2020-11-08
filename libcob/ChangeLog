@@ -1,4 +1,9 @@
 
+2020-11-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c, common.h: new functions cob_check_ref_mod_detailed and
+	  cob_check_ref_mod_minimal for adjusted check of COB_EC_BOUND_REF_MOD
+
 2020-11-05  Simon Sobisch <simonsobisch@gnu.org>
 
 	* fileio.c: initialize errno in all places where it is checked afterwards

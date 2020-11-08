@@ -1,4 +1,12 @@
 
+2020-11-08  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #390 ref-mod with zero-length
+	* config.def, typeck.c (cb_build_identifier): added cb_ref_mod_zero_length
+	  to allow reference-modification at compile-time with a length of zero
+	* pparse.y, pplex.l, scanner.l, cobc.c: added >> REF-MOD-ZERO-LENGTH and
+	  adjusted SSRANGE, now also supporting SSRANGE"1" and SSRANGE"3"
+
 2020-11-04  Simon Sobisch <simonsobisch@gnu.org>
 
 	* codegen.c (output_initialize_compound): adjusted OCCURS initialization
