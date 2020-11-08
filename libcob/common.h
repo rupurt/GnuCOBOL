@@ -375,7 +375,6 @@ only usable with COB_USE_VC2013_OR_GREATER */
 #endif /* __MINGW32__ */
 
 #ifdef __BORLANDC__
-#include <io.h>
 #define _timeb		timeb
 #define _ftime(a)	ftime(a)
 #define strncasecmp	strnicmp
@@ -398,7 +397,9 @@ only usable with COB_USE_VC2013_OR_GREATER */
 #pragma error_messages (off, E_STATEMENT_NOT_REACHED)
 #endif
 
+#ifndef COB_WITHOUT_JMP
 #include <setjmp.h>
+#endif
 
 #ifndef	COB_EXT_EXPORT
 #if	((defined(_WIN32) || defined(__CYGWIN__)) && !defined(__clang__))
@@ -1578,6 +1579,7 @@ struct cob_fileio_funcs {
 	int	(*fdelete)	(cob_file *);
 };
 
+#ifndef COB_WITHOUT_JMP
 /* Low level jump structure */
 struct cobjmp_buf {
 	int	cbj_int[4];
@@ -1585,6 +1587,7 @@ struct cobjmp_buf {
 	jmp_buf	cbj_jmp_buf;
 	void	*cbj_ptr_rest[2];
 };
+#endif
 
 #define __LIBCOB_VERSION	3
 #define __LIBCOB_VERSION_MINOR		1
@@ -1975,9 +1978,12 @@ COB_EXPIMP void		cob_cancel_field	(const cob_field *,
 COB_EXPIMP void		cob_cancel		(const char *);
 COB_EXPIMP int		cob_call		(const char *, const int, void **);
 COB_EXPIMP int		cob_func		(const char *, const int, void **);
+
+#ifndef COB_WITHOUT_JMP
 COB_EXPIMP void		*cob_savenv		(struct cobjmp_buf *);
 COB_EXPIMP void		*cob_savenv2		(struct cobjmp_buf *, const int);
 COB_EXPIMP void		cob_longjmp		(struct cobjmp_buf *);
+#endif
 
 COB_EXPIMP int		cob_get_num_params ( void );
 COB_EXPIMP int		cob_get_param_constant ( int num_param );
@@ -2664,10 +2670,13 @@ typedef	char *		cobchar_t;
 #define	cobs64_t	cob_s64_t
 #define	cobuns64_t	cob_u64_t
 
+#ifndef COB_WITHOUT_JMP
 #define	cobsetjmp(x)	setjmp (cob_savenv (x))
 #define	coblongjmp(x)	cob_longjmp (x)
 #define	cobsavenv(x)	cob_savenv (x)
 #define	cobsavenv2(x,z)	cob_savenv2 (x, z)
+#endif
+
 #define	cobfunc(x,y,z)	cob_func (x, y, z)
 #define	cobcall(x,y,z)	cob_call (x, y, z)
 #define	cobcancel(x)	cob_cancel (x)

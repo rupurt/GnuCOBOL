@@ -333,6 +333,8 @@ AM_PROG_CC_C_O
 AM_PROG_LEX
 AC_PROG_YACC
 
+LT_PROG_RC
+
 # only GNU Bison is supported, so drop yacc-compatibility warnings if possible
 # note: that breaks old Bison versions which we still support,
 #       if that changes the test may be obsolete
@@ -386,10 +388,6 @@ AC_DEFUN([AC_PROG_F77], [])
 AC_DEFUN([AC_PROG_CXX], [])
 AC_PROG_LN_S
 AC_PROG_INSTALL
-
-# AC_LIBTOOL_DLOPEN
-# AC_LIBTOOL_WIN32_DLL
-# AC_PROG_LIBTOOL
 
 AC_PROG_MAKE_SET
 AC_LIB_RPATH

@@ -6,6 +6,7 @@
 	* common.c (cob_sys_waitpid) [_WIN32]: fixed logic error in #if, allowing
 	  the best process synchronization possible on that platform
 	* common.h [_MSC_VER]: removed unused global includes
+	* common.h, call.c: allow removal of longjump by defining COB_WITHOUT_JMP
 
 2020-10-27  Simon Sobisch <simonsobisch@gnu.org>
 
