@@ -10247,20 +10247,20 @@ output_module_init_function (struct cb_program *prog)
 	output_line ("module->flag_exit_program = 0;");
 	{
 		int	opt = 0;
-	if (cb_flag_traceall) {
-		opt |= COB_MODULE_TRACE;
-		opt |= COB_MODULE_TRACEALL;
-	} else
-	if (cb_flag_trace) {
-		opt |= COB_MODULE_TRACE;
-	}
+		if (cb_flag_traceall) {
+			opt |= COB_MODULE_TRACE;
+			opt |= COB_MODULE_TRACEALL;
+		} else
+		if (cb_flag_trace) {
+			opt |= COB_MODULE_TRACE;
+		}
 #if 0 /* currently unused */
-	if (cobc_wants_debug
-	 || cb_flag_dump) {
-		opt |= COB_MODULE_DEBUG;
-	}
+		if (cobc_wants_debug
+		 || cb_flag_dump) {
+			opt |= COB_MODULE_DEBUG;
+		}
 #endif
-	output_line ("module->flag_debug_trace = %d;", opt);
+		output_line ("module->flag_debug_trace = %d;", opt);
 	}
 	output_line ("module->flag_dump_ready = %u;", cb_flag_dump ? 1 : 0);
 	output_line ("module->module_stmt = 0;");
@@ -10341,7 +10341,6 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	struct literal_list	*m;
 	FILE			*savetarget;
 	const char		*s;
-	char			fdname[48];
 	char			key_ptr[64];
 	unsigned int		i;
 	cob_u32_t		inc;
@@ -10889,7 +10888,7 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	if (prog->num_proc_params) {
 		if (!cb_sticky_linkage && !prog->flag_chained
 #if	0	/* RXWRXW USERFUNC */
-		&& prog->prog_type != COB_MODULE_TYPE_FUNCTION
+		 && prog->prog_type != COB_MODULE_TYPE_FUNCTION
 #endif
 		) {
 			output_line ("/* Set not passed parameter pointers to NULL */");
@@ -11461,12 +11460,13 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	}
 
 	for (l = prog->file_list; l; l = CB_CHAIN (l)) {
+		char			fdname[48];
 		fl = CB_FILE(CB_VALUE (l));
 		if (!fl->record) continue;
 		if (  (fl->organization != COB_ORG_SORT
-	 	    && (cb_flag_dump & COB_DUMP_FD))
+		    && (cb_flag_dump & COB_DUMP_FD))
 		 ||   (fl->organization == COB_ORG_SORT
-	 	    && (cb_flag_dump & COB_DUMP_SD))) {
+		    && (cb_flag_dump & COB_DUMP_SD))) {
 			sprintf (fdname, "%s %s",
 				fl->organization != COB_ORG_SORT ? "FD" : "SD",
 				fl->name);

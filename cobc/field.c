@@ -1184,7 +1184,10 @@ validate_any_length_item (struct cb_field *f)
 		return 1;
 	}
 
-	/* CHECKME: Why do we increase the reference counter here and not in another place? */
+	/* CHECKME: Why do we increase the reference counter here
+	            (to ensure the field is generated)?
+	            Better would be to add the check for 'f->count != 0' to the place
+	            where it possibly is missing... */
 	f->count++;
 	return 0;
 }
@@ -2457,7 +2460,8 @@ compute_size (struct cb_field *f)
 			if ((c->report_flag & COB_REPORT_LINE)
 			 && !(c->report_flag & COB_REPORT_LINE_PLUS)
 			 && c->report_line == f->report_line) {
-				cb_warning_x (cb_warn_additional, CB_TREE(f), _("duplicate LINE %d ignored"), f->report_line);
+				cb_warning_x (cb_warn_additional, CB_TREE (f),
+					_("duplicate LINE %d ignored"), f->report_line);
 				f->report_line = 0;
 				f->report_flag &= ~COB_REPORT_LINE;
 			}

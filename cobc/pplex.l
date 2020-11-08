@@ -213,7 +213,8 @@ DEFNUM_LITERAL	[+-]?[0-9]*[\.]*[0-9]+
 }
 
 ^[ ]*">>"[ ]?"DISPLAY"[ ]+ {
-	/* OpenCOBOL/GnuCOBOL 2.x extension, 202x: display message during compilation */
+	/* previous OpenCOBOL/GnuCOBOL 2.x extension, added in COBOL 202x with slightly different syntax:
+	   display message during compilation --> needs a dialect option to switch to the appropriate state */
 	display_msg[0] = 0;
 	BEGIN DISPLAY_DIRECTIVE_STATE;
 }

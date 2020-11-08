@@ -1670,7 +1670,7 @@ build_external_assignment_name (cb_tree name)
 	name_ptr = remove_labels_from_filename (name_ptr);
 	if (name_ptr != orig_ptr) {
 		cb_warning (cb_warn_additional, _("ASSIGN %s interpreted as '%s'"),
-			    orig_ptr, name_ptr);
+			orig_ptr, name_ptr);
 	}
 
 	/* Convert the EXTERNAL name into literal */
@@ -1861,6 +1861,9 @@ cb_build_identifier (cb_tree x, const int subchk)
 	f = CB_FIELD (v);
 
 	/* BASED check and check for OPTIONAL LINKAGE items */
+
+	/* CHECKME: do we need the field founder to decide?  LINKAGE and flag_item_based
+	            should be available in 'f' already ... */
 	if (current_statement && !suppress_data_exceptions &&
 	    (CB_EXCEPTION_ENABLE (COB_EC_DATA_PTR_NULL) ||
 	     CB_EXCEPTION_ENABLE (COB_EC_PROGRAM_ARG_OMITTED))) {
@@ -2065,6 +2068,7 @@ cb_build_identifier (cb_tree x, const int subchk)
 								  cb_build_cast_int (r->length) :
 								  cb_int1);
 				} else {
+					/* check upper + size + lower as requested */
 					e1 = CB_BUILD_FUNCALL_6 ("cob_check_ref_mod_detailed",
 								 CB_BUILD_STRING0 (f->name),
 								 cb_int1,	/* abend */

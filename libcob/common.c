@@ -2211,8 +2211,7 @@ cob_field_to_string (const cob_field *f, void *str, const size_t maxsize)
 		strncpy (str, _("field with NULL address"), maxsize);
 		return;
 	}
-	i = f->size - 1;
-	for (; ;) {
+	for (i = f->size - 1; ; i--) {
 		if (f->data[i] && f->data[i] != (unsigned char)' ') {
 			count = i + 1;
 			break;
@@ -2220,7 +2219,6 @@ cob_field_to_string (const cob_field *f, void *str, const size_t maxsize)
 		if (!i) {
 			break;
 		}
-		--i;
 	}
 	if (count > maxsize) {
 		count = maxsize;
