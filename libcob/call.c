@@ -431,6 +431,10 @@ do_cancel_module (struct call_hash *p, struct call_hash **base_hash,
 	int nocancel;
 	nocancel = 0;
 
+	/* FIXME: check the modules entry point and take care of
+	   CBL_ERROR_PROC / CBL_EXIT_PROC which defines: If a program containing
+	   an exit/error procedure is canceled, the exit/error procedure is removed. */
+
 	if (!p->module) {
 		return;
 	}

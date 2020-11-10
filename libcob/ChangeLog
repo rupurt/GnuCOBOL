@@ -127,6 +127,13 @@
 
 2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
 
+	* common.c (struct exit_handlerlist, cob_sys_exit_proc):
+	  added priority for exit handler,
+	  correct return for install_flag 2 (query) if entry not registered
+	* common.c (cob_sys_exit_proc, cob_sys_error_proc):
+	  fix bad free for re-entry / delete of existing exit/error handler,
+	  added  ACU variant (currently deactivated)
+
 	work on installable error handlers (per MF and ACU)
 	* common.c (cob_runtime_error): remove error handler from the que before
 	  calling it, effectively let error handlers re-install themselves;

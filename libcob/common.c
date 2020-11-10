@@ -341,6 +341,7 @@ static int		cob_switch[COB_SWITCH_MAX + 1];
 static struct exit_handlerlist {
 	struct exit_handlerlist	*next;
 	int			(*proc)(void);
+	unsigned char priority;
 } *exit_hdlrs;
 
 /* Runtime error handling */
@@ -4718,42 +4719,104 @@ cob_sys_exit_proc (const void *dispo, const void *pptr)
 {
 	struct exit_handlerlist *hp;
 	struct exit_handlerlist *h;
-	const unsigned char	*x;
+	unsigned char data_buff;
+	const unsigned char	*install_flag;
+	const unsigned char	*priority;
 	int			(**p)(void);
 
 	COB_CHK_PARMS (CBL_EXIT_PROC, 2);
 
-	memcpy (&p, &pptr, sizeof (void *));
-	if (!p || !*p) {
-		return -1;
+#if 0	/* TODO: take care of ACU variant:
+	   pptr is not an already resolved entry point
+	   but a name which is to be cob_resolve'd (at use-time);
+	   maybe resolve here and return -1 if not possible;
+	   furthermore the second parameter is a mixed priority + install_flag */
+	if (something) {
+		const char *name = (char *)pptr;
+		pptr = cob_resolve_cobol (name, 0, 0);
+
+		if (!p) {
+			return -1;
+		}
+
+		install_flag = &data_buff;
+		memcpy (&priority, &disp, sizeof (unsigned char *));
+		if (priority == 254) {
+			*install_flag = 1;
+		} else if (priority == 255) {
+			*install_flag = 2;
+		} else {
+			*install_flag = 3;
+		}
+
+	} else {
+#endif
+		memcpy (&p, &pptr, sizeof (void *));
+
+		if (!p || !*p) {
+			return -1;
+		}
+
+		install_flag = dispo;
+		if (*install_flag > 3) {
+			return -1;
+		}
+		if (*install_flag == 2 || *install_flag == 3) {
+			memcpy (&priority, &pptr + sizeof (void *), sizeof (unsigned char *));
+			if (*install_flag == 3 && *priority > 127) {
+				data_buff = 64;
+				priority = &data_buff;
+			}
+		} else {
+			data_buff = 64;
+			priority = &data_buff;
+		}
+#if 0
 	}
+#endif
 
 	hp = NULL;
 	h = exit_hdlrs;
-	/* Remove handler anyway */
+	/* Search handler, remove if not function 2  */
 	while (h != NULL) {
 		if (h->proc == *p) {
+			/* Return priority of installed handler */
+			if (*install_flag == 2) {
+#if 0	/* TODO: take care of ACU variant: priority in return */
+				if (something) {
+					return priority;
+				}
+#endif
+				memcpy (&priority, &h->priority, sizeof (unsigned char));
+				return 0;
+			}
 			if (hp != NULL) {
 				hp->next = h->next;
 			} else {
 				exit_hdlrs = h->next;
 			}
-			if (hp) {
-				cob_free (hp);
+			cob_free (h);
+			/* Remove handler --> done */
+			if (*install_flag == 1) {
+				return 0;
 			}
 			break;
 		}
 		hp = h;
 		h = h->next;
 	}
-	x = dispo;
-	if   (*x != 0 && *x != 2 && *x != 3) {
-		/* Remove handler */
-		return 0;
+	if (*install_flag == 2) {
+#if 0	/* TODO: take care of ACU variant: priority 255 = not availabe */
+		if (something) {
+			return 255;
+		}
+#endif
+		return -1;
 	}
 	h = cob_malloc (sizeof (struct exit_handlerlist));
 	h->next = exit_hdlrs;
 	h->proc = *p;
+	memcpy (&h->priority, priority, sizeof (unsigned char));
 	exit_hdlrs = h;
 	return 0;
 }
@@ -4768,24 +4831,31 @@ cob_sys_error_proc (const void *dispo, const void *pptr)
 
 	COB_CHK_PARMS (CBL_ERROR_PROC, 2);
 
-	memcpy (&p, &pptr, sizeof (void *));
-	if (!p || !*p) {
-		return -1;
-	}
+#if 0	/* TODO: take care of ACU variant:
+	   pptr is not an already resolved entry point
+	   but a name which is to be cob_resolve'd (at use-time);
+	   maybe resolve here and return -1 if not possible */
+	if (something) {
+		const char *name = (char *)pptr;
+		pptr = cob_resolve_cobol (name, 0, 0);
+		if (!p) {
+			return -1;
+		}
+	} else {
+#endif
+		memcpy (&p, &pptr, sizeof (void *));
+		if (!p || !*p) {
+			return -1;
+		}
+#if 0
+}
+#endif
 
 	hp = NULL;
 	h = hdlrs;
-	/* Remove handler anyway */
+	/* Search for existing handler */
 	while (h != NULL) {
 		if (h->proc == *p) {
-			if (hp != NULL) {
-				hp->next = h->next;
-			} else {
-				hdlrs = h->next;
-			}
-			if (hp) {
-				cob_free (hp);
-			}
 			break;
 		}
 		hp = h;
@@ -4794,12 +4864,39 @@ cob_sys_error_proc (const void *dispo, const void *pptr)
 	x = dispo;
 	if (*x != 0) {
 		/* Remove handler */
-		return 0;
+		if (h != NULL) {
+			if (hp != NULL) {
+				hp->next = h->next;
+			} else {
+				hdlrs = h->next;
+			}
+			cob_free (h);
+		}
+	} else {
+		if (h == NULL) {
+			/* insert handler */
+			h = cob_malloc (sizeof (struct handlerlist));
+			h->next = hdlrs;
+			h->proc = *p;
+			hdlrs = h;
+		} else {
+#if 0	/* TODO: take care of ACU variant: placing it first */
+			if (something) {
+				if (hp != NULL) {
+					hp->next = h->next;
+				}
+				h->next = hdlrs;
+				hdlrs = h;
+			} else {
+				/* MF-Variant: when already existing: do nothing */
+				return 0;
+			}
+#else
+			/* MF-Variant: when already existing: do nothing */
+			return 0;
+#endif
+		}
 	}
-	h = cob_malloc (sizeof (struct handlerlist));
-	h->next = hdlrs;
-	h->proc = *p;
-	hdlrs = h;
 	return 0;
 }
 
@@ -7284,7 +7381,6 @@ cob_fatal_error (const enum cob_fatal_error fatal_error)
 		if (cob_module_err) {
 			cob_runtime_error (_("recursive CALL from '%s' to '%s' which is NOT RECURSIVE"),
 					COB_MODULE_PTR->module_name, cob_module_err->module_name);
-			cob_module_err = NULL;
 		/* LCOV_EXCL_START */
 		/* Note: only in for old modules - not active with current generation */
 		} else {

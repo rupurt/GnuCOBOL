@@ -4719,7 +4719,8 @@ AT_SETUP([System routine CBL_ERROR_PROC (1)])
 AT_KEYWORDS([extensions exceptions error
 EXCEPTION-LOCATION EXCEPTION-STATEMENT EXCEPTION-FILE EXCEPTION-STATUS])
 
-# tests that error handlers work
+# tests that error handlers work (later for ACU: test for re-ordered)
+# including multiple error handlers
 
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
@@ -4734,9 +4735,15 @@ AT_DATA([prog.cob], [
        PROCEDURE DIVISION.
        S1.
            DISPLAY 'Program is starting'
+      *>   Do this for the ACU test, where second call moves top front
+      *>   SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
+      *>   CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
            SET Err-Proc-Address TO ENTRY 'ErrProc'
            CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
            SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
+           CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
+      *>   Ensure susbequent CALLs with the same one are ignored (MF!)
+           SET Err-Proc-Address TO ENTRY 'ErrProc'
            CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
            SET Err-Proc-Address TO NULL
            CALL 'Tilt' *> THIS DOESN'T EXIST!!!!
@@ -4775,17 +4782,17 @@ AT_DATA([prog.cob], [
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1],
 [Program is starting
-Error (interal): DemoErrProc; S1; 19-
+Error (interal): DemoErrProc; S1; 25-
                  CALL                           -
                  EC-PROGRAM-NOT-FOUND           -
-Error-Message:   prog.cob:19: module 'Tilt' not found
+Error-Message:   prog.cob:25: module 'Tilt' not found
 -*- Returning to Next Error Routine -*-
-Error: DemoErrProc; S1; 19-
+Error: DemoErrProc; S1; 25-
        CALL                           -
        EC-PROGRAM-NOT-FOUND           -
 -*- Returning to Standard Error Routine -*-
 ],
-[libcob: prog.cob:19: error: module 'Tilt' not found
+[libcob: prog.cob:25: error: module 'Tilt' not found
 ])
 
 AT_CHECK([$COBC -x -o prog_noloc prog.cob], [0], [], [])
