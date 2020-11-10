@@ -730,12 +730,12 @@ directive:
   {
 	current_cmd = PLEX_ACT_IF;
   }
-  if_directive
+  if_directive_if
 | ELIF_DIRECTIVE
   {
 	current_cmd = PLEX_ACT_ELIF;
   }
-  if_directive
+  if_directive_elif
 | ELSE_DIRECTIVE
   {
 	plex_action_directive (PLEX_ACT_ELSE, 0);
@@ -753,6 +753,24 @@ directive:
 	if (current_call_convention == CB_CONV_STATIC_LINK) {
 		current_call_convention |= CB_CONV_COBOL;
 	};
+  }
+;
+
+if_directive_if:
+  if_directive
+| error
+  {
+	cb_error (_("invalid %s directive"), "IF");
+	yyerrok;
+  }
+;
+
+if_directive_elif:
+  if_directive
+| error
+  {
+	cb_error (_("invalid %s directive"), "ELIF");
+	yyerrok;
   }
 ;
 
@@ -952,7 +970,7 @@ set_choice:
   }
 | SOURCEFORMAT _as error
   {
-    /* FIXME: we should consume until end of line here! */
+	/* FIXME: we should consume until end of line here! */
 	ppp_error_invalid_option ("SOURCEFORMAT", NULL);
   }
 | SSRANGE _literal
@@ -1302,10 +1320,17 @@ if_directive:
 	}
 	plex_action_directive (current_cmd, found ^ $3);
   }
-| variable_or_literal
+| garbage
   {
-	cb_error (_("invalid %s directive"), "IF/ELIF");
+	plex_action_directive (current_cmd, 0);
+	YYERROR;
   }
+;
+
+garbage:
+  variable_or_literal
+| garbage variable_or_literal
+| garbage error
 ;
 
 variable_or_literal:

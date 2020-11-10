@@ -226,6 +226,12 @@
 	* config.def: added possible values for assign-clause and
 	  screen-section-rules.
 
+2020-07-21  Simon Sobisch <simonsobisch@gnu.org>
+
+	* ppparse.y: improved error handling for broken IF/ELIF
+	  directives by consuming as much errors as possible and
+	  emitting a "false"
+
 2020-07-19  Edward Hart <edward.dan.hart@gmail.com>
 
 	* cobc.c, typeck.c: added support for JSON-C as JSON handler

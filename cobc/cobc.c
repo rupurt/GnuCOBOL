@@ -3948,27 +3948,29 @@ process_filename (const char *filename)
 	if (strcasecmp (extension, "i") == 0) {
 		/* Already preprocessed */
 		fn->need_preprocess = 0;
-	} else if (strcasecmp (extension, "c") == 0
+	} else 
+	if (strcasecmp (extension, "c") == 0
 #if	defined(_WIN32)
-			|| strcasecmp (extension, "asm") == 0
+	 || strcasecmp (extension, "asm") == 0
 #endif
-			|| strcasecmp (extension, "s") == 0) {
+	 || strcasecmp (extension, "s") == 0) {
 		/* Already compiled */
 		fn->need_preprocess = 0;
 		fn->need_translate = 0;
-	} else if (
+	} else
+	if (
 #if	defined(__OS400__)
-			extension[0] == 0
+	    extension[0] == 0
 #else
-			strcasecmp (extension, COB_OBJECT_EXT) == 0
+	    strcasecmp (extension, COB_OBJECT_EXT) == 0
 #if	defined(_WIN32)
-			|| strcasecmp (extension, "lib") == 0
+	 || strcasecmp (extension, "lib") == 0
 #endif
 #if	!defined(_WIN32) || defined(__MINGW32__) || defined(__MINGW64__)
-			|| strcasecmp (extension, "a") == 0
-			|| strcasecmp (extension, "so") == 0
-			|| strcasecmp (extension, "dylib") == 0
-			|| strcasecmp (extension, "sl") == 0
+	 || strcasecmp (extension, "a") == 0
+	 || strcasecmp (extension, "so") == 0
+	 || strcasecmp (extension, "dylib") == 0
+	 || strcasecmp (extension, "sl") == 0
 #endif
 #endif
 	) {
@@ -3986,8 +3988,8 @@ process_filename (const char *filename)
 		fn->preprocess = cobc_main_strdup (fn->source);
 	} else if (output_name && cb_compile_level == CB_LEVEL_PREPROCESS) {
 		fn->preprocess = cobc_main_strdup (output_name);
-	} else if (save_all_src || save_temps ||
-		   cb_compile_level == CB_LEVEL_PREPROCESS) {
+	} else if (save_all_src || save_temps
+	        || cb_compile_level == CB_LEVEL_PREPROCESS) {
 		fn->preprocess = cobc_main_stradd_dup (fbasename, ".i");
 	} else {
 		fn->preprocess = cobc_main_malloc (COB_FILE_MAX);

@@ -7169,3 +7169,221 @@ AT_CHECK([$COMPILE_ONLY prog.cob], [0],
 ])
 AT_CLEANUP
 
+
+AT_SETUP([conditional / define directives (1)])
+AT_KEYWORDS([misc directive])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       PROCEDURE        DIVISION.
+       >>IF ACTIVATE DEFINED
+       >>DISPLAY "NOTOK"
+       >>ELIF ACTIVATE2 DEFINED
+       >>DISPLAY "OK"
+       >>ELSE
+       >>DISPLAY "NOTOK"
+       >>END-IF
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE_ONLY -DACTIVATE2 prog.cob], [0],
+[OK
+])
+AT_CLEANUP
+
+
+AT_SETUP([conditional / define directives (2)])
+AT_KEYWORDS([misc directive])
+
+# COBOL 2002 format; checks that defines are applied at correct place
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog.
+       PROCEDURE      DIVISION.
+       >> IF X DEFINED
+         >>DISPLAY "X defined"
+       >> ELSE
+         >> DISPLAY "X not defined"
+         >> DEFINE X 1
+       >> END-IF
+           CONTINUE
+           .
+])
+
+AT_CHECK([$COMPILE_ONLY -D X prog.cob], [0],
+[X defined
+])
+AT_CHECK([$COMPILE_ONLY prog.cob], [0],
+[X not defined
+])
+AT_CLEANUP
+
+
+AT_SETUP([conditional / define directives (3)])
+AT_KEYWORDS([misc directive])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog.
+       PROCEDURE      DIVISION.
+       >>IF A IS DEFINED
+       >>IF B IS DEFINED
+           CONTINUE
+       >> DISPLAY "NOT OK (not both definitions)"
+           .
+       >>ELSE
+           CONTINUE
+       >> DISPLAY "NOT OK (no definitions)"
+           .
+       >>END-IF
+       >>ELSE
+           CONTINUE
+       >> DISPLAY "OK"
+           .
+       >>END-IF
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [0],
+[OK
+], [])
+AT_CLEANUP
+
+
+AT_SETUP([conditional / define directives (4)])
+AT_KEYWORDS([misc directive])
+
+# check for case-insensivity
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog.
+       PROCEDURE      DIVISION.
+       >>IF A IS DEFINED
+           CONTINUE
+           .
+       >>else
+           CONTINUE
+           .
+       >>eNd-If
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [0], [])
+AT_CLEANUP
+
+
+AT_SETUP([error handling in conditional directives])
+AT_KEYWORDS([misc directive])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog.
+       PROCEDURE      DIVISION.
+       >> IF BANANA
+         >>DISPLAY "Who throws bananas?"
+       >> ELSE
+         >> DISPLAY "No BANANA here."
+         >> DEFINE X 1
+       >> END-IF
+           CONTINUE
+           .
+])
+
+AT_CHECK([$COMPILE_ONLY -D X prog.cob], [1],
+[No BANANA here.
+],
+[prog.cob:5: error: invalid IF directive
+prog.cob:9: error: duplicate DEFINE directive 'X'
+])
+AT_CLEANUP
+
+
+AT_SETUP([conditional directives with lvl 78 (1)])
+AT_KEYWORDS([misc extensions directive])
+
+# MicroFocus format; checks that level 78 are applied
+
+# FIXME - not done yet:
+AT_XFAIL_IF(true)
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.     prog.
+       DATA            DIVISION.
+       WORKING-STORAGE SECTION.
+       78 Y            VALUE 'a'.
+       PROCEDURE       DIVISION.
+      $IF X DEFINED
+      $DISPLAY X defined
+      $ELIF Y DEFINED
+      $DISPLAY X not defined, but Y via lvl 78
+      $ELSE
+      $DISPLAY X not defined
+      $END
+           CONTINUE
+           .
+])
+
+AT_CHECK([$COMPILE_ONLY -D X prog.cob], [0],
+[X defined
+])
+AT_CHECK([$COMPILE_ONLY prog.cob], [0],
+[X not defined, but Y via lvl 78
+])
+AT_CLEANUP
+
+
+AT_SETUP([conditional directives with lvl 78 (2)])
+AT_KEYWORDS([misc extensions directive])
+
+# MicroFocus format; checks that level 78 are applied with correct values
+
+# FIXME - not done yet:
+AT_XFAIL_IF(true)
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.     prog.
+       DATA            DIVISION.
+       WORKING-STORAGE SECTION.
+       78 Y            VALUE 1.
+       78 Y2           VALUE 1.
+       78 X            VALUE 2.
+       78 Z            VALUE 354.
+       PROCEDURE       DIVISION.
+      $IF Y = Y2X
+      $DISPLAY correct Y = Y2
+      $ELSE
+      $DISPLAY bad: Y should be = Y2
+      $END
+      $IF Y > X
+      $DISPLAY BAD - Y is not > X
+      $ELIF Y < X
+      $DISPLAY correct Y < X
+      $ELSE
+      $DISPLAY BROKEN
+      $END
+      
+      $IF X > Y
+      $DISPLAY correct X > Y
+      $ELIF X < Y
+      $DISPLAY BAD - X is not < Y
+      $ELSE
+      $DISPLAY BROKEN
+      $END
+           CONTINUE
+           .
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [0],
+[correct Y = Y2
+correct Y < X
+correct X > Y
+])
+AT_CLEANUP
+
+# TODO: add missing tests for syntax errors in >>IF/ELSE/END
+
