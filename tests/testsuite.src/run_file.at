@@ -1799,6 +1799,47 @@ AT_CHECK([$COBCRUN_DIRECT ./prog2], [1], [],
 AT_CLEANUP
 
 
+AT_SETUP([ASSIGN with empty data item])
+AT_KEYWORDS([runfile status])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       ENVIRONMENT      DIVISION.
+       INPUT-OUTPUT     SECTION.
+       FILE-CONTROL.
+       SELECT test-file ASSIGN path
+                        ORGANIZATION LINE SEQUENTIAL.
+       DATA             DIVISION.
+       FILE	            SECTION.
+       FD  test-file.
+       01  test-rec     PIC X(5).
+       WORKING-STORAGE  SECTION.
+       01  WS-SUBSCRIPT-CNT         PIC 9.
+       01  path         PIC X(10).
+       01  x            PIC X.
+       PROCEDURE        DIVISION CHAINING x.
+           IF X = SPACE
+              MOVE SPACES     TO path
+           ELSE
+              MOVE LOW-VALUES TO path
+           END-IF
+           OPEN INPUT test-file
+           DISPLAY "Hello"
+           STOP RUN.
+])
+
+AT_CHECK([$COBC -x prog.cob])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
+[libcob: error: inconsistant file name (status = 31) for file test-file ('')
+])
+AT_CHECK([$COBCRUN_DIRECT ./prog X], [1], [],
+[libcob: error: inconsistant file name (status = 31) for file test-file ('')
+])
+
+AT_CLEANUP
+
+
 AT_SETUP([INDEXED file key-name])
 AT_KEYWORDS([runfile split key])
 
@@ -4140,15 +4181,119 @@ AT_DATA([prog2.cob], [
         STOP RUN.
 ])
 
+AT_DATA([prog3.cob], [
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID.     prog3.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 FNAME        PIC X(256).
+        01 RET          PIC -9.
+        01 FHANDLE      PIC X(4)   USAGE COMP-X.
+
+        01 OFFSET       PIC X(8)   USAGE COMP-X.
+        01 NBYTES       PIC X(4)   USAGE COMP-X.
+        01 READ-BUFFER  PIC X(10).
+
+        PROCEDURE DIVISION CHAINING FNAME.
+        DISPLAY 'RUN WITH ' FUNCTION TRIM (FNAME TRAILING).
+        CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
+        IF RETURN-CODE NOT = 0
+           DISPLAY 'error opening file ...'
+           MOVE 0 TO RETURN-CODE
+           STOP RUN.
+
+        CALL 'CBL_CLOSE_FILE' USING FHANDLE.
+        IF RETURN-CODE NOT = 0
+           DISPLAY 'error closing file ...'
+                   return-code
+           MOVE 0 TO RETURN-CODE.
+
+        STOP RUN.
+])
+
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
-AT_CHECK([$COMPILE prog2.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [],
 [libcob: prog.cob:15: warning: call to CBL_CREATE_FILE with wrong file_lock: 11
 libcob: prog.cob:15: warning: call to CBL_CREATE_FILE with wrong file_dev: 22
 libcob: prog.cob:15: warning: call to CBL_OPEN_FILE with wrong access mode: 55
 ])
+
+AT_CHECK([$COMPILE prog2.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog2], [0], [], [])
+
+AT_CHECK([mkdir -p sub], [0], [], [])
+AT_CHECK([$COMPILE prog3.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3 notthere], [0],
+[RUN WITH notthere
+error opening file ...
+], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3 prog2], [0],
+[RUN WITH prog2
+], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3 ./prog2], [0],
+[RUN WITH ./prog2
+], [])
+# the first part is resolved by DD_var and dd_var
+AT_CHECK([DD_dot="." dd_dot="A" dot="B"  $COBCRUN_DIRECT ./prog3 'dot/prog'], [0],
+[RUN WITH dot/prog
+], [])
+AT_CHECK([DD_dot="" dd_dot="." dot="A"  $COBCRUN_DIRECT ./prog3 'dot/prog'], [0],
+[RUN WITH dot/prog
+], [])
+# MF would say (ignore for now as this conflicts with ACUCOBOL) don't resolve by $
+# as it does not start with $:
+#AT_CHECK([DD_dot="" dd_dot="" dot="." $COBCRUN_DIRECT ./prog3 'dot/prog'], [0],
+#[RUN WITH dot/prog
+#error opening file ...
+#], [])
+AT_CHECK([DD_dot="" dd_dot="" dot="." $COBCRUN_DIRECT ./prog3 'dot/prog'], [0],
+[RUN WITH dot/prog
+], [])
+AT_CHECK([DD_dot="" dd_dot="" dot="" $COBCRUN_DIRECT ./prog3 'dot/prog'], [0],
+[RUN WITH dot/prog
+error opening file ...
+], [])
+# the first part with $  is resolved by DD_var and dd_var and var
+AT_CHECK([DD_dot="." dd_dot="" dot=""  $COBCRUN_DIRECT ./prog3 '$dot/prog'], [0],
+[RUN WITH $dot/prog
+], [])
+AT_CHECK([DD_dot="" dd_dot="." dot=""  $COBCRUN_DIRECT ./prog3 '$dot/prog'], [0],
+[RUN WITH $dot/prog
+], [])
+AT_CHECK([DD_dot="" dd_dot="" dot="."  $COBCRUN_DIRECT ./prog3 '$dot/prog'], [0],
+[RUN WITH $dot/prog
+], [])
+# if a _leading_ $ does not exist it is removed, together with the following slash
+# should ignore the variable and the first slash
+AT_CHECK([DD_dot="" dd_dot="" dot=""  $COBCRUN_DIRECT ./prog3 '$dot/prog'], [0],
+[RUN WITH $dot/prog
+], [])
+# would _possibly_ fail with MF (docs are wrong here in any case...)
+# but this is by GnuCOBOL design here:
+AT_CHECK([DD_dot="" dd_dot="" dot=""  $COBCRUN_DIRECT ./prog3 '$dot/$dotter/prog'], [0],
+[RUN WITH $dot/$dotter/prog
+], [])
+AT_CHECK([DD_dot="" dd_dot="" dot="dot"  $COBCRUN_DIRECT ./prog3 '$dot/prog'], [0],
+[RUN WITH $dot/prog
+error opening file ...
+], [])
+# should try './prog'
+AT_CHECK([DD_prog="A" dd_prog="B" prog="C"  $COBCRUN_DIRECT ./prog3 './prog'], [0],
+[RUN WITH ./prog
+], [])
+# should try './$prog'
+AT_CHECK([DD_prog="" dd_prog="" prog=""  $COBCRUN_DIRECT ./prog3 './$prog'], [0],
+[RUN WITH ./$prog
+error opening file ...
+], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3 ../prog2], [0],
+[RUN WITH ../prog2
+error opening file ...
+], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3 sub/../prog2], [0],
+[RUN WITH sub/../prog2
+], [])
 
 AT_CLEANUP
 

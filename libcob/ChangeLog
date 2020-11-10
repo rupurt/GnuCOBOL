@@ -125,6 +125,22 @@
 	  COB_STACKTRACE allowing to disable stracktrace creation on abort
 	* common.c: also handle SIGEMT; skip module dump for SIGTERM and SIGINT
 
+2020-08-18  Simon Sobisch <simonsobisch@gnu.org>
+
+	rework file mapping via environment names and apply them to CBL_/C$
+	* fileio.c (has_directory_separator, looks_absolute): new helpers
+	* fileio.c (cob_chk_file_mapping, cob_chk_file_env): rewritten:
+	  file names / parts that start with period/digit are not converted,
+	  periods within the name converted to underscores to get the environment
+	  variable name, empty environment names are not used, if COB_FILE_PATH
+	  is set, it is always applied if the file name is neither absolute nor
+	  start with -F/-D (acu-compat)
+	* fileio.c (cob_open): return COB_STATUS_31_INCONSISTENT_FILENAME if it is
+	  unset/empty
+	* fileio.c (open_cbl_file, cob_sys_delete_file, cob_sys_copy_file,
+	  cob_sys_check_file_exist, cob_sys_rename_file): CBL_ and C$ file routines
+	  use common mapping rules now
+
 2020-08-17  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (struct exit_handlerlist, cob_sys_exit_proc):

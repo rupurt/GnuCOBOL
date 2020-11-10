@@ -15,6 +15,16 @@ NEWS - user visible changes				-*- outline -*-
      hardening options or leave as-is, or disable (which previous versions
      effectively did)
 
+  ** file name mapping (improved MF and ACU-compatibility):
+     entries starting with a period or number are not resolved any more,
+     periods in the external identifier are always replaced by underscore
+      -> MY.FILE is resolved by DD_MY_FILE, dd_MY_FILE, MIFILE now;
+     prefixes "-F " and "-D " are removed from external names;
+     if filename is not absolute after translation, COB_FILE_PATH is now
+     still applied;
+     File name mapping now applies both to COBOL statements and CALLable
+     CBL_ and C$ file routines.
+
   ** ensure runtime checks are generated - nder some conditions the
      generated code had excluded runtime checks, permitting out-of-bounds or
      null-pointer accesses
