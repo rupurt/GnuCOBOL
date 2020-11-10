@@ -1,4 +1,10 @@
 
+2020-11-09  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (cob_terminate_routines): fixed typo in dump skip condition
+	* common.c (cob_strdup): minor performance improvement
+	* common.c (cob_gettmpdir): ensure TMPDIR without trailing slash
+
 2020-11-08  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c, common.h: new functions cob_check_ref_mod_detailed and

@@ -615,7 +615,7 @@ cob_terminate_routines (void)
 
 	if (COB_MODULE_PTR && abort_reason[0] != 0) {
 		if (cobsetptr->cob_stacktrace) {
-			if (!(dump_trace_started & (DUMP_TRACE_DONE_TRACE || DUMP_TRACE_ACTIVE_TRACE))) {
+			if (!(dump_trace_started & (DUMP_TRACE_DONE_TRACE | DUMP_TRACE_ACTIVE_TRACE))) {
 				dump_trace_started |= DUMP_TRACE_DONE_TRACE;
 				dump_trace_started |= DUMP_TRACE_ACTIVE_TRACE;
 				cob_stack_trace_internal (stderr);
@@ -1768,8 +1768,8 @@ cob_strdup (const char *p)
 	char	*mptr;
 	size_t	len;
 
-	len = strlen (p);
-	mptr = (char *) cob_malloc (len + 1U);
+	len = strlen (p) + 1;
+	mptr = (char *)cob_fast_malloc (len);
 	memcpy (mptr, p, len);
 	return mptr;
 }
@@ -4569,6 +4569,8 @@ check_valid_env_tmpdir (const char * envname)
 	return dir;
 }
 
+
+/* return pointer to TMPDIR without trailing slash */
 static const char *
 cob_gettmpdir (void)
 {
@@ -4596,6 +4598,14 @@ cob_gettmpdir (void)
 			tmp[0] = '.';
 			tmp[1] = 0;
 			tmpdir = tmp;
+		} else {
+			size_t size = strlen (tmpdir) - 1;
+			if (tmpdir[size] == SLASH_CHAR) {
+				tmp = (char*)cob_fast_malloc (size);
+				memcpy (tmp, tmpdir, size);
+				tmp[size] = 0;
+				tmpdir = tmp;
+			}
 		}
 		(void)cob_setenv ("TMPDIR", tmpdir, 1);
 		if (tmp) {
