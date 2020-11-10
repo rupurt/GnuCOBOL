@@ -1057,6 +1057,74 @@ VARTAB(17) = "0000HI MOM  0000"
 AT_CLEANUP
 
 
+AT_SETUP([INITIALIZE OCCURS UNBOUNDED])
+AT_KEYWORDS([extensions runsubscripts subscripts refmod INITIALIZE])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  p            USAGE POINTER.
+       01  p2           USAGE POINTER.
+
+       LINKAGE SECTION.
+       01  a-table.
+           03  prefix.
+               05  n    PIC 9(03)  VALUE 123.
+           03  table-data value all "ABCDE".
+            04  rows    OCCURS 0 TO UNBOUNDED TIMES
+                        DEPENDING ON n.
+               05 col1  PIC X.
+               05 col2  PIC X(02).
+
+       PROCEDURE DIVISION.
+           ALLOCATE LENGTH OF prefix CHARACTERS
+                    RETURNING p
+           SET ADDRESS OF a-table TO p
+           INITIALIZE prefix ALL TO VALUE
+           IF FUNCTION LENGTH (a-table) NOT = 372
+              DISPLAY 'WRONG LENGTH table: ' FUNCTION LENGTH (a-table)
+              END-DISPLAY
+           END-IF
+           ALLOCATE FUNCTION LENGTH (a-table) CHARACTERS
+                    RETURNING p2
+           SET ADDRESS OF a-table TO p2
+           FREE p
+           INITIALIZE prefix ALL TO VALUE
+      *> FIXME: broken - initializes up to max but only should initialize
+      *>        up to current size   INITIALIZE table-data ALL TO VALUE
+      *>  INITIALIZE table-data  ALL TO VALUE
+      *> FIXME: broken - FUNCTION LENGTH(table-data) must be resolved
+      *>        at run-time but is currently set to max at compile-time
+      *>   INITIALIZE table-data (1:FUNCTION LENGTH(table-data))
+      *>              ALL TO VALUE
+           INITIALIZE table-data (1:FUNCTION LENGTH(rows(1)) * n)
+                      ALL TO VALUE
+           IF col2(1) NOT = "BC"
+              DISPLAY "col2(1) wrong: " col2(1)
+              END-DISPLAY
+           END-IF
+           IF rows(2) NOT = "DEA"
+              DISPLAY "rows(2) wrong: " rows(2)
+              END-DISPLAY
+           END-IF
+           DISPLAY LENGTH OF a-table
+      *>   check if ref-mod also works as expected
+           MOVE ALL ZEROES TO a-table (1: (LENGTH OF a-table))
+           .
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+# multiple issues, see comments above
+AT_XFAIL_IF(true)
+
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+
+AT_CLEANUP
+
+
 AT_SETUP([DEPENDING ON with ODOSLIDE])
 AT_KEYWORDS([nested ODO])
 

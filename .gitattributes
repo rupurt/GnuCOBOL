@@ -135,7 +135,6 @@ extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
-libcob/exception-io.def -text
 m4/ax_ac_append_to_file.m4 -text
 m4/ax_ac_define_resolved.m4 -text
 m4/ax_ac_print_to_file.m4 -text
