@@ -176,6 +176,7 @@ doc/version.texi
 extras/*.dll
 extras/Makefile
 extras/Makefile.in
+/gnucobol-*
 lib/.deps
 lib/Makefile
 lib/Makefile.in
@@ -196,15 +197,16 @@ m4/Makefile
 m4/atlocal
 po/*.gmo
 po/*.po~
+po/*quot.insert-header
+po/*quot.po
 po/.deps
 po/Makefile
 po/Makefile.in
 po/Makevars.template
 po/POTFILES
 po/atlocal
-po/en@boldquot.po
-po/en@quot.po
 po/remove-potcdate.sed
+/pre-inst-env
 /stamp-h1
 /tarstamp.h
 tests/*.log
