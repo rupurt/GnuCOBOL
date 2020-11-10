@@ -624,18 +624,22 @@ ppparse_clear_vars (const struct cb_define_struct *p)
 %token ASSIGN
 %token BOUND
 %token CALLFH
+%token CHECKNUM
 %token COMP1
 %token CONSTANT
 %token DPC_IN_DATA	"DPC-IN-DATA"
 %token FOLDCOPYNAME
 %token MAKESYN
 %token NOBOUND
+%token NOCHECKNUM
 %token NODPC_IN_DATA	"NODPC-IN-DATA"
 %token NOFOLDCOPYNAME
+%token NOSPZERO
 %token NOSSRANGE
 /* OVERRIDE token defined above. */
 %token REMOVE
 %token SOURCEFORMAT
+%token SPZERO
 %token SSRANGE
 
 %token IF_DIRECTIVE
@@ -845,6 +849,11 @@ set_choice:
   {
 	fprintf (ppout, "#CALLFH \"EXTFH\"\n");
   }
+| CHECKNUM
+  {
+	/* Enable EC-DATA-INCOMPATIBLE checking */
+	append_to_turn_list (ppp_list_add (NULL, "EC-DATA-INCOMPATIBLE"), 1, 0);
+  }
 | COMP1 LITERAL
   {
 	char	*p = $2;
@@ -910,6 +919,11 @@ set_choice:
 	/* Disable EC-BOUND-SUBSCRIPT checking */
 	append_to_turn_list (ppp_list_add (NULL, "EC-BOUND-SUBSCRIPT"), 0, 0);
   }
+| NOCHECKNUM
+  {
+	/* Disable EC-DATA-INCOMPATIBLE checking */
+	append_to_turn_list (ppp_list_add (NULL, "EC-DATA-INCOMPATIBLE"), 0, 0);
+  }
 | NODPC_IN_DATA
   {
 	cb_dpc_in_data = CB_DPC_IN_NONE;
@@ -917,6 +931,11 @@ set_choice:
 | NOFOLDCOPYNAME
   {
 	cb_fold_copy = 0;
+  }
+| NOSPZERO
+  {
+	CB_PENDING ("SPZERO");
+	/* TODO: cb_space_is_zero = 0; */
   }
 | NOSSRANGE
   {
@@ -972,6 +991,11 @@ set_choice:
   {
 	/* FIXME: we should consume until end of line here! */
 	ppp_error_invalid_option ("SOURCEFORMAT", NULL);
+  }
+| SPZERO
+  {
+	CB_PENDING ("SPZERO");
+	/* TODO: cb_space_is_zero = 1; */
   }
 | SSRANGE _literal
   {

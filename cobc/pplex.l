@@ -663,6 +663,10 @@ CONTROL_STATEMENT_STATE>{
   "CALLFH"	{
 	return CALLFH;
   }
+  "CHECKNUM"	|
+  "CHECK-NUM"	{
+	return CHECKNUM;
+  }
   "COMP1"	|
   "COMP-1"	{
 	return COMP1;
@@ -686,6 +690,11 @@ CONTROL_STATEMENT_STATE>{
   "NO-BOUND"		{
 	return NOBOUND;
   }
+  "NOCHECKNUM"  	|
+  "NO-CHECKNUM" 	|
+  "NO-CHECK-NUM"	{
+	return NOCHECKNUM;
+  }
   "NODPCINDATA" 	|
   "NO-DPCINDATA"	|
   "NODPC-IN-DATA"	|
@@ -701,6 +710,10 @@ CONTROL_STATEMENT_STATE>{
   "NO-SSRANGE"	{
 	return NOSSRANGE;
   }
+  "NOSPZERO"	|
+  "NO-SPZERO"	{
+	return NOSPZERO;
+  }
   "OVERRIDE"	{
 	return OVERRIDE;
   }
@@ -709,6 +722,9 @@ CONTROL_STATEMENT_STATE>{
   }
   "SSRANGE"	{
 	return SSRANGE;
+  }
+  "SPZERO"	{
+	return SPZERO;
   }
   "SOURCEFORMAT" |
   "SOURCE-FORMAT"	{

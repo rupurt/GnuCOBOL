@@ -228,6 +228,8 @@
 
 2020-07-21  Simon Sobisch <simonsobisch@gnu.org>
 
+	* pplex.l, ppparse.y: implemented CHECKNUM/NOCHECKNUM,
+	  preparation for SPZERO
 	* ppparse.y: improved error handling for broken IF/ELIF
 	  directives by consuming as much errors as possible and
 	  emitting a "false"
