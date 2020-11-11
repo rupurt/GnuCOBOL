@@ -44,6 +44,8 @@
 /* function available and working, declaration missing on AIX... */
 FILE *fmemopen (void *buf, size_t size, const char *mode);
 #endif
+#elif defined(HAVE_DECL_FMEMOPEN) && HAVE_DECL_FMEMOPEN == 1
+#define HAVE_FMEMOPEN 1
 #endif
 
 /*	NOTE - The following variable should be uncommented when
