@@ -1,4 +1,8 @@
 
+2020-11-11  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Emit correct code for -debug within C function calls
+
 2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
 
 	* parser.y, ppparse.y: actually %require bison 3.0 (see 2020-02-02)

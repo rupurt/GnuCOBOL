@@ -207,7 +207,6 @@ static int			odo_stop_now = 0;
 static int			gen_num_lit_big_end = 1;
 static unsigned int		nolitcast = 0;
 
-static unsigned int		in_func_call = 0;
 static unsigned int		in_cond = 0;
 static unsigned int		inside_check = 0;
 static unsigned int		inside_stack[COB_INSIDE_SIZE];
@@ -1120,8 +1119,7 @@ output_data (cb_tree x)
 		if (r->check 
 		 && !gen_init_working
 		 && in_cond
-		 && inside_check == 0
-		 && in_func_call == 0) {
+		 && inside_check == 0) {
 			int n, sav_stack_id;
 			cb_tree	l;
 
@@ -1129,6 +1127,7 @@ output_data (cb_tree x)
 			did_check = 1;
 			output_newline ();
 			output_prefix ();
+			output("(");		/* Parens starts list of debug functions */
 			output("(");
 			n = output_indent_level;
 			output_indent_level = 0;
@@ -1140,7 +1139,7 @@ output_data (cb_tree x)
 					output_indent_level = n;
 				}
 			}
-			output ("), ");
+			output ("), ");		/* End debug check and comma preceeds expression */
 			output_newline ();
 			output_prefix ();
 		}
@@ -1209,6 +1208,7 @@ output_data (cb_tree x)
 		if (r->check 
 		 && did_check) {
 			--inside_check;
+			output(")");	/* End expression */
 		}
 		break;
 	}
@@ -4371,7 +4371,6 @@ output_funcall (cb_tree x)
 		return;
 	}
 
-	in_func_call = 1;
 	screenptr = p->screenptr;
 	output ("%s (", p->name);
 	for (i = 0; i < p->argc; i++) {
@@ -4400,7 +4399,6 @@ output_funcall (cb_tree x)
 		}
 	}
 	output (")");
-	in_func_call = 0;
 	nolitcast = 0;
 	screenptr = 0;
 }
@@ -4408,11 +4406,9 @@ output_funcall (cb_tree x)
 static void
 output_func_1 (const char *name, cb_tree x)
 {
-	in_func_call = 1;
 	output ("%s (", name);
 	output_param (x, param_id);
 	output (")");
-	in_func_call = 0;
 }
 
 /* Condition */
