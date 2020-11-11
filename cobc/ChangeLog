@@ -1,4 +1,8 @@
 
+2020-11-11  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Emit correct code for -debug within C function calls
+
 2020-11-08  Simon Sobisch <simonsobisch@gnu.org>
 
 	FR #390 ref-mod with zero-length
