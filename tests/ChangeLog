@@ -1,4 +1,8 @@
 
+2020-11-11  Simon Sobisch <simonsobisch@gnu.org>
+
+	* atlocal.in, atlocal_valgrind: exec_prefix as exec_prefix
+
 2020-11-04  Simon Sobisch <simonsobisch@gnu.org>
 
 	* atlocal.in, atlocal_valgrind, atlocal_win:

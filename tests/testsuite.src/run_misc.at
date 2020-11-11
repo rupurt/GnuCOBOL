@@ -12211,3 +12211,115 @@ NOT JUMPED
 ], [])
 
 AT_CLEANUP
+
+
+AT_SETUP([runtime checks within conditions])
+AT_KEYWORDS([runmisc condition expression])
+
+# this serves as a sample what was broken in the initial
+# 3.1 release
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       01 mytab.
+          03  VAR                   PIC  9(02) value 1.
+          03  VAR2                  PIC  9(02) value 2.
+          03                        OCCURS 2.
+           05 T15-PRGM              PIC  X(08).
+           05 T16-PRGM              PIC  X(08).
+          03                        OCCURS 2.
+           05 T15-NRGM              PIC  9(04).
+           05 T16-NRGM              USAGE BINARY-INT.
+
+       PROCEDURE DIVISION.
+      *
+           MOVE 'TESTME' TO T16-PRGM (VAR) (VAR2:)
+           MOVE T16-PRGM (VAR) (1:VAR2) TO T15-PRGM (VAR)
+           IF  T16-PRGM(VAR)
+             = T15-PRGM(VAR2)
+              DISPLAY 'WRONG RESULT OCCURS'.
+              
+           IF  MYTAB(VAR:VAR2)
+             = MYTAB(VAR2:VAR)
+              DISPLAY 'WRONG RESULT REFMOD'.
+           
+            INITIALIZE mytab
+
+            GOBACK.
+])
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+# note: we mostly are interessted in a good codegen here...
+
+
+AT_DATA([prog2.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog2.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       01 mytab.
+          03  VAR                   PIC  9(02) value 1.
+          03  VAR2                  PIC  9(02) value 3.
+          03                        OCCURS 2.
+           05 T15-PRGM              PIC  X(08).
+           05 T16-PRGM              PIC  X(08).
+          03                        OCCURS 2.
+           05 T15-NRGM              PIC  9(04).
+           05 T16-NRGM              USAGE BINARY-INT.
+          05 buffer                 PIC X(500).
+
+       PROCEDURE DIVISION.
+      *
+           IF  T16-PRGM(VAR)
+             = T15-PRGM(VAR2)
+              DISPLAY 'WRONG RESULT OCCURS'.
+
+            GOBACK.
+])
+AT_CHECK([$COBC -x prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog2], [0], [], [])
+AT_CHECK([$COBC -x --debug -o prog2b prog2.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog2b], [1], [],
+[libcob: prog2.cob:21: error: subscript of 'T15-PRGM' out of bounds: 3
+note: maximum subscript for 'T15-PRGM': 2
+])
+AT_DATA([prog3.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    prog3.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       
+       01 mytab.
+          03  VAR                   PIC  9(02) value 1.
+          03  VAR2                  PIC  9(02) value 99.
+          03                        OCCURS 2.
+           05 T15-PRGM              PIC  X(08).
+           05 T16-PRGM              PIC  X(08).
+          03                        OCCURS 2.
+           05 T15-NRGM              PIC  9(04).
+           05 T16-NRGM              USAGE BINARY-INT.
+
+       PROCEDURE DIVISION.
+              
+           IF  MYTAB(VAR:VAR2)
+             = MYTAB(VAR2:VAR)
+              DISPLAY 'WRONG RESULT REFMOD'.
+
+            GOBACK.
+])
+AT_CHECK([$COBC -x prog3.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+AT_CHECK([$COBC -x --debug -o prog3b prog3.cob], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog3b], [1], [],
+[libcob: prog3.cob:20: error: offset of 'mytab' out of bounds: 99, maximum: 52
+])
+
+AT_CLEANUP
