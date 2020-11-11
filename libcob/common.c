@@ -625,7 +625,7 @@ cob_terminate_routines (void)
 
 	if (COB_MODULE_PTR && abort_reason[0] != 0) {
 		if (cobsetptr->cob_stacktrace) {
-			if (!(dump_trace_started & (DUMP_TRACE_DONE_TRACE || DUMP_TRACE_ACTIVE_TRACE))) {
+			if (!(dump_trace_started & (DUMP_TRACE_DONE_TRACE | DUMP_TRACE_ACTIVE_TRACE))) {
 				dump_trace_started |= DUMP_TRACE_DONE_TRACE;
 				dump_trace_started |= DUMP_TRACE_ACTIVE_TRACE;
 				cob_stack_trace_internal (stderr);
