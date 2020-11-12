@@ -137,7 +137,9 @@ else
 fi
 export PATHSEP
 
-exec_prefix="@exec_prefix@" # this is is likely referenced in the LIBS entries below
+# entries likely referenced in the LIBS entries below
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
 
 COB_CFLAGS="-I${abs_top_srcdir} @COB_CFLAGS@"
 COB_LIBS="-L${abs_top_builddir}/libcob/.libs @COB_LIBS@"

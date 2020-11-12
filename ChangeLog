@@ -1,5 +1,9 @@
 
-2020-11-01  Simon Sobisch <simonsobisch@gnu.org>
+2020-11-12  Simon Sobisch <simonsobisch@gnu.org>
+
+	* mf/ax_ac_define_resolved.m4: fixed resolving passed --prefix
+
+2020-11-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* configure.ac: version 3.1
 

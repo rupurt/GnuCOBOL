@@ -23,7 +23,7 @@ AC_DEFUN([AX_AC_DEFINE_RESOLVED],[
 
 _VAR_RES_EXEC_PREFIX=$(eval echo "${exec_prefix}" | $SED "s#NONE#${prefix}#")
 _VAR_RES_PREFIX=$(eval echo "${prefix}")
-_VAR_RES_RESOLVED=$(eval echo "$2"	\
+_VAR_RES_RESOLVED=$(echo "$2"	\
 	| $SED 's#${exec_prefix}#'"${_VAR_RES_EXEC_PREFIX}"'#' \
 	| $SED 's#${prefix}#'"${_VAR_RES_PREFIX}"'#' \
 	| $SED "s#NONE#${ac_default_prefix}#" )

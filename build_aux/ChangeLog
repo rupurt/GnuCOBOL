@@ -1,5 +1,9 @@
 
-2020-11-01  Simon Sobisch <simonsobisch@gnu.org>
+2020-11-12  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pre-inst-env.in: added prefix
+
+2020-11-11  Simon Sobisch <simonsobisch@gnu.org>
 
 	* create_win_dist.sh: removed obsolete defaults.h
 	* pre-inst-env.in: exec_prefix as exec_prefix
