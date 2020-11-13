@@ -1,3 +1,6 @@
+2020-11-13  James K. Lowden  <jklowden@symas.com>
+
+	* common.c (cob_check_version): support 3-part version strings
 
 2020-11-09  Simon Sobisch <simonsobisch@gnu.org>
 
