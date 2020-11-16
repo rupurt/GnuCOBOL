@@ -8318,6 +8318,21 @@ cob_init (const int argc, char **argv)
 		return;
 	}
 #endif
+	/* 
+	 * GNU libc may write a stack trace to /dev/tty when malloc
+	 * detects corruption.  If LIBC_FATAL_STDERR_ is set to any
+	 * nonempty string, it writes to stderr instead. See:
+	 *https://code.woboq.org/userspace/glibc/sysdeps/posix/libc_fatal.c.html
+	 */
+	static char glibc_magic[] = "LIBC_FATAL_STDERR_\0keep_off_the_grass";
+	
+	if( NULL == getenv(glibc_magic) ) { /* first time only */
+		char *p = glibc_magic + strlen(glibc_magic);
+		if (p + 1 < glibc_magic + sizeof(glibc_magic)) {
+			*p = '=';
+			(void)putenv(glibc_magic);
+		}
+	}
 
 	cob_set_signal ();
 
