@@ -8312,12 +8312,16 @@ cob_init (const int argc, char **argv)
 #endif
 	int		i;
 
-#if 0	/* Simon: Should not happen - is it necessary anywhere?
-		   We may change this to a runtime warning/error */
+	/* Ensure initialization is only done once. Within generated modules and
+	   libcob this is already ensured, but an external caller may call this
+	   function again */
 	if (cob_initialized) {
+#if 0	/* Simon: We may raise a runtime warning/error in the future here */
+		cob_runtime_warning ("%s called more than once", cob_init");
+#endif
 		return;
 	}
-#endif
+
 	/* 
 	 * GNU libc may write a stack trace to /dev/tty when malloc
 	 * detects corruption.  If LIBC_FATAL_STDERR_ is set to any
