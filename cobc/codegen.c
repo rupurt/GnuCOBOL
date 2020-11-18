@@ -1887,13 +1887,14 @@ output_local_indexes (void)
 	int	i;
 	int	found = 0;
 
+	output_local ("\tint\t\ti_len;\n");
 	for (i = 0; i < COB_MAX_SUBSCRIPTS; i++) {
 		if (i_counters[i]) {
 			if (!found) {
 				found = 1;
 				output_local ("\n/* Subscripts */\n");
 			}
-			output_local ("int\t\ti%d;\n", i);
+			output_local ("int\t\ti%d, i%d_max;\n", i, i);
 		}
 	}
 }
@@ -4724,6 +4725,7 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 	int	n;
 	int	size;
 	int	lsize;
+	struct cb_field *p;
 
 	/* Check for non-standard 01 OCCURS */
 	if (init_occurs) {
@@ -4767,7 +4769,25 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 	}
 	i = size / lsize;
 	i_counters[0] = 1;
-	output_line ("for (i0 = 0; i0 < %d; i0++)", i);
+	if (CB_REFERENCE_P(x)) {
+		cb_tree		l;
+		struct cb_reference	*r = CB_REFERENCE (x);
+		for (l = r->check; l; l = CB_CHAIN (l)) {
+			output_stmt (CB_VALUE (l));
+		}
+	}
+	if (f->odo_level) {
+		output_line("i0_max = i_len / %d;",lsize);
+	}
+	output_prefix ();
+	output ("for (i0 = 0; i0 < ");
+	if (f->odo_level) {
+		output ("i0_max");
+	} else {
+		output_occurs (f);
+	}
+	output ("; i0++)");
+	output_newline ();
 	output_block_open ();
 	output_prefix ();
 	output ("memcpy (");
@@ -4936,8 +4956,11 @@ output_initialize_one (struct cb_initialize *p, cb_tree x)
 			/* Check for non-standard 01 OCCURS */
 			if (init_occurs) {
 				i_counters[0] = 1;
-				output_line ("for (i0 = 1; i0 <= %d; i0++)",
-					     f->occurs_max);
+				output_prefix ();
+				output ("for (i0 = 1; i0 <= ");
+				output_occurs (f);
+				output ("; i0++)");
+				output_newline ();
 				output_block_open ();
 				CB_REFERENCE (x)->subs =
 					CB_BUILD_CHAIN (cb_i[0], CB_REFERENCE (x)->subs);
@@ -5223,6 +5246,7 @@ output_initialize (struct cb_initialize *p)
 	cb_tree			x;
 	int			c;
 	int			type;
+	struct cb_reference	*r = NULL;
 
 	f = cb_code_field (p->var);
 	type = deduce_initialize_type (p, f, 1);
@@ -5247,7 +5271,14 @@ output_initialize (struct cb_initialize *p)
 			/* Fall through */
 		case INITIALIZE_COMPOUND:
 			i_counters[0] = 1;
-			output_line ("for (i0 = 1; i0 <= %d; i0++)", f->occurs_max);
+			output_prefix ();
+			output ("for (i0 = 1; i0 <= ");
+			if (f->odo_level)
+				output ("i_len");
+			else
+				output_occurs (f);
+			output ("; i0++)");
+			output_newline ();
 			output_block_open ();
 			x = cb_build_field_reference (f, NULL);
 			CB_REFERENCE (x)->subs =
@@ -5261,6 +5292,21 @@ output_initialize (struct cb_initialize *p)
 		default:
 			break;
 		}
+	}
+	if (type == INITIALIZE_NONE)
+		return;
+	if (CB_REFERENCE_P (p->var))
+		r = CB_REFERENCE (p->var);
+	if (r
+	 && r->length
+	 && f->odo_level
+	 && (type != INITIALIZE_DEFAULT
+	  || initialize_uniform_char (f, p) == -1)) {
+		output_prefix ();
+		output ("i_len = ");
+		output_integer (CB_REFERENCE (p->var)->length);
+		output (";");
+		output_newline ();
 	}
 	switch (type) {
 	case INITIALIZE_NONE:
@@ -8172,7 +8218,8 @@ output_stmt (cb_tree x)
 		 || CB_TREE_CLASS (ap->var) == CB_CLASS_ALPHABETIC) {
 			f1 = cb_code_field(ap->var);
 			if (!f1->flag_real_binary
-			 && f1->pic) {
+			 && f1->pic
+			 && f1->usage != CB_USAGE_LENGTH) {
 				output_prefix ();
 				if (CB_NUMERIC_LITERAL_P (ap->val)
 				 && CB_LITERAL (ap->val)->scale == 0
