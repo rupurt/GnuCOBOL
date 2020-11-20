@@ -1067,6 +1067,7 @@ AT_DATA([prog.cob], [
        WORKING-STORAGE  SECTION.
        01  p            USAGE POINTER.
        01  p2           USAGE POINTER.
+       01  dlen         PIC 9(7).
 
        LINKAGE SECTION.
        01  a-table.
@@ -1091,14 +1092,14 @@ AT_DATA([prog.cob], [
                     RETURNING p2
            SET ADDRESS OF a-table TO p2
            FREE p
+
            INITIALIZE prefix ALL TO VALUE
-      *> FIXME: broken - initializes up to max but only should initialize
-      *>        up to current size   INITIALIZE table-data ALL TO VALUE
-      *>  INITIALIZE table-data  ALL TO VALUE
-      *> FIXME: broken - FUNCTION LENGTH(table-data) must be resolved
-      *>        at run-time but is currently set to max at compile-time
-      *>   INITIALIZE table-data (1:FUNCTION LENGTH(table-data))
-      *>              ALL TO VALUE
+
+           IF LENGTH OF a-table NOT = 372
+              MOVE LENGTH OF a-table TO dlen
+              DISPLAY "BAD SIZE: " dlen
+           END-DISPLAY
+
            INITIALIZE table-data (1:FUNCTION LENGTH(rows(1)) * n)
                       ALL TO VALUE
            IF col2(1) NOT = "BC"
@@ -1109,16 +1110,21 @@ AT_DATA([prog.cob], [
               DISPLAY "rows(2) wrong: " rows(2)
               END-DISPLAY
            END-IF
-           DISPLAY LENGTH OF a-table
+
       *>   check if ref-mod also works as expected
            MOVE ALL ZEROES TO a-table (1: (LENGTH OF a-table))
+
+      *> Test -  should only initialize up to current size, not max:
+           INITIALIZE table-data     TO DEFAULT
+           INITIALIZE table-data ALL TO VALUE
+
+      *> Test - FUNCTION LENGTH(table-data) must be resolved at run-time
+          INITIALIZE table-data (1:FUNCTION LENGTH(table-data))
+              ALL TO VALUE
            .
 ])
 
 AT_CHECK([$COMPILE prog.cob], [0], [], [])
-
-# multiple issues, see comments above
-AT_XFAIL_IF(true)
 
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 

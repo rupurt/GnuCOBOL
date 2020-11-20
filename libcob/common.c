@@ -8428,10 +8428,33 @@ cob_init (const int argc, char **argv)
 #endif
 	int		i;
 
-#if 0	/* Simon: Should not happen - is it necessary anywhere?
-		   We may change this to a runtime warning/error */
+	/* Ensure initialization is only done once. Within generated modules and
+	   libcob this is already ensured, but an external caller may call this
+	   function again */
 	if (cob_initialized) {
+#if 0	/* Simon: We may raise a runtime warning/error in the future here */
+		cob_runtime_warning ("%s called more than once", "cob_init");
+#endif
 		return;
+	}
+
+#ifdef __GLIBC__
+	{
+		/* 
+		 * GNU libc may write a stack trace to /dev/tty when malloc
+		 * detects corruption.  If LIBC_FATAL_STDERR_ is set to any
+		 * nonempty string, it writes to stderr instead. See:
+		 *https://code.woboq.org/userspace/glibc/sysdeps/posix/libc_fatal.c.html
+		 */
+		static char glibc_magic[] = "LIBC_FATAL_STDERR_\0keep_off_the_grass";
+	
+		if( NULL == getenv(glibc_magic) ) { /* don't override user-settings */
+			char *p = glibc_magic + strlen(glibc_magic);
+			if (p + 1 < glibc_magic + sizeof(glibc_magic)) {
+				*p = '=';
+				(void)putenv(glibc_magic);
+			}
+		}
 	}
 #endif
 

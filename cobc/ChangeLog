@@ -12,6 +12,11 @@
 	  flags and exception options it sets, allowing to remove its internal
 	  explicit_set flag
 
+2020-11-18  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c, typeck.c: Generated code for INITIALIZE computes the actual
+	  length for OCCURS DEPENDING on x UNBOUNDED before doing the initialize
+
 2020-11-11  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Emit correct code for -debug within C function calls

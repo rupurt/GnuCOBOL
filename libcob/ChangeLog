@@ -4,6 +4,16 @@
 	* common.c (cob_stack_trace_internal): early exit if no data available
 	* common.c (cob_check_version): test for minimal version 2.2
 
+2020-11-18  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (cob_init): skip initialization again if already done as
+	  external callers may call it falsely again
+
+2020-11-16  James K. Lowden  <jklowden@symas.com>
+
+	* common.c (cob_init) [__GLIBC__]: set LIBC_FATAL_STDERR_ to prevent
+	  glibc from writing stack traces to /dev/tty.
+
 2020-11-13  James K. Lowden  <jklowden@symas.com>
 
 	* common.c (cob_check_version): support 3-part version strings

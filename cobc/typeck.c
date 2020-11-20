@@ -8160,6 +8160,8 @@ cb_emit_initialize (cb_tree vars, cb_tree fillinit, cb_tree value,
 		    cb_tree replacing, cb_tree def)
 {
 	cb_tree		l;
+	struct cb_field		*f, *p;
+	int			odo_level;
 	unsigned int	no_fill_init;
 	unsigned int	def_init;
 	cb_tree		x;
@@ -8180,6 +8182,31 @@ cb_emit_initialize (cb_tree vars, cb_tree fillinit, cb_tree value,
 			return;
 		}
 
+		f = CB_FIELD_PTR (x);
+		odo_level = 0;
+		while(f->children)
+			f = f->children;
+		for (p = f; p; p = p->parent) {
+			if (p->depending) {
+				odo_level++;
+			}
+			p->odo_level = odo_level;
+			if (!p->parent) {
+				break;
+			}
+		}
+		if (CB_FIELD_PTR   (x)->odo_level
+		 && CB_REFERENCE_P (x)
+		 && CB_REFERENCE   (x)->subs == NULL
+		 && CB_REFERENCE   (x)->length == NULL) {
+			cb_tree		temp;
+			temp = cb_build_index (cb_build_filler (), NULL, 0, NULL);
+			CB_FIELD (cb_ref (temp))->usage = CB_USAGE_LENGTH;
+			CB_FIELD (cb_ref (temp))->count++;
+			CB_FIELD (cb_ref (temp))->pic->have_sign = 0;	/* LENGTH is UNSIGNED */
+			cb_emit (cb_build_assign (temp, cb_build_length_1 (x)));
+			CB_REFERENCE (x)->length = temp;
+		}
 		cb_emit (cb_build_initialize (x , value, replacing,
 					      def_init, 1, no_fill_init));
 	}
