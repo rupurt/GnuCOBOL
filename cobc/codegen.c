@@ -4721,11 +4721,9 @@ static void
 output_initialize_literal (cb_tree x, struct cb_field *f,
 			   struct cb_literal *l, const int init_occurs)
 {
-	int	i;
 	int	n;
 	int	size;
 	int	lsize;
-	struct cb_field *p;
 
 	/* Check for non-standard 01 OCCURS */
 	if (init_occurs) {
@@ -4767,7 +4765,6 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 		output_newline ();
 		return;
 	}
-	i = size / lsize;
 	i_counters[0] = 1;
 	if (CB_REFERENCE_P(x)) {
 		cb_tree		l;
@@ -4780,7 +4777,7 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 		output_line("i0_max = i_len / %d;",lsize);
 	}
 	output_prefix ();
-	output ("for (i0 = 0; i0 < ");
+	output ("for (i0 = 0; i0 <= ");
 	if (f->odo_level) {
 		output ("i0_max");
 	} else {
