@@ -6,8 +6,8 @@
 
 2020-11-16  James K. Lowden  <jklowden@symas.com>
 
-	* common.c (cob_init): set LIBC_FATAL_STDERR_ to prevent glibc
-	  from writing stack traces to /dev/tty.
+	* common.c (cob_init) [__GLIBC__]: set LIBC_FATAL_STDERR_ to prevent
+	  glibc from writing stack traces to /dev/tty.
 
 2020-11-01  Ron Norman <rjn@inglenet.com>
 
