@@ -2488,23 +2488,26 @@ cob_check_version (const char *prog,
 		   const char *packver_prog, const int patchlev_prog)
 {
 	int nparts;
-	struct ver_t lib = {}, app = { -1, -1 };
-
-	/* note: to be tested with direct C call */
+	struct ver_t lib = { 0 }, app = { -1, -1 };
 
 	nparts = sscanf (PACKAGE_VERSION, "%d.%d.%d",
 			 &lib.major, &lib.minor, &lib.point);
 	lib.version = version_bitstring(lib);
 
-	switch( nparts ) {
+	switch (nparts) {
 	case 2:
 	case 3:
 		nparts = sscanf (packver_prog, "%d.%d.%d",
 				 &app.major, &app.minor, &app.point);
 
-		if( nparts >= 2 ) {
+		if (nparts >= 2) {
+			/* we only claim compatibility to 2.2+ */
+			struct ver_t minimal = { 2, 2 }; 
+
 			app.version = version_bitstring(app);
-			break;
+			if (app.version >= version_bitstring (minimal)) {
+				break;
+			}
 		}
 		/* fall through */
 	default:
@@ -8754,6 +8757,14 @@ void
 cob_stack_trace_internal (FILE *target)
 {
 	cob_module	*mod;
+
+	/* exit early in the case of no module loaded at all,
+	   possible to happen for example when aborted from cob_check_version of first module */
+	if (!COB_MODULE_PTR
+	 || (   COB_MODULE_PTR->module_stmt == 0
+	     && COB_MODULE_PTR->next == NULL)) {
+		return;
+	}
 
 	if (target == stderr
 	 || target == stdout) {

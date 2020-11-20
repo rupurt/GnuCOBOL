@@ -1705,14 +1705,14 @@ AT_CHECK([$COMPILE_ONLY -Wextra prog.cob], [0], [],
 AT_CLEANUP
 
 
-AT_SETUP([line overflow in Fixed-form / Free-form])
+AT_SETUP([line overflow in fixed-form / free-form])
 AT_KEYWORDS([misc])
 
 # We're testing trailing tabs and whitespace (should not lead to warning)
 # along with comments after boundaries (col 72 / col 512)
 
-# AT_DATA removes trailing spaces, workaround: add "_" and
-# remove it later via sed
+# remark: some editors remove trailing spaces, the  workaround: add "_" and
+# remove it later via sed; AT_DATA would not do that when using double [[  ]]
 
 AT_DATA([prog_tmpl.cob], [
        IDENTIFICATION   DIVISION.
@@ -1730,27 +1730,60 @@ AT_DATA([prog_tmpl.cob], [
 ])
 
 # AT_DATA workaround via sed:
-AT_CHECK([sed -e 's/_$//' prog_tmpl.cob > prog.cob], [0], [], [])
+AT_CHECK([$SED -e 's/_$//' prog_tmpl.cob > prog.cob], [0], [], [])
 
-AT_CHECK([$COMPILE_ONLY -fixed -Wextra prog.cob], [0], [],
-[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
-prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
-prog.cob:11: warning: source text after program-text area (column 72)
+AT_CHECK([$COBC -fsyntax-only -fixed -Wextra prog.cob], [0], [],
+[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
+prog.cob:8: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
+prog.cob:11: warning: source text after program-text area (column 72) [[-Wdangling-text]]
 ])
 
-AT_CHECK([$COMPILE_ONLY -free -Wextra prog.cob], [1], [],
-[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
-prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
+AT_CHECK([$COBC -fsyntax-only -free -Wextra prog.cob], [1], [],
+[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
+prog.cob:8: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
 prog.cob:8: error: unknown statement 'This'
 ])
 
-AT_CHECK([$COMPILE_ONLY -F -Wextra prog.cob], [1], [],
-[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated
-prog.cob:8: warning: source text exceeds 512 bytes, will be truncated
+AT_CHECK([$COBC -fsyntax-only -F -Wextra prog.cob], [1], [],
+[prog.cob:7: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
+prog.cob:8: warning: source text exceeds 512 bytes, will be truncated [[-Wothers]]
 prog.cob:8: error: unknown statement 'This'
 ])
 
 AT_CLEANUP
+
+
+AT_SETUP([missing newline in fixed-form / free-form])
+AT_KEYWORDS([misc])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       PROCEDURE        DIVISION.
+           CONTINUE
+])
+
+AT_CHECK([$COMPILE_ONLY prog.cob], [1], [],
+[prog.cob:8: error: syntax error, unexpected end of file
+])
+
+# fixing the initial setup but now producing a missing newline:
+printf "           CONTINUE." >> prog.cob
+
+AT_CHECK([$COBC -fsyntax-only -Wextra -fixed prog.cob], [0], [],
+[prog.cob:8: warning: line not terminated by a newline [[-Wothers]]
+])
+AT_CHECK([$COBC -fsyntax-only -Wextra -free prog.cob], [0], [],
+[prog.cob:8: warning: line not terminated by a newline [[-Wothers]]
+])
+# should not happen if the data only consists of space characters
+printf "\n              \t " >> prog.cob
+
+AT_CHECK([$COMPILE_ONLY -Wextra prog.cob], [0], [], [])
+AT_CLEANUP
+
 
 
 AT_SETUP([continuation Indicator - too many lines])

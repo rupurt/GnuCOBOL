@@ -91,6 +91,11 @@ COBCRUN_DIRECT="$MEMCHECK --log-file=$VG_COBCRUN_DIRECT_LOG ${COBCRUN_DIRECT}"
 
 # -- END OF VALGRIND SPECIFIC PARTS ---
 
+AWK=@AWK@
+GREP=@GREP@
+SED=@SED@
+exort AWK GREP SED
+
 # be sure to use the English messages
 LC_ALL=C
 export LC_ALL
@@ -252,6 +257,8 @@ if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 		COB_HAS_CURSES="no"
 	fi
 fi
+
+rm -rf info.out
 
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL

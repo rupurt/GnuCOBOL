@@ -1,4 +1,17 @@
 
+2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
+
+	* pplex.l (ppinput): fixed processing after "line not terminated"
+
+2020-11-19  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #53 TURN directive and -fno-ec=NAME/-fec=NAME - finish
+	* cobc.c (turn_ec_for_table): correct handling for EC-ALL
+	* cobc.c (cobc_turn_ec): handling EC-USER as PENDING
+	* cobc.c (process_command_line), cobc.h: handle -debug before all the
+	  flags and exception options it sets, allowing to remove its internal
+	  explicit_set flag
+
 2020-11-11  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Emit correct code for -debug within C function calls
@@ -292,9 +305,16 @@
 	* typeck.c: implement syntax rules for FILE STATUS (bug #656), with
 	  warning for PIC 99 status (FR #333).
 	* parser.y (file_control_entry): fixed bug #619: create dummy
-	 current_file for invalid SELECT.
+	  current_file for invalid SELECT.
 	* cobc.c (compare_prepare): fixed bug #569: stop copying into cmp_line
 	  when line length exceeds CB_LINE_LENGTH.
+
+2020-06-30  Simon Sobisch <simonsobisch@gnu.org>
+
+	FR #53 TURN directive - finished command line variant as -fno-ec/-fec
+	* cobc.c, flag.def, help.c: renamed -fdisable-ec/-fenable-ec
+	* cobc.c: removed the need to use EC- prefix in the name for -f[no-]ec
+	* flag.def, help.c: fixed some help output
 
 2020-06-30  Edward Hart <edward.dan.hart@gmail.com>
 
@@ -333,14 +353,15 @@
 2020-06-23  Edward Hart <edward.dan.hart@gmail.com>
 
 	FR #53 TURN directive
-	* cobc.c, cobc.h: completed initial implementation on disabling ECs.
+	* cobc.c, cobc.h: completed initial implementation on disabling ECs
+	  on command line with -fdisable-ec=NAME -fenable-ec=NAME
 	* cobc.c, cobc.h, parser.y, ppparse.y, scanner.l: completed initial
-	  implementation of >>TURN.
+	  implementation of >>TURN
 
 2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c, cobc.h, flag.def, ppparse.y: draft work on >>TURN and
-	  disabling exceptions (FR #53).
+	  disabling exceptions (FR #53)
 
 2020-06-22  Simon Sobisch <simonsobisch@gnu.org>
 

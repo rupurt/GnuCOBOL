@@ -8968,7 +8968,6 @@ Paragraph: 1000-LOAD-RECORD                -    358
 Paragraph: LISTFILE                        -    387
 ])
 
-# AT_DATA workaround via sed:
 AT_CAPTURE_FILE(./trace_append.txt)
 
 AT_CHECK([diff reference_append trace_append.txt], [0], [], [])
@@ -9517,8 +9516,8 @@ WORKING-STORAGE
 ])
 
 # AT_DATA workaround via sed:
-AT_CHECK([sed -e 's/_$//' reference_tmpl > reference], [0], [], [])
-AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+AT_CHECK([$SED -e 's/_$//' reference_tmpl > reference], [0], [], [])
+AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 tstdump.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
@@ -9539,7 +9538,7 @@ libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
 dump written to tstdump.dump
 ])
 
-AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 tstdump.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
@@ -9601,8 +9600,8 @@ FD FLATFILE
 ])
 
 # AT_DATA workaround via sed:
-AT_CHECK([sed -e 's/_$//' reference_fdls_tmpl > reference], [0], [], [])
-AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+AT_CHECK([$SED -e 's/_$//' reference_fdls_tmpl > reference], [0], [], [])
+AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 tstdump_fdls.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
@@ -9620,7 +9619,7 @@ libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
 dump written to tstdump_allfdls.dump
 ])
 
-AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 tstdump_allfdls.dump > tstdump.sed], [0], [], [])
 
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
@@ -9673,8 +9672,8 @@ AT_CHECK([diff reference tstdump.sed], [0], [], [])
 #])
 #
 ## AT_DATA workaround via sed:
-#AT_CHECK([sed -e 's/_$//' reference_ls_sticky_tmpl > reference], [0], [], [])
-#AT_CHECK([sed -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
+#AT_CHECK([$SED -e 's/_$//' reference_ls_sticky_tmpl > reference], [0], [], [])
+#AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 #tstdump_ls_sticky.dump > tstdump.sed], [0], [], [])
 #
 #AT_CHECK([diff reference tstdump.sed], [0], [], [])
@@ -11466,7 +11465,7 @@ AT_CHECK([diff reference prt.log], [0], [], [],
 
 # Previous test "failed" --> check if EOL of PIPE is the issue
 
-AT_CHECK([sed -e 's/PIPE.\r/PIPE./g' prt.log > prt2.log], [0], [], [])
+AT_CHECK([$SED -e 's/PIPE.\r/PIPE./g' prt.log > prt2.log], [0], [], [])
 AT_CHECK([diff reference prt2.log], [0], [], [])
 )
 
@@ -12310,7 +12309,9 @@ AT_DATA([prog3.cob], [
        PROCEDURE DIVISION.
               
            IF  MYTAB(VAR:VAR2)
-             = MYTAB(VAR2:VAR)
+      *>     = MYTAB(VAR2:VAR)   that _should_ work but on x86_64
+      *>                         the second line is evaluated first
+             = MYTAB(VAR:VAR )
               DISPLAY 'WRONG RESULT REFMOD'.
 
             GOBACK.
@@ -12319,7 +12320,112 @@ AT_CHECK([$COBC -x prog3.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
 AT_CHECK([$COBC -x --debug -o prog3b prog3.cob], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog3b], [1], [],
-[libcob: prog3.cob:20: error: offset of 'mytab' out of bounds: 99, maximum: 52
+[libcob: prog3.cob:20: error: length of 'mytab' out of bounds: 99, maximum: 52
 ])
+
+AT_CLEANUP
+
+
+AT_SETUP([libcob version check])
+AT_KEYWORDS([runmisc])
+
+# using a C program here, normally this would be called from old or newer modules
+AT_DATA([prog.c], [[
+#include <stdio.h>
+#include <libcob.h>
+
+#define COUNT_OF(x) (sizeof(x)/sizeof(x[0]))
+
+struct verify_t {
+  char *prog, *packver_prog;
+  int patchlev_prog;
+} verify[] = {
+#include "testdata.h"
+};
+
+int
+main(int argc, char *argv[])
+{
+  struct verify_t *p;
+  for( p=verify; p < verify + COUNT_OF(verify); p++ ) {
+    cob_check_version(p->prog, p->packver_prog, p->patchlev_prog);
+  }
+  return 0;
+}
+]])
+
+# good cases
+AT_DATA([testdata.h], [[
+#define TST_STRINGIFY(s)			#s
+#define TST_XSTRINGIFY(s)		TST_STRINGIFY (s)
+  { "test22", "2.2",    0 },
+/*  { "TestMatch1",
+		TST_XSTRINGIFY (__LIBCOB_VERSION) "."
+		TST_XSTRINGIFY (__LIBCOB_VERSION_MINOR) "."
+		TST_XSTRINGIFY (__LIBCOB_VERSION_PATCHLEVEL),
+    0}, */
+  { "TestMatch2",
+		TST_XSTRINGIFY (__LIBCOB_VERSION) "."
+		TST_XSTRINGIFY (__LIBCOB_VERSION_MINOR) "."
+      "0",
+    0},
+  { "TestMatch3",
+		TST_XSTRINGIFY (__LIBCOB_VERSION) "."
+		TST_XSTRINGIFY (__LIBCOB_VERSION_MINOR),
+    0 }
+]])
+
+AT_CHECK([$COMPILE prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+
+AT_DATA([testdata.h], [[
+  { "TooSmall1", "1.1",    0 }
+]])
+AT_CHECK([$COMPILE -o small1 prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./small1 2>small1.log], [1], [], [])
+AT_CHECK([$GREP -v "libcob has" small1.log], [0],
+[libcob: error: version mismatch
+note: TooSmall1 has version 1.1.0
+], [])
+
+AT_DATA([testdata.h], [[
+  { "TooSmall2", "2.0",    0 }
+]])
+AT_CHECK([$COMPILE -o small2 prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./small2 2>small2.log], [1], [], [])
+AT_CHECK([$GREP -v "libcob has" small2.log], [0],
+[libcob: error: version mismatch
+note: TooSmall2 has version 2.0.0
+], [])
+
+AT_DATA([testdata.h], [[
+  { "TooHigh1", "3.2",    0 },
+]])
+AT_CHECK([$COMPILE -o high1 prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./high1 2>high1.log], [1], [], [])
+AT_CHECK([$GREP -v "libcob has" high1.log], [0],
+[libcob: error: version mismatch
+note: TooHigh1 has version 3.2.0
+], [])
+
+AT_DATA([testdata.h], [[
+  { "TooHigh2", "4.0",  0 }
+]])
+AT_CHECK([$COMPILE -o high2 prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./high2 2>high2.log], [1], [], [])
+AT_CHECK([$GREP -v "libcob has" high2.log], [0],
+[libcob: error: version mismatch
+note: TooHigh2 has version 4.0.0
+], [])
+
+AT_DATA([testdata.h], [[
+  { "TooHigh3", "4.0.1",  2 }
+]])
+AT_CHECK([$COMPILE -o high3 prog.c], [0], [], [])
+AT_CHECK([$COBCRUN_DIRECT ./high3 2>high3.log], [1], [], [])
+AT_CHECK([$GREP -v "libcob has" high3.log], [0],
+[libcob: error: version mismatch
+note: TooHigh3 has version 4.0.1.2
+], [])
 
 AT_CLEANUP

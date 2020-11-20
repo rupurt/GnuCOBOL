@@ -1650,20 +1650,22 @@ start:
 		if (cb_source_format == CB_FORMAT_FREE) {
 			if (line_overflow == 0) {
 				cb_plex_warning (COBC_WARN_FILLER, newline_count + 1,
-						 _("line not terminated by a newline"));
+						_("line not terminated by a newline"));
+				n++;
 			} else if (line_overflow == 2) {
 				cb_plex_warning (COBC_WARN_FILLER, newline_count + 1,
-						 _("source text exceeds %d bytes, will be truncated"),
-						   PPLEX_BUFF_LEN);
+						_("source text exceeds %d bytes, will be truncated"),
+						  PPLEX_BUFF_LEN);
 			}
 		} else {
 			if (line_overflow == 0) {
 				cb_plex_warning (COBC_WARN_FILLER, newline_count,
-						 _("line not terminated by a newline"));
+						_("line not terminated by a newline"));
+				n++;
 			} else if (line_overflow == 2) {
 				cb_plex_warning (COBC_WARN_FILLER, newline_count,
-						 _("source text exceeds %d bytes, will be truncated"),
-						   PPLEX_BUFF_LEN);
+						_("source text exceeds %d bytes, will be truncated"),
+						  PPLEX_BUFF_LEN);
 			}
 		}
 		buff[n++] = '\n';

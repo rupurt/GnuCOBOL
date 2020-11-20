@@ -261,10 +261,6 @@ struct list_files	*cb_current_file = NULL;
 struct cob_time		current_compile_time = { 0 };
 struct tm		current_compile_tm = { 0 };
 
-#if	0	/* RXWRXW - source format */
-char			*source_name = NULL;
-#endif
-
 enum cb_format		cb_source_format = CB_FORMAT_FIXED;
 int			cb_text_column;
 int			cb_indicator_column;
@@ -1643,32 +1639,25 @@ turn_ec_for_table (struct cb_exception *table, const size_t table_len,
 {
 	size_t	i;
 
-	if (ec.code & 0x00FF) {
-		/* Set individual level-1 EC */
+	if (ec.code == CB_EXCEPTION_CODE (COB_EC_ALL)) {
+		/* EC-ALL - level-1 EC to set all ECs */
 		for (i = 0; i < table_len; ++i) {
-			if (table[i].code == ec.code) {
-				table[i].enable = to_on_off;
-				table[i].explicit_enable_val = 1;
-				break;
-			}
+			table[i].enable = to_on_off;
 		}
-	} else if (ec.code != 0) {
-		/*
-		  Simon: ToDo: Group activation; check occurences of
-		  EC-generation
-		*/
+	} else if ((ec.code & 0x00FF) == 0) {
 		/* Set all ECs subordinate to level-2 EC */
 		for (i = 0; i < table_len; ++i) {
 			if ((table[i].code & 0xFF00) == ec.code) {
 				table[i].enable = to_on_off;
-				table[i].explicit_enable_val = 1;
 			}
 		}
 	} else {
-		/* EC-ALL; set all ECs */
+		/* Set individual level-3 EC */
 		for (i = 0; i < table_len; ++i) {
-			table[i].enable = to_on_off;
-			table[i].explicit_enable_val = 1;
+			if (table[i].code == ec.code) {
+				table[i].enable = to_on_off;
+				break;
+			}
 		}
 	}
 }
@@ -1742,11 +1731,6 @@ ec_duped (struct cb_text_list *ec_list, struct cb_text_list *ec,
 	return 0;
 }
 
-/*
-  Simon: ToDo: Move save/restore of activated exceptions before
-  preparse; after C generation A dynamic save (only if changed)
-  and restore (only if set) would be nice
-*/
 unsigned int
 cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree loc)
 {
@@ -1765,6 +1749,15 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 		for (i = 0; i < len; ++i) {
 			upme[i] = (cob_u8_t)toupper (upme[i]);
 		}
+
+		/* User specified exception (always nonfatal, compared by name) */
+		if (!strncmp (ec->text, "EC-USER", 7)) {
+			/* TODO: EC-USER[NAME] not supported yet, maybe addd as table
+			         of strings or hash into the generated program */
+			CB_PENDING ("EC-USER");
+			return 1;
+		}
+
 		/* extract exception code via text comparison */
 		ec_idx = 0;
 		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
@@ -1775,7 +1768,6 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 		}
 
 		/* Error if not a known exception name */
-		/* TO-DO: What about EC-USER? */
 		if (ec_idx == 0) {
 			cb_error_x (loc, _("invalid exception-name: %s"),
 				    ec->text);
@@ -1786,7 +1778,7 @@ cobc_turn_ec (struct cb_text_list *ec_list, const cob_u32_t to_on_off, cb_tree l
 			return 1;
 		}
 
-		if (!strncmp(CB_EXCEPTION_NAME(ec_idx), "EC-I-O", 6)) {
+		if (!strncmp (CB_EXCEPTION_NAME(ec_idx), "EC-I-O", 6)) {
 			if (turn_ec_io (cb_exception_table[ec_idx], to_on_off,
 					loc, &ec)) {
 				return 1;
@@ -2853,7 +2845,8 @@ process_command_line (const int argc, char **argv)
 	}
 #endif
 
-	/* First run of getopt: handle std/conf and all listing options
+	/* First run of getopt: handle std/conf and all listing options, along
+	   with grouping options that should not override other entries (as --debug)
 	   We need to postpone single configuration flags as we need
 	   a full configuration to be loaded before */
 	cob_optind = 1;
@@ -3017,6 +3010,13 @@ process_command_line (const int argc, char **argv)
 			conf_ret |= cb_load_conf (cob_optarg, 0);
 			break;
 
+		case 'd':
+			/* -debug : Turn on all runtime checks */
+			cb_flag_source_location = 1;
+			cb_flag_stack_check = 1;
+			cobc_wants_debug = 1;
+			break;
+
 		default:
 			/* as we postpone most options simply skip everything other here */
 			break;
@@ -3035,6 +3035,13 @@ process_command_line (const int argc, char **argv)
 	/* Exit for configuration errors resulting from -std/-conf/default.conf */
 	if (conf_ret != 0) {
 		cobc_early_exit (EXIT_FAILURE);
+	}
+
+	/* debug: Turn on all exception conditions */
+	if (cobc_wants_debug) {
+		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
+			CB_EXCEPTION_ENABLE (i) = 1;
+		}
 	}
 
 	cob_optind = 1;
@@ -3244,9 +3251,7 @@ process_command_line (const int argc, char **argv)
 
 		case 'd':
 			/* -debug : Turn on all runtime checks */
-			cb_flag_source_location = 1;
-			cb_flag_stack_check = 1;
-			cobc_wants_debug = 1;
+			/* This options was processed in the first getopt-run */
 			break;
 
 		case '_':
@@ -3705,6 +3710,13 @@ process_command_line (const int argc, char **argv)
 		cobc_main_free (output_name_buff);
 	}
 
+	/* debug: Turn on all exception conditions
+	   -> drop note about this after hanling exit_option and general problems */
+	if (cobc_wants_debug && verbose_output > 1) {
+		fputs (_ ("all runtime checks are enabled"), stderr);
+		fputc ('\n', stderr);
+	}
+
 	/* Set relaxed syntax configuration options if requested */
 	/* part 1: relaxed syntax compiler configuration option */
 	if (cb_relaxed_syntax_checks) {
@@ -3769,19 +3781,6 @@ process_command_line (const int argc, char **argv)
 	if (cb_flag_traceall) {
 		cb_flag_trace = 1;
 		cb_flag_source_location = 1;
-	}
-
-	/* debug: Turn on all exception conditions */
-	if (cobc_wants_debug) {
-		for (i = (enum cob_exception_id)1; i < COB_EC_MAX; ++i) {
-			if (!CB_EXCEPTION_EXPLICIT (i)) {
-				CB_EXCEPTION_ENABLE (i) = 1;
-			}
-		}
-		if (verbose_output > 1) {
-			fputs (_("all runtime checks are enabled"), stderr);
-			fputc ('\n', stderr);
-		}
 	}
 
 	/* If C debug, do not strip output */
