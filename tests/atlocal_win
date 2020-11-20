@@ -40,7 +40,7 @@ export PATH
 AWK=awk
 GREP=grep
 SED=sed
-exort AWK GREP SED
+export AWK GREP SED
 
 # be sure to use the English messages
 LC_ALL=C

@@ -94,7 +94,7 @@ COBCRUN_DIRECT="$MEMCHECK --log-file=$VG_COBCRUN_DIRECT_LOG ${COBCRUN_DIRECT}"
 AWK=@AWK@
 GREP=@GREP@
 SED=@SED@
-exort AWK GREP SED
+export AWK GREP SED
 
 # be sure to use the English messages
 LC_ALL=C
