@@ -2,12 +2,28 @@
 2020-11-18  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c,typeck.c: Generated code for INITIALIZE computes the actual
-	                      length for OCCURS DEPENDING on x UNBOUNDED before 
-						  doing the initialize
+	  length for OCCURS DEPENDING on x UNBOUNDED before doing the initialize
 
 2020-11-11  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Emit correct code for -debug within C function calls
+
+2020-11-04  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c (output_initialize_compound): adjusted OCCURS initialization
+	  to only do the initialization (and runtime checks) once and then
+	  memcpy to all other occurences
+	* tree.c: preparation for all-upper-case names (post 3.1)
+
+2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codegen.c, tree.h, cobc.c: added cb_wants_dump_comments variable,
+	  set by cobc if COBC_GEN_DUMP_COMMENTS is set
+	* codegen.c: depending on cb_wants_dump_comments generate additional
+	  dump code *as comment*: REDEFINES and lvl 66/78 fields, fields that
+	  should not be dumped and information about field attributes
+	* codegen.c (output_display_fields): removed duplicate code,
+	  use of output_block_open/output_block_close
 
 2020-11-03  Simon Sobisch <simonsobisch@gnu.org>
 
