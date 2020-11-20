@@ -8317,7 +8317,7 @@ cob_init (const int argc, char **argv)
 	   function again */
 	if (cob_initialized) {
 #if 0	/* Simon: We may raise a runtime warning/error in the future here */
-		cob_runtime_warning ("%s called more than once", cob_init");
+		cob_runtime_warning ("%s called more than once", "cob_init");
 #endif
 		return;
 	}
