@@ -278,7 +278,7 @@ copy_file_line (cb_tree e, cb_tree y, cb_tree x)
 	}
 }
 
-/* compute hash value of COBOL word (case insensitive) */
+/* compute hash value of COBOL word */
 static size_t
 word_hash (const unsigned char *s)
 {
@@ -290,7 +290,7 @@ word_hash (const unsigned char *s)
 	val = 0;
 	pos = 1;
 	for (; *s; s++, pos++) {
-		val += pos * toupper (*s);
+		val += *s * pos;
 	}
 #if	0	/* RXWRXW - Hash remainder */
 	return val % CB_WORD_HASH_SIZE;
@@ -298,17 +298,43 @@ word_hash (const unsigned char *s)
 	return val & CB_WORD_HASH_MASK;
 }
 
+/* look up word (case insensitive) */
 static void
 lookup_word (struct cb_reference *p, const char *name)
 {
 	struct cb_word	*w;
 	size_t		val;
 
-	val = word_hash ((const unsigned char *)name);
+	/* build uppercase variant (we don't want the hash to differentiate those) */
+	unsigned char word[COB_MAX_WORDLEN + 1];
+	{
+		size_t i;
+		size_t len = strlen (name);
+		if (len > COB_MAX_WORDLEN) {
+#if 0	/* leave to post-processing for now, just cut for the hash function */
+			cobc_err_msg ("unexpected word length: %u", (unsigned int)len);
+			COBC_ABORT ();
+#else
+			len = COB_MAX_WORDLEN;
+#endif
+		}
+		for (i = 0; i < len; ++i) {
+			word[i] = (cob_u8_t)toupper ((unsigned char)name[i]);
+		}
+		word[i] = 0;
+	}
+	val = word_hash (word);
+
 	/* Find an existing word */
 	if (likely(current_program)) {
+		/* checking only "very similar" words that share the same hash */
 		for (w = current_program->word_table[val]; w; w = w->next) {
+#if 1	/* TODO we currently use words "as written first" use an all-upper
+		   approach post 3.1 */
 			if (strcasecmp (w->name, name) == 0) {
+#else
+			if (strcmp (w->name, (char *)word) == 0) {
+#endif
 				p->word = w;
 				p->hashval = val;
 				p->flag_duped = 1;
@@ -319,7 +345,12 @@ lookup_word (struct cb_reference *p, const char *name)
 
 	/* Create new word */
 	w = cobc_parse_malloc (sizeof (struct cb_word));
+#if 1	/* TODO we currently use words "as written first" use an all-upper
+		   approach post 3.1 */
 	w->name = cobc_parse_strdup (name);
+#else
+	w->name = cobc_parse_strdup ((char *)word);
+#endif
 
 	/* Insert it into the table */
 	if (likely(current_program)) {
