@@ -76,14 +76,14 @@ AH_TEMPLATE([COB_PARAM_CHECK], [Enable minimum parameter check for system librar
 AH_TEMPLATE([PATCH_LEVEL], [Define a patch level (numeric, max. 8 digits)])
 AH_TEMPLATE([MAX_CALL_FIELD_PARAMS], [Define maximum parameters for CALL])
 AH_TEMPLATE([WITH_MATH], [Math multiple precision library])
-AH_TEMPLATE([WITH_INDEX_EXTFH], [Compile with an external ISAM handler])
-AH_TEMPLATE([WITH_SEQRA_EXTFH], [Compile with an external SEQ/RAN handler])
-AH_TEMPLATE([WITH_DB], [Use Berkeley DB library as emulation of ISAM handler])
+AH_TEMPLATE([WITH_INDEX_EXTFH], [Compile with obsolete external INDEXED handler])
+AH_TEMPLATE([WITH_SEQRA_EXTFH], [Compile with obsolete external SEQ/RAN handler])
+AH_TEMPLATE([WITH_DB], [Use Berkeley DB library as INDEXED handler])
 # FIXME: may be specified with different file version
 # AH_TEMPLATE([COB_BDB_BAD_DUPNO], [Retain incorrect duplicate sequence for compatibility on little endian!])
-AH_TEMPLATE([WITH_CISAM], [Use CISAM as ISAM handler])
-AH_TEMPLATE([WITH_DISAM], [Use DISAM as ISAM handler])
-AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as ISAM handler])
+AH_TEMPLATE([WITH_CISAM], [Use CISAM as INDEXED handler])
+AH_TEMPLATE([WITH_DISAM], [Use DISAM as INDEXED handler])
+AH_TEMPLATE([WITH_VBISAM], [Use VBISAM as INDEXED handler])
 
 AH_TEMPLATE([WITH_XML2], [Use libxml2 as XML handler])
 AH_TEMPLATE([WITH_JSON], [JSON handler])
@@ -1308,7 +1308,7 @@ LIBS="$curr_libs" # removing curses
 
 AC_ARG_WITH([seqra-extfh],
   [AS_HELP_STRING([--with-seqra-extfh],
-    [(GnuCOBOL) Use external SEQ/RAN file handler])],
+    [(GnuCOBOL) Use external SEQ/RAN handler (obsolete)])],
   [ if test "$with_seqra_extfh" = "yes"; then
 	AC_DEFINE([WITH_SEQRA_EXTFH], [1])
     fi ],
@@ -1316,7 +1316,7 @@ AC_ARG_WITH([seqra-extfh],
 
 AC_ARG_WITH([cisam],
   [AS_HELP_STRING([--with-cisam],
-    [(GnuCOBOL) Use CISAM for ISAM I/O])],
+    [(GnuCOBOL) Use CISAM for INDEXED I/O])],
   [ if test "$with_cisam" = "yes"; then
 	AC_CHECK_HEADERS([isam.h], [],
 		AC_MSG_ERROR([isam.h is required for CISAM]))
@@ -1330,7 +1330,7 @@ AC_ARG_WITH([cisam],
 AS_IF([test "$with_cisam" != "yes"], [
   AC_ARG_WITH([disam],
   [AS_HELP_STRING([--with-disam],
-    [(GnuCOBOL) Use DISAM for ISAM I/O])],
+    [(GnuCOBOL) Use DISAM for INDEXED I/O])],
   [ if test "$with_disam" = "yes"; then
 	AC_CHECK_HEADERS([disam.h], [],
 		AC_MSG_ERROR([disam.h is required for DISAM]))
@@ -1374,7 +1374,7 @@ AS_IF([test "$with_cisam" != "yes" -a "$with_disam" != "yes"], [
 AS_IF([test "$with_cisam" != "yes" -a "$with_disam" != "yes" -a "$with_vbisam" != "yes"], [
   AC_ARG_WITH([index-extfh],
   [AS_HELP_STRING([--with-index-extfh],
-    [(GnuCOBOL) Use external ISAM file handler])],
+    [(GnuCOBOL) Use external ISAM file handler (obsolete)])],
   [ if test "$with_index_extfh" = "yes"; then
 	AC_DEFINE([WITH_INDEX_EXTFH], [1])
     fi ],
@@ -2191,23 +2191,25 @@ case "$USE_CURSES" in
 	;;
 esac
 if test "$with_debug_log" = "yes"; then
-  AC_MSG_NOTICE([ Enabled Compiler Developer logger:           yes])
+  AC_MSG_NOTICE([ Enable GnuCOBOL developer logging            yes])
 fi
 if test "$with_seqra_extfh" = "yes"; then
   AC_MSG_NOTICE([ Use external SEQ/RAN file handler:           yes])
+  AC_MSG_WARN([ Obsolete feature "OpenCOBOL-only-EXTFH" used!])
 fi
 if test "$with_index_extfh" = "yes"; then
-  AC_MSG_NOTICE([ Use external ISAM file handler:              yes])
+  AC_MSG_NOTICE([ Use external INDEXED file handler:           yes])
+  AC_MSG_WARN([ Obsolete feature "OpenCOBOL-only-EXTFH" used!])
 elif test "$with_cisam" = "yes"; then
-  AC_MSG_NOTICE([ Use CISAM for ISAM I/O:                      yes])
+  AC_MSG_NOTICE([ Use CISAM for INDEXED I/O:                   yes])
 elif test "$with_disam" = "yes"; then
-  AC_MSG_NOTICE([ Use DISAM for ISAM I/O:                      yes])
+  AC_MSG_NOTICE([ Use DISAM for INDEXED I/O:                   yes])
 elif test "$with_vbisam" = "yes"; then
-  AC_MSG_NOTICE([ Use VBISAM for ISAM I/O:                     yes])
+  AC_MSG_NOTICE([ Use VBISAM for INDEXED I/O:                  yes])
 elif test "$with_db" = "yes"; then
-  AC_MSG_NOTICE([ Use Berkeley DB for ISAM I/O:                yes])
+  AC_MSG_NOTICE([ Use Berkeley DB for INDEXED I/O:             yes])
 else
-  AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
+  AC_MSG_NOTICE([ INDEXED I/O (no handler configured):         NO])
 fi
 
 case "$with_xml2" in

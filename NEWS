@@ -67,6 +67,12 @@ NEWS - user visible changes				-*- outline -*-
    which will now raise an error "unsigned integer expected";
    if used replace by standard "LINE / COL +/- integer"
 
+* Obsolete features (will be removed in the next version if no explicit user
+  requests are raised)
+
+** support for Borland C compiler and linker
+** -fif-cutoff flag for cobc (currently disabled, see entry below in 3.0rc1)
+** old OpenCOBOL-only-EXTFH
 
 * Changes to the COBOL compiler (cobc) options:
 
