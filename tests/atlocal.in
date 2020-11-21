@@ -135,14 +135,14 @@ export COB_UNIX_LF
 # for runtime configuration ...
 COB_RUNTIME_CONFIG="${abs_top_srcdir}/config/runtime_empty.cfg"
 export COB_RUNTIME_CONFIG
-for cobenv in $(${LOCAL_ENV} ${COBCRUN} --runtime-conf \
+for cobenv in $(${LOCAL_ENV} ${ABS_COBCRUN} --runtime-conf \
                  | grep " env:" | cut -d: -f2 | cut -d= -f1 \
                  | grep -v "PATH" | grep -v "TERM"); \
 	do _unset_option $cobenv; \
 done
 
 # prevent multiple calls by caching the output
-${LOCAL_ENV} ${COBC} --info > info.out
+${LOCAL_ENV} ${ABS_COBC} --info > info.out
 
 # ... and also unset for the compiler
 if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
@@ -202,6 +202,7 @@ else
 	else
 		COB_HAS_JSON="no"
 	fi
+	# see note below
 	if test $(grep -i -c " screen .*disabled" info.out) = 0; then
 		COB_HAS_CURSES="yes"
 	else
@@ -228,6 +229,7 @@ fi
 
 rm -rf info.out
 
+# NIST tests (tests/cobol85) are executed in a separate perl process with a new environment --> export needed
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT

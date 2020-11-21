@@ -1,4 +1,12 @@
 
+2020-11-21  Simon Sobisch <simonsobisch@gnu.org>
+
+	* valgrind.supp: suppression file for bash + bdb errors (commonly not
+	  shipped with the OS)
+	* atlocal_valgrind: default to suppress via valgrind.supp;
+	  log name not build from parameter passed to the script any more;
+	  updated usage-notes
+
 2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
 
 	* general: pass AWK, GREP, SED to the testsuite and use those
