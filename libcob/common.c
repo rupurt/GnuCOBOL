@@ -8364,11 +8364,8 @@ cob_init (const int argc, char **argv)
 		 * nonempty string, it writes to stderr instead. See:
 		 *https://code.woboq.org/userspace/glibc/sysdeps/posix/libc_fatal.c.html
 		 */
-		static char glibc_magic_name[] = "LIBC_FATAL_STDERR_";
-		static char glibc_magic_set[] = "LIBC_FATAL_STDERR_=keep_off_the_grass";
-	
-		if( getenv (glibc_magic_name) == NULL ) { /* don't override user-settings */
-			(void)putenv (glibc_magic_set);
+		if( getenv ((const char*)"LIBC_FATAL_STDERR_") == NULL ) {
+			(void)putenv ((char*)"LIBC_FATAL_STDERR_=keep_off_the_grass");
 		}
 	}
 #endif
