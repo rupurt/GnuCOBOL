@@ -1022,13 +1022,12 @@ ix_bdb_delete_internal (cob_file *f, const int rewrite, int bdb_opts)
 
 	/* Delete the secondary keys */
 	for (i = 1; i < (int)(f->nkeys); ++i) {
-		len = db_savekey(f, p->suppkey, p->data.data, i);
-		memset(p->savekey, 0, p->maxkeylen);
 		len = db_savekey(f, p->savekey, p->saverec, i);
 		p->key.data = p->savekey;
 		p->key.size = (cob_dbtsize_t) len;
 		/* rewrite: no delete if secondary key is unchanged */
 		if (rewrite) {
+			db_savekey(f, p->suppkey, p->saverec, i);
 			p->rewrite_sec_key[i] = db_cmpkey(f, p->suppkey, f->record->data, i, 0);
 			if (!p->rewrite_sec_key[i]) {
 				continue;

@@ -88,7 +88,7 @@ db_savekey (cob_file *f, unsigned char *keyarea, unsigned char *record, int idx)
 {
 	int totlen, part;
 
-	if (f->keys[idx].count_components > 0) {
+	if (f->keys[idx].count_components > 1) {
 		totlen = 0;
 		for (part = 0; part < f->keys[idx].count_components; part++) {
 			memcpy (keyarea + totlen,
