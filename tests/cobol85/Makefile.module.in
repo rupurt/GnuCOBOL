@@ -37,8 +37,11 @@ all:
 .PHONY: test test-local diff test-O test-O-local libs libs-local \
         $(TESTS) $(TESTS_LOCAL)
 
+# note: we use autotest setup files atconfig and atlocal to use the same
+#       test environment as in the testsuite
+
 test:
-	@. ../../atconfig && . ../../atlocal NIST_$@ && $(MAKE) $@-local
+	@. ../../atconfig && . ../../atlocal && $(MAKE) $@-local
 
 test-local:
 	@echo
@@ -51,7 +54,7 @@ diff: report.txt
 	@diff $(DIFF_FLAGS) ##COB85DIR##/##MODULE##.txt report.txt || true
 
 test-O:
-	@. ../../atconfig && . ../../atlocal NIST-##MODULE##-O_$@ && $(MAKE) $@-local
+	@. ../../atconfig && . ../../atlocal && $(MAKE) $@-local
 
 test-O-local:
 	@echo
@@ -60,7 +63,7 @@ test-O-local:
 
 libs:
 	@if test -d lib; then                                                        \
-	 . ../../atconfig && . ../../atlocal NIST-##MODULE##_lib && $(MAKE) $@-local; \
+	 . ../../atconfig && . ../../atlocal && $(MAKE) $@-local; \
 	fi
 
 libs-local:
@@ -71,7 +74,7 @@ libs-local:
 	fi
 
 $(TESTS): libs
-	@. ../../atconfig && . ../../atlocal NIST_$@ && $(MAKE) $@-local
+	@. ../../atconfig && . ../../atlocal && $(MAKE) $@-local
 
 $(TESTS_LOCAL): libs-local
 	@echo "Running single test `echo $@ | sed -e 's|-.*||g'`"

@@ -1404,7 +1404,7 @@ cob_gen_cisam=no
 
   AC_ARG_WITH([vbisam],
   [AS_HELP_STRING([--with-vbisam],
-    [(GnuCOBOL) Use VBISAM for ISAM I/O])],
+    [(GnuCOBOL) Use VBISAM for INDEXED I/O])],
   [ if test "$with_vbisam" = "yes"; then
 	AC_CHECK_HEADERS([vbisam.h], [],
 		AC_MSG_ERROR([vbisam.h is required for VBISAM]))
@@ -1424,7 +1424,7 @@ cob_gen_cisam=no
 AS_IF([test "$with_cisam" != "yes"], [
   AC_ARG_WITH([disam],
   [AS_HELP_STRING([--with-disam],
-    [(GnuCOBOL) Use DISAM for ISAM I/O])],
+    [(GnuCOBOL) Use DISAM for INDEXED I/O])],
   [ if test "$with_disam" = "yes"; then
 	AC_CHECK_HEADERS([disam.h], [],
 		AC_MSG_ERROR([disam.h is required for DISAM]))
@@ -1480,7 +1480,7 @@ fi
 
 AC_ARG_WITH([index-extfh],
 [AS_HELP_STRING([--with-index-extfh],
-  [(GnuCOBOL) Use external ISAM handler (obsolete)])],
+  [(GnuCOBOL) Use external INDEXED handler (obsolete)])],
 [ if test "$with_index_extfh" = "yes"; then
   AC_DEFINE([WITH_INDEX_EXTFH], [1])
   fi ],
@@ -2431,34 +2431,36 @@ if test "$with_debug_log" = "yes"; then
 fi
 if test "$with_seqra_extfh" = "yes"; then
   AC_MSG_NOTICE([ Use external SEQ/RAN file handler:           yes])
+  AC_MSG_WARN([ Obsolete feature "OpenCOBOL-only-EXTFH" used!])
 fi
 if test "$with_index_extfh" = "yes"; then
-  AC_MSG_NOTICE([ Use external ISAM file handler               yes])
+  AC_MSG_NOTICE([ Use external INDEXED file handler            yes])
+  AC_MSG_WARN([ Obsolete feature "OpenCOBOL-only-EXTFH" used!])
 fi
 if test "$with_vbisam" = "yes"; then
-  AC_MSG_NOTICE([ Use VBISAM for ISAM I/O                      yes])
+  AC_MSG_NOTICE([ Use VBISAM for INDEXED I/O                   yes])
 fi
 if test "$with_disam" = "yes"; then
-  AC_MSG_NOTICE([ Use DISAM for ISAM I/O                       yes])
+  AC_MSG_NOTICE([ Use DISAM for INDEXED I/O                    yes])
 fi
 if test "$with_cisam" = "yes"; then
-  AC_MSG_NOTICE([ Use CISAM for ISAM I/O                       yes])
+  AC_MSG_NOTICE([ Use CISAM for INDEXED I/O                    yes])
 fi
 if test "$with_db" = "yes"; then
-  AC_MSG_NOTICE([ Use Berkeley DB for ISAM I/O:                yes])
+  AC_MSG_NOTICE([ Use Berkeley DB for INDEXED I/O:             yes])
 fi
 if test "$with_lmdb" = "yes"; then
-  AC_MSG_NOTICE([ Use LMDB for ISAM I/O:                       yes])
+  AC_MSG_NOTICE([ Use LMDB for INDEXED I/O:                    yes])
 fi
 if test "$with_odbc" = "yes"; then
-  AC_MSG_NOTICE([ Use ODBC for ISAM I/O:                       yes])
+  AC_MSG_NOTICE([ Use ODBC for INDEXED I/O:                    yes])
 fi
 if test "$with_oci" = "yes"; then
-  AC_MSG_NOTICE([ Use Oracle DB (OCI) for ISAM I/O:            yes])
+  AC_MSG_NOTICE([ Use Oracle DB (OCI) for INDEXED I/O:         yes])
 fi
 
 if test "$COB_HAS_ISAM" = no; then
-  AC_MSG_NOTICE([ ISAM I/O (no handler configured):            NO])
+  AC_MSG_NOTICE([ INDEXED I/O (no handler configured):         NO])
 fi
 
 case "$with_xml2" in
