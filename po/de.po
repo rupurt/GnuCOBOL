@@ -4,14 +4,15 @@
 # Simon Sobisch <sf-mensch@users.sourceforge.net>, 2013.
 # Mario Blättermann <mario.blaettermann@gmail.com>, 2017.
 # Roland Illig <roland.illig@gmx.de>, 2019-2020.
+# Christian Kirbach <christian.kirbach@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnucobol-3.1-rc1\n"
+"Project-Id-Version: gnucobol-3.1\n"
 "Report-Msgid-Bugs-To: gnucobol-messages@gnu.org\n"
 "POT-Creation-Date: 2020-11-10 21:48+0100\n"
-"PO-Revision-Date: 2020-07-01 11:34+0200\n"
-"Last-Translator: Roland Illig <roland.illig@gmx.de>\n"
+"PO-Revision-Date: 2020-11-21 21:50+0100\n"
+"Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "X-Poedit-Basepath: ..\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Poedit 2.4.1\n"
 
 #: cobc/cobc.c:94
 #, c-format
@@ -111,22 +112,19 @@ msgid "invalid PROGRAM-ID '%s'%s"
 msgstr "Ungültige PROGRAM-ID »%s«%s"
 
 #: cobc/cobc.c:1709
-#, fuzzy, c-format
-#| msgid "file does not exist"
+#, c-format
 msgid "file '%s' does not exist"
-msgstr "Datei existiert nicht"
+msgstr "Die Datei »%s« existiert nicht"
 
 #: cobc/cobc.c:1735
-#, fuzzy, c-format
-#| msgid "duplicate values in class '%s'"
+#, c-format
 msgid "duplicate exception '%s'"
-msgstr "Doppelte Werte in Klasse »%s«"
+msgstr "Doppelte Ausnahme »%s«"
 
 #: cobc/cobc.c:1780
-#, fuzzy, c-format
-#| msgid "invalid parameter: %s"
+#, c-format
 msgid "invalid exception-name: %s"
-msgstr "Ungültiger Parameter: %s"
+msgstr "Ungültiger Ausnahme-Name: %s"
 
 #: cobc/cobc.c:1917 cobc/cobc.c:8644
 msgid "please check environment variables as noted above"
@@ -206,10 +204,8 @@ msgid "Packaged  %s"
 msgstr "Gepackt   %s"
 
 #: cobc/cobc.c:2375 cobc/cobc.c:2388 cobc/cobc.c:2493 libcob/common.c:7983
-#, fuzzy
-#| msgid "C version %s%s"
 msgid "C version"
-msgstr "C-Version %s%s"
+msgstr "C-Version"
 
 #: cobc/cobc.c:2401
 msgid "executing:"
@@ -520,7 +516,8 @@ msgstr "Unerwartetes CONSTANT-Element"
 msgid "unexpected tree tag: %d"
 msgstr "Unerwartete Kennzeichnungsmarke im Baum: %d"
 
-#: cobc/codegen.c:2926 cobc/codegen.c:3199 cobc/codegen.c:7952 cobc/tree.c:1281
+#: cobc/codegen.c:2926 cobc/codegen.c:3199 cobc/codegen.c:7952
+#: cobc/tree.c:1281
 #, fuzzy, c-format
 msgid "unexpected cast type: %d"
 msgstr "Unerwartete Typumwandlung %d"
@@ -667,7 +664,7 @@ msgstr ""
 
 #: cobc/config.def:57 cobc/config.def:63
 msgid "<number>"
-msgstr ""
+msgstr "<Zahl>"
 
 #: cobc/config.def:58
 msgid "maximum number of characters allowed in the PICTURE character-string"
@@ -807,11 +804,11 @@ msgstr ""
 
 #: cobc/config.def:164
 msgid "COMP-1 is a 16-bit signed integer"
-msgstr ""
+msgstr "COMP-1 ist eine 16-Bit-Glanzzahl mit Vorzeichen"
 
 #: cobc/config.def:167
 msgid "POINTER is a 64-bit unsigned integer"
-msgstr ""
+msgstr "POINTER ist eine 64-Bit-Glanzzahl ohne Vorzeichen"
 
 #: cobc/config.def:170
 msgid "imply zero in move of non-numeric literal to numeric items"
@@ -1054,8 +1051,8 @@ msgstr "REDEFINES muss der ursprünglichen Definition folgen"
 msgid "record sizes does not match RECORD clause"
 msgstr ""
 
-#: cobc/config.def:340 cobc/parser.y:5443 cobc/parser.y:5457 cobc/parser.y:5470
-#: cobc/parser.y:5481
+#: cobc/config.def:340 cobc/parser.y:5443 cobc/parser.y:5457
+#: cobc/parser.y:5470 cobc/parser.y:5481
 msgid "RECORD DELIMITER clause"
 msgstr ""
 
@@ -1108,10 +1105,9 @@ msgid "VSAM status in FILE STATUS"
 msgstr ""
 
 #: cobc/error.c:87
-#, fuzzy, c-format
-#| msgid "in section"
+#, c-format
 msgid "in section '%s':"
-msgstr "Im Abschnitt"
+msgstr "Im Abschnitt »%s«:"
 
 #: cobc/error.c:98
 #, fuzzy, c-format
@@ -1124,9 +1120,9 @@ msgid "too many errors"
 msgstr "zu viele Fehler"
 
 #: cobc/error.c:143
-#, fuzzy, c-format
+#, c-format
 msgid "in file included from "
-msgstr "Ungültige Konfiguration '%s'"
+msgstr "in Datei eingebunden von"
 
 #: cobc/error.c:162 libcob/common.c:7522
 msgid "configuration error:"
@@ -1703,7 +1699,7 @@ msgstr "END PROGRAM '%s' ist unterschiedlich zur PROGRAM-ID '%s'"
 #: cobc/field.c:3056
 #, c-format
 msgid "'%s' and '%s' must be in the same record"
-msgstr ""
+msgstr "»%s« und »%s« müssen im gleichen Datensatz sein"
 
 #: cobc/field.c:3067
 #, fuzzy, c-format
@@ -1801,9 +1797,8 @@ msgstr ""
 "                        und Programm beenden"
 
 #: cobc/flag.def:109
-#, fuzzy
 msgid "  -fcomputed-goto       generate computed goto C statements"
-msgstr "Erzeuge berechnete goto C statements"
+msgstr "  -fcomputed-goto       Berechnete goto C statements erzeugen"
 
 #: cobc/flag.def:112
 msgid "  -falternate-ebcdic    use restricted ASCII to EBCDIC translate"
@@ -1926,9 +1921,8 @@ msgid ""
 msgstr ""
 
 #: cobc/flag.def:193
-#, fuzzy
 msgid "  -fstatic-call         output static function calls for the CALL statement"
-msgstr "Statische Funktionsaufrufe für das CALL Statement ausgeben"
+msgstr "  -fstatic-call         Statische Funktionsaufrufe für das CALL Statement ausgeben"
 
 #: cobc/flag.def:196
 msgid ""
@@ -1965,10 +1959,8 @@ msgid "  -fno-tmessages        suppress warning and error summary from listing"
 msgstr ""
 
 #: cobc/flag.def:218
-#, fuzzy
-#| msgid "  --tsymbols            specify symbols in listing"
 msgid "  -ftsymbols            specify symbols in listing"
-msgstr "  --tsymbols            Symbole für Listing angeben"
+msgstr "  --ftsymbols            Symbole für Listing angeben"
 
 #: cobc/flag.def:221
 msgid ""
@@ -1995,14 +1987,10 @@ msgstr ""
 "oder (noch besser) verwenden Sie das Ticketsystem auf der Homepage."
 
 #: cobc/help.c:51 bin/cobcrun.c:149
-#, fuzzy
-#| msgid "GnuCOBOL home page: <http://www.gnu.org/software/gnucobol/>"
 msgid "GnuCOBOL home page: <https://www.gnu.org/software/gnucobol/>"
 msgstr "Homepage von GnuCOBOL: <https://www.gnu.org/software/gnucobol/>"
 
 #: cobc/help.c:52 bin/cobcrun.c:150
-#, fuzzy
-#| msgid "General help using GNU software: <http://www.gnu.org/gethelp/>"
 msgid "General help using GNU software: <https://www.gnu.org/gethelp/>"
 msgstr "Allgemeine Hilfe zur Verwendung von GNU-Software: <https://www.gnu.org/gethelp/>"
 
@@ -2044,8 +2032,6 @@ msgstr ""
 "                          für eingeschränkte Bildschirme"
 
 #: cobc/help.c:71
-#, fuzzy
-#| msgid "  -###                 like -v but commands not executed"
 msgid "  -###                  like -v but commands not executed"
 msgstr "  -###                 wie -v, aber die Befehle werden nicht ausgeführt"
 
@@ -2088,7 +2074,6 @@ msgid "  -F, -free             use free source format"
 msgstr "  -F, -free             verwendet freies Quellformat"
 
 #: cobc/help.c:83
-#, fuzzy
 msgid "  -fixed                use fixed source format (default)"
 msgstr "  -fixed                Benutze fixed source format (Standard)"
 
@@ -2097,15 +2082,12 @@ msgid "  -O, -O2, -O3, -Os     enable optimization"
 msgstr "  -O, -O2, -O3, -Os     aktiviert die Optimierung"
 
 #: cobc/help.c:85
-#, fuzzy
-#| msgid "  -W                    enable all warnings"
 msgid "  -O0                   disable optimization"
-msgstr "  -W                    schaltet alle Warnungen ein"
+msgstr "  -O0                   Optimierungen ausschalten"
 
 #: cobc/help.c:86
-#, fuzzy
 msgid "  -g                    enable C compiler debug and stack check"
-msgstr "  -g                    C Compiler Debugginginformationen / Stapelprüfungen / Traceinformationen aktivieren"
+msgstr "  -g                    C Compiler Fehlerdiagnoseinformationen und Stapelprüfungen einschalten"
 
 #: cobc/help.c:87
 #, fuzzy
@@ -2128,9 +2110,8 @@ msgstr ""
 "                          einziges dynamisch ladbares Modul"
 
 #: cobc/help.c:96
-#, fuzzy
 msgid "  -E                    preprocess only; do not compile or link"
-msgstr "  -E                    Nur Präprozessor, kein Compiler oder Binder"
+msgstr "  -E                    Nur Präprozessor, nicht übersetzen oder binden"
 
 #: cobc/help.c:97
 msgid "  -C                    translation only; convert COBOL to C"
@@ -2157,10 +2138,8 @@ msgid "  --tlines=<lines>      specify lines per page in listing, default = 55"
 msgstr "  --tlines=<lines>      Anzahl der Zeilen pro Listingseite angeben, Vorgabe ist 55"
 
 #: cobc/help.c:104
-#, fuzzy
-#| msgid "  --tsymbols            specify symbols in listing"
 msgid "  --tsymbols            specify symbols in listing, use -ftsymbols instead"
-msgstr "  --tsymbols            Symbole für Listing angeben"
+msgstr "  --tsymbols            Symbole für Listing angeben. Verwenden Sie stattdessen -ftsymbols"
 
 #: cobc/help.c:106
 msgid "  -P[=<dir or file>]    generate preprocessed program listing (.lst)"
@@ -2248,23 +2227,19 @@ msgstr "  -ext <Dateiendung>      Weitere Standard-Dateiendung hinzufügen"
 
 #: cobc/help.c:134
 msgid "Warning options:"
-msgstr ""
+msgstr "Warneinstellungen:"
 
 #: cobc/help.c:135
 msgid "  -Wall                 enable most warnings (all except as noted below)"
 msgstr "  -Wall                 schaltet alle Warnungen mit Ausnahmen wie folgt ein"
 
 #: cobc/help.c:136
-#, fuzzy
-#| msgid "  -W                    enable all warnings"
 msgid "  -Wextra               like -Wall but enable some extra warning flags"
-msgstr "  -W                    schaltet alle Warnungen ein"
+msgstr "  -Wextra               wie -Wall, aber einige Extra-Warnungen einschalten"
 
 #: cobc/help.c:137
-#, fuzzy
-#| msgid "  -W                    enable all warnings"
 msgid "  -w                    disable all warnings"
-msgstr "  -W                    schaltet alle Warnungen ein"
+msgstr "  -w                    Alle Warnungen ausschalten"
 
 #: cobc/help.c:138
 #, fuzzy
@@ -2274,10 +2249,8 @@ msgstr "  -Wno-<warning>        Warnung ausschalten, die mit -W oder -Wall einge
 
 #. TRANSLATORS: This msgid is appended to msgid for -Wno-pending and others
 #: cobc/help.c:144
-#, fuzzy
-#| msgid "  -W                    enable all warnings"
 msgid "                        * ALWAYS active"
-msgstr "  -W                    schaltet alle Warnungen ein"
+msgstr "                        * IMMER aktiv"
 
 #. TRANSLATORS: This msgid is appended to msgid for -Wpossible-truncate and others
 #: cobc/help.c:148
@@ -2308,7 +2281,7 @@ msgstr "  -Werror=<warning>     die angegebene <warning> als Fehler behandeln"
 
 #: cobc/help.c:172
 msgid "Compiler options:"
-msgstr ""
+msgstr "Compiler-Einstellungen:"
 
 #: cobc/help.c:190
 msgid ""
@@ -2339,7 +2312,7 @@ msgstr "wobei <support> eins von diesen ist:"
 #: cobc/typeck.c:1810
 #, c-format
 msgid "'%s'"
-msgstr ""
+msgstr "»%s«"
 
 #: cobc/help.c:263
 msgid "word to be taken out of the reserved words list"
@@ -2497,10 +2470,9 @@ msgid "%s header missing"
 msgstr ""
 
 #: cobc/parser.y:985
-#, fuzzy, c-format
-#| msgid "duplicate %s clause"
+#, c-format
 msgid "duplicate %s"
-msgstr "Doppelte %s-Klausel"
+msgstr "»%s« duplizieren"
 
 #: cobc/parser.y:987
 #, c-format
@@ -2573,22 +2545,16 @@ msgid "condition-name not allowed here: '%s'"
 msgstr "Element mit Stufe 88 hier nicht zulässig"
 
 #: cobc/parser.y:1557 cobc/parser.y:2139
-#, fuzzy
-#| msgid "'%s' cannot be used here"
 msgid "SCREEN item cannot be used here"
-msgstr "»%s« kann hier nicht verwendet werden"
+msgstr "SCREEN kann hier nicht verwendet werden"
 
 #: cobc/parser.y:1560
-#, fuzzy
-#| msgid "'%s' cannot be used here"
 msgid "REPORT item cannot be used here"
-msgstr "»%s« kann hier nicht verwendet werden"
+msgstr "REPORT kann hier nicht verwendet werden"
 
 #: cobc/parser.y:1566
-#, fuzzy
-#| msgid "'%s' cannot be used here"
 msgid "TYPEDEF item cannot be used here"
-msgstr "»%s« kann hier nicht verwendet werden"
+msgstr "TYPEDEF kann hier nicht verwendet werden"
 
 #: cobc/parser.y:1575
 #, fuzzy
@@ -2874,8 +2840,8 @@ msgstr "Doppelte Werte in Klasse »%s«"
 msgid "file cannot have both EXTERNAL and GLOBAL clauses"
 msgstr ""
 
-#: cobc/parser.y:5954 cobc/parser.y:6534 cobc/parser.y:6996 cobc/parser.y:12513
-#: cobc/parser.y:15489
+#: cobc/parser.y:5954 cobc/parser.y:6534 cobc/parser.y:6996
+#: cobc/parser.y:12513 cobc/parser.y:15489
 #, c-format
 msgid "%s is invalid in a user FUNCTION"
 msgstr ""
@@ -2931,10 +2897,9 @@ msgid "%s requires a data name"
 msgstr "%s benötigt Angabe eines Datennamens"
 
 #: cobc/parser.y:6923
-#, fuzzy, c-format
-#| msgid "%s not allowed on %s files"
+#, c-format
 msgid "%s not allowed in %s"
-msgstr "%s nicht zulässig für %s Dateien"
+msgstr "%s ist nicht zulässig in %s"
 
 #: cobc/parser.y:6944 cobc/parser.y:6998 cobc/parser.y:7713 cobc/parser.y:7796
 #: cobc/parser.y:7820
@@ -4013,7 +3978,8 @@ msgid "hexadecimal-boolean literal"
 msgstr "Numerisches Literal ist negativ"
 
 #: cobc/scanner.l:1359 cobc/scanner.l:1373 cobc/scanner.l:1488
-#: cobc/scanner.l:1547 cobc/scanner.l:1645 cobc/scanner.l:1714 cobc/tree.c:2540
+#: cobc/scanner.l:1547 cobc/scanner.l:1645 cobc/scanner.l:1714
+#: cobc/tree.c:2540
 #, fuzzy, c-format
 msgid "literal length %d exceeds %d characters"
 msgstr "PROGRAM Name überschreitet 31 Zeichen"
@@ -4236,7 +4202,7 @@ msgstr ""
 
 #: cobc/tree.c:2800
 msgid "B, 0 or /"
-msgstr ""
+msgstr "B, 0 oder /"
 
 #: cobc/tree.c:2814
 msgid "the sign of the floating-point exponent"
@@ -4244,11 +4210,11 @@ msgstr ""
 
 #: cobc/tree.c:2816
 msgid "a leading +/- sign"
-msgstr ""
+msgstr "ein führendes »+« oder »-«"
 
 #: cobc/tree.c:2818
 msgid "a trailing +/- sign"
-msgstr ""
+msgstr "ein angehängtes »+« oder »-«"
 
 #: cobc/tree.c:2820
 msgid "CR or DB"
@@ -4256,11 +4222,11 @@ msgstr ""
 
 #: cobc/tree.c:2822
 msgid "a leading currency symbol"
-msgstr ""
+msgstr "Ein führendes Währungssymbol"
 
 #: cobc/tree.c:2824
 msgid "a trailing currency symbol"
-msgstr ""
+msgstr "Ein angehängtes Währungssymbol"
 
 #: cobc/tree.c:2826
 msgid "a Z or * which is before the decimal point"
@@ -4288,7 +4254,7 @@ msgstr ""
 
 #: cobc/tree.c:2840
 msgid "A or X"
-msgstr ""
+msgstr "A oder X"
 
 #: cobc/tree.c:2846
 msgid "a P which is before the decimal point"
@@ -4374,7 +4340,7 @@ msgstr ""
 
 #: cobc/tree.c:3228
 msgid "exponent"
-msgstr ""
+msgstr "Exponent"
 
 #: cobc/tree.c:3281
 msgid "S must be at start of PICTURE string"
@@ -4448,10 +4414,9 @@ msgid "minimal record length %d can not hold the key item '%s'; needs to be at l
 msgstr ""
 
 #: cobc/tree.c:4304
-#, fuzzy, c-format
-#| msgid "missing definitions:"
+#, c-format
 msgid "missing file description for %s"
-msgstr "Fehlende Definitionen:"
+msgstr "Fehlende Dateibeschreibung für %s"
 
 #: cobc/tree.c:4348
 #, c-format
@@ -4460,7 +4425,7 @@ msgstr ""
 
 #: cobc/tree.c:4351 cobc/tree.c:4368
 msgid "file size adjusted"
-msgstr ""
+msgstr "Dateigröße angepasst"
 
 #: cobc/tree.c:4363
 #, c-format
@@ -4535,10 +4500,9 @@ msgid "invalid expression"
 msgstr "Ungültiger Ausdruck"
 
 #: cobc/tree.c:5627
-#, fuzzy, c-format
-#| msgid "invalid expression"
+#, c-format
 msgid "invalid expression: %s %s %s"
-msgstr "Ungültiger Ausdruck"
+msgstr "Ungültiger Ausdruck: %s %s %s"
 
 #: cobc/tree.c:5675
 #, c-format
@@ -4685,7 +4649,7 @@ msgstr "»%s« ist kein numerischer Wert"
 #: cobc/typeck.c:735
 #, c-format
 msgid "'%s' is not an integer value"
-msgstr ""
+msgstr "»%s« ist kein Ganzzahl-Wert"
 
 #: cobc/typeck.c:739
 msgid "positive numeric integer is required here"
@@ -5376,7 +5340,7 @@ msgstr ""
 #: cobc/typeck.c:8557
 #, c-format
 msgid "value is %s"
-msgstr ""
+msgstr "Wert ist »%s«"
 
 #: cobc/typeck.c:8561
 #, c-format
@@ -5956,16 +5920,14 @@ msgid "%s: option '%s%s' requires an argument"
 msgstr "%s: Option »%s« erfordert ein Argument"
 
 #: libcob/cobgetopt.c:689
-#, fuzzy, c-format
-#| msgid "%s: invalid option -- %c"
+#, c-format
 msgid "%s: invalid option -- '%c'"
-msgstr "%s: Ungültige Option -- %c"
+msgstr "%s: Ungültige Option -- »%c«"
 
 #: libcob/cobgetopt.c:707 libcob/cobgetopt.c:754
-#, fuzzy, c-format
-#| msgid "%s: option requires an argument -- %c"
+#, c-format
 msgid "%s: option requires an argument -- '%c'"
-msgstr "%s: Option erfordert ein Argument -- %c"
+msgstr "%s: Option erfordert ein Argument -- »%c«"
 
 #: libcob/common.c:846
 #, c-format
@@ -5975,12 +5937,12 @@ msgstr "Versuch auf nicht bereitgestellten Arbeitsspeicher zuzugreifen"
 #: libcob/common.c:851
 #, c-format
 msgid "bus error"
-msgstr ""
+msgstr "Busfehler"
 
 #: libcob/common.c:856
 #, c-format
 msgid "fatal arithmetic error"
-msgstr ""
+msgstr "Schwerwiegender arithmetischer Fehler"
 
 #: libcob/common.c:860
 #, c-format
@@ -6002,17 +5964,14 @@ msgid "field with NULL address"
 msgstr ""
 
 #: libcob/common.c:2488 libcob/common.c:7781 libcob/common.c:7795
-#, fuzzy
-#| msgid "error: version mismatch"
 msgid "version mismatch"
-msgstr "Fehler: Versionsnummern stimmen nicht überein"
+msgstr "Versionsnummer stimmt nicht überein"
 
 #: libcob/common.c:2489 libcob/common.c:2491 libcob/common.c:7782
 #: libcob/common.c:7784
-#, fuzzy, c-format
-#| msgid "%s has version/patch level %s/%d"
+#, c-format
 msgid "%s has version %s.%d"
-msgstr "%s hat die Version/das Patchlevel %s/%d"
+msgstr "%s hat die Version %s.%d"
 
 #: libcob/common.c:2504
 #, fuzzy, c-format
@@ -6113,8 +6072,7 @@ msgstr ""
 
 #: libcob/common.c:6106 libcob/common.c:6127 libcob/common.c:6140
 #: libcob/common.c:8300
-#, fuzzy, c-format
-#| msgid " (default)"
+#, c-format
 msgid "(default)"
 msgstr " (Standard)"
 
@@ -6123,8 +6081,6 @@ msgid "should be unsigned"
 msgstr ""
 
 #: libcob/common.c:6394 libcob/common.c:6443
-#, fuzzy
-#| msgid "must be numeric"
 msgid "should be numeric"
 msgstr "muss numerisch sein"
 
@@ -6145,10 +6101,9 @@ msgid "not set"
 msgstr ""
 
 #: libcob/common.c:6640 libcob/common.c:6643 libcob/common.c:6646
-#, fuzzy, c-format
-#| msgid "Written by %s\n"
+#, c-format
 msgid "set by %s"
-msgstr "Geschrieben von %s\n"
+msgstr "Festlegt durch %s"
 
 #: libcob/common.c:6763
 #, c-format
@@ -6166,10 +6121,8 @@ msgid "WARNING - '%s %s' without a value - ignored!"
 msgstr ""
 
 #: libcob/common.c:7287
-#, fuzzy
-#| msgid "error: "
 msgid "error"
-msgstr "Fehler: "
+msgstr "Fehler"
 
 #: libcob/common.c:7329
 msgid "attempt to CANCEL active program"
@@ -6391,7 +6344,7 @@ msgstr "Konfiguration der Laufzeitumgebung"
 
 #: libcob/common.c:8161
 msgid "via"
-msgstr ""
+msgstr "via"
 
 #: libcob/common.c:8234 libcob/common.c:8262
 msgid "... removed from environment"

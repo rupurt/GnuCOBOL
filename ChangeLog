@@ -1,4 +1,9 @@
 
+2020-11-21  Simon Sobisch <simonsobisch@gnu.org>
+
+	* configure.ac, NEWS: explicit note about obsolete OpenCOBOL-EXTFH
+	  and BorlandC
+
 2020-11-12  Simon Sobisch <simonsobisch@gnu.org>
 
 	* mf/ax_ac_define_resolved.m4: fixed resolving passed --prefix

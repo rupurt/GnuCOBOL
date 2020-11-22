@@ -1659,8 +1659,8 @@ COB_EXPIMP int	cob_putenv			(char *);
 COB_EXPIMP void	cob_check_version		(const char *, const char *,
 						 const int);
 
-COB_EXPIMP void	*cob_save_func			(cob_field **, const int,
-						 const int, ...);
+COB_EXPIMP struct cob_func_loc *cob_save_func	(cob_field **,
+									const int, const int, ...);
 COB_EXPIMP void	cob_restore_func		(struct cob_func_loc *);
 
 COB_EXPIMP void	cob_accept_arg_number		(cob_field *);

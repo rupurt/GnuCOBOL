@@ -2406,7 +2406,7 @@ cob_module_free (cob_module **module)
 
 /* save module environment - returns an allocated cob_func_loc (free at cob_restore_func)
    and the intermediate return field (must be freed by caller) */
-void *
+struct cob_func_loc *
 cob_save_func (cob_field **savefld, const int params,
 	       const int eparams, ...)
 {
@@ -2423,6 +2423,7 @@ cob_save_func (cob_field **savefld, const int params,
 
 	/* Allocate return field */
 	*savefld = cob_malloc (sizeof (cob_field));
+
 	/* Allocate save area */
 	fl = cob_malloc (sizeof (struct cob_func_loc));
 	fl->func_params = cob_malloc (sizeof (void *) * ((size_t)numparams + 1U));
