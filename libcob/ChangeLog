@@ -9,6 +9,10 @@
 	* common.c (cob_init) [__GLIBC__]: set LIBC_FATAL_STDERR_ to prevent
 	  glibc from writing stack traces to /dev/tty.
 
+2020-11-13  James K. Lowden  <jklowden@symas.com>
+
+	* common.c (cob_check_version): support 3-part version strings
+
 2020-11-01  Ron Norman <rjn@inglenet.com>
 
 	* fsqlxfd.c: use cob_str_case_str instead of strcasestr

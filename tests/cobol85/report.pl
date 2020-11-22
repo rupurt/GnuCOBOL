@@ -276,9 +276,12 @@ printf LOG_TIME ("Total       %8.4f\n\n", ($global_end - $global_start));
 
 sub compile_lib {
 	my $in = $_[0];
+	# export identifier in at_group (originally for autotest)
+	# (mainly for use with external tools like valgrind)
+	$ENV{"at_group"} = "NIST_lib_" + substr($in,3);
 	print "$compile_module $in\n";
 	my $local_start = time;
-	$ret = system ("$TRAP  $compile_module $in");
+	$ret = system ("$TRAP $compile_module $in");
 	if ($ret != 0) {
 		if (($ret >> 8) == 77) {
 			die "Interrupted\n";
@@ -297,6 +300,10 @@ sub run_test {
 
 	$exe =~ s/\.CBL//;
 	$exe =~ s/\.SUB//;
+	
+	# export identifier in at_group (originally for autotest)
+	# (mainly for use with external tools like valgrind)
+	$ENV{"at_group"} = "NIST_$exe";
 
 	my $line_prefix = sprintf("%-11s", $in);
 	if ($skip{$exe}) {

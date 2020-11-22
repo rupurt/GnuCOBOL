@@ -32,13 +32,20 @@ COB_WIN_BUILDPATH="$COB_SRC_PATH/build_windows/x64/Debug"
 COBC="cobc.exe"
 COBCRUN="cobcrun.exe"
 COBCRUN_DIRECT="" # used for running created executables through tools
+LOCAL_ENV=""
 
 PATH="${COB_WIN_BUILDPATH}:${PATH}"
 export PATH
 
+AWK=awk
+GREP=grep
+SED=sed
+export AWK GREP SED
+
 # be sure to use the English messages
 LC_ALL=C
 export LC_ALL
+unset LANG
 
 # workaround to adjust the testsuite later:
 # FLAGS="-debug -Wall ${COBOL_FLAGS}"
@@ -61,7 +68,6 @@ _unset_option () {
 	     -a "$1" != "COB_LIBRARY_PATH" \
 	     -a "$1" != "COB_CFLAGS" \
 	     -a "$1" != "COB_LIBS" \
-	     -a "$1" != "COB_MSG_FORMAT" \
 	     -a "$1" != "COB_UNIX_LF"; then
 		unset $1
 	fi
@@ -97,27 +103,34 @@ export COB_CONFIG_DIR COB_COPY_DIR
 #export LD_LIBRARY_PATH DYLD_LIBRARY_PATH SHLIB_PATH LIBPATH
 export COB_LIBRARY_PATH
 COB_UNIX_LF=1
-COB_MSG_FORMAT=GCC
-export COB_UNIX_LF COB_MSG_FORMAT
+export COB_UNIX_LF
 
 # unset all environment variables that are used in libcob
 # for runtime configuration ...
 COB_RUNTIME_CONFIG="$(_return_path "${abs_top_srcdir}/config/runtime_empty.cfg")"
 export COB_RUNTIME_CONFIG
-for cobenv in $("${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1); \
+for cobenv in $(${LOCAL_ENV} ${ABS_COBCRUN} --runtime-conf \
+                 | grep " env:" | cut -d: -f2 | cut -d= -f1 \
+                 | grep -v "PATH" | grep -v "TERM"); \
 	do _unset_option $cobenv; \
 done
 
 # prevent multiple calls by caching the output
-${COBC} --info > info.out
+${LOCAL_ENV} ${ABS_COBC} --info > info.out
 
 # ... and also unset for the compiler
-for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
-	do _unset_option $cobenv; \
-done
+if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
+	for cobenv in $(grep "env:" info.out | cut -d: -f2 | cut -d= -f1 \
+	              | grep -v "PATH"); \
+		do _unset_option $cobenv; \
+	done
+fi
 
 COB_STACKTRACE=0
 export COB_STACKTRACE
+
+COB_MSG_FORMAT=GCC
+export COB_MSG_FORMAT
 
 # different flags checked in the testsuite
 # note: kept intended to ease merge from atlocal.in
@@ -130,18 +143,19 @@ export COB_STACKTRACE
 	else
 		COB_BIGENDIAN="no"
 	fi
-
 	COB_HAS_64_BIT_POINTER=$(grep "64bit-mode" info.out | cut -d: -f2 | cut -b2-)
+
 	cob_indexed=$(grep -i "indexed file" info.out | cut -d: -f2)
-	case $(grep -i "indexed file" info.out | cut -d: -f2) in
+	case "$cob_indexed" in
 	" disabled")	COB_HAS_ISAM="no";;
 	" BDB") 		COB_HAS_ISAM="db";;
 	" VBISAM"*)	COB_HAS_ISAM="vbisam";;
 	" D-ISAM")	COB_HAS_ISAM="disam";;
 	" C-ISAM")	COB_HAS_ISAM="cisam";;
 	" EXTFH")	COB_HAS_ISAM="index_extfh";;
-	*)		echo "unknown entry -$cob_indexed- please report" && exit 1;;
+	*)		echo "unknown entry for indexed handler: '"$cob_indexed"' please report" && exit 1;;
 	esac
+
 	if test $(grep -i -c "XML library.*disabled" info.out) = 0; then
 		COB_HAS_XML2="yes"
 	else
@@ -152,17 +166,34 @@ export COB_STACKTRACE
 	else
 		COB_HAS_JSON="no"
 	fi
-
-	COB_HAS_CURSES="no"
-#if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
+	# see note below
+	if test $(grep -i -c " screen .*disabled" info.out) = 0; then
+		COB_HAS_CURSES="yes"
+	else
+		COB_HAS_CURSES="no"
+	fi
+fi
+if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 	# running MSYS builds as not-visible child processes result in
-	# "Redirection is not supported" (old PDcurses) and exit 127 (NCurses)
-	# --> disabling the tests for this feature, uncomment if fixed in the curses library
-	#if test $(grep -i -c "screen .*: .*curses" info.out) = 1; then
-	#	COB_HAS_CURSES="yes"
-	#fi
-#fi
+	# "Redirection is not supported" (at least old PDcurses)
+	# --> disabling the tests for this feature
+	# ncurses is known to work as long as TERM is appropriate
+	if test $(grep -i -c "ncurses" info.out) != 0; then
+		if test "x$MSYSTEM" != "x"; then
+			TERM=""
+		else
+			TERM="xterm"
+		fi
+		export TERM
+		# no change here... COB_HAS_CURSES="yes"
+	else
+		COB_HAS_CURSES="no"
+	fi
+fi
 
+rm -rf info.out
+
+# NIST tests (tests/cobol85) are executed in a separate perl process with a new environment --> export needed
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT

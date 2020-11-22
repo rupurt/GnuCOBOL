@@ -33,6 +33,7 @@ if test "$GNUCOBOL_ENV_SETUP" != "1" -a "$GNUCOBOL_TEST_LOCAL" != "1"; then
 	PATH="${abs_top_builddir}/libcob/.libs:${PATH}"
 	PATH="${abs_top_builddir}/cobc:${abs_top_builddir}/bin:${PATH}"
 	export PATH
+	LOCAL_ENV="${abs_top_builddir}/pre-inst-env"
 else
 	if test "x${COBC}" = "x"; then
 		COBC="cobc@COB_EXE_EXT@"
@@ -43,6 +44,7 @@ else
 	if test "x${COBCRUN_DIRECT}" = "x"; then
 		COBCRUN_DIRECT=""
 	fi
+	LOCAL_ENV=""
 fi
 
 if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
@@ -53,9 +55,15 @@ else
 	ABS_COBCRUN="$(which cobcrun)"
 fi
 
+AWK=@AWK@
+GREP=@GREP@
+SED=@SED@
+export AWK GREP SED
+
 # be sure to use the English messages
 LC_ALL=C
 export LC_ALL
+unset LANG
 
 # workaround to adjust the testsuite later:
 # FLAGS="-debug -Wall ${COBOL_FLAGS}"
@@ -98,7 +106,9 @@ else
 fi
 export PATHSEP
 
-exec_prefix="@prefix@" # this is is likely referenced in the LIBS entries below
+# entries likely referenced in the LIBS entries below
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
 
 # options that are also used in pre-inst-env (always add to both)
 # but not directly in the testsuite
@@ -125,17 +135,22 @@ export COB_UNIX_LF
 # for runtime configuration ...
 COB_RUNTIME_CONFIG="${abs_top_srcdir}/config/runtime_empty.cfg"
 export COB_RUNTIME_CONFIG
-for cobenv in $("${abs_top_builddir}/pre-inst-env" ${COBCRUN} --runtime-conf | grep COB_ | cut -d: -f2 | cut -d= -f1); \
+for cobenv in $(${LOCAL_ENV} ${ABS_COBCRUN} --runtime-conf \
+                 | grep " env:" | cut -d: -f2 | cut -d= -f1 \
+                 | grep -v "PATH" | grep -v "TERM"); \
 	do _unset_option $cobenv; \
 done
 
 # prevent multiple calls by caching the output
-"${abs_top_builddir}/pre-inst-env" ${COBC} --info > info.out
+${LOCAL_ENV} ${ABS_COBC} --info > info.out
 
 # ... and also unset for the compiler
-for cobenv in $(grep "COB_" info.out | cut -d: -f1 | grep -v "env"); \
-	do _unset_option $cobenv; \
-done
+if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
+	for cobenv in $(grep "env:" info.out | cut -d: -f2 | cut -d= -f1 \
+	              | grep -v "PATH"); \
+		do _unset_option $cobenv; \
+	done
+fi
 
 COB_STACKTRACE=0
 export COB_STACKTRACE
@@ -146,11 +161,11 @@ if test "$GNUCOBOL_TEST_LOCAL" != "1"; then
 	COB_OBJECT_EXT="@COB_OBJECT_EXT@"
 	COB_EXE_EXT="@COB_EXE_EXT@"
 	COB_BIGENDIAN="@COB_BIGENDIAN@"
+	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
 	COB_HAS_ISAM="@COB_HAS_ISAM@"
 	COB_HAS_XML2="@COB_HAS_XML2@"
 	COB_HAS_JSON="@COB_HAS_JSON@"
 	COB_HAS_CURSES="@COB_HAS_CURSES@"
-	COB_HAS_64_BIT_POINTER="@COB_HAS_64_BIT_POINTER@"
 else
 
 	COB_OBJECT_EXT="$(grep COB_OBJECT_EXT info.out | cut -d: -f2 | cut -b2-)"
@@ -161,18 +176,19 @@ else
 	else
 		COB_BIGENDIAN="no"
 	fi
-
 	COB_HAS_64_BIT_POINTER=$(grep "64bit-mode" info.out | cut -d: -f2 | cut -b2-)
+
 	cob_indexed=$(grep -i "indexed file" info.out | cut -d: -f2)
-	case $(grep -i "indexed file" info.out | cut -d: -f2) in
+	case "$cob_indexed" in
 	" disabled")	COB_HAS_ISAM="no";;
 	" BDB") 		COB_HAS_ISAM="db";;
 	" VBISAM"*)	COB_HAS_ISAM="vbisam";;
 	" D-ISAM")	COB_HAS_ISAM="disam";;
 	" C-ISAM")	COB_HAS_ISAM="cisam";;
 	" EXTFH")	COB_HAS_ISAM="index_extfh";;
-	*)		echo "unknown entry -$cob_indexed- please report" && exit 1;;
+	*)		echo "unknown entry for indexed handler: '"$cob_indexed"' please report" && exit 1;;
 	esac
+
 	if test $(grep -i -c "XML library.*disabled" info.out) = 0; then
 		COB_HAS_XML2="yes"
 	else
@@ -183,14 +199,34 @@ else
 	else
 		COB_HAS_JSON="no"
 	fi
+	# see note below
+	if test $(grep -i -c " screen .*disabled" info.out) = 0; then
+		COB_HAS_CURSES="yes"
+	else
+		COB_HAS_CURSES="no"
+	fi
 fi
 if test "x$MSYSTEM" != "x" -o "$OSTYPE" = "cygwin"; then
 	# running MSYS builds as not-visible child processes result in
-	# "Redirection is not supported" (old PDcurses) and exit 127 (NCurses)
+	# "Redirection is not supported" (at least old PDcurses)
 	# --> disabling the tests for this feature
-	COB_HAS_CURSES="no"
+	# ncurses is known to work as long as TERM is appropriate
+	if test $(grep -i -c "ncurses" info.out) != 0; then
+		if test "x$MSYSTEM" != "x"; then
+			TERM=""
+		else
+			TERM="xterm"
+		fi
+		export TERM
+		# no change here... COB_HAS_CURSES="yes"
+	else
+		COB_HAS_CURSES="no"
+	fi
 fi
 
+rm -rf info.out
+
+# NIST tests (tests/cobol85) are executed in a separate perl process with a new environment --> export needed
 export COB_HAS_ISAM COB_HAS_XML2 COB_HAS_JSON COB_HAS_CURSES COB_HAS_64_BIT_POINTER
 export COBC COBCRUN COBCRUN_DIRECT RUN_PROG_MANUAL
 export COB_OBJECT_EXT COB_EXE_EXT

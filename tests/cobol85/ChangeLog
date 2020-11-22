@@ -1,4 +1,9 @@
 
+2020-11-21  Simon Sobisch <simonsobisch@gnu.org>
+
+	* Makefil.module.in: don't pass additional params to atlocal
+	* report.pl: now exporting at_group for more useful valgrind log names
+
 2020-10-16  Simon Sobisch <simonsobisch@gnu.org>
 
 	* expand.pl, report.pl, summary.pl: added backwards-compatibility

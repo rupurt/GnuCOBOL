@@ -32,6 +32,7 @@ date2=`date +"%a %b %d"`
 
 if test "$3" = "once"; then
 	sed \
+	-e 's/GnuCOBOL [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[-devalphabetarc]*[0-9]*\.[0-9][0-9]*  */GnuCOBOL V.R.P               /g' \
 	-e 's/GnuCOBOL [0-9][0-9]*\.[0-9][0-9]*[-devalphabetarc]*[0-9]*\.[0-9][0-9]*  */GnuCOBOL V.R.P               /g' \
 	-e 's/[0-2][0-9]:[0-6][0-9]:[0-9][0-9] [0-9][0-9][0-9][0-9]$/HH:MM:SS YYYY/g' \
 	-e 's/'"$date1"'/DDD MMM dd/g' \
@@ -39,6 +40,7 @@ if test "$3" = "once"; then
 	<"$1" >"$2"
 else
 	sed \
+	-e 's/GnuCOBOL [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*[-devalphabetarc]*[0-9]*\.[0-9][0-9]*  */GnuCOBOL V.R.P          /g' \
 	-e 's/GnuCOBOL [0-9][0-9]*\.[0-9][0-9]*[-devalphabetarc]*[0-9]*\.[0-9][0-9]*  */GnuCOBOL V.R.P          /g' \
 	-e 's/[0-2][0-9]:[0-6][0-9]:[0-9][0-9] [0-9][0-9][0-9][0-9]/HH:MM:SS YYYY/g' \
 	-e 's/'"$date1"'/DDD MMM dd/g' \
