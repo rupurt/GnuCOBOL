@@ -158,11 +158,13 @@ copy_file_to_fcd (cob_file *f, FCD3 *fcd)
 	}
 	fnlen = strlen(assignto);
 	if (fcd->fnamePtr == NULL) {
-		fcd->fnamePtr = cob_strdup(assignto);
+		fcd->fnamePtr = cob_cache_malloc (fnlen+1);
+		strcpy(fcd->fnamePtr, assignto);
 		STCOMPX2(fnlen, fcd->fnameLen);
 	} else if (f->fcd != fcd) {
 		cob_cache_free ((void*)fcd->fnamePtr);
-		fcd->fnamePtr = cob_strdup(assignto);
+		fcd->fnamePtr = cob_cache_malloc (fnlen+1);
+		strcpy(fcd->fnamePtr, assignto);
 		STCOMPX2(fnlen, fcd->fnameLen);
 	}
 	fcd->openMode |= OPEN_NOT_OPEN;

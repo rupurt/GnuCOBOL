@@ -1,4 +1,10 @@
 
+2020-11-22  Ron Norman <rjn@inglenet.com>
+	* common.c: set LIBC_FATAL_STDERR_ more hard coded 
+	* fbdb.c: fix error in use of wrong record area
+	* fextfh.c: use cob_cache_malloc instead of cob_strdup
+	* fsqlxfd.c: If count_components > 1 then its a composite key
+
 2020-11-18  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (cob_init): skip initialization again if already done as
