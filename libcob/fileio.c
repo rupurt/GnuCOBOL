@@ -3248,14 +3248,15 @@ cob_file_close (cob_file_api *a, cob_file *f, const int opt)
 				f->file_pid = 0;
 				return COB_STATUS_00_SUCCESS;
 			}
-			if (f->file) {
-				fclose ((FILE *)f->file);
-			}
 		} else {
 			if (f->fd >= 0) {
 				close (f->fd);
 				f->fd = -1;
 			}
+		}
+		if (f->file != NULL) {
+			fclose ((FILE *)f->file);
+			f->file = NULL;
 		}
 		if (opt == COB_CLOSE_NO_REWIND) {
 			f->open_mode = COB_OPEN_CLOSED;
