@@ -790,14 +790,16 @@ isam_open (cob_file_api *a, cob_file *f, char *filename, const int mode, const i
 		ISERRNO = 0;
 		isfd = isopen ((void *)filename, ISINPUT | ISEXCLLOCK | vmode);
 		if (ISERRNO == EFLOCKED) {
-			return COB_STATUS_61_FILE_SHARING;
-		} else {
 			if (isfd >= 0) {
 				isfullclose (isfd);
 			}
-			isam_file_delete (a, f, filename);
-			ISERRNO = 0;
+			return COB_STATUS_61_FILE_SHARING;
 		}
+		if (isfd >= 0) {
+			isfullclose (isfd);
+		}
+		isam_file_delete (a, f, filename);
+		ISERRNO = 0;
 		dobld = 1;
 		break;
 	case COB_OPEN_I_O:
