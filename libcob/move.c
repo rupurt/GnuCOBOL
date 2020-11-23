@@ -1193,9 +1193,34 @@ cob_move_ibm (void *dst, void *src, const int len)
 {
 	char	*dest = dst;
 	char	*srce = src;
-	int	i;
-	for (i=0; i < len; i++) {
-		dest[i] = srce[i];
+	int		i = len;
+	while(i-- > 0) {
+		*dest = *srce;
+		dest++;
+		srce++;
+	}
+}
+
+/*
+ * Propagate table (1) throughout the table
+ * (used by INITIALIZE)
+ */
+void
+cob_init_table (void *tbl, unsigned long len, long occ)
+{
+	char	*m = tbl + len;
+	unsigned long		i = len;
+	int		j = 1;
+	if (occ < 1)
+		return;
+	do {
+		j = j * 2;
+		memcpy((void*)m, tbl, i);
+		m = m + i;
+		i = i * 2;
+	} while ((j * 2) < occ);
+	if (j < occ) {
+		memcpy((void*)m, tbl, len * (occ - j));
 	}
 }
 
