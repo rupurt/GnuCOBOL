@@ -3239,13 +3239,12 @@ indexed_delete_internal (cob_file *f, const int rewrite)
 
 	/* Delete the secondary keys */
 	for (i = 1; i < f->nkeys; ++i) {
-		len = bdb_savekey(f, p->suppkey, p->data.data, i);
-		memset(p->savekey, 0, p->maxkeylen);
 		len = bdb_savekey(f, p->savekey, p->saverec, i);
 		p->key.data = p->savekey;
 		p->key.size = (cob_dbtsize_t) len;
 		/* rewrite: no delete if secondary key is unchanged */
 		if (rewrite) {
+			bdb_savekey (f, p->suppkey, p->saverec, i);
 			p->rewrite_sec_key[i] = bdb_cmpkey(f, p->suppkey, f->record->data, i, 0);
 			if (!p->rewrite_sec_key[i]) {
 				continue;
@@ -7603,11 +7602,12 @@ copy_file_to_fcd (cob_file *f, FCD3 *fcd)
 	}
 	fnlen = strlen(assignto);
 	if (fcd->fnamePtr != NULL) {
-		cob_free ((void*)fcd->fnamePtr);
+		cob_cache_free ((void*)fcd->fnamePtr);
 	}
-	fcd->fnamePtr = strdup(assignto);
-	fcd->openMode |= OPEN_NOT_OPEN;
+	fcd->fnamePtr = cob_cache_malloc ((size_t)fnlen+1);
+	memcpy(fcd->fnamePtr, assignto, (size_t)fnlen+1);
 	STCOMPX2(fnlen, fcd->fnameLen);
+	fcd->openMode |= OPEN_NOT_OPEN;
 	STCOMPX2(0, fcd->refKey);
 	if(f->lock_mode == COB_LOCK_EXCLUSIVE
 	|| f->lock_mode == COB_LOCK_OPEN_EXCLUSIVE)

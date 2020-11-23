@@ -1,4 +1,12 @@
 
+2020-11-22  Ron Norman <rjn@inglenet.com>
+
+	* common.c: set LIBC_FATAL_STDERR_ more hard coded 
+	* fbdb.c (ix_bdb_delete_internal)->fileio.c(indexed_delete_internal):
+	  fix error in use of wrong record area
+	* fextfh.c->fileio.c (copy_file_to_fcd): use cob_cache_malloc instead
+	  of cob_strdup
+
 2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (cob_stack_trace_internal): early exit if no data available
