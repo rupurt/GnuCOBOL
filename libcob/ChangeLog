@@ -1,6 +1,7 @@
 
 2020-11-23  Ron Norman <rjn@inglenet.com>
-	* common.h, move.c: Add cob_init_table 
+
+	* common.h, move.c: add cob_init_table
 	
 2020-11-22  Ron Norman <rjn@inglenet.com>
 
@@ -9,6 +10,11 @@
 	  fix error in use of wrong record area
 	* fextfh.c->fileio.c (copy_file_to_fcd): use cob_cache_malloc instead
 	  of cob_strdup
+
+2020-11-22  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c, common.h (cob_save_func): have correct return type
+	  struct cob_func_loc* instead of void*
 
 2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
 

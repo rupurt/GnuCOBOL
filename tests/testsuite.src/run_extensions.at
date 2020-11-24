@@ -1058,7 +1058,81 @@ AT_CLEANUP
 
 
 AT_SETUP([INITIALIZE OCCURS UNBOUNDED])
-AT_KEYWORDS([extensions runsubscripts subscripts refmod INITIALIZE])
+AT_KEYWORDS([extensions runsubscripts subscripts refmod])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  p            USAGE POINTER.
+       01  p2           USAGE POINTER.
+       01  dlen         PIC 9(7).
+
+       LINKAGE SECTION.
+       01  a-table.
+           03  prefix.
+               05  n    PIC 9(03)  VALUE 123.
+           03  table-data value all "ABCDE".
+            04  rows    OCCURS 0 TO UNBOUNDED TIMES
+                        DEPENDING ON n.
+               05 col1  PIC X.
+               05 col2  PIC X(02).
+
+       PROCEDURE DIVISION.
+           ALLOCATE LENGTH OF prefix CHARACTERS
+                    RETURNING p
+           SET ADDRESS OF a-table TO p
+           INITIALIZE prefix ALL TO VALUE
+           IF FUNCTION LENGTH (a-table) NOT = 372
+              DISPLAY 'WRONG LENGTH table: ' FUNCTION LENGTH (a-table)
+              END-DISPLAY
+           END-IF
+           ALLOCATE FUNCTION LENGTH (a-table) CHARACTERS
+                    RETURNING p2
+           SET ADDRESS OF a-table TO p2
+           FREE p
+
+           INITIALIZE prefix ALL TO VALUE
+
+           IF LENGTH OF a-table NOT = 372
+              MOVE LENGTH OF a-table TO dlen
+              DISPLAY "BAD SIZE: " dlen
+           END-DISPLAY
+
+           INITIALIZE table-data (1:FUNCTION LENGTH(rows(1)) * n)
+                      ALL TO VALUE
+           IF col2(1) NOT = "BC"
+              DISPLAY "col2(1) wrong: " col2(1)
+              END-DISPLAY
+           END-IF
+           IF rows(2) NOT = "DEA"
+              DISPLAY "rows(2) wrong: " rows(2)
+              END-DISPLAY
+           END-IF
+
+      *>   check if ref-mod also works as expected
+           MOVE ALL ZEROES TO a-table (1: (LENGTH OF a-table))
+
+      *> Test -  should only initialize up to current size, not max:
+           INITIALIZE table-data     TO DEFAULT
+           INITIALIZE table-data ALL TO VALUE
+
+      *> Test - FUNCTION LENGTH(table-data) must be resolved at run-time
+          INITIALIZE table-data (1:FUNCTION LENGTH(table-data))
+              ALL TO VALUE
+           .
+])
+
+AT_CHECK([$COMPILE prog.cob], [0], [], [])
+
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [], [])
+
+AT_CLEANUP
+
+
+AT_SETUP([INITIALIZE OCCURS ODOSLIDE])
+AT_KEYWORDS([extensions runsubscripts subscripts])
 
 AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
@@ -1116,16 +1190,6 @@ AT_DATA([prog.cob], [
                 15   FLD-5-4 PIC XX  VALUE "ey".
            05   FILLER  PIC X(3).
 
-       LINKAGE SECTION.
-       01  a-table.
-           03  prefix.
-               05  n    PIC 9(03)  VALUE 123.
-           03  table-data value all "ABCDE".
-            04  rows    OCCURS 0 TO UNBOUNDED TIMES
-                        DEPENDING ON n.
-               05 col1  PIC X.
-               05 col2  PIC X(02).
-
        PROCEDURE DIVISION.
            MOVE ALL "*" TO grp-1.
            INITIALIZE FLD-1 ALL TO VALUE.
@@ -1149,54 +1213,12 @@ AT_DATA([prog.cob], [
            MOVE ALL "*" TO grp-5.
            INITIALIZE FLD-5 ALL TO VALUE.
            DISPLAY "GRP-5:" grp-5.
-
-           ALLOCATE LENGTH OF prefix CHARACTERS
-                    RETURNING p
-           SET ADDRESS OF a-table TO p
-           INITIALIZE prefix ALL TO VALUE
-           IF FUNCTION LENGTH (a-table) NOT = 372
-              DISPLAY 'WRONG LENGTH table: ' FUNCTION LENGTH (a-table)
-              END-DISPLAY
-           END-IF
-           ALLOCATE FUNCTION LENGTH (a-table) CHARACTERS
-                    RETURNING p2
-           SET ADDRESS OF a-table TO p2
-           FREE p
-
-           INITIALIZE prefix ALL TO VALUE
-
-           IF LENGTH OF a-table NOT = 372
-              MOVE LENGTH OF a-table TO dlen
-              DISPLAY "BAD SIZE: " dlen
-           END-DISPLAY
-
-           INITIALIZE table-data (1:FUNCTION LENGTH(rows(1)) * n)
-                      ALL TO VALUE
-           IF col2(1) NOT = "BC"
-              DISPLAY "col2(1) wrong: " col2(1)
-              END-DISPLAY
-           END-IF
-           IF rows(2) NOT = "DEA"
-              DISPLAY "rows(2) wrong: " rows(2)
-              END-DISPLAY
-           END-IF
-
-      *>   check if ref-mod also works as expected
-           MOVE ALL ZEROES TO a-table (1: (LENGTH OF a-table))
-
-      *> Test -  should only initialize up to current size, not max:
-           INITIALIZE table-data     TO DEFAULT
-           INITIALIZE table-data ALL TO VALUE
-
-      *> Test - FUNCTION LENGTH(table-data) must be resolved at run-time
-          INITIALIZE table-data (1:FUNCTION LENGTH(table-data))
-              ALL TO VALUE
-           .
 ])
 
 AT_CHECK([$COMPILE -fodoslide prog.cob], [0], [], [])
 
-AT_CHECK([$COBCRUN_DIRECT ./prog], [0], [GRP-1:***ABCDE***
+AT_CHECK([$COBCRUN_DIRECT ./prog], [0],
+[GRP-1:***ABCDE***
 GRP-2:***ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD AB***
 GRP-3:***ABC00XXABC00XXABC00XX***
 GRP-4:***AB12YZAB12YZAB12YZAB12YZAB12YZAB12YZAB12YZAB12YZAB12YZAB12YZAB12YZ***

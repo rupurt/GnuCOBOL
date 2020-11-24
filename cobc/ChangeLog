@@ -5,6 +5,10 @@
 	  'memcpy' to speed up the process
 	  If size is not know until run time then emit call to cob_init_table
 
+2020-11-21  Simon Sobisch <simonsobisch@gnu.org>
+
+	* codgen.c (process_command_line): minor cleanup
+
 2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pplex.l (ppinput): fixed processing after "line not terminated"

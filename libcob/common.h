@@ -1879,7 +1879,7 @@ COB_EXPIMP void cob_unstring_finish	(void);
 
 COB_EXPIMP void		cob_move	(cob_field *, cob_field *);
 COB_EXPIMP void		cob_move_ibm	(void *, void *, const int);
-COB_EXPIMP void		cob_init_table	(void *, unsigned long, long);
+COB_EXPIMP void		cob_init_table	(void *, const size_t, const size_t);
 COB_EXPIMP void		cob_set_int	(cob_field *, const int);
 COB_EXPIMP int		cob_get_int	(cob_field *);
 COB_EXPIMP cob_s64_t	cob_get_llint	(cob_field *);
