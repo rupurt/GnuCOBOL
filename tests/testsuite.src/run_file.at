@@ -10510,8 +10510,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 00
          Record : 'ALP00000 ALPHA ELECTRICAL CO. LTD.123 MAIN STREET          NEW YORK             '
-                  '    N.Y.                     3131234432MR. DAVE HARRIS          UNI-90301MEG8417'
-                  '    1600 BPI00085'
+               80:'    N.Y.                     3131234432MR. DAVE HARRIS          UNI-90301MEG8417'
+              160:'    1600 BPI00085'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10532,8 +10532,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10554,8 +10554,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10576,8 +10576,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10598,8 +10598,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10620,8 +10620,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10642,8 +10642,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10664,8 +10664,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10686,8 +10686,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10708,8 +10708,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10730,8 +10730,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10752,8 +10752,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10774,8 +10774,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10796,8 +10796,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10818,8 +10818,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'OLD00000 OLD TYME PIZZA MFG. CO.  1705 WISCONSIN ROAD      RICHMOND             '
-                  '    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
-                  '    6250 BPI00124'
+               80:'    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
+              160:'    6250 BPI00124'
  Line:    371           IF
  Line:    347Paragraph: 1000-LOAD-RECORD
  Line:    349           MOVE
@@ -10840,8 +10840,8 @@ Program-Id: prog
  Line:    370           WRITE
             WRITE TSPFILE Status: 02
          Record : 'PRE00000 PRESTIGE OFFICE FURNITURE114A MAPLE GROVE         WHITEPLAIN           '
-                  '    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
-                  '    6250 BPI00086'
+               80:'    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
+              160:'    6250 BPI00086'
  Line:    371           IF
  Line:    339           DISPLAY
  Line:    341           CLOSE
@@ -10868,8 +10868,8 @@ Program-Id: prog
  Line:    399           READ
             READ Sequential TSPFILE Status: 00
          Record : 'PRE00000 PRESTIGE OFFICE FURNITURE114A MAPLE GROVE         WHITEPLAIN           '
-                  '    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
-                  '    6250 BPI00086'
+               80:'    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
+              160:'    6250 BPI00086'
  Line:    400           READ
             READ Sequential TSPFILE Status: 10
  Line:    402           MOVE
@@ -10881,86 +10881,86 @@ Program-Id: prog
  Line:    413           READ
             READ Sequential TSPFILE Status: 00
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    414           IF
  Line:    422           PERFORM
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    431           ADD
  Line:    424           DISPLAY
  Line:    427           READ
             READ Sequential TSPFILE Status: 00
          Record : 'OLD00000 OLD TYME PIZZA MFG. CO.  1705 WISCONSIN ROAD      RICHMOND             '
-                  '    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
-                  '    6250 BPI00124'
+               80:'    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
+              160:'    6250 BPI00124'
  Line:    431           ADD
  Line:    433           IF
  Line:    437           DISPLAY
@@ -10972,86 +10972,86 @@ Program-Id: prog
  Line:    445           READ
             READ Sequential TSPFILE Status: 00
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    446           IF
  Line:    451           PERFORM
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    460           ADD
  Line:    453           DISPLAY
  Line:    456           READ
             READ Sequential TSPFILE Status: 00
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    460           ADD
  Line:    463           CLOSE
             CLOSE TSPFILE Status: 00
@@ -11069,16 +11069,16 @@ Program-Id: prog
  Line:    476           READ
             READ TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
             Key : 'BET00000'
  Line:    477           IF
  Line:    481           DISPLAY
  Line:    485           READ
             READ Sequential TSPFILE Status: 00
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    486           IF
  Line:    490           DISPLAY
  Line:    494           MOVE
@@ -11086,16 +11086,16 @@ Program-Id: prog
  Line:    496           READ
             READ TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
             Key :  6456445643
  Line:    497           IF
  Line:    501           DISPLAY
  Line:    505           WRITE
             WRITE TSPFILE Status: 22
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    506           IF
  Line:    510           DISPLAY
  Line:    513           MOVE
@@ -11103,16 +11103,16 @@ Program-Id: prog
  Line:    515           READ
             READ TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
             Key : 'GAM00000'
  Line:    516           DISPLAY
  Line:    520           ADD
  Line:    521           REWRITE
             REWRITE TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00080'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00080'
  Line:    522           IF
  Line:    527           DISPLAY
  Line:    532           MOVE
@@ -11120,8 +11120,8 @@ Program-Id: prog
  Line:    534           READ
             READ TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
             Key : 'BET00000'
  Line:    535           DISPLAY
  Line:    539           MOVE
@@ -11129,8 +11129,8 @@ Program-Id: prog
  Line:    541           REWRITE
             REWRITE TSPFILE Status: 02
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
  Line:    542           IF
  Line:    547           DISPLAY
  Line:    551           MOVE
@@ -11138,16 +11138,16 @@ Program-Id: prog
  Line:    553           READ
             READ TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
             Key : 'FOR00000'
  Line:    554           MOVE
  Line:    555           MOVE
  Line:    556           REWRITE
             REWRITE TSPFILE Status: 02
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    557           IF
  Line:    562           DISPLAY
  Line:    566           CLOSE
@@ -11899,8 +11899,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 00
          Record : 'ALP00000 ALPHA ELECTRICAL CO. LTD.123 MAIN STREET          NEW YORK             '
-                  '    N.Y.                     3131234432MR. DAVE HARRIS          UNI-90301MEG8417'
-                  '    1600 BPI00085'
+               80:'    N.Y.                     3131234432MR. DAVE HARRIS          UNI-90301MEG8417'
+              160:'    1600 BPI00085'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -11921,8 +11921,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -11943,8 +11943,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -11965,8 +11965,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -11987,8 +11987,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12009,8 +12009,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12031,8 +12031,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12053,8 +12053,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12075,8 +12075,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12097,8 +12097,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12119,8 +12119,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12141,8 +12141,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12163,8 +12163,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12185,8 +12185,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12207,8 +12207,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'OLD00000 OLD TYME PIZZA MFG. CO.  1705 WISCONSIN ROAD      RICHMOND             '
-                  '    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
-                  '    6250 BPI00124'
+               80:'    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
+              160:'    6250 BPI00124'
  Line:    382            IF
  Line:    358 Paragraph: 1000-LOAD-RECORD
  Line:    360            MOVE
@@ -12229,8 +12229,8 @@ Program-Id: prog
  Line:    381            WRITE
             WRITE TSPFILE Status: 02
          Record : 'PRE00000 PRESTIGE OFFICE FURNITURE114A MAPLE GROVE         WHITEPLAIN           '
-                  '    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
-                  '    6250 BPI00086'
+               80:'    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
+              160:'    6250 BPI00086'
  Line:    382            IF
  Line:    350            DISPLAY
  Line:    352            CLOSE
@@ -12257,8 +12257,8 @@ Program-Id: prog
  Line:    407            READ
             READ Sequential TSPFILE Status: 00
          Record : 'PRE00000 PRESTIGE OFFICE FURNITURE114A MAPLE GROVE         WHITEPLAIN           '
-                  '    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
-                  '    6250 BPI00086'
+               80:'    N.Y.                     4169898509MR. THOMAS JEFFERSON     UNI-90403MEG8470'
+              160:'    6250 BPI00086'
  Line:    408            READ
             READ Sequential TSPFILE Status: 10
  Line:    410            MOVE
@@ -12270,8 +12270,8 @@ Program-Id: prog
  Line:    418            READ
             READ Sequential TSPFILE Status: 00
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    419            IF
  Line:    424            PERFORM
  Line:    426            DISPLAY
@@ -12279,88 +12279,88 @@ Program-Id: prog
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    434            ADD
  Line:    426            DISPLAY
  Line:    429            CALL
  Line:    430            READ
             READ Sequential TSPFILE Status: 00
          Record : 'OLD00000 OLD TYME PIZZA MFG. CO.  1705 WISCONSIN ROAD      RICHMOND             '
-                  '    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
-                  '    6250 BPI00124'
+               80:'    VIRGINIA                 8787458374MS. ALICE WINSTON        UNI-90403MEG8470'
+              160:'    6250 BPI00124'
  Line:    434            ADD
  Line:    436            IF
  Line:    439            DISPLAY
@@ -12373,86 +12373,86 @@ Program-Id: prog
  Line:    450            READ
             READ Sequential TSPFILE Status: 00
          Record : 'NEW00000 NEW WAVE SURF SHOPS INC. 3240 MARIS AVENUE        COLUMBUS             '
-                  '    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
-                  '    6250 BPI00324'
+               80:'    OHIO                     7534587453MS. Goldie Hawn          UNI-80/83MEG8470'
+              160:'    6250 BPI00324'
  Line:    451            IF
  Line:    456            PERFORM
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'MOR00000 MORNINGSIDE CARPENTRY.   1709 DUNDAS CRESCENT W.  FORT WAYNE           '
-                  '    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
-                  '    6250 BPI00110'
+               80:'    COLORADO                 4169898509MR. STEVEN YOURDIN       UNI-80/83MEG8470'
+              160:'    6250 BPI00110'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'LEW00000 LEWISTON GRAPHICS LTD.   9904 QUEEN STREET        NEW JERSEY           '
-                  '    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
-                  '    6250 BPI00064'
+               80:'    N.J.                     6554456433MR. DONALD FISCHER       UNI-80/83MEG8470'
+              160:'    6250 BPI00064'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'KON00000 KONFLAB PLASTIC PRODUCTS.808 NORTHWEST MAIN ST.   SEATTLE              '
-                  '    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
-                  '    1600 BPI00128'
+               80:'    WASHINGTON               7456434355MR. FRED MILLER          UNI-80/81MEG8417'
+              160:'    1600 BPI00128'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'JOH00000 JOHNSON BOATING SUPPLIES 1134 PARIS ROAD          TOPEKA               '
-                  '    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
-                  '    1600 BPI00034'
+               80:'    KANSAS                   6456445643MS. VALERIE HARPER       UNI-80/81MEG8417'
+              160:'    1600 BPI00034'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'INC00000 INCREMENTAL BACKUP CORP. 10908 SANTA MONICA BLVD. WILBUR               '
-                  '    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
-                  '    1600 BPI00016'
+               80:'    DELAWARE                 3455445444MR. DARRYL TOWNSEND      UNI-80/81MEG8417'
+              160:'    1600 BPI00016'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'H&J00000 H & J PLUMBING SUPPLIES  77 SUNSET BLVD.          MADISON              '
-                  '    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
-                  '    6250 BPI00032'
+               80:'    WISCONSIN                6546456333MR. BRIAN PATTERSON      UNI-80/83MEG8470'
+              160:'    6250 BPI00032'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'EPS00000 EPSILON EQUIPMENT SUPPLY 1184 EAST FIRST STREET   CALGARY              '
-                  '    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
-                  '    1600 BPI00090'
+               80:'    CANADA                   5292398745MRS. DONNA BREWER        UNI-80/61MEG8417'
+              160:'    1600 BPI00090'
  Line:    465            ADD
  Line:    458            DISPLAY
  Line:    461            READ
             READ Sequential TSPFILE Status: 00
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    465            ADD
  Line:    468            CLOSE
             CLOSE TSPFILE Status: 00
@@ -12470,16 +12470,16 @@ Program-Id: prog
  Line:    481            READ
             READ TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
             Key : 'BET00000'
  Line:    482            IF
  Line:    486            DISPLAY
  Line:    490            READ
             READ Sequential TSPFILE Status: 00
          Record : 'DEL00000 DELTA LUGGAGE REPAIRS    1620 ARIZONA WAY         TORONTO              '
-                  '    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
-                  '    6250 BPI00045'
+               80:'    CANADA                   4169898509MR. PETER MACKAY         UNI-80/53MEG8470'
+              160:'    6250 BPI00045'
  Line:    491            IF
  Line:    495            DISPLAY
  Line:    499            MOVE
@@ -12487,16 +12487,16 @@ Program-Id: prog
  Line:    501            READ
             READ TSPFILE Status: 00
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
             Key :  6456445643
  Line:    502            IF
  Line:    506            DISPLAY
  Line:    510            WRITE
             WRITE TSPFILE Status: 22
          Record : 'GIB00000 GIBRALTER LIFE INSURANCE 650 LIBERTY CRESCENT     LOS RIOS             '
-                  '    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
-                  '    1600 BPI00067'
+               80:'    NEW MEXICO               6456445643MR. D.A. MORRISON        UNI-80/61MEG8417'
+              160:'    1600 BPI00067'
  Line:    511            IF
  Line:    515            DISPLAY
  Line:    518            MOVE
@@ -12504,16 +12504,16 @@ Program-Id: prog
  Line:    520            READ
             READ TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00075'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00075'
             Key : 'GAM00000'
  Line:    521            DISPLAY
  Line:    525            ADD
  Line:    526            REWRITE
             REWRITE TSPFILE Status: 00
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1401 JEFFERSON BLVD.     WASHINGTON           '
-                  '    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
-                  '    1600 BPI00080'
+               80:'    D.C.                     8372487274MR. ALLAN JONES          UNI-80/31MEG8417'
+              160:'    1600 BPI00080'
  Line:    527            IF
  Line:    532            DISPLAY
  Line:    537            MOVE
@@ -12521,8 +12521,8 @@ Program-Id: prog
  Line:    539            READ
             READ TSPFILE Status: 00
          Record : 'BET00000 BETA SHOE MFG. INC.      1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
             Key : 'BET00000'
  Line:    540            DISPLAY
  Line:    544            MOVE
@@ -12530,8 +12530,8 @@ Program-Id: prog
  Line:    546            REWRITE
             REWRITE TSPFILE Status: 02
          Record : 'GAM00000 GAMMA X-RAY TECHNOLOGY   1090 2ND AVE. WEST       ATLANTA              '
-                  '    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
-                  '    6250 BPI00034'
+               80:'    GEORGIA                  4082938498MS. JANICE SILCOX        UNI-90403MEG8470'
+              160:'    6250 BPI00034'
  Line:    547            IF
  Line:    552            DISPLAY
  Line:    556            MOVE
@@ -12539,23 +12539,23 @@ Program-Id: prog
  Line:    558            READ
             READ TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               8009329492MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
             Key : 'FOR00000'
  Line:    559            MOVE
  Line:    560            MOVE
  Line:    561            REWRITE
             REWRITE TSPFILE Status: 02
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    562            IF
  Line:    567            DISPLAY
  Line:    571            DELETE
             DELETE TSPFILE Status: 00
          Record : 'FOR00000 FORTUNE COOKIE COMPANY   114 JOHN F. KENNEDY AVE. SAN DIEGO            '
-                  '    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
-                  '    6250 BPI00107'
+               80:'    CALIFORNIA               6456445643MR. MICHAEL SMYTHE       UNI-80/63MEG8470'
+              160:'    6250 BPI00107'
  Line:    572            CLOSE
             CLOSE TSPFILE Status: 00
  Line:    322            OPEN
