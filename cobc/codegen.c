@@ -1906,7 +1906,7 @@ output_local_indexes (void)
 				found = 1;
 				output_local ("\n/* Subscripts */\n");
 			}
-			output_local ("int\t\ti%d, i%d_max;\n", i, i);
+			output_local ("\tint\t\ti%d = 0, i%d_max = 0;\n", i, i);
 		}
 	}
 }
@@ -5356,13 +5356,15 @@ output_initialize (struct cb_initialize *p)
 		case INITIALIZE_COMPOUND:
 			i_counters[0] = 1;
 			output_prefix ();
-			output ("for (i0 = 1; i0 <= ");
-			if (f->odo_level)
-				output ("i_len");
+			output ("i_len = ");
+			if (f->flag_unbounded)
+				output ("0");
 			else
 				output_occurs (f);
-			output ("; i0++)");
+			output (";");
 			output_newline ();
+
+			output_line ("for (i0 = 1; i0 <= i_len; i0++)");
 			output_block_open ();
 			x = cb_build_field_reference (f, NULL);
 			CB_REFERENCE (x)->subs =
