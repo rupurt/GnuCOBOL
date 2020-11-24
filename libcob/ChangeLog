@@ -1,4 +1,7 @@
 
+2020-11-23  Ron Norman <rjn@inglenet.com>
+	* common.h, move.c: Add cob_init_table 
+	
 2020-11-22  Ron Norman <rjn@inglenet.com>
 
 	* common.c: set LIBC_FATAL_STDERR_ more hard coded 

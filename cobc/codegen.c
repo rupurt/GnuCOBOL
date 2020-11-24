@@ -2192,14 +2192,6 @@ output_emit_field (cb_tree x, const char *cmt)
 			f->step_count = f->size;
 		}
 		if (f->flag_occurs && f->occurs_max > 1) {
-#if 0 /* CHECKME Simon: this comment doesn't seem useful */
-			output_local("\t\t/* col%3d %s OCCURS %d ",
-				f->report_column, f->name, f->occurs_max);
-			if (cmt) {
-				output_local(": %s ", cmt);
-			}
-			output_local("*/\n");
-#endif
 			for (i = 1; i <= f->occurs_max; i++) {
 				if (i == 1) {
 					output ("static cob_field %s%d\t= ", CB_PREFIX_FIELD, f->id);
@@ -4601,36 +4593,71 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 			output_stmt (CB_VALUE (l));
 		}
 	}
-	if (f->odo_level) {
-		output_line("i0_max = i_len / %d;",lsize);
-	}
-	output_prefix ();
-	output ("for (i0 = 0; i0 <= ");
-	if (f->odo_level) {
-		output ("i0_max");
+	if (!chk_field_variable_size(f)
+	 && !f->depending
+	 && !f->odo_level) {
+		int off;
+		output_prefix ();
+		output ("memcpy (");
+		output_data (x);
+		output (", ");
+		output_string (l->data, lsize, l->llit);
+		output (", %d);", lsize);
+		output_newline ();
+		for (off = lsize; off+lsize < size; ) {
+			output_prefix ();
+			output ("memcpy (");
+			output_data (x);
+			output (" + %d, ", off);
+			output_data (x);
+			output (", %d);", lsize);
+			output_newline ();
+			off = off + lsize;
+			lsize = lsize * 2;
+		}
+		if (off < size) {
+			output_prefix ();
+			output ("memcpy (");
+			output_data (x);
+			output (" + %d, ", off);
+			output_data (x);
+			output (", %d);", size-off);
+			output_newline ();
+		}
 	} else {
-		output_occurs (f);
-	}
-	output ("; i0++)");
-	output_newline ();
-	output_block_open ();
-	output_prefix ();
-	output ("memcpy (");
-	output_data (x);
-	output (" + (i0 * %d), ", lsize);
-	output_string (l->data, lsize, l->llit);
-	output (", %d);", lsize);
-	output_newline ();
-	output_block_close ();
-	n = size % lsize;
-	if (n) {
+		if (f->odo_level) {
+			output_line("i0_max = i_len / %d;",lsize);
+		}
+		output_prefix ();
+		output ("for (i0 = 0; i0 < ");
+		if (f->odo_level) {
+			output ("i0_max");
+		} else if (f->flag_occurs) {
+			output_occurs (f);
+		} else {
+			output ("%d",f->size/lsize);
+		}
+		output ("; i0++)");
+		output_newline ();
+		output_block_open ();
 		output_prefix ();
 		output ("memcpy (");
 		output_data (x);
 		output (" + (i0 * %d), ", lsize);
-		output_string (l->data, n, l->llit);
-		output (", %d);", n);
+		output_string (l->data, lsize, l->llit);
+		output (", %d);", lsize);
 		output_newline ();
+		output_block_close ();
+		n = size % lsize;
+		if (n) {
+			output_prefix ();
+			output ("memcpy (");
+			output_data (x);
+			output (" + (i0 * %d), ", lsize);
+			output_string (l->data, n, l->llit);
+			output (", %d);", n);
+			output_newline ();
+		}
 	}
 }
 
@@ -5040,59 +5067,71 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 			} else {
 				const int		idx = f->indexes;
 				struct cb_reference* ref = CB_REFERENCE (c);
-				cb_tree			save_check;
+				cb_tree			save_check, save_length;
 
 				/* Output initialization for the first record */
-				output_line ("i%d = 1;", idx);
-				i_counters[idx] = 1;
-				ref->subs = CB_BUILD_CHAIN (cb_i[idx], ref->subs);
+				save_length = ref->length;
+				save_check = ref->check;
+				ref->subs = CB_BUILD_CHAIN (cb_int1, ref->subs);
 				if (type == INITIALIZE_ONE) {
 					output_initialize_one (p, c);
 				} else {
+					ref->length = NULL;
 					output_initialize_compound (p, c);
 				}
 
 				/* all exceptions should have been raised above,
 				   so temporarily detach from the reference */
-				save_check = ref->check;
 				ref->check = NULL;
+				ref->length = NULL;
 
-				/* copy record for all other records */
-				output_block_open ();
-				output_line ("/* copy initialized record for %s to later occurences */", f->name);
+				if (!chk_field_variable_size(f)
+				&& !f->depending) {
+					long len = (long)f->size;
+					unsigned int occ = f->occurs_max;
+					unsigned int j = 1;
+					/* Table size is know at compile time */
+					/* Generate inline 'memcpy' to propagate the array data */
 
-				output_prefix ();
-				output ("const void *first%d = ", idx);
-				output_data (c);
-				output (";");
-				output_newline ();
-
-				output_prefix ();
-				output ("const int size%d = ", idx);
-				output_size (c);
-				output (";");
-				output_newline ();
-
-				output_prefix ();
-				output ("const int max_i%d = ", idx);
-				output_occurs (f);
-				output (";");
-				output_newline ();
-
-				output_line ("for (i%d = 2; i%d <= max_i%d; i%d++)", idx, idx, idx, idx);
-				output_block_open ();
-				output_prefix ();
-				output ("memcpy (");
-				output_data (c);
-				output (", first%d, size%d);", idx, idx);
-				output_newline ();
-				output_block_close ();
-
-				ref->subs = CB_CHAIN (ref->subs);
-				output_block_close ();
+					if (occ > 1) {
+						do {
+							output_prefix ();
+							output ("memcpy (");
+							output_base (f, 0);
+							output (" + %ld, ",len);
+							output_base (f, 0);
+							output (", %ld);\t/* %d thru %d */",len,j+1,j*2);
+							output_newline ();
+							j = j * 2;
+							len = len * 2;
+						} while ((j * 2) < occ);
+						if (j < occ) {
+							output_prefix ();
+							output ("memcpy (");
+							output_base (f, 0);
+							output (" + %ld, ",len);
+							output_base (f, 0);
+							output (", %ld);\t/* %d thru %d */",
+										(long)(f->size * (occ - j)),j+1,occ);
+							output_newline ();
+						}
+					}
+				} else {
+					/* Table size is only known at run time */
+					output_prefix ();
+					output ("cob_init_table (");
+					output_base (f, 0);
+					output (", ");
+					output_size (c);
+					output (", ");
+					output_occurs (f);
+					output (");");
+					output_newline ();
+				}
 
 				/* restore previous exception-checks for the reference */
 				ref->check = save_check;
+				ref->length = save_length;
 			}
 		}
 	}

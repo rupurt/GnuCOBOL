@@ -1,4 +1,10 @@
 
+2020-11-23  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Generated code for INITIALIZE enhanced to emit progressive
+	  'memcpy' to speed up the process
+	  If size is not know until run time then emit call to cob_init_table
+
 2020-11-20  Simon Sobisch <simonsobisch@gnu.org>
 
 	* pplex.l (ppinput): fixed processing after "line not terminated"
