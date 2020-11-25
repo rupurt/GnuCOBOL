@@ -14,11 +14,15 @@
 	* error.c (undefined_error, ambiguous_error): only raise these errors /
 	  warnings once per word, solving FR #313 report undefined identifiers once
 
+2020-11-25  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Additional work to enhance INITIALIZE
+
 2020-11-23  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Generated code for INITIALIZE enhanced to emit progressive
 	  'memcpy' to speed up the process
-	  If size is not know until run time then emit call to cob_init_table
+	  If size is not known until run time then emit call to cob_init_table
 
 2020-11-21  Simon Sobisch <simonsobisch@gnu.org>
 

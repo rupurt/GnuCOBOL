@@ -692,7 +692,7 @@ cob_dump_field (const int level, const char *name,
 				return;
 			} else if (subscript != dump_idx) {
 				if (memcmp(dump_prev, f->data + adjust, size) == 0) {
-					fprintf (fp, "%-10s ... occurence (%d) same as (%d)\n", 
+					fprintf (fp, "%-10s ... occurrence (%d) same as (%d)\n", 
 									" ", subscript+1, dump_idx+1);
 					dump_skip = subscript;
 					return;
