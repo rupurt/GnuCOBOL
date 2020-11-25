@@ -44,6 +44,11 @@ static cob_global		*cobglobptr = NULL;
 static cob_settings		*cobsetptr = NULL;
 
 static char no_syspunch_error_raised = 0;
+#define MAX_PREV 256
+static char dump_prev[MAX_PREV];
+static int	dump_idx = -1;
+static int	dump_skip = -1;
+static int	dump_tbl = -1;
 
 static const unsigned short	bin_digits[] =
 	{ 1, 3, 5, 8, 10, 13, 15, 17, 20 };
@@ -406,7 +411,8 @@ static void
 display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int max_width)
 {
 	unsigned int	i, j, pos, lowv, highv, spacev, zerov, printv, delv, len, colsize;
-	char	wrk[200];
+	unsigned int	bgn, duplen;
+	char	wrk[200], prev[MAX_PREV];
 
 	lowv = highv = spacev = zerov = printv = delv = 0;
 	colsize = max_width - indent - 2;
@@ -473,9 +479,35 @@ display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int ma
 	}
 
 	if (printv == f->size) {
+		duplen = bgn = 0;
 		for (i=0; len > colsize; i+=colsize,len-=colsize) {
-			fprintf (fp, "'%.*s'\n%*s", colsize, &f->data[i], indent, " ");
+			if (colsize < MAX_PREV) {
+				if (i == 0) {
+					memcpy(prev, f->data, colsize);
+				} else if (memcmp(prev, &f->data[i], colsize) == 0) {
+					duplen = 0;
+					bgn = i + 1;
+					while(memcmp(prev, &f->data[i], colsize) == 0
+						&& len > colsize) {
+						duplen += colsize;
+						i += colsize;
+						len -= colsize;
+					}
+					i -= colsize;
+					len += colsize;
+					fprintf (fp, "%5u thru %u same as above\n%*s", 
+								bgn, bgn+duplen, indent-6, " ");
+					memcpy(prev, &f->data[i], colsize);
+					continue;
+				}
+				memcpy(prev, &f->data[i], colsize);
+			}
+			if(i > 0)
+				fprintf(fp,"%5u:",i);
+			fprintf (fp, "'%.*s'\n%*s", colsize, &f->data[i], indent-6, " ");
 		}
+		if(i > 0)
+			fprintf(fp,"%5u:",i);
 		if (len <= colsize) {
 			fprintf (fp, "'%.*s'", len, &f->data[i]);
 			return;
@@ -517,7 +549,27 @@ display_alnum_dump (cob_field *f, FILE *fp, unsigned int indent, unsigned int ma
 		colsize = colsize * 9;
 	}
 
+	colsize = colsize / 4;
+	colsize = colsize * 4;
 	for (i = 0; i < f->size; ) {
+		if (colsize < MAX_PREV
+		 && i < (f->size - colsize)) {
+			if (i > 0
+			 && memcmp(prev, &f->data[i], colsize/2) == 0) {
+				duplen = 0;
+				bgn = i;
+				while(memcmp(prev, &f->data[i], colsize/2) == 0
+					&& i < (f->size - colsize/2)) {
+					duplen += colsize/2;
+					i += colsize/2;
+				}
+				fprintf (fp, "--- %u thru %u same as above ---", bgn+1, bgn+duplen);
+				if (i < f->size) {
+					fprintf (fp, "\n%*s", indent, " ");
+				}
+			}
+			memcpy(prev, &f->data[i], colsize);
+		}
 		wrk[0] = 0;
 		pos = i + 1;
 		for (j=0; j < colsize && i < f->size; j+=2,i++) {
@@ -624,6 +676,35 @@ cob_dump_field (const int level, const char *name,
 		}
 		va_end (ap);
 		strcat (vname,")");
+		if (indexes == 1
+		 && size > f->size
+		 && size < MAX_PREV) {
+			if (subscript == 0) {
+				dump_idx = subscript;
+				dump_skip = subscript;
+				if(dump_tbl < 0) {
+					memcpy(dump_prev, f->data + adjust, size);
+					dump_tbl = 1;
+				} else {
+					dump_tbl++;
+				}
+			} else if (subscript == dump_skip) {
+				return;
+			} else if (subscript != dump_idx) {
+				if (memcmp(dump_prev, f->data + adjust, size) == 0) {
+					fprintf (fp, "%-10s ... occurence (%d) same as (%d)\n", 
+									" ", subscript+1, dump_idx+1);
+					dump_skip = subscript;
+					return;
+				} 
+				memcpy(dump_prev, f->data + adjust, size);
+				dump_idx = subscript;
+				dump_skip = -1;
+				dump_tbl = -1;
+			}
+		}
+	} else {
+		dump_idx = dump_tbl = dump_skip = -1;
 	}
 	if (f->data) {
 		f->data += adjust;

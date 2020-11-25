@@ -9367,15 +9367,15 @@ WORKING-STORAGE
                                      1 x 5811
   05      TSTCOMP3                        58585
   05      TSTLONG                        'Quick brown fox jumped over the dog              Quick br'
-                                         'own fox jumped over the dog'
-  05      TSTHEX                          Q u i c  k e r    g r e y    f o x    j u m  p e d   _
-                                     1 x 51756963 6B657220 67726579 20666F78 206A756D 70656420 _
-                                          t h e    c o u g  a r   X  X X   X  X X X X  X X   X _
-                                    25 x 74686520 636F7567 61722058 58581158 58585858 58580758 _
-                                          X X X X  X X X X  X X   X  X X X X  X X X X  X X X X _
-                                    49 x 58585858 58585858 58580D58 58585858 58585858 58585858 _
-                                          X X X X  X X X X  X X X X  X X X X  X X X X  X X X X _
-                                    73 x 58585858 58585858 58585858 58585858 58585858 58585858 _
+                                      57:'own fox jumped over the dog'
+  05      TSTHEX                          Q u i c  k e r    g r e y    f o x    j u m  p e d  _
+                                     1 x 51756963 6B657220 67726579 20666F78 206A756D 70656420
+                                          t h e    c o u g  a r   X  X X   X  X X X X  X X   X
+                                    25 x 74686520 636F7567 61722058 58581158 58585858 58580758
+                                          X X X X  X X X X  X X   X  X X X X  X X X X  X X X X
+                                    49 x 58585858 58585858 58580D58 58585858 58585858 58585858
+                                          X X X X  X X X X  X X X X  X X X X  X X X X  X X X X
+                                    73 x 58585858 58585858 58585858 58585858 58585858 58585858
                                           X X X X
                                     97 x 58585858
   05      TSTHEX2                        XXXXXXXXX\0XXXXXXXXXXXXXXXXXXXXX\\XXXXXX\0XXXXXXX\tXXXXXX
@@ -9422,15 +9422,15 @@ WORKING-STORAGE
                                      1 x 5811
   05      TSTCOMP3                        58585
   05      TSTLONG                        'Quick brown fox jumped over the dog              Quick br'
-                                         'own fox jumped over the dog'
-  05      TSTHEX                          Q u i c  k e r    g r e y    f o x    j u m  p e d   _
-                                     1 x 51756963 6B657220 67726579 20666F78 206A756D 70656420 _
-                                          t h e    c o u g  a r   X  X X   X  X X X X  X X   X _
-                                    25 x 74686520 636F7567 61722058 58581158 58585858 58580758 _
-                                          X X X X  X X X X  X X   X  X X X X  X X X X  X X X X _
-                                    49 x 58585858 58585858 58580D58 58585858 58585858 58585858 _
-                                          X X X X  X X X X  X X X X  X X X X  X X X X  X X X X _
-                                    73 x 58585858 58585858 58585858 58585858 58585858 58585858 _
+                                      57:'own fox jumped over the dog'
+  05      TSTHEX                          Q u i c  k e r    g r e y    f o x    j u m  p e d  _
+                                     1 x 51756963 6B657220 67726579 20666F78 206A756D 70656420
+                                          t h e    c o u g  a r   X  X X   X  X X X X  X X   X
+                                    25 x 74686520 636F7567 61722058 58581158 58585858 58580758
+                                          X X X X  X X X X  X X   X  X X X X  X X X X  X X X X
+                                    49 x 58585858 58585858 58580D58 58585858 58585858 58585858
+                                          X X X X  X X X X  X X X X  X X X X  X X X X  X X X X
+                                    73 x 58585858 58585858 58585858 58585858 58585858 58585858
                                           X X X X
                                     97 x 58585858
   05      TSTHEX2                        XXXXXXXXX\0XXXXXXXXXXXXXXXXXXXXX\\XXXXXX\0XXXXXXX\tXXXXXX
