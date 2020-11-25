@@ -4656,6 +4656,63 @@ deduce_initialize_type (struct cb_initialize *p, struct cb_field *f,
 	return INITIALIZE_NONE;
 }
 
+/*
+ * Emit code to propagate table initialize
+ */
+static void
+propagate_table ( cb_tree x )
+{
+	struct cb_field *f;
+	long len;
+	unsigned int occ, j = 1;
+	f = cb_code_field (x);
+	len = (long)f->size;
+	occ = f->occurs_max;
+
+	if (gen_init_working
+	 || (!chk_field_variable_size(f)
+	  && !f->flag_unbounded
+	  && !f->depending)) {
+		/* Table size is known at compile time */
+		/* Generate inline 'memcpy' to propagate the array data */
+
+		if (occ > 1) {
+			do {
+				output_prefix ();
+				output ("memcpy (");
+				output_base (f, 0);
+				output (" + %5ld, ",len);
+				output_base (f, 0);
+				output (", %5ld);\t/* %s: %5d thru %d */",len,f->name,j+1,j*2);
+				output_newline ();
+				j = j * 2;
+				len = len * 2;
+			} while ((j * 2) < occ);
+			if (j < occ) {
+				output_prefix ();
+				output ("memcpy (");
+				output_base (f, 0);
+				output (" + %5ld, ",len);
+				output_base (f, 0);
+				output (", %5ld);\t/* %s: %5d thru %d */",
+							(long)(f->size * (occ - j)),f->name,j+1,occ);
+				output_newline ();
+			}
+		}
+	} else {
+		/* Table size is only known at run time */
+		output_prefix ();
+		output ("cob_init_table (");
+		output_base (f, 0);
+		output (", ");
+		output_size (x);
+		output (", ");
+		output_occurs (f);
+		output (");");
+		output_newline ();
+	}
+}
+
 static int
 initialize_uniform_char (const struct cb_field *f,
 			 const struct cb_initialize *p)
@@ -5251,8 +5308,7 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 					output_initialize_compound (p, c);
 				}
 			} else {
-				const int		idx = f->indexes;
-				struct cb_reference* ref = CB_REFERENCE (c);
+				struct cb_reference *ref = CB_REFERENCE (c);
 				cb_tree			save_check, save_length;
 
 				/* Output initialization for the first record */
@@ -5271,49 +5327,7 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				ref->check = NULL;
 				ref->length = NULL;
 
-				if (!chk_field_variable_size(f)
-				&& !f->depending) {
-					long len = (long)f->size;
-					unsigned int occ = f->occurs_max;
-					unsigned int j = 1;
-					/* Table size is know at compile time */
-					/* Generate inline 'memcpy' to propagate the array data */
-
-					if (occ > 1) {
-						do {
-							output_prefix ();
-							output ("memcpy (");
-							output_base (f, 0);
-							output (" + %ld, ",len);
-							output_base (f, 0);
-							output (", %ld);\t/* %d thru %d */",len,j+1,j*2);
-							output_newline ();
-							j = j * 2;
-							len = len * 2;
-						} while ((j * 2) < occ);
-						if (j < occ) {
-							output_prefix ();
-							output ("memcpy (");
-							output_base (f, 0);
-							output (" + %ld, ",len);
-							output_base (f, 0);
-							output (", %ld);\t/* %d thru %d */",
-										(long)(f->size * (occ - j)),j+1,occ);
-							output_newline ();
-						}
-					}
-				} else {
-					/* Table size is only known at run time */
-					output_prefix ();
-					output ("cob_init_table (");
-					output_base (f, 0);
-					output (", ");
-					output_size (c);
-					output (", ");
-					output_occurs (f);
-					output (");");
-					output_newline ();
-				}
+				propagate_table ( c );
 
 				/* restore previous exception-checks for the reference */
 				ref->check = save_check;
@@ -5354,25 +5368,11 @@ output_initialize (struct cb_initialize *p)
 			}
 			/* Fall through */
 		case INITIALIZE_COMPOUND:
-			i_counters[0] = 1;
-			output_prefix ();
-			output ("i_len = ");
-			if (f->flag_unbounded)
-				output ("0");
-			else
-				output_occurs (f);
-			output (";");
-			output_newline ();
-
-			output_line ("for (i0 = 1; i0 <= i_len; i0++)");
-			output_block_open ();
 			x = cb_build_field_reference (f, NULL);
-			CB_REFERENCE (x)->subs =
-				CB_BUILD_CHAIN (cb_i[0], CB_REFERENCE (x)->subs);
+			CB_REFERENCE (x)->subs = CB_BUILD_CHAIN (cb_int1, CB_REFERENCE (x)->subs);
 			output_initialize_compound (p, x);
-			CB_REFERENCE (x)->subs =
-				CB_CHAIN (CB_REFERENCE (x)->subs);
-			output_block_close ();
+			CB_REFERENCE (x)->subs = CB_CHAIN (CB_REFERENCE (x)->subs);
+			propagate_table (x);
 			output_initialize_chaining (f, p);
 			return;
 		default:
