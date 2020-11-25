@@ -1,4 +1,19 @@
 
+2020-11-25  Simon Sobisch <simonsobisch@gnu.org>
+
+	* error.c, cobc.h, tree.h: diagnostic functions now return cb_warn_val to
+	  provide the caller with the information about the type of diagnostic
+	  raised (note: can be adjusted with -W /-Wno / -Werror and by "ignored");
+	  use of cb_error_node for position tree in some wrapper functions (has no
+	  source reference and is therefore always resolved by current line)
+	* error.c, tree.h, typeck.c, parser.y: cb_note_x now implies listing
+	  suppression, therefore made related functions static instead of exporting
+	* error.c, tree.h: cb_word->error now specifies if the word reference
+	  produced a warning or error
+	* error.c (get_qualified_name): extracted from undefined_error and re-use
+	* error.c (undefined_error, ambiguous_error): only raise these errors /
+	  warnings once per word, solving FR #313 report undefined identifiers once
+
 2020-11-23  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Generated code for INITIALIZE enhanced to emit progressive

@@ -16928,9 +16928,7 @@ table_name:
 		$$ = cb_error_node;
 	} else if (!CB_FIELD (x)->index_list) {
 		cb_error_x ($1, _("'%s' not indexed"), cb_name ($1));
-		listprint_suppress ();
 		cb_note_x (COB_WARNOPT_NONE, x, _("'%s' defined here"), cb_name (x));
-		listprint_restore ();
 		$$ = cb_error_node;
 	} else {
 		$$ = $1;

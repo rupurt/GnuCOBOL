@@ -4469,18 +4469,17 @@ cb_build_expr (cb_tree list)
 			if (cb_warn_parentheses
 			 && expr_index > 3
 			 && (op == '|' || op == '&')) {
-				cb_tree e = cb_any;
-				e->source_line = cb_exp_line;
-				e->source_file = cb_source_file;
-
+			 	/* hack to use exp_line instead of source_line */
+				cb_error_node->source_line = cb_exp_line;
 				if (op == '|' && expr_stack[expr_index-2].token == '&') {
-					cb_warning_x (cb_warn_parentheses, e,
+					cb_warning_x (cb_warn_parentheses, cb_error_node,
 						_("suggest parentheses around %s within %s"), "AND", "OR");
 				} else
 				if (op == '&' && expr_stack[expr_index-2].token == '|') {
-					cb_warning_x (cb_warn_parentheses, e,
+					cb_warning_x (cb_warn_parentheses, cb_error_node,
 						_("suggest parentheses around %s within %s"), "OR", "AND");
 				}
+				cb_error_node->source_line = 0;	/* undo hack */
 			}
 			cb_expr_shift (op, v);
 			break;
@@ -8572,7 +8571,6 @@ move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
 		/* MOVE statement */
 		if (cb_warn_opt_val[warning_opt] != COBC_WARN_DISABLED) {
 			cb_warning_x (warning_opt, loc, "%s", msg);
-			listprint_suppress ();
 			if (src_flag) {
 				/* note: src_flag is -1 for numeric literals,
 				   contains literal size otherwise */
@@ -8589,7 +8587,6 @@ move_warning (cb_tree src, cb_tree dst, const unsigned int value_flag,
 				}
 			}
 			warning_destination (warning_opt, dst);
-			listprint_restore ();
 		}
 	}
 

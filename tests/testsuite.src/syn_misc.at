@@ -1432,7 +1432,6 @@ prog.cob:49: error: 'SWIT1-ON' is not defined
 prog.cob:56: error: 'SWIT2-ON' is not defined
 prog.cob:63: error: 'SWITCH-B' is not defined
 prog.cob:63: error: syntax error, unexpected OFF
-prog.cob:64: error: 'SWIT2-ON' is not defined
 prog.cob:70: error: 'SWIT26-ON' is not defined
 prog.cob:76: error: 'SWIT32-OFF' is not defined
 ])
@@ -3759,7 +3758,6 @@ prog.cob:39: error: syntax error, unexpected Identifier
 prog.cob:44: error: syntax error, unexpected Identifier, expecting THREAD
 prog.cob:48: error: syntax error, unexpected END-CALL
 prog.cob:51: error: syntax error, unexpected Identifier
-prog.cob:34: error: 'thread' is not defined, but is a reserved word in another dialect
 ])
 
 AT_CLEANUP
@@ -5836,15 +5834,57 @@ AT_DATA([prog.cob], [
 # note: the last error message comes from program validation
 #       and therefore cannot be raised earlier
 AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option prog.cob], [0], [],
-[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
-prog.cob:13: warning: offset of 'var' out of bounds: -98 [[-Wignored-error]]
-prog.cob:16: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
-prog.cob:17: warning: 'notdefined' is not defined [[-Wignored-error]]
-prog.cob:20: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
-prog.cob:24: warning: expression '115' LESS THAN '16' is always FALSE [[-Wconstant-expression]]
-prog.cob:25: warning: 'notdefined' is not defined [[-Wignored-error]]
-prog.cob:21: warning: 'notdefined' is not defined [[-Wignored-error]]
+[[prog.cob:11: warning: expression '115' LESS THAN '16' is always FALSE [-Wconstant-expression]
+prog.cob:13: warning: offset of 'var' out of bounds: -98 [-Wignored-error]
+prog.cob:16: warning: expression '115' LESS THAN '16' is always FALSE [-Wconstant-expression]
+prog.cob:17: warning: 'notdefined' is not defined [-Wignored-error]
+prog.cob:20: warning: expression '115' LESS THAN '16' is always FALSE [-Wconstant-expression]
+prog.cob:24: warning: expression '115' LESS THAN '16' is always FALSE [-Wconstant-expression]
+]])
+
+# verify that we do only skip an undefined error when it actually was reported
+AT_DATA([prog2.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA  DIVISION.
+       WORKING-STORAGE SECTION.
+       01  var       PIC X(200).
+       78  var-len   value 115.
+
+       PROCEDURE DIVISION.
+       
+           IF var-len < 16
+              move notdefined to var *> won't be seen with -Wno-ignore-error
+           END-IF
+
+       >> IF SKIP-FIRST-ERROR NOT DEFINED
+      *> always reported here (if active) as that's the first error
+           move notdefined to var    
+       >> END-IF
+
+           IF var-len < 16
+              move notdefined to var      *> never here, because of the warning/error above
+           END-IF
+           
+           move var        to notdefined   *> only here if not the skip was active
+
+           STOP RUN.
 ])
+
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -Wno-constant-expression prog2.cob], [1], [],
+[[prog2.cob:12: warning: 'notdefined' is not defined [-Wignored-error]
+prog2.cob:17: error: 'notdefined' is not defined
+]])
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -Wno-constant-expression -Wno-ignored-error prog2.cob], [1], [],
+[[prog2.cob:17: error: 'notdefined' is not defined
+]])
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -Wno-constant-expression -DSKIP-FIRST-ERROR prog2.cob], [1], [],
+[[prog2.cob:12: warning: 'notdefined' is not defined [-Wignored-error]
+prog2.cob:24: error: 'notdefined' is not defined
+]])
+AT_CHECK([$COMPILE_ONLY -fdiagnostics-show-option -Wno-constant-expression -Werror=ignored-error prog2.cob], [1], [],
+[[prog2.cob:12: error: 'notdefined' is not defined [-Werror=ignored-error]
+]])
 
 AT_CLEANUP
 

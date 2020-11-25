@@ -423,8 +423,6 @@ prog.cob:7: warning: ASSIGN variable used
 ])
 AT_CHECK([$COMPILE_ONLY prog2.cob], [1], [],
 [prog2.cob:11: error: 'not-a-var' is not defined
-prog2.cob:9: error: 'not-a-var' is not defined
-prog2.cob:7: error: 'not-a-var' is not defined
 ])
 
 AT_CLEANUP
