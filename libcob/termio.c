@@ -678,7 +678,7 @@ cob_dump_field (const int level, const char *name,
 		va_end (ap);
 		strcat (vname,")");
 		if (indexes == 1
-		 && size > f->size
+		 && size >= f->size
 		 && size < MAX_PREV) {
 			if (subscript == 0) {
 				dump_idx = subscript;

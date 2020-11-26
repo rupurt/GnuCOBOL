@@ -10372,8 +10372,6 @@ libcob: cpyabrt:4: warning: implicit CLOSE of FLATFILE ('RELFIX')
 dump written to tstdump.dump
 ])
 
-# CHECKME: why does trunk outputs "HEXV PIC X COMP-X" with length of 3 as 013?
-
 AT_DATA([reference_tmpl], [
 Module dump due to LINKAGE item 'TSPFL-RECORD' (accessed by 'CM-COMPANY') not passed by caller
 
@@ -10558,10 +10556,10 @@ WORKING-STORAGE
 01        SUMS-NON-STD-OCCURS (2)         +000000000004096.000
 01        SUMS-NON-STD-OCCURS (3)         +000000000005440.000
 01        SUMS-NON-STD-OCCURS (4)         -000000000000042.345
-01        SUMS-NON-STD-OCCURS (5)         -000000000000042.345
-01        SUMS-NON-STD-OCCURS (6)         -000000000000042.345
-01        SUMS-NON-STD-OCCURS (7)         -000000000000042.345
-01        SUMS-NON-STD-OCCURS (8)         -000000000000042.345
+           ... occurrence (5) same as (4)
+           ... occurrence (6) same as (4)
+           ... occurrence (7) same as (4)
+           ... occurrence (8) same as (4)
 
 ])
 
@@ -10727,6 +10725,229 @@ AT_CHECK([diff reference tstdump.sed], [0], [], [])
 #tstdump_ls_sticky.dump > tstdump.sed], [0], [], [])
 #
 #AT_CHECK([diff reference tstdump.sed], [0], [], [])
+
+AT_CLEANUP
+
+AT_SETUP([Test dump feature (2)])
+AT_KEYWORDS([Dump])
+
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID. prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01  P2           USAGE POINTER.
+
+       01 TAB-ADR-EINTRAEGE        PIC S9(4)      VALUE 8.
+
+       01 TAB-ADRESSEN OCCURS 0 TO 1000 TIMES
+            DEPENDING ON TAB-ADR-EINTRAEGE
+            INDEXED BY TAB-ADR-IND.
+          05 TAB-ADR-ELEMENT.
+              10 TAB-ADR-PRGM         PIC X(8).
+              10 TAB-ADR-ID           PIC X(2).
+              10 TAB-ADR-ADR-64       PIC S9(16) COMP-5.
+              10 TAB-ADR-LAST-ADR-64  PIC S9(16) COMP-5.
+
+       01  GRP-1.
+           05   FILLER  PIC X(3).
+           05   FLD-1   OCCURS 10 TIMES.
+             10 FLD-1-Y   PIC 9999 VALUE 2020.
+             10 FLD-1-M   PIC 99 VALUE 11.
+             10 FLD-1-X   PIC X(128) VALUE "This is something ".
+           05   FILLER  PIC X(3).
+
+       01  GRP-2.
+           05   FILLER  PIC X(3).
+           05   FLD-2   PIC X(42) VALUE ALL "ABCD ".
+           05   FILLER  PIC X(3).
+       01  GRP-2A.
+           05   FILLER  PIC X(2).
+           05   FLD-2A  PIC X(8) VALUE ALL "ABC".
+           05   FILLER  PIC X(1200) VALUE "X".
+       01  GRP-3.
+           05   FILLER  PIC X(3).
+           05   FLD-3   OCCURS 3 TIMES 
+                        VALUE ALL "ABC00XX".
+                15   FLD-3-2 PIC XXX.
+                15   FLD-3-3 PIC 99.
+                15   FLD-3-4 PIC XX.
+           05   FILLER  PIC X(3).
+
+       77  C5    PIC 9(03)  VALUE 6.
+       01  GRP-5.
+           05   FILLER  PIC X(3).
+           05   FLD-5.
+              10   FLD-5-1 OCCURS 0 TO 9 TIMES
+                        DEPENDING ON C5.
+                15   FLD-5-2 PIC XXX VALUE "Mon".
+                15   FLD-5-3 PIC 99  VALUE 49.
+                15   FLD-5-4 PIC XX  VALUE "ey".
+
+       LINKAGE SECTION.
+       01  A-TABLE.
+           03  prefix.
+               05  n    PIC 9(03)  VALUE 123.
+           03  table-data value all "ABCDE".
+            04  rows    OCCURS 0 TO UNBOUNDED TIMES
+                        DEPENDING ON n.
+               05 col1  PIC X.
+               05 col2  PIC X(02).
+
+       PROCEDURE DIVISION.
+           MOVE ALL "*" TO GRP-2.
+           INITIALIZE FLD-2 ALL TO VALUE.
+           DISPLAY "GRP-2:" GRP-2.
+
+           MOVE ALL "*" TO GRP-3.
+           INITIALIZE FLD-3 (1) ALL TO VALUE.
+           INITIALIZE FLD-3 (2) ALL TO VALUE.
+           INITIALIZE FLD-3 (3) ALL TO VALUE.
+           DISPLAY "GRP-3:" GRP-3.
+
+           MOVE 7       TO c5.
+           MOVE ALL "*" TO GRP-5.
+           INITIALIZE FLD-5 ALL TO VALUE.
+           DISPLAY "GRP-5:" GRP-5.
+
+           MOVE SPACES TO GRP-2A.
+           MOVE "Peek" TO GRP-2A (510:4).
+           MOVE "Boo" TO GRP-2A (910:3).
+           MOVE X"FE99" TO GRP-2A (910:2).
+           MOVE "You" TO GRP-2A (1010:3).
+           MOVE "$$" TO FLD-5-4 (5).
+           MOVE "Something else!" TO FLD-1-X (5).
+           SET P2 TO NULL.
+           SET ADDRESS OF A-TABLE TO P2.
+           MOVE ALL ZEROES TO A-TABLE (1: (LENGTH OF A-TABLE)).
+           STOP RUN.
+])
+
+AT_CHECK([$COMPILE -std=default -debug -fdump=ALL prog.cob ], [0], [], [])
+
+AT_CHECK([export COB_DUMP_FILE=tstdump.txt
+$COBCRUN_DIRECT ./prog], [11], [GRP-2:***ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD AB***
+GRP-3:***ABC00XXABC00XXABC00XX***
+GRP-5:***Mon49eyMon49eyMon49eyMon49eyMon49eyMon49eyMon49ey
+], [libcob: prog.cob:89: error: BASED/LINKAGE item 'A-TABLE' has NULL address
+
+prog.cob:89: attempt to reference unallocated memory (signal SIGSEGV)
+
+])
+
+
+AT_CAPTURE_FILE(./tstdump.txt)
+
+AT_DATA([reference], [
+Module dump due to BASED/LINKAGE item 'A-TABLE' has NULL address
+
+ Last statement of prog was at line 89 of prog.cob   
+
+Dump Program-Id prog from prog.cob compiled MMM DD YYYY HH:MM:SS
+
+WORKING-STORAGE
+**********************
+01        P2                              0x0000000000000000
+01        TAB-ADR-EINTRAEGE               +0008
+01        TAB-ADRESSEN.
+  05      TAB-ADR-ELEMENT (1).
+     10   TAB-ADR-PRGM (1)               ALL SPACES
+     10   TAB-ADR-ID (1)                 ALL SPACES
+     10   TAB-ADR-ADR-64 (1)              +00000000000000000000
+     10   TAB-ADR-LAST-ADR-64 (1)         +00000000000000000000
+           ... occurrence (2) same as (1)
+           ... occurrence (3) same as (1)
+           ... occurrence (4) same as (1)
+           ... occurrence (5) same as (1)
+           ... occurrence (6) same as (1)
+           ... occurrence (7) same as (1)
+           ... occurrence (8) same as (1)
+01        GRP-1.
+  05      FILLER                         ALL SPACES
+  05      FLD-1.
+     10   FLD-1-Y (1)                     2020
+     10   FLD-1-M (1)                     11
+     10   FLD-1-X (1)                    'This is something'
+           ... occurrence (2) same as (1)
+           ... occurrence (3) same as (1)
+           ... occurrence (4) same as (1)
+     10   FLD-1-Y (5)                     2020
+     10   FLD-1-M (5)                     11
+     10   FLD-1-X (5)                    'Something else!'
+     10   FLD-1-Y (6)                     2020
+     10   FLD-1-M (6)                     11
+     10   FLD-1-X (6)                    'This is something'
+           ... occurrence (7) same as (6)
+           ... occurrence (8) same as (6)
+           ... occurrence (9) same as (6)
+           ... occurrence (10) same as (6)
+  05      FILLER                         ALL SPACES
+01        GRP-2.
+  05      FILLER                         '***'
+  05      FLD-2                          'ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD AB'
+  05      FILLER                         '***'
+01        GRP-2A.
+  05      FILLER                         ALL SPACES
+  05      FLD-2A                         ALL SPACES
+  05      FILLER                                                                              
+                                     1 x 20202020 20202020 20202020 20202020 20202020 20202020
+                                         --- 25 thru 492 same as above ---
+                                                         P  e e k                             
+                                   493 x 20202020 20202050 65656B20 20202020 20202020 20202020
+                                                                                              
+                                   517 x 20202020 20202020 20202020 20202020 20202020 20202020
+                                         --- 541 thru 878 same as above ---
+                                                                                             
+                                   879 x 2020 20202020 20202020 20202020 20202020 202020FE 99
+                                          o                                                  
+                                   902 x 6F2020 20202020 20202020 20202020 20202020 20202020 
+                                                                                              
+                                   925 x 20202020 20202020 20202020 20202020 20202020 20202020
+                                         --- 949 thru 974 same as above ---
+                                                                                             
+                                   975 x 2020 20202020 20202020 20202020 20202020 20202020 20
+                                              Y  o u                                         
+                                   998 x 202059 6F752020 20202020 20202020 20202020 20202020 
+                                                                                              
+                                  1021 x 20202020 20202020 20202020 20202020 20202020 20202020
+                                         --- 1045 thru 1174 same as above ---
+                                                                                             
+                                  1175 x 2020 20202020 20202020 20202020 20202020 20202020 20
+                                               
+                                  1198 x 202020
+01        GRP-3.
+  05      FILLER                         '***'
+  05      FLD-3.
+       15 FLD-3-2 (1)                    'ABC'
+       15 FLD-3-3 (1)                     00
+       15 FLD-3-4 (1)                    'XX'
+           ... occurrence (2) same as (1)
+           ... occurrence (3) same as (1)
+  05      FILLER                         '***'
+77        C5                              007
+01        GRP-5.
+  05      FILLER                         '***'
+  05      FLD-5.
+     10   FLD-5-1.
+       15 FLD-5-2 (1)                    'Mon'
+       15 FLD-5-3 (1)                     49
+       15 FLD-5-4 (1)                    'ey'
+           ... occurrence (2) same as (1)
+           ... occurrence (3) same as (1)
+           ... occurrence (4) same as (1)
+       15 FLD-5-2 (5)                    'Mon'
+       15 FLD-5-3 (5)                     49
+       15 FLD-5-4 (5)                    '$$'
+       15 FLD-5-2 (6)                    'Mon'
+       15 FLD-5-3 (6)                     49
+       15 FLD-5-4 (6)                    'ey'
+           ... occurrence (7) same as (6)
+
+LINKAGE
+**********************
+])
+
+AT_CHECK([gcdiff reference tstdump.txt], [0], [], [])
 
 AT_CLEANUP
 

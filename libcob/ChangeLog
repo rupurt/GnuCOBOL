@@ -1,4 +1,7 @@
 
+2020-11-26  Ron Norman <rjn@inglenet.com>
+	* termio.c: Catch more table entries as repeated
+
 2020-11-24  Ron Norman <rjn@inglenet.com>
 	* termio.c: Improve field dump routines to look for duplicated data
 
