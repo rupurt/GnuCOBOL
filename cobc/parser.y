@@ -16917,6 +16917,7 @@ table_name:
 		listprint_restore ();
 		$$ = cb_error_node;
 	} else {
+		cb_search_ready (x);
 		$$ = $1;
 	}
   }

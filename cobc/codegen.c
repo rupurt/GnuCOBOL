@@ -5418,8 +5418,6 @@ output_initialize (struct cb_initialize *p)
 	}
 }
 
-/* SEARCH */
-
 static void
 output_occurs (struct cb_field *p)
 {
@@ -5429,6 +5427,8 @@ output_occurs (struct cb_field *p)
 		output ("%d", p->occurs_max);
 	}
 }
+
+/* SEARCH */
 
 static void
 output_search_whens (cb_tree table, struct cb_field *p, cb_tree stmt,
@@ -5461,16 +5461,35 @@ output_search_whens (cb_tree table, struct cb_field *p, cb_tree stmt,
 
 	/* Start loop */
 	skip_line_num++;
+	output_prefix ();
+	output ("if ( (");
+	output_integer (idx);
+	output (" < 1) || (");
+	output_integer (idx);
+	output (" > ");
+	output_occurs (p);
+	output (") ) /* Is Table Index valid? */");
+	output_newline ();
+	output_block_open ();
+#if 0	/* CHECKME: What should be done when the index is invalid */
+	output_prefix ();
+	output_integer (idx);
+	output (" = 1;");
+	output_newline ();
+#endif
+	output_block_close ();
 	output_line ("for (;;) {");
 	output_indent_level += 2;
 
 	/* End test */
 	output_prefix ();
-	output ("if (");
+	output ("if ( (");
+	output_integer (idx);
+	output (" < 1) || (");
 	output_integer (idx);
 	output (" > ");
 	output_occurs (p);
-	output (")");
+	output (") )");
 	output_newline ();
 	output_block_open ();
 	output_line ("/* Table end */");
@@ -5519,11 +5538,13 @@ output_search_all (cb_tree table, struct cb_field *p, cb_tree stmt,
 	output_newline ();
 
 	/* Check for at least one entry */
-	output_prefix ();
-	output ("if (");
-	output_occurs (p);
-	output (" == 0) head = tail;");
-	output_newline ();
+	if (p->depending) {
+		output_prefix ();
+		output ("if (");
+		output_occurs (p);
+		output (" == 0) head = tail;");
+		output_newline ();
+	}
 
 	/* Start loop */
 	output_line ("for (;;)");
@@ -5549,6 +5570,13 @@ output_search_all (cb_tree table, struct cb_field *p, cb_tree stmt,
 
 	/* WHEN test */
 	output_line ("/* WHEN */");
+	if (cb_flag_source_location
+	 || cb_flag_dump) {
+		if (last_line != cond->source_line) {
+			output_line ("module->module_stmt = 0x%08X;",
+				COB_SET_LINE_FILE(when->source_line, lookup_source(when->source_file)));
+		}
+	}
 	output_prefix ();
 	output ("if (");
 	output_cond (cond, 1);

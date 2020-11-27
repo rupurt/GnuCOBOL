@@ -1933,6 +1933,7 @@ extern cb_tree			cb_build_any_intrinsic (cb_tree);
 extern cb_tree			cb_build_search (const int,
 						 const cb_tree, const cb_tree,
 						 const cb_tree, const cb_tree);
+extern void			cb_search_ready (const cb_tree);
 
 extern cb_tree			cb_build_call (const cb_tree, const cb_tree,
 					       const cb_tree, const cb_tree,
