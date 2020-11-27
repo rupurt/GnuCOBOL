@@ -1614,11 +1614,11 @@ AT_DATA([prog2.cob], [
 AT_CHECK([$COBC -x prog.cob])
 AT_CHECK([$COBCRUN_DIRECT ./prog X], [0], [], [])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
-[libcob: error: inconsistant file name (status = 31) for file test-file ('field with NULL address')
+[libcob: error: inconsistent file name (status = 31) for file test-file ('field with NULL address')
 ])
 AT_CHECK([$COMPILE prog.cob])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
-[libcob: prog.cob:23: error: inconsistant file name (status = 31) for file test-file ('field with NULL address') on OPEN
+[libcob: prog.cob:23: error: inconsistent file name (status = 31) for file test-file ('field with NULL address') on OPEN
 ])
 
 AT_CHECK([$COMPILE prog2.cob])
@@ -1793,7 +1793,7 @@ Extend file: foxasg.txt - 00 #0002.
 AT_CHECK([$COMPILE prog2.cob], [0], [], [])
 
 AT_CHECK([$COBCRUN_DIRECT ./prog2], [1], [],
-[libcob: prog2.cob:32: error: inconsistant file name (status = 31) for file f ('field with NULL address') on OPEN
+[libcob: prog2.cob:32: error: inconsistent file name (status = 31) for file f ('field with NULL address') on OPEN
 ])
 
 AT_CLEANUP
@@ -1831,10 +1831,10 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$COBC -x prog.cob])
 AT_CHECK([$COBCRUN_DIRECT ./prog], [1], [],
-[libcob: error: inconsistant file name (status = 31) for file test-file ('')
+[libcob: error: inconsistent file name (status = 31) for file test-file ('')
 ])
 AT_CHECK([$COBCRUN_DIRECT ./prog X], [1], [],
-[libcob: error: inconsistant file name (status = 31) for file test-file ('')
+[libcob: error: inconsistent file name (status = 31) for file test-file ('')
 ])
 
 AT_CLEANUP

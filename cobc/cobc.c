@@ -3010,6 +3010,57 @@ process_command_line (const int argc, char **argv)
 			conf_ret |= cb_load_conf (cob_optarg, 0);
 			break;
 
+		case '0':
+			/* -O0 : disable optimizations (or at least minimize them) */
+			cob_optimize = 0;
+			strip_output = 0;
+			cb_constant_folding = 0;
+			copt = CB_COPT_0;
+			break;
+
+		case 'O':
+			/* -O : Optimize */
+			cob_optimize = 1;
+			copt = CB_COPT_1;
+			break;
+
+		case '2':
+			/* -O2 : Optimize */
+			cob_optimize = 1;
+			strip_output = 1;
+			copt = CB_COPT_2;
+			break;
+
+		case '3':
+			/* -O3 : Optimize */
+			cob_optimize = 1;
+			strip_output = 1;
+			copt = CB_COPT_3;
+			break;
+
+		case 's':
+			/* -Os : Optimize */
+			cob_optimize = 1;
+			strip_output = 1;
+			copt = CB_COPT_S;
+			break;
+
+		case 'g':
+			/* -g : Generate C debug code */
+			save_all_src = 1;
+			gflag_set = 1;
+			cb_flag_stack_check = 1;
+			cb_flag_source_location = 1;
+#if 1		/* auto-included, may be disabled manually if needed */
+			cb_flag_c_line_directives = 1;
+			cb_flag_c_labels = 1;
+#endif
+			cb_flag_remove_unreachable = 0;
+#ifdef COB_DEBUG_FLAGS
+			COBC_ADD_STR (cobc_cflags, " ", cobc_debug_flags, NULL);
+#endif
+			break;
+
 		case 'd':
 			/* -debug : Turn on all runtime checks */
 			cb_flag_source_location = 1;
@@ -3180,53 +3231,17 @@ process_command_line (const int argc, char **argv)
 
 		case '0':
 			/* -O0 : disable optimizations (or at least minimize them) */
-			cob_optimize = 0;
-			strip_output = 0;
-			cb_constant_folding = 0;
-			copt = CB_COPT_0;
-			break;
-
 		case 'O':
 			/* -O : Optimize */
-			cob_optimize = 1;
-			copt = CB_COPT_1;
-			break;
-
 		case '2':
 			/* -O2 : Optimize */
-			cob_optimize = 1;
-			strip_output = 1;
-			copt = CB_COPT_2;
-			break;
-
 		case '3':
 			/* -O3 : Optimize */
-			cob_optimize = 1;
-			strip_output = 1;
-			copt = CB_COPT_3;
-			break;
-
 		case 's':
 			/* -Os : Optimize */
-			cob_optimize = 1;
-			strip_output = 1;
-			copt = CB_COPT_S;
-			break;
-
 		case 'g':
 			/* -g : Generate C debug code */
-			save_all_src = 1;
-			gflag_set = 1;
-			cb_flag_stack_check = 1;
-			cb_flag_source_location = 1;
-#if 0	/* possibly auto-include: */
-			cb_flag_c_line_directives = 1;
-			cb_flag_c_labels = 1;
-#endif
-			cb_flag_remove_unreachable = 0;
-#ifdef COB_DEBUG_FLAGS
-			COBC_ADD_STR (cobc_cflags, " ", cobc_debug_flags, NULL);
-#endif
+			/* These options were all processed in the first getopt-run */
 			break;
 
 		case '$':

@@ -7455,7 +7455,7 @@ cob_fatal_error (const enum cob_fatal_error fatal_error)
 			msg = _("permanent file error");
 			break;
 		case COB_STATUS_31_INCONSISTENT_FILENAME:
-			msg = _("inconsistant file name");
+			msg = _("inconsistent file name");
 			break;
 		case COB_STATUS_35_NOT_EXISTS:
 			msg = _("file does not exist");

@@ -1,4 +1,12 @@
 
+2020-11-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c (process_command_line): early processing for -g and optimization
+	  flags to allow their "grouped" options to be adjusted by single options
+	  later on
+	* cobc.c (process_command_line), flag.def: -g now implies the recently
+	  added flags -fgen-c-line-directives and -fgen-c-labels
+
 2020-11-25  Simon Sobisch <simonsobisch@gnu.org>
 
 	* error.c, cobc.h, tree.h: diagnostic functions now return cb_warn_val to
