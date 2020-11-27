@@ -479,6 +479,8 @@ static const struct optim_table	align_bin_sub_funcs[] = {
 static cb_tree cb_build_name_reference (struct cb_field *f1, struct cb_field *f2);
 static void cb_walk_cond (cb_tree x);
 static cb_tree cb_build_length_1 (cb_tree x);
+static struct cb_field	*check_search_table = NULL;
+static struct cb_field	*check_search_index = NULL;
 static struct cb_field	*check_base_p = NULL;
 static struct cb_field	*check_odo_p = NULL;
 static struct cb_field	*check_subscript_p = NULL;
@@ -609,19 +611,27 @@ cb_add_check_odo ( struct cb_field *p )
 static cb_tree
 cb_add_check_subscript ( struct cb_field *p, cb_tree sub, const char *name, const int opt )
 {
-	struct cb_field *sub_p;
+	struct cb_field *sub_p, *pp;
 	cb_tree	y;
 
-	if (cb_flag_optimize_check) {
-		sub_p = NULL;
-		if (CB_REFERENCE_P (sub)) {
-			y = cb_ref (sub);
-			if (y != cb_error_node
-			 && CB_FIELD_P (y))
-				sub_p = CB_FIELD_PTR (y);
-		} else if (CB_FIELD_P (sub)) {
-			sub_p = CB_FIELD_PTR (sub);
+	sub_p = NULL;
+	if (CB_REFERENCE_P (sub)) {
+		y = cb_ref (sub);
+		if (y != cb_error_node
+		 && CB_FIELD_P (y))
+			sub_p = CB_FIELD_PTR (y);
+	} else if (CB_FIELD_P (sub)) {
+		sub_p = CB_FIELD_PTR (sub);
+	}
+	if (check_search_index != NULL
+	 && check_search_index == sub_p) {
+		/* If field is a member of the table being searched, skip check */
+		for (pp = p; pp; pp = pp->parent) {
+			if (pp == check_search_table)	
+				return NULL;
 		}
+	}
+	if (cb_flag_optimize_check) {
 		if (check_subscript_p == p
 		 && check_sub == sub_p)
 			return NULL;
@@ -11607,16 +11617,39 @@ cb_build_search_all (cb_tree table, cb_tree cond)
 }
 
 void
+cb_search_ready (cb_tree table)
+{
+	struct cb_field	*f;
+	if (table == NULL) {
+		check_search_table = NULL;
+		check_search_index = NULL;
+		return;
+	}
+	f = cb_code_field (table);
+	if(f->index_list) {
+		check_search_table = f;
+		check_search_index = cb_code_field (CB_VALUE (f->index_list));
+	} else {
+		check_search_table = NULL;
+		check_search_index = NULL;
+	}
+}
+
+void
 cb_emit_search (cb_tree table, cb_tree varying, cb_tree at_end, cb_tree whens)
 {
+	struct cb_field	*f;
 	if (cb_validate_one (table)
 	 || cb_validate_one (varying)
 	 || whens == cb_error_node) {
 		return;
 	}
+
+	f = cb_code_field (table);
 	whens = cb_list_reverse (whens);
 	cb_emit (cb_build_search (0, table, varying,
 				  cb_check_needs_break (at_end), whens));
+	cb_search_ready (NULL);
 }
 
 void
@@ -11638,6 +11671,7 @@ cb_emit_search_all (cb_tree table, cb_tree at_end, cb_tree when, cb_tree stmts)
 	cb_emit (cb_build_search (1, table, NULL,
 				  cb_check_needs_break (at_end),
 				  cb_build_if (x, stmt_lis, NULL, 0)));
+	cb_search_ready (NULL);
 }
 
 /* SET statement */
