@@ -6,6 +6,7 @@
 	  later on
 	* cobc.c (process_command_line), flag.def: -g now implies the recently
 	  added flags -fgen-c-line-directives and -fgen-c-labels
+	* codegen.c: output "cob_nop ();" instead of ";" for not-optimized "no op"
 
 2020-11-25  Simon Sobisch <simonsobisch@gnu.org>
 

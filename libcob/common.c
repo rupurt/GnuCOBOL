@@ -2171,6 +2171,15 @@ cob_trace_stmt (const char *stmt)
 }
 
 void
+cob_nop (void)
+{
+	/* this is only an empty function, a call to it may be inserted by cobc
+	   to force some optimizations in the C compiler to not be triggered in
+	   a quite portable way */
+	;
+}
+
+void
 cob_ready_trace (void)
 {
 	cobsetptr->cob_line_trace = 1;

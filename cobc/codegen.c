@@ -5145,8 +5145,8 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 
 				/* restore previous exception-checks for the reference */
 				ref->check = save_check;
-				ref->length = save_length;
-			}
+					ref->length = save_length;
+				}
 		}
 	}
 }
@@ -7564,7 +7564,7 @@ output_line_and_trace_info (cb_tree x, const char *name)
 		if (cb_flag_source_location) {
 			output_trace_info (x, name);
 		} else {
-			output_line (";");
+			output_line ("cob_nop ();");
 		}
 		output_c_info ();
 	} else {
@@ -7942,7 +7942,7 @@ output_stmt (cb_tree x)
 			}
 		} else {
 			if (cb_flag_c_line_directives) {
-				output_line (";");
+				output_line ("cob_nop ();");
 				output_c_info ();
 			}
 		}

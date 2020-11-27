@@ -1,5 +1,12 @@
 
+2020-11-27  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c, common.h: added externalized cob_nop to have a portable way to
+	  ensure some optimizations on C level not be done (currently: not removing
+	  #line references)
+
 2020-11-24  Ron Norman <rjn@inglenet.com>
+
 	* termio.c: Improve field dump routines to look for duplicated data
 
 2020-11-23  Ron Norman <rjn@inglenet.com>

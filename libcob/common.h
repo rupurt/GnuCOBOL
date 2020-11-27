@@ -1758,6 +1758,7 @@ COB_EXPIMP void			*cob_external_addr	(const char *, const int);
 COB_EXPIMP unsigned char	*cob_get_pointer	(const void *);
 COB_EXPIMP void			cob_ready_trace		(void);
 COB_EXPIMP void			cob_reset_trace		(void);
+COB_EXPIMP void			cob_nop (void);
 
 /* Call from outside to set/read/re-evaluate libcob options */
 enum cob_runtime_option_switch {
