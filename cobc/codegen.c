@@ -1857,16 +1857,12 @@ static void
 output_local_indexes (void)
 {
 	int	i;
-	int	found = 0;
 
-	output_local ("\tint\t\ti_len;\n");
+	output_local ("\n/* Subscripts */\n");
+	output_local ("int\t\ti_len;\n");	/* used for ODO handling */
 	for (i = 0; i < COB_MAX_SUBSCRIPTS; i++) {
 		if (i_counters[i]) {
-			if (!found) {
-				found = 1;
-				output_local ("\n/* Subscripts */\n");
-			}
-			output_local ("\tint\t\ti%d = 0, i%d_max = 0;\n", i, i);
+			output_local ("int\t\ti%d = 0, i%d_max = 0;\n", i, i);
 		}
 	}
 }
@@ -3475,7 +3471,6 @@ output_param (cb_tree x, int id)
 	char			*func;
 	int			n;
 	int			sav_stack_id;
-	char			fname[12];
 
 	if (x == NULL) {
 		output ("NULL");
@@ -3771,7 +3766,6 @@ output_param (cb_tree x, int id)
 			if (stack_id >= num_cob_fields) {
 				num_cob_fields = stack_id + 1;
 			}
-			sprintf (fname, "f%d", stack_id++);
 			if (inside_check != 0) {
 				if (inside_stack[inside_check - 1] != 0) {
 					inside_stack[inside_check - 1] = 0;
@@ -3780,7 +3774,7 @@ output_param (cb_tree x, int id)
 					output_prefix ();
 				}
 			}
-			output ("COB_SET_FLD(%s, ", fname);
+			output ("COB_SET_FLD(f%d, ", stack_id++);
 			output_size (x);
 			output (", ");
 			output_data (x);
@@ -4476,14 +4470,12 @@ deduce_initialize_type (struct cb_initialize *p, struct cb_field *f,
  * Emit code to propagate table initialize
  */
 static void
-propagate_table ( cb_tree x )
+propagate_table (cb_tree x)
 {
-	struct cb_field *f;
-	long len;
-	unsigned int occ, j = 1;
-	f = cb_code_field (x);
-	len = (long)f->size;
-	occ = f->occurs_max;
+	struct cb_field *f = cb_code_field (x);
+	size_t len = (size_t)f->size;
+	const unsigned int occ = f->occurs_max;
+	unsigned int j = 1;
 
 	if (gen_init_working
 	 || (!chk_field_variable_size(f)
@@ -4493,25 +4485,30 @@ propagate_table ( cb_tree x )
 		/* Generate inline 'memcpy' to propagate the array data */
 
 		if (occ > 1) {
+			/* double the chunks each time */
 			do {
 				output_prefix ();
 				output ("memcpy (");
 				output_base (f, 0);
-				output (" + %5ld, ",len);
+				output (" + %5lu, ", len);
 				output_base (f, 0);
-				output (", %5ld);\t/* %s: %5d thru %d */",len,f->name,j+1,j*2);
+				output (", %5lu);\t/* %s: %5d thru %d */",
+						len, f->name, j + 1, j * 2);
 				output_newline ();
 				j = j * 2;
 				len = len * 2;
 			} while ((j * 2) < occ);
+
+			/* missing piece after last chunk */
 			if (j < occ) {
 				output_prefix ();
 				output ("memcpy (");
 				output_base (f, 0);
-				output (" + %5ld, ",len);
+				output (" + %5lu, ", len);
 				output_base (f, 0);
-				output (", %5ld);\t/* %s: %5d thru %d */",
-							(long)(f->size * (occ - j)),f->name,j+1,occ);
+				len = (size_t)f->size * (occ - j);
+				output (", %5lu);\t/* %s: %5d thru %d */",
+						len, f->name, j + 1, occ);
 				output_newline ();
 			}
 		}
@@ -5123,11 +5120,11 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				}
 			} else {
 				struct cb_reference *ref = CB_REFERENCE (c);
-				cb_tree			save_check, save_length;
+				cb_tree			save_length;
 
 				/* Output initialization for the first record */
+				output_line ("/* initialize first record for %s */", f->name);
 				save_length = ref->length;
-				save_check = ref->check;
 				ref->subs = CB_BUILD_CHAIN (cb_int1, ref->subs);
 				if (type == INITIALIZE_ONE) {
 					output_initialize_one (p, c);
@@ -5137,16 +5134,13 @@ output_initialize_compound (struct cb_initialize *p, cb_tree x)
 				}
 				ref->length = NULL;
 
-				/* all exceptions should have been raised above,
-				   so temporarily detach from the reference */
-				ref->check = NULL;
-
-				propagate_table ( c );
+				output_line ("/* copy initialized record for %s to later occurrences */",
+					f->name);
+				propagate_table (c);
 
 				/* restore previous exception-checks for the reference */
-				ref->check = save_check;
-					ref->length = save_length;
-				}
+				ref->length = save_length;
+			}
 		}
 	}
 }
@@ -9385,33 +9379,33 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 	char	fname[64];
 	int	fld_id;
 
-    	if(f == NULL)
-	    return;
+	if (f == NULL)
+		return;
 	n = f->sister;
 	c = f->children;
-	if(n
-	&& n->storage != CB_STORAGE_REPORT)
+	if (n
+	 && n->storage != CB_STORAGE_REPORT)
 		n = NULL;
-	if(n
-	&& n->report != r)
+	if (n
+	 && n->report != r)
 		n = NULL;
-	if(c
-	&& c->storage != CB_STORAGE_REPORT)
+	if (c
+	 && c->storage != CB_STORAGE_REPORT)
 		c = NULL;
-	if(n
-	&& (n->report_flag & COB_REPORT_LINE)) {
+	if (n
+	 && (n->report_flag & COB_REPORT_LINE)) {
 		output_report_define_lines(top, n, r);
 	}
-	if(c
-	&& (c->report_flag & COB_REPORT_LINE)) {
+	if (c
+	 && (c->report_flag & COB_REPORT_LINE)) {
 		output_report_define_lines(0, c, r);
 	} else {
 		c = NULL;
 	}
-	if(!top)
+	if (!top)
 		c = NULL;
 
-	if(f->report_flag & COB_REPORT_LINE_EMITTED)	/* Was this already emited? */
+	if (f->report_flag & COB_REPORT_LINE_EMITTED)	/* Already emitted? */
 		return;
 	f->report_flag |= COB_REPORT_LINE_EMITTED;
 
@@ -9446,9 +9440,9 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 		sprintf (fname, "%s of ", f->name);
 	}
 	output_local("\n/* %s%s ",fname,r->name);
-	if((f->report_flag & COB_REPORT_LINE)
-	&& f->children
-	&& (f->children->report_flag & COB_REPORT_LINE)) {
+	if ((f->report_flag & COB_REPORT_LINE)
+	 && f->children
+	 && (f->children->report_flag & COB_REPORT_LINE)) {
 		printf("Warning: Ignoring nested LINE %s %d\n",
 			(f->report_flag & COB_REPORT_LINE_PLUS)?"PLUS":"",
 			f->report_line);
@@ -9456,7 +9450,7 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 		f->report_flag &= ~COB_REPORT_LINE_PLUS;
 		f->report_flag &= ~COB_REPORT_LINE;
 	}
-	if(f->report_flag & COB_REPORT_LINE)
+	if (f->report_flag & COB_REPORT_LINE)
 		output_local("LINE %s %d ",
 			(f->report_flag & COB_REPORT_LINE_PLUS)?"PLUS":"",
 			f->report_line);
