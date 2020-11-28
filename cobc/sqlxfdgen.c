@@ -1225,7 +1225,7 @@ output_xfd_file (struct cb_file *fl)
 	int		i,j,k,sub,idx[MAX_OCC_NEST];
 
 	if (fl->record_min != fl->record_max) {
-		cb_warning (COBC_WARN_ENABLED,
+		cb_warning (COBC_WARN_FILLER,
 			_("FD %s; SQL requires fixed size records"), fl->name);
 		return;
 	}
