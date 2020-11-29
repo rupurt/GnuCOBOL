@@ -313,15 +313,6 @@ struct cb_turn_list {
 	int		with_location;
 };
 
-/* Basic memory structure */
-struct cobc_mem_struct {
-	struct	cobc_mem_struct	*next;			/* next pointer */
-	void			*memptr;
-	size_t			memlen;
-};
-#define COBC_MEM_SIZE ((sizeof(struct cobc_mem_struct) + sizeof(long long) - 1) \
-						/ sizeof(long long)) * sizeof(long long)  
-
 /* Type of name to check in cobc_check_valid_name */
 enum cobc_name_type {
 	FILE_BASE_NAME = 0,

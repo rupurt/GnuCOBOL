@@ -291,6 +291,17 @@ unsigned int	cb_correct_program_order = 0;
 
 cob_u32_t		optimize_defs[COB_OPTIM_MAX] = { 0 };
 
+
+/* Basic memory structure */
+struct cobc_mem_struct {
+	struct	cobc_mem_struct	*next;			/* next pointer */
+	void			*memptr;
+	size_t			memlen;
+};
+const size_t COBC_MEM_SIZE =
+	((sizeof(struct cobc_mem_struct) + sizeof(long long) - 1)
+	/ sizeof(long long)) * sizeof(long long);
+
 #define	COB_EXCEPTION(code,tag,name,critical) {name, 0x##code, 0, 0},
 struct cb_exception cb_exception_table[] = {
 	{NULL, 0, 0, 0},		/* CB_EC_ZERO */
@@ -1664,7 +1675,7 @@ turn_ec_for_table (struct cb_exception *table, const size_t table_len,
 
 
 static unsigned int
-turn_ec_io (struct cb_exception ec_to_turn,
+turn_ec_io (const struct cb_exception ec_to_turn,
 	    const cob_u32_t to_on_off,
 	    cb_tree loc,
 	    struct cb_text_list ** const ec_list)
@@ -5084,7 +5095,7 @@ static int
 set_picture (struct cb_field *field, char *picture, size_t picture_len)
 {
 	size_t usage_len;
-	char picture_usage[CB_LIST_PICSIZE];
+	char picture_usage[CB_LIST_PICSIZE] = { 0 };
 
 	memset (picture, 0, CB_LIST_PICSIZE);
 
@@ -6332,7 +6343,6 @@ print_line (struct list_files *cfile, char *line, int line_num, int in_copy)
 	struct list_skip	*skip;
 	int	do_print;
 	int	on_off;
-	char	pch;
 
 	do_print = cfile->listing_on;
 	if (line_has_listing_directive (line, cfile->source_format, &on_off)) {
@@ -6346,7 +6356,7 @@ print_line (struct list_files *cfile, char *line, int line_num, int in_copy)
 	}
 
 	if (do_print) {
-		pch = in_copy ? 'C' : ' ';
+		char	pch = in_copy ? 'C' : ' ';
 		for (skip = cfile->skip_head; skip; skip = skip->next) {
 			if (skip->skipline == line_num) {
 				pch = 'X';
@@ -6708,7 +6718,7 @@ reflow_replaced_free_format_text (char *pline[CB_READ_AHEAD],
 		/*
 		  Terminate the line at null or the first non-space character.
 		*/
-		for (j = first_col; pline[i][j] && pline[i][j] == ' '; j++);
+		for (j = first_col; pline[i][j] == ' '; j++);
 		pline[i][j] = '\0';
 
 		/*
@@ -6779,7 +6789,7 @@ print_replace_text (struct list_files *cfile, FILE *fd,
 	char	tterm[2];
 	char	ttoken[CB_LINE_LENGTH + 2];
 	char	cmp_line[CB_LINE_LENGTH + 2];
-	char	from_line[CB_LINE_LENGTH + 2];
+	char	from_line[CB_LINE_LENGTH + 2] = { 0 };
 
 	if (is_comment_line (pline[0], fixed)) {
 		return pline_cnt;
@@ -6948,7 +6958,11 @@ print_replace_text (struct list_files *cfile, FILE *fd,
 		}
 	} else {
 		strcpy (from_line, rfp);
+#if 0
 		from_ptr = get_next_token (from_line, ftoken, fterm);
+#else
+		(void) get_next_token (from_line, ftoken, fterm);
+#endif
 		if (ftoken[0] == ':' || ftoken[0] == '(') {
 			subword = 1;
 		}
@@ -7120,7 +7134,11 @@ print_replace_main (struct list_files *cfile, FILE *fd,
 	is_copy_line = !strcasecmp (ttoken, "COPY");
 	is_replace_line = !strcasecmp (ttoken, "REPLACE");
 	if (is_replace_line && to_ptr) {
+#if 0
 		to_ptr = get_next_token (to_ptr, ttoken, tterm);
+#else
+		(void)get_next_token (to_ptr, ttoken, tterm);
+#endif
 		is_replace_off = !strcasecmp (ttoken, "OFF");
 	}
 
@@ -7426,7 +7444,6 @@ process_translate (struct filename *fn)
 	struct local_filename	*lf;
 	int			ret;
 	int			i;
-	char	*buffer;
 
 	/* Initialize */
 	cb_source_file = NULL;
@@ -7530,7 +7547,7 @@ process_translate (struct filename *fn)
 	/* remove possible path from header name for later codegen */
 	if (strrchr (cb_storage_file_name, '/')
 	 || strrchr (cb_storage_file_name, '\\')) {
-		buffer = file_basename (cb_storage_file_name, COB_BASENAME_KEEP_EXT);
+		char	*buffer = file_basename (cb_storage_file_name, COB_BASENAME_KEEP_EXT);
 		memcpy ((void *) cb_storage_file_name, (void *) buffer, strlen (buffer) + 1);
 	}
 

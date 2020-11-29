@@ -1,4 +1,12 @@
 
+2020-11-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c: limit sscanf width for strings
+	* common.c (set_config_val): removed duplicate check for
+	  ptr (!= 0 && == ' ')
+	* call.c, common.c, fileio.c, intrinsic.c, mlio.c, strings.c:
+	  reduced scope of some variables
+
 2020-11-28  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c (cob_check_version): restored compat option for GC 2.x pre 2.2

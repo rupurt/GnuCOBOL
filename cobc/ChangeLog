@@ -1,4 +1,11 @@
 
+2020-11-29  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c, cobc.h: moved memory related struct and size from header + define
+	  to source + constant
+	* error.c (cb_note_x): fixed late return that lead to listing issues and
+	  memory leak
+
 2020-11-28  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c: fixed bad memory access for cobc -v -version

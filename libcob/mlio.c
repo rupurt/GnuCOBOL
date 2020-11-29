@@ -262,12 +262,12 @@ static xmlChar *
 get_xml_name (const cob_field * const f)
 {
 	xmlChar	*name;
-	xmlChar	*underscore;
-	xmlChar	*name_with_underscore;
 
 	name = get_trimmed_xml_data (f);
 
 	if (name && !cob_is_xml_namestartchar (name[0])) {
+		xmlChar	*underscore;
+		xmlChar	*name_with_underscore;
 		underscore = xmlCharStrdup ("_");
 		if (underscore) {
 			name_with_underscore = xmlStrcat (underscore, name);

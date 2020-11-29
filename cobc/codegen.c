@@ -480,21 +480,15 @@ list_cache_sort (void *inlist, int (*cmpfunc)(const void *mp1, const void *mp2))
 				} else if (qsize == 0 || !q) {
 					e = p;
 					p = p->next;
-					if (psize) {
-						psize--;
-					}
+					psize--;
 				} else if ((*cmpfunc) (p, q) <= 0) {
 					e = p;
 					p = p->next;
-					if (psize) {
-						psize--;
-					}
+					psize--;
 				} else {
 					e = q;
 					q = q->next;
-					if (qsize) {
-						qsize--;
-					}
+					qsize--;
 				}
 				if (tail) {
 					tail->next = e;
@@ -805,14 +799,14 @@ out_odoslide_grp_offset (struct cb_field *p, struct cb_field *fld)
 			add_size = 0;
 			for (f = p->children; f; f = f->sister) {
 				if (f == fld) {
-					found_it = 1;
+					/* found_it = 1; */
 					if (add_size > 0) {
 						if (need_plus_sign) {
 							output ("+");
 							need_plus_sign = 0;
 						}
-						output ("%d",add_size);
-						add_size = 0;
+						output ("%d", add_size);
+						/* add_size = 0; */
 					}
 					output (")");
 					return 1;
@@ -966,7 +960,6 @@ output_base (struct cb_field *f, const cob_u32_t no_output)
 {
 	struct cb_field		*f01;
 	struct cb_field		*p;
-	struct cb_field		*v;
 	struct base_list	*bl;
 
 	/* LCOV_EXCL_START */
@@ -1043,6 +1036,7 @@ output_base (struct cb_field *f, const cob_u32_t no_output)
 		if (cb_flag_odoslide) {
 			out_odoslide_offset (f01, f);
 		} else {
+			struct cb_field		*v;
 			for (p = f->parent; p; f = f->parent, p = f->parent) {
 				for (p = p->children; p != f; p = p->sister) {
 					v = chk_field_variable_size (p);
@@ -1086,7 +1080,6 @@ is_index_1 (cb_tree x)
 static void
 output_data (cb_tree x)
 {
-	int did_check = 0;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_LITERAL: {
 		struct cb_literal	*l = CB_LITERAL (x);
@@ -1110,6 +1103,7 @@ output_data (cb_tree x)
 	case CB_TAG_REFERENCE: {
 		struct cb_reference	*r = CB_REFERENCE (x);
 		struct cb_field		*f = CB_FIELD (r->value);
+		int did_check = 0;
 
 		if (r->check 
 		 && !gen_init_working
@@ -1773,7 +1767,6 @@ output_call_cache (void)
 {
 	struct call_list	*call;
 	struct static_call_list	*static_call;
-	const char			*convention_modifier;
 
 	if (needs_unifunc || call_cache || func_call_cache) {
 		output_local ("\n/* Call pointers */\n");
@@ -1792,6 +1785,7 @@ output_call_cache (void)
 			      call->call_name);
 	}
 	if (static_call_cache) {
+		const char			*convention_modifier;
 		static_call_cache = static_call_list_reverse (static_call_cache);
 		output_local ("/* Define external subroutines being called statically */\n");
 		for (static_call = static_call_cache; static_call;
@@ -2228,7 +2222,6 @@ output_emit_field (cb_tree x, const char *cmt)
 static void
 output_local_field_cache (struct cb_program *prog)
 {
-	cb_tree			l;
 	struct field_list	*field;
 	struct cb_field		*f;
 	struct cb_report	*rep;
@@ -2284,6 +2277,7 @@ output_local_field_cache (struct cb_program *prog)
 	
 	/* Output report writer special fields */
 	if (prog->report_storage) {
+		cb_tree			l;
 		for (l = prog->report_list; l; l = CB_CHAIN (l)) {
 			rep = CB_REPORT(CB_VALUE(l));
 			for (f = rep->records; f; f = f->sister) {
@@ -3359,7 +3353,6 @@ output_long_integer (cb_tree x)
 static void
 output_index (cb_tree x)
 {
-	struct cb_field		*f;
 	switch (CB_TREE_TAG (x)) {
 	case CB_TAG_INTEGER:
 		output ("%d", CB_INTEGER (x)->val - 1);
@@ -3370,7 +3363,7 @@ output_index (cb_tree x)
 	default:
 		output ("(");
 		if (CB_TREE_TAG (x) == CB_TAG_REFERENCE) {
-			f = cb_code_field (x);
+			struct cb_field	*f = cb_code_field (x);
 			if (f->pic
 			&& f->pic->have_sign == 0) {	/* Avoid ((unsigned int)(0 - 1)) */
 				f->pic->have_sign = 1;	/* Handle subscript as signed */
@@ -3466,11 +3459,7 @@ output_param (cb_tree x, int id)
 	FILE			*savetarget;
 	struct cb_intrinsic	*ip;
 	struct cb_alphabet_name	*abp;
-	struct cb_alphabet_name	*rbp;
 	cb_tree			l;
-	char			*func;
-	int			n;
-	int			sav_stack_id;
 
 	if (x == NULL) {
 		output ("NULL");
@@ -3621,6 +3610,8 @@ output_param (cb_tree x, int id)
 			break;
 		}
 		if (r->check) {
+			int			n;
+			int			sav_stack_id;
 			inside_stack[inside_check++] = 0;
 			/* LCOV_EXCL_START */
 			if (inside_check >= COB_INSIDE_SIZE) {
@@ -3655,7 +3646,7 @@ output_param (cb_tree x, int id)
 			break;
 		}
 		if (CB_ALPHABET_NAME_P (r->value)) {
-			rbp = CB_ALPHABET_NAME (r->value);
+			struct cb_alphabet_name	*rbp = CB_ALPHABET_NAME (r->value);
 			switch (rbp->alphabet_type) {
 			case CB_ALPHABET_ASCII:
 #ifdef	COB_EBCDIC_MACHINE
@@ -3809,6 +3800,7 @@ output_param (cb_tree x, int id)
 	case CB_TAG_INTRINSIC:
 		ip = CB_INTRINSIC (x);
 		if (ip->isuser) {
+			char			*func;
 			l = cb_ref (ip->name);
 			/* LCOV_EXCL_START */
 			if (l == cb_error_node) {
@@ -7782,7 +7774,10 @@ output_stmt (cb_tree x)
 	struct cb_cast		*cp;
 #endif
 	size_t			size;
-	int			code, skip_else;
+	int			skip_else;
+#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.2 */
+	int			code;
+#endif
 
 	stack_id = 0;
 	if (x == NULL) {
@@ -8180,10 +8175,10 @@ output_stmt (cb_tree x)
 			}
 			output_newline ();
 		}
-#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.1 */
+#ifdef COBC_HAS_CUTOFF_FLAG	/* CHECKME: likely will be removed completely in 3.2 */
 		gen_if_level++;
-#endif
 		code = 0;
+#endif
 		output_prefix ();
 		/* Really PRESENT WHEN for Report field */
 		if (ip->is_if == 2    
@@ -8364,9 +8359,9 @@ output_stmt (cb_tree x)
 				output_prefix ();
 				output ("memset (");
 				output_data (CB_DEBUG(x)->target);
-				code = (int)(size - CB_DEBUG(x)->size);
 				output (" + %d, ' ', %d);",
-					(int)CB_DEBUG(x)->size, code);
+					(int)CB_DEBUG(x)->size,
+					(int)(size - CB_DEBUG(x)->size));
 				output_newline ();
 
 			}
@@ -8388,9 +8383,9 @@ output_stmt (cb_tree x)
 				output_prefix ();
 				output ("memset (");
 				output_data (CB_DEBUG(x)->target);
-				code = (int)(size - CB_DEBUG(x)->size);
 				output (" + %d, ' ', %d);",
-					(int)CB_DEBUG(x)->size, code);
+					(int)CB_DEBUG(x)->size,
+					(int)(size - CB_DEBUG(x)->size));
 				output_newline ();
 			}
 		}

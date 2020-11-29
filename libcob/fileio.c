@@ -5454,7 +5454,6 @@ cob_start (cob_file *f, const int cond, cob_field *key,
 	   cob_field *keysize, cob_field *fnstatus)
 {
 	int		ret;
-	int		size;
 	cob_field	tempkey;
 
 	f->flag_read_done = 0;
@@ -5476,9 +5475,8 @@ cob_start (cob_file *f, const int cond, cob_field *key,
 		return;
 	}
 
-	size = 0;
 	if (unlikely (keysize)) {
-		size = cob_get_int (keysize);
+		int		size = cob_get_int (keysize);
 		if (size < 1 || size > (int)key->size) {
 			save_status (f, fnstatus, COB_STATUS_23_KEY_NOT_EXISTS);
 			return;

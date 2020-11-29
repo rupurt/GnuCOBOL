@@ -1190,6 +1190,12 @@ AT_KEYWORDS([fundamental udf])
 
 # see Bug #641
 
+
+# Skipped in 3.1.1 as the codegen is not safe (returning local variable address)
+# codegen adjusted in 4.x
+
+AT_SKIP_IF([true])
+
 AT_DATA([prog.cob], [
        IDENTIFICATION DIVISION.
        FUNCTION-ID. reply.

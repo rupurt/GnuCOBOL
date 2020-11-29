@@ -998,8 +998,6 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 	char			*dname;
 	cb_tree			x = NULL;
 
-	unsigned char		bom[4];
-
 	if (ppin) {
 		for (; newline_count > 0; newline_count--) {
 			ungetc ('\n', ppin);
@@ -1052,6 +1050,7 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 	/* Check for BOM - *not* for input from stdin as rewind() clears the input
 	  buffer if used on stdin and output in console has normally no BOM at all */
 	if (ppin && strcmp (name, COB_DASH) != 0) {
+		unsigned char		bom[4];
 		if (fread (bom, 3, 1, ppin) == 1) {
 			if (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
 				rewind (ppin);

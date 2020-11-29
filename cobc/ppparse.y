@@ -1001,7 +1001,6 @@ set_choice:
   {
 	char	*p = $2;
 	char	ep = 0;
-	struct cb_text_list	*txt;
 	
 	/* Remove surrounding quotes/brackets */
 	if (p) {
@@ -1018,6 +1017,7 @@ set_choice:
 
 	/* Enable EC-BOUND-SUBSCRIPT and -REF-MOD checking */
 	if (ep) {
+		struct cb_text_list	*txt;
 		if (ep == '3') {
 			/* SSRANGE"3": REF-MOD, with zero length allowed (at runtime) */
 			fprintf (ppout, "#REFMOD_ZERO 1\n");
@@ -1139,13 +1139,12 @@ define_directive:
 	char			*s;
 	char			*q;
 	struct cb_define_struct	*p;
-	size_t			size;
 
 	s = getenv ($1);
 	q = NULL;
 	if (s && *s && *s != ' ') {
 		if (*s == '"' || *s == '\'') {
-			size = strlen (s) - 1U;
+			const size_t	size = strlen (s) - 1U;
 			/* Ignore if improperly quoted */
 			if (s[0] == s[size]) {
 				q = s;

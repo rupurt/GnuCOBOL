@@ -384,7 +384,6 @@ cob_set_library_path ()
 
 	resolve_path = cob_malloc (sizeof (char *) * i);
 	resolve_size = 0;
-	pstr = resolve_alloc;
 
 	for (; ; ) {
 		p = strtok (pstr, PATHSEP_STR);
@@ -744,7 +743,7 @@ cob_encode_program_id (const unsigned char *const name,
 		break;
 	case COB_FOLD_UPPER:
 	{
-		unsigned char *p = name_buff;
+		unsigned char *p;
 		for (p = name_buff; *p; p++) {
 			if (islower (*p)) {
 				*p = (cob_u8_t)toupper (*p);
@@ -754,7 +753,7 @@ cob_encode_program_id (const unsigned char *const name,
 	}
 	case COB_FOLD_LOWER:
 	{
-		unsigned char *p = name_buff;
+		unsigned char *p;
 		for (p = name_buff; *p; p++) {
 			if (isupper (*p)) {
 				*p = (cob_u8_t)tolower (*p);
@@ -773,14 +772,12 @@ static void *
 cob_resolve_internal (const char *name, const char *dirent,
 	const int fold_case)
 {
-	unsigned char		*p;
 	const unsigned char	*s;
 	void			*func;
 	struct struct_handle	*preptr;
 	lt_dlhandle		handle;
 	size_t			i;
 	char call_entry_buff[COB_MINI_BUFF];
-	char call_entry2_buff[COB_MINI_BUFF];
 
 	/* LCOV_EXCL_START */
 	if (unlikely(!cobglobptr)) {
@@ -852,7 +849,8 @@ cob_resolve_internal (const char *name, const char *dirent,
 
 	/* Check if name needs conversion */
 	if (unlikely(cobsetptr->name_convert != 0)) {
-		p = (unsigned char *)call_entry2_buff;
+		unsigned char call_entry2_buff[COB_MINI_BUFF];
+		unsigned char *p = call_entry2_buff;
 		for (; *s; ++s, ++p) {
 			if (cobsetptr->name_convert == 1 && isupper (*s)) {
 				*p = (cob_u8_t) tolower (*s);
@@ -863,7 +861,7 @@ cob_resolve_internal (const char *name, const char *dirent,
 			}
 		}
 		*p = 0;
-		s = (const unsigned char *)call_entry2_buff;
+		s = call_entry2_buff;
 	}
 
 	/* Search external modules */
@@ -1109,7 +1107,6 @@ cob_call_field (const cob_field *f, const struct cob_call_struct *cs,
 	char				*buff;
 	char				*entry;
 	char				*dirent;
-	size_t				len;
 
 	/* LCOV_EXCL_START */
 	if (unlikely(!cobglobptr)) {
@@ -1122,6 +1119,7 @@ cob_call_field (const cob_field *f, const struct cob_call_struct *cs,
 
 	/* check for uncommon leading space - trim it */
 	if (*buff == ' ') {
+		size_t				len;
 		/* same warning as in cobc/typeck.c */
 		cob_runtime_warning (
 			_("'%s' literal includes leading spaces which are omitted"), buff);

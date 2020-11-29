@@ -1190,7 +1190,7 @@ cb_build_generic_register (const char *name, const char *external_definition)
 {
 	cb_tree field_tree;
 	char	definition[COB_MINI_BUFF];
-	char	temp[COB_MINI_BUFF];
+	char	temp[COB_MINI_BUFF] = { 0 };
 	char *p, *r;
 	struct cb_field *field;
 	enum cb_usage	usage;

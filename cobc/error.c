@@ -688,15 +688,16 @@ listprint_restore (void)
 void
 cb_note_x (const enum cb_warn_opt opt, cb_tree x, const char *fmt, ...)
 {
+	const enum cb_warn_val	pref = cb_warn_opt_val[opt];
 	va_list ap;
+
+	if (opt != COB_WARNOPT_NONE && pref == COBC_WARN_DISABLED) {
+		return;
+	}
 
 	listprint_suppress ();
 	va_start (ap, fmt);
 	if (opt != COB_WARNOPT_NONE) {
-		const enum cb_warn_val	pref = cb_warn_opt_val[opt];
-		if (pref == COBC_WARN_DISABLED) {
-			return;
-		}
 		print_error (x->source_file, x->source_line, _("note: "),
 			fmt, ap, warning_option_text (opt, pref));
 	} else {

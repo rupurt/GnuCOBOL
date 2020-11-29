@@ -3243,7 +3243,7 @@ cob_check_numval (const cob_field *srcfield, const cob_field *currency,
 				break;
 			}
 		}
-		if (!begp) {
+		if (!endp || !begp) {
 			return 1;
 		}
 		currcy_size = endp - begp;

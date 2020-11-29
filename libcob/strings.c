@@ -587,7 +587,6 @@ cob_unstring_into (cob_field *dst, cob_field *dlm, cob_field *cnt)
 	int		srsize;
 	int		dlsize;
 	int		match_size = 0;
-	int		brkpt = 0;
 
 	if (cobglobptr->cob_exception_code) {
 		return;
@@ -605,6 +604,7 @@ cob_unstring_into (cob_field *dst, cob_field *dlm, cob_field *cnt)
 		cob_str_memcpy (dst, start, match_size);
 		unstring_offset += match_size;
 	} else {
+		int		brkpt = 0;
 		srsize = (int) unstring_src->size;
 		s = unstring_src->data + srsize;
 		for (p = start; p < s; ++p) {

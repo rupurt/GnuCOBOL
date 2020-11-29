@@ -1447,7 +1447,7 @@ if test "$with_db" = "yes"; then
 			LIBS="$test_libs -l$cobdb"
 			AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>
 			#include <db.h>]], [[
-			int major, minor, patch;
+			int major = 0, minor = 0, patch = 0;
 			db_version (&major, &minor, &patch);
 			if (major == DB_VERSION_MAJOR && minor == DB_VERSION_MINOR) {
 				return 0;
