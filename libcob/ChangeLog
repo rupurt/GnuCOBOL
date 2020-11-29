@@ -3,6 +3,7 @@
 
 	* common.c (cob_check_version): restored compat option for GC 2.x pre 2.2
 	* fileio.c, screenio.c, strings.c, termio.c: fixed some minor coding issues
+	* termio.c (cob_dump_field): fixed bad memcpy
 
 2020-11-27  Simon Sobisch <simonsobisch@gnu.org>
 

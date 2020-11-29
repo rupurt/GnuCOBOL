@@ -159,7 +159,8 @@ pretty_display_numeric (cob_field *f, FILE *fp)
 
 	cob_move (f, &temp);
 	for (i = 0; i < size; ++i) {
-		putc (q[i], fp);
+		if(q[i] != 0)
+			putc (q[i], fp);
 	}
 }
 
@@ -658,7 +659,7 @@ cob_dump_field (const int level, const char *name,
 	}
 
 	memcpy (f, f_addr, sizeof (cob_field));
-	memcpy (vname, name, COB_MAX_WORDLEN);
+	memcpy (vname, name, strlen (name + 1));
 	adjust = offset;
 
 	if (indexes > 0) {
@@ -678,8 +679,9 @@ cob_dump_field (const int level, const char *name,
 		}
 		va_end (ap);
 		strcat (vname,")");
+		vname[VNAME_MAX - 1] = 0;
 		if (indexes == 1
-		 && size > f->size
+		 && size >= f->size
 		 && size < MAX_PREV) {
 			if (subscript == 0) {
 				dump_idx = subscript;
@@ -707,8 +709,8 @@ cob_dump_field (const int level, const char *name,
 		}
 	} else {
 		dump_idx = dump_tbl = dump_skip = -1;
+		vname[VNAME_MAX - 1] = 0;
 	}
-	vname[VNAME_MAX - 1] = 0;
 	if (f->data) {
 		f->data += adjust;
 	}

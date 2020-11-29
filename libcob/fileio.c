@@ -985,6 +985,7 @@ do_acu_hypen_translation (char *src)
 	for (src = src + 3; *src && isspace ((cob_u8_t)*src); src++);
 	
 	strncpy (file_open_buff, src, (size_t)COB_FILE_MAX);
+	file_open_buff[COB_FILE_MAX] = 0;
 	strncpy (file_open_name, file_open_buff, (size_t)COB_FILE_MAX);
 }
 
@@ -1087,6 +1088,7 @@ cob_chk_file_mapping (void)
 			strncpy (file_open_buff, p, (size_t)COB_FILE_MAX);
 		}
 	}
+	file_open_buff[COB_FILE_MAX] = 0;
 	/* First element completed, loop through remaining */
 	/* elements delimited by slash */
 	/* Check only for $ from now on; includes the DD_xx/dd_xx/xx mapping */
@@ -5995,6 +5997,7 @@ open_cbl_file (unsigned char *file_name, unsigned char *file_access,
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 
@@ -6201,6 +6204,7 @@ cob_sys_delete_file (unsigned char *file_name)
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 	cob_chk_file_mapping ();
@@ -6237,6 +6241,7 @@ cob_sys_copy_file (unsigned char *fname1, unsigned char *fname2)
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 	cob_chk_file_mapping ();
@@ -6250,6 +6255,7 @@ cob_sys_copy_file (unsigned char *fname1, unsigned char *fname2)
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[1]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 	cob_chk_file_mapping ();
@@ -6359,14 +6365,17 @@ cob_sys_rename_file (unsigned char *fname1, unsigned char *fname2)
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[0]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 	cob_chk_file_mapping ();
 	strncpy (localbuff, file_open_name, (size_t)COB_FILE_MAX);
+	localbuff[COB_FILE_MAX] = 0;
 
 	{
 		char	*fn = cob_str_from_fld (COB_MODULE_PTR->cob_procedure_params[1]);
 		strncpy (file_open_name, fn, (size_t)COB_FILE_MAX);
+		file_open_name[COB_FILE_MAX] = 0;
 		cob_free (fn);
 	}
 	cob_chk_file_mapping ();

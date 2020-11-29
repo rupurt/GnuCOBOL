@@ -1266,7 +1266,7 @@ read_literal (const char mark, const char *type)
 		) {
 			snprintf (err_msg, COB_MINI_MAX,
 				_("missing terminating %c character"), mark);
-			plex_buff[cb_lit_length - 0] = 0; /* ensure valid C-string for error message */
+			plex_buff[plex_size - 1] = 0; /* ensure valid C-string for error message */
 			error_literal ("", plex_buff);
 	}
 
