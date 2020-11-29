@@ -659,7 +659,7 @@ cob_dump_field (const int level, const char *name,
 	}
 
 	memcpy (f, f_addr, sizeof (cob_field));
-	memcpy (vname, name, strlen (name + 1));
+	memcpy (vname, name, strlen (name) + 1);
 	adjust = offset;
 
 	if (indexes > 0) {
@@ -686,8 +686,8 @@ cob_dump_field (const int level, const char *name,
 			if (subscript == 0) {
 				dump_idx = subscript;
 				dump_skip = subscript;
-				if(dump_tbl < 0) {
-					memcpy(dump_prev, f->data + adjust, size);
+				if (dump_tbl < 0) {
+					memcpy (dump_prev, f->data + adjust, size);
 					dump_tbl = 1;
 				} else {
 					dump_tbl++;
