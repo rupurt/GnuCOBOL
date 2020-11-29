@@ -1,4 +1,9 @@
 
+2020-11-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* common.c (cob_check_version): restored compat option for GC 2.x pre 2.2
+	* fileio.c, screenio.c, strings.c, termio.c: fixed some minor coding issues
+
 2020-11-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c, common.h: added externalized cob_nop to have a portable way to

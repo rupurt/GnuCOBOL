@@ -130,7 +130,7 @@ static int			pending_accept;
 static int			got_sys_char;
 static unsigned int	curr_setting_insert_mode = INT_MAX;
 #ifdef NCURSES_MOUSE_VERSION
-static int	curr_setting_mouse_flags = INT_MAX;
+static unsigned int	curr_setting_mouse_flags = UINT_MAX;
 #endif
 #endif
 
@@ -1470,6 +1470,8 @@ shift_left (cob_screen * const s, const int cline, const int ccolumn,
 {
 	int		offset;
 	unsigned char	move_char;
+
+	COB_UNUSED (right_pos);
 	
 	for (offset = 0; offset < ccolumn - scolumn; offset++) {
 		move_char = s->field->data[offset + 1];

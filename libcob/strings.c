@@ -170,10 +170,14 @@ inspect_common (cob_field *f1, cob_field *f2, const enum inspect_type type)
 	}
 
 	len = inspect_end - inspect_start;
+	if (f2->size > len) {
+		return;
+	}
 	init_pos = inspect_start - inspect_data;
 
 	if (type == INSPECT_TRAILING) {
-		for (i = len - f2->size; i >= 0; --i) {
+		const size_t	i_max = len - f2->size; /* no + 1 here */
+		for (i = i_max; ; --i) {
 			/* Find matching substring */
 			if (memcmp (inspect_start + i, f2->data, f2->size) == 0) {
 				mark = &inspect_mark[init_pos + i];
@@ -191,6 +195,9 @@ inspect_common (cob_field *f1, cob_field *f2, const enum inspect_type type)
 					memset (mark, 1, f2->size);
 					i -= f2->size - 1;
 					n++;
+				}
+				if (i == 0) {
+					break;
 				}
 			} else {
 				break;

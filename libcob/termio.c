@@ -633,6 +633,7 @@ cob_dump_file (const char *name, cob_file *fl)
 	fprintf (fp, "   FILE STATUS  '%.2s'\n", fl->file_status);
 }
 
+#define VNAME_MAX	COB_MAX_WORDLEN + 1 + 3 + COB_MAX_SUBSCRIPTS * (7 + 1)
 /* Output field for DUMP purposes */
 void
 cob_dump_field (const int level, const char *name, 
@@ -641,7 +642,7 @@ cob_dump_field (const int level, const char *name,
 	FILE	*fp = cob_get_dump_file ();
 
 	/* fieldname and additional for subscripts: " ()" + indexes (max-size 7 + ",") */
-	char	vname[COB_MAX_WORDLEN + 1 + 3 + COB_MAX_SUBSCRIPTS * (7 + 1)];
+	char	vname[VNAME_MAX];
 	char	lvlwrk[16];
 	int 	adjust, indent;
 	cob_field	f[1];
@@ -662,7 +663,8 @@ cob_dump_field (const int level, const char *name,
 
 	if (indexes > 0) {
 		va_list	ap;
-		int	idx, subscript, size;
+		int	idx, subscript;
+		size_t size;
 		strcat (vname, " (");
 		va_start (ap, indexes);
 		for (idx = 1; idx <= indexes; idx++) {
@@ -696,7 +698,7 @@ cob_dump_field (const int level, const char *name,
 									" ", subscript+1, dump_idx+1);
 					dump_skip = subscript;
 					return;
-				} 
+				}
 				memcpy(dump_prev, f->data + adjust, size);
 				dump_idx = subscript;
 				dump_skip = -1;
@@ -706,6 +708,7 @@ cob_dump_field (const int level, const char *name,
 	} else {
 		dump_idx = dump_tbl = dump_skip = -1;
 	}
+	vname[VNAME_MAX - 1] = 0;
 	if (f->data) {
 		f->data += adjust;
 	}

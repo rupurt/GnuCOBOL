@@ -6123,7 +6123,7 @@ warn_if_no_definition_seen_for_prototype (const struct cb_prototype *proto)
 		return;
 	}
 
-	if (cb_warn_prototypes) {
+	if (cb_warn_opt_val[cb_warn_ignored_initial_val] != COBC_WARN_DISABLED) {
 		if (strcmp (proto->name, proto->ext_name) == 0) {
 			/*
 			  Warn if no definition seen for element with prototype-

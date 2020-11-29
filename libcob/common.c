@@ -2527,6 +2527,11 @@ cob_check_version (const char *prog,
 	if (app.version == lib.version && patchlev_prog <= PATCH_LEVEL) {
 		return;
 	}
+
+	if (app.major == 2 && app.minor < 2) {
+		cannot_check_subscript = 1;
+	}
+
 	if (app.version < lib.version) {
 		return;
 	}
@@ -2538,10 +2543,6 @@ cob_check_version (const char *prog,
 	cob_runtime_hint (_("%s has version %s.%d"), "libcob",
 			   PACKAGE_VERSION, PATCH_LEVEL);
 	cob_stop_run (1);
-
-	if (app.major == 2 && app.minor < 2) {
-		cannot_check_subscript = 1;
-	}
 }
 
 void
@@ -4809,7 +4810,7 @@ cob_sys_exit_proc (const void *dispo, const void *pptr)
 			return -1;
 		}
 		if (*install_flag == 2 || *install_flag == 3) {
-			memcpy (&priority, &pptr + sizeof (void *), sizeof (unsigned char *));
+			memcpy ((void*)(&priority), &pptr + sizeof (void *), sizeof (unsigned char *));
 			if (*install_flag == 3 && *priority > 127) {
 				data_buff = 64;
 				priority = &data_buff;
@@ -4834,7 +4835,7 @@ cob_sys_exit_proc (const void *dispo, const void *pptr)
 					return priority;
 				}
 #endif
-				memcpy (&priority, &h->priority, sizeof (unsigned char));
+				memcpy ((void *)(&priority), &h->priority, sizeof (unsigned char));
 				return 0;
 			}
 			if (hp != NULL) {

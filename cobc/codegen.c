@@ -4641,10 +4641,10 @@ output_initialize_literal (cb_tree x, struct cb_field *f,
 	}
 	i_counters[0] = 1;
 	if (CB_REFERENCE_P(x)) {
-		cb_tree		l;
+		cb_tree		rx;
 		struct cb_reference	*r = CB_REFERENCE (x);
-		for (l = r->check; l; l = CB_CHAIN (l)) {
-			output_stmt (CB_VALUE (l));
+		for (rx = r->check; rx; rx = CB_CHAIN (rx)) {
+			output_stmt (CB_VALUE (rx));
 		}
 	}
 	if (!chk_field_variable_size(f)
@@ -7777,7 +7777,6 @@ output_stmt (cb_tree x)
 	struct cb_para_label	*pal;
 	struct cb_set_attr	*sap;
 	struct cb_file		*fl;
-	struct cb_field		*p2;
 	char	*px;
 #ifdef	COB_NON_ALIGNED
 	struct cb_cast		*cp;
@@ -8147,8 +8146,6 @@ output_stmt (cb_tree x)
 				} else if (ip->test->source_line || (w && w->source_line)) {
 					if (ip->test->source_line) {
 						w = ip->test;
-					} else {
-						w = w;
 					}
 					output_prefix ();
 					output ("/* Line: %-10d: %-19s", w->source_line, "WHEN");
@@ -8164,10 +8161,6 @@ output_stmt (cb_tree x)
 							output_line ("module->module_stmt = 0x%08X;",
 								COB_SET_LINE_FILE(w->source_line, lookup_source(w->source_file)));
 						}
-#if 0 /* CHECKME: Do we need this? If yes: move */
-					} else {
-						lookup_source(w->source_file);
-#endif
 					}
 					if (last_line != w->source_line) {
 						/* Output source location as code */
@@ -8193,10 +8186,10 @@ output_stmt (cb_tree x)
 		code = 0;
 		output_prefix ();
 		/* Really PRESENT WHEN for Report field */
-		if (ip->is_if == 2    &&
-		    ip->stmt1 == NULL &&
-		    ip->stmt2 != NULL) {
-			p2 = (struct cb_field *)ip->stmt2;
+		if (ip->is_if == 2    
+		 && ip->stmt1 == NULL 
+		 && ip->stmt2 != NULL) {
+			struct cb_field *p2 = (struct cb_field *)ip->stmt2;
 			if((p2->report_flag & COB_REPORT_LINE)) {
 				px = (char*)CB_PREFIX_REPORT_LINE;
 				output_line ("/* PRESENT WHEN Line */");
@@ -8220,10 +8213,10 @@ output_stmt (cb_tree x)
 			break;
 		}
 		/* Really PRESENT WHEN for Report line */
-		if (ip->is_if == 3    &&
-		    ip->stmt1 == NULL &&
-		    ip->stmt2 != NULL) {
-			p2 = (struct cb_field *)ip->stmt2;
+		if (ip->is_if == 3    
+		 && ip->stmt1 == NULL 
+		 && ip->stmt2 != NULL) {
+			struct cb_field *p2 = (struct cb_field *)ip->stmt2;
 			if((p2->report_flag & COB_REPORT_LINE)) {
 				px = (char*)CB_PREFIX_REPORT_LINE;
 				output_line ("/* PRESENT WHEN line */");
@@ -9380,24 +9373,24 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 	int	fld_id;
 
 	if (f == NULL)
-		return;
+	    return;
 	n = f->sister;
 	c = f->children;
 	if (n
-	 && n->storage != CB_STORAGE_REPORT)
+	&& n->storage != CB_STORAGE_REPORT)
 		n = NULL;
 	if (n
-	 && n->report != r)
+	&& n->report != r)
 		n = NULL;
 	if (c
-	 && c->storage != CB_STORAGE_REPORT)
+	&& c->storage != CB_STORAGE_REPORT)
 		c = NULL;
 	if (n
-	 && (n->report_flag & COB_REPORT_LINE)) {
+	&& (n->report_flag & COB_REPORT_LINE)) {
 		output_report_define_lines(top, n, r);
 	}
 	if (c
-	 && (c->report_flag & COB_REPORT_LINE)) {
+	&& (c->report_flag & COB_REPORT_LINE)) {
 		output_report_define_lines(0, c, r);
 	} else {
 		c = NULL;
@@ -9441,8 +9434,8 @@ output_report_define_lines (int top, struct cb_field *f, struct cb_report *r)
 	}
 	output_local("\n/* %s%s ",fname,r->name);
 	if ((f->report_flag & COB_REPORT_LINE)
-	 && f->children
-	 && (f->children->report_flag & COB_REPORT_LINE)) {
+	&& f->children
+	&& (f->children->report_flag & COB_REPORT_LINE)) {
 		printf("Warning: Ignoring nested LINE %s %d\n",
 			(f->report_flag & COB_REPORT_LINE_PLUS)?"PLUS":"",
 			f->report_line);
@@ -11645,17 +11638,17 @@ output_internal_function (struct cb_program *prog, cb_tree parameter_list)
 	}
 	if (prog->linkage_storage) {
 		if (cb_flag_dump & COB_DUMP_LS) {
-			struct cb_field	*f;
 			output_newline ();
 			output_line ("/* Dump LINKAGE SECTION */");
 			if (prog->num_proc_params) {
+				struct cb_field	*lf;
 				/* restore data pointer to last known entry */
 				for (l = parameter_list; l; l = CB_CHAIN (l)) {
-					f = cb_code_field (CB_VALUE (l));
+					lf = cb_code_field (CB_VALUE (l));
 					output_prefix ();
-					output_base (f, 0);
+					output_base (lf, 0);
 					output (" = last_");
-					output_base (f, 0);
+					output_base (lf, 0);
 					output (";");
 					output_newline ();
 				}

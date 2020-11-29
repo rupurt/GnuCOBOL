@@ -2908,7 +2908,7 @@ process_command_line (const int argc, char **argv)
 					snprintf (cobc_buffer, cobc_buffer_size, "%s -v", cobc_cc);
 				}
 #endif
-				cobc_buffer[cobc_buffer_size] = 0;
+				cobc_buffer[cobc_buffer_size - 1] = 0;
 				process (cobc_buffer);
 				cobc_free (cobc_buffer);
 				cobc_buffer = NULL;

@@ -1525,7 +1525,7 @@ validate_elem_value (const struct cb_field * const f)
 	}
 
 	/* ISO+IEC+1989-2002: 13.16.42.2-10 */
-	if (cb_warn_ignored_initial_val) {
+	if (cb_warn_opt_val[cb_warn_ignored_initial_val] != COBC_WARN_DISABLED) {
 		for (p = f; p; p = p->parent) {
 			if (p->flag_external) {
 				cb_warning_x (cb_warn_ignored_initial_val, x,

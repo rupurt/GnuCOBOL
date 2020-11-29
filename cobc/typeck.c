@@ -6982,11 +6982,9 @@ cb_emit_call (cb_tree prog, cb_tree par_using, cb_tree returning,
 				continue;
 			}
 			if (CB_PURPOSE_INT (l) == CB_CALL_BY_REFERENCE) {
-				if (cb_warn_call_params) {
-					if (f->level != 01 && f->level != 77) {
-						cb_warning_x (cb_warn_call_params, x,
-							_("'%s' is not a 01 or 77 level item"), CB_NAME (x));
-					}
+				if (f->level != 01 && f->level != 77) {
+					cb_warning_x (cb_warn_call_params, x,
+						_("'%s' is not a 01 or 77 level item"), CB_NAME (x));
 				}
 				check_list = cb_list_add (check_list, x);
 			} else if (f->flag_any_length) {
@@ -8175,15 +8173,18 @@ cb_emit_initialize (cb_tree vars, cb_tree fillinit, cb_tree value,
 	def_init = (def != NULL);
 	for (l = vars; l; l = CB_CHAIN (l)) {
 		x = CB_VALUE (l);
-		if (!(CB_REFERENCE_P (x) && CB_FIELD_P (CB_REFERENCE (x)->value)) &&
-		    !CB_FIELD_P (x)) {
+		if (CB_VALID_TREE (x)
+		 && ( CB_FIELD_P (x)
+		  || (CB_REFERENCE_P (x) && CB_FIELD_P (CB_REFERENCE (x)->value)))) {
+			/* as expected */
+		} else {
 			cb_error_x (CB_TREE (current_statement), _("invalid INITIALIZE statement"));
 			return;
 		}
 
 		f = CB_FIELD_PTR (x);
 		odo_level = 0;
-		while(f->children)
+		while (f->children)
 			f = f->children;
 		for (p = f; p; p = p->parent) {
 			if (p->depending) {
@@ -11662,7 +11663,7 @@ validate_pointer_clause (cb_tree pointer, cb_tree pointee)
 	struct cb_field	*pointer_field = CB_FIELD_PTR (pointer);
 
 	if (pointer_field->children) {
-		cb_error_x (pointer, _("'%s' is not an elementary item"),
+		cb_error_x (pointee, _("'%s' is not an elementary item"),
 			    CB_NAME (pointer));
 		return;
 	}

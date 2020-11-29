@@ -1218,7 +1218,6 @@ ppcopy (const char *name, const char *lib, struct cb_replace_list *replace_list)
 		/* check for library-name with directory-name via environment
 		   (as emulation of specifying a library-name via JCL) */
 		if (*lib >= 'A' && *lib <= 'Z') {
-			const char* lib_env;
 			char envname[COB_MINI_BUFF];
 
 			snprintf (envname, (size_t)COB_MINI_MAX, "COB_COPY_LIB_%s", lib);

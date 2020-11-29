@@ -6184,7 +6184,7 @@ code_set_clause:
 			CB_PENDING ("CODE-SET");
 			break;
 		default:
-			if (cb_warn_additional) {
+			if (cb_warn_opt_val[cb_warn_additional] != COBC_WARN_DISABLED) {
 				cb_warning_x (cb_warn_additional, $3, _("ignoring CODE-SET '%s'"),
 						  cb_name ($3));
 			} else {

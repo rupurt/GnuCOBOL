@@ -1,4 +1,11 @@
 
+2020-11-28  Simon Sobisch <simonsobisch@gnu.org>
+
+	* cobc.c: fixed bad memory access for cobc -v -version
+	* scanner.l: fxied bad memory access for "missing terminator"
+	* tree.c, parser.y, field.c: last missing adjustments for cb_warn_opt_val
+	* codegen.c, error.c, pplex.l, typeck.c: fixed some minor coding issues
+
 2020-11-27  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c (process_command_line): early processing for -g and optimization

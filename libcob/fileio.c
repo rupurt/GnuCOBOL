@@ -952,10 +952,10 @@ looks_absolute (char *src)
 {
 	/* no file path adjustment if filename is absolute
 	   because it begins with a slash (or win-disk-drive) */
-	if (file_open_name[0] == '/'
-	 || file_open_name[0] == '\\'
+	if (src[0] == '/'
+	 || src[0] == '\\'
 #if WIN32
-	 || file_open_name[1] == ':'
+	 || src[1] == ':'
 #endif
 		) {
 		return 1;
@@ -1428,6 +1428,8 @@ cob_fd_file_open (cob_file *f, char *filename, const int mode, const int sharing
 	int		fdmode;
 	int		fperms;
 
+	COB_UNUSED (sharing);	/* used in 4.x */
+
 	fdmode = O_BINARY;
 	fperms = 0;
 	switch (mode) {
@@ -1607,8 +1609,6 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 	/* Note filename points to file_open_name */
 	/* cob_chk_file_mapping manipulates file_open_name directly */
 
-	COB_UNUSED (sharing);
-
 	cob_chk_file_mapping ();
 
 	nonexistent = 0;
@@ -1763,16 +1763,19 @@ cob_file_open (cob_file *f, char *filename, const int mode, const int sharing)
 	}
 #elif defined _WIN32
 	{
-		HANDLE osHandle = (HANDLE)_get_osfhandle (f->fd);
-		if (osHandle != INVALID_HANDLE_VALUE) {
-			DWORD flags = LOCKFILE_FAIL_IMMEDIATELY;
-			OVERLAPPED fromStart = {0};
-			if (mode != COB_OPEN_INPUT) flags |= LOCKFILE_EXCLUSIVE_LOCK;
-			if (!LockFileEx (osHandle, flags, 0, MAXDWORD, MAXDWORD, &fromStart)) {
-				f->open_mode = COB_OPEN_CLOSED;
-				f->fd = -1;
-				fclose (fp);
-				return COB_STATUS_61_FILE_SHARING;
+		/* Lock the file */
+		if (fp) {
+			HANDLE osHandle = (HANDLE)_get_osfhandle (f->fd);
+			if (osHandle != INVALID_HANDLE_VALUE) {
+				DWORD flags = LOCKFILE_FAIL_IMMEDIATELY;
+				OVERLAPPED fromStart = {0};
+				if (mode != COB_OPEN_INPUT) flags |= LOCKFILE_EXCLUSIVE_LOCK;
+				if (!LockFileEx (osHandle, flags, 0, MAXDWORD, MAXDWORD, &fromStart)) {
+					f->open_mode = COB_OPEN_CLOSED;
+					f->fd = -1;
+					fclose (fp);
+					return COB_STATUS_61_FILE_SHARING;
+				}
 			}
 		}
 	}
