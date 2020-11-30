@@ -1,4 +1,8 @@
 
+2020-11-30  Ron Norman <rjn@inglenet.com>
+
+	* codegen.c: Only emit the 'i_len' variable if it is used
+
 2020-11-27  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c,typeck.c,parser.y,tree.h: 
