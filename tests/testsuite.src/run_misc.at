@@ -9905,6 +9905,10 @@ AT_CHECK([$SED -e 's/_$//' reference_tmpl > reference], [0], [], [])
 AT_CHECK([$SED -e 's/compiled ... .. .... ..:..:../compiled MMM DD YYYY HH:MM:SS/g' \
 tstdump.txt > tstdump.sed], [0], [], [])
 
+AT_CHECK([test "$COB_HAS_64_BIT_POINTER" = "yes" ||
+$SED -e 's/_$//; s/0x0000000000000000/0x00000000/' reference_tmpl > reference
+], [0], [], [])
+
 AT_CHECK([diff reference tstdump.sed], [0], [], [])
 
 AT_CLEANUP
