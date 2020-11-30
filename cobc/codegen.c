@@ -223,6 +223,7 @@ static unsigned int		in_cond = 0;
 static unsigned int		inside_check = 0;
 static unsigned int		inside_stack[COB_INSIDE_SIZE];
 
+static unsigned int		i_len_used = 0;
 static unsigned int		i_counters[COB_MAX_SUBSCRIPTS];
 static const cob_s64_t	cob_exp10_ll[19] = {
 	COB_S64_C(1),
@@ -1899,7 +1900,8 @@ output_local_indexes (void)
 	int	i;
 	int	found = 0;
 
-	output_local ("\tint\t\ti_len;\n");
+	if (i_len_used)
+		output_local ("\tint\t\ti_len = 0;\n");
 	for (i = 0; i < COB_MAX_SUBSCRIPTS; i++) {
 		if (i_counters[i]) {
 			if (!found) {
@@ -5388,6 +5390,7 @@ output_initialize (struct cb_initialize *p)
 	 && f->odo_level
 	 && (type != INITIALIZE_DEFAULT
 	  || initialize_uniform_char (f, p) == -1)) {
+		i_len_used = 1;
 		output_prefix ();
 		output ("i_len = ");
 		output_integer (CB_REFERENCE (p->var)->length);
@@ -13058,6 +13061,7 @@ codegen (struct cb_program *prog, const char *translate_name, const int subseque
 	excp_current_program_id = prog->orig_program_id;
 	excp_current_section = NULL;
 	excp_current_paragraph = NULL;
+	i_len_used = 0;
 	memset ((void *)i_counters, 0, sizeof (i_counters));
 
 	output_target = yyout;
