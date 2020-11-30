@@ -2,6 +2,7 @@
 2020-11-30  Ron Norman <rjn@inglenet.com>
 
 	* codegen.c: Only emit the 'i_len' variable if it is used
+	* pplex.l: When searching for COPY book, use 'stat' to verify its a file
 
 2020-11-27  Ron Norman <rjn@inglenet.com>
 
