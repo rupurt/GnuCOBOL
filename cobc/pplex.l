@@ -980,9 +980,9 @@ ppopen (const char *name, struct cb_replace_list *replacing_list)
 		ppin = stdin;
 	} else {
 		for (current_copy_info = copy_stack; current_copy_info; current_copy_info = current_copy_info->next) {
-			// FIXME: for WIN32 compare with cleaning / and \ (COPY "lib/file" vs COPY "lib\file"),
-			//        ideally open first, then check if we have thy physical same file
-			//        (could also fix symlinked files)
+			/* FIXME: for WIN32 compare with cleaning / and \ (COPY "lib/file" vs COPY "lib\file"),
+			*         ideally open first, then check if we have thy physical same file
+			*         (could also fix symlinked files) */
 			if (!strcmp (name, current_copy_info->dname)) {
 				for (current_copy_info = current_copy_info->next; current_copy_info; current_copy_info = current_copy_info->prev) {
 					int		line;
@@ -1092,6 +1092,7 @@ ppcopy_try_open (const char *dir, const char *name, int has_ext)
 {
 	struct cb_text_list	*el = cb_extension_list;
 	const char		*extension = "";
+	struct stat st;
 
 	for (;;) {
 		if (dir) {
@@ -1102,18 +1103,10 @@ ppcopy_try_open (const char *dir, const char *name, int has_ext)
 				name, extension);
 		}
 		plexbuff2[COB_SMALL_MAX] = 0;
-#if 0	/* TODO: output in separate COB_DEBUG_LOG */
-		printf ("checking COPY file: %s... ", plexbuff2);
-#endif
-		if (access (plexbuff2, R_OK) == 0) {
-#if 0	/* TODO: output in separate COB_DEBUG_LOG */
-			printf ("Found!\n");
-#endif
-			return plexbuff2;
-#if 0	/* TODO: output in separate COB_DEBUG_LOG */
-		} else {
-			printf ("%s\n", cb_get_strerror ());
-#endif
+		if (access (plexbuff2, R_OK) == 0
+		 && stat (plexbuff2, &st) == 0) {
+			if ((st.st_mode & S_IFREG)) 	/* Must be a regular file */
+				return plexbuff2;
 		}
 #ifdef COB_MULTI_EXTENSION	/* compat to older GC versions */
 		COB_UNUSED (has_ext):
