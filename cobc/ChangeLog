@@ -1,4 +1,9 @@
 
+2020-11-30  Ron Norman <rjn@inglenet.com>
+
+	* pplex.l (ppcopy_try_open): When searching for COPY book, use 'stat'
+	  to verify its a file
+
 2020-11-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* cobc.c, cobc.h: moved memory related struct and size from header + define

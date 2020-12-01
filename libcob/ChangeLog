@@ -1,4 +1,8 @@
 
+2020-11-30  Ron Norman <rjn@inglenet.com>
+
+	* common.c (cob_check_version): rewrote as it did not work on some platforms
+
 2020-11-29  Simon Sobisch <simonsobisch@gnu.org>
 
 	* common.c: limit sscanf width for strings

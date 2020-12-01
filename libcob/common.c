@@ -2480,18 +2480,19 @@ cob_restore_func (struct cob_func_loc *fl)
 
 struct ver_t {
 	int major, minor, point;
-	unsigned long version;
+	unsigned int version;
 };
 
 /*
  * Convert version components to an integer value for comparison.
  */
-static inline unsigned long
-version_bitstring( const struct ver_t module ) {
-	unsigned long version =
-		((unsigned long)module.major << 24) |
-		((unsigned long)module.minor << 16) |
-		((unsigned long)module.point <<  8);
+static COB_INLINE unsigned int
+version_bitstring( const struct ver_t module )
+{
+	unsigned int version =
+		((unsigned int)module.major << 24) |
+		((unsigned int)module.minor << 16) |
+		((unsigned int)module.point <<  8);
 	return version;
 }
 
@@ -2500,45 +2501,38 @@ cob_check_version (const char *prog,
 		   const char *packver_prog, const int patchlev_prog)
 {
 	int nparts;
-	struct ver_t lib = { 0 }, app = { -1, -1 };
+	struct ver_t lib = { 9, 9, 9 };
+	struct ver_t app = { 0 };
 
 	nparts = sscanf (PACKAGE_VERSION, "%d.%d.%d",
 			 &lib.major, &lib.minor, &lib.point);
-	lib.version = version_bitstring(lib);
 
-	switch (nparts) {
-	case 2:
-	case 3:
-		nparts = sscanf (packver_prog, "%d.%d.%d",
-				 &app.major, &app.minor, &app.point);
+	if (nparts >= 2) {
+		lib.version = version_bitstring(lib);
 
-		if (nparts >= 2) {
+		sscanf (packver_prog, "%d.%d.%d",
+			 &app.major, &app.minor, &app.point);
+		app.version = version_bitstring(app);
+
+		if (app.version == lib.version
+		 && patchlev_prog <= PATCH_LEVEL) {
+			return;
+		} else 
+		if (app.major == 2 && app.minor < 2) {
+		} else
+		if (app.version < lib.version) {
 			/* we only claim compatibility to 2.2+ */
 			struct ver_t minimal = { 2, 2 }; 
-
-			app.version = version_bitstring(app);
+			if (app.version <= version_bitstring (minimal)) {
+				cannot_check_subscript = 1;
+			}
+			minimal.minor = 1;
 			if (app.version >= version_bitstring (minimal)) {
-				break;
+				return;
 			}
 		}
-		/* fall through */
-	default:
-		goto version_error;
-	}
-
-	if (app.version == lib.version && patchlev_prog <= PATCH_LEVEL) {
-		return;
-	}
-
-	if (app.major == 2 && app.minor < 2) {
-		cannot_check_subscript = 1;
-	}
-
-	if (app.version < lib.version) {
-		return;
 	}
 	
- version_error:
 	cob_runtime_error (_("version mismatch"));
 	cob_runtime_hint (_("%s has version %s.%d"), prog,
 			   packver_prog, patchlev_prog);
