@@ -24,7 +24,8 @@ build_aux/ylwrap eol=lf
 build_windows/ChangeLog.txt eol=crlf
 build_windows/README.txt eol=crlf
 build_windows/config.h.in eol=crlf
-build_windows/makebisonflex.bat eol=crlf
+build_windows/gcvsvars.cmd eol=crlf
+build_windows/makebisonflex.cmd eol=crlf
 build_windows/makedist.cmd eol=crlf
 build_windows/maketarstamp.ps1 eol=lf
 build_windows/ocide/GnuCOBOL.cwa -text
@@ -33,10 +34,11 @@ build_windows/ocide/cobcrun.exe.cpj -text
 build_windows/ocide/libcob.dll.cpj -text
 build_windows/ocide/libsupport.l.cpj -text
 build_windows/resource.h eol=crlf
-build_windows/set_env_vs.bat eol=crlf
 build_windows/set_env_vs_dist.bat eol=crlf
-build_windows/set_env_vs_dist_x64.bat eol=crlf
-build_windows/set_env_vs_x64.bat eol=crlf
+build_windows/set_env_vs_x64.cmd eol=crlf
+build_windows/set_env_vs_x64.dist.tmpl.cmd eol=crlf
+build_windows/set_env_vs_x86.cmd eol=crlf
+build_windows/set_env_vs_x86.dist.tmpl.cmd eol=crlf
 build_windows/version_cobc.rc eol=crlf
 build_windows/version_cobcrun.rc eol=crlf
 build_windows/version_gcdiff.rc -text
