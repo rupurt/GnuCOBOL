@@ -34,7 +34,6 @@ build_windows/ocide/cobcrun.exe.cpj -text
 build_windows/ocide/libcob.dll.cpj -text
 build_windows/ocide/libsupport.l.cpj -text
 build_windows/resource.h eol=crlf
-build_windows/set_env_vs_dist.bat eol=crlf
 build_windows/set_env_vs_x64.cmd eol=crlf
 build_windows/set_env_vs_x64.dist.tmpl.cmd eol=crlf
 build_windows/set_env_vs_x86.cmd eol=crlf
