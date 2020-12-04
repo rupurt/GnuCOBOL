@@ -1,4 +1,5 @@
 * text=auto !eol
+/CMakeLists.txt -text
 /Makefile.am eol=lf
 /NOTES -text
 /autogen.sh eol=lf
@@ -6,6 +7,7 @@ bin/Makefile.am eol=lf
 bin/cob-config.in eol=lf
 bin/gcdiff.c -text
 build_aux/bootstrap eol=lf
+build_aux/cmake/inline.c -text
 build_aux/compile eol=lf
 build_aux/config.guess eol=lf
 build_aux/config.rpath eol=lf
