@@ -7,6 +7,7 @@ bin/Makefile.am eol=lf
 bin/cob-config.in eol=lf
 bin/gcdiff.c -text
 build_aux/bootstrap eol=lf
+build_aux/cmake/config.cmake.h -text
 build_aux/cmake/inline.c -text
 build_aux/compile eol=lf
 build_aux/config.guess eol=lf
