@@ -148,6 +148,7 @@ libcob/fsqlxfd.c -text
 libcob/libcobci.c -text
 libcob/libcobdi.c -text
 libcob/libcobvb.c -text
+libcob/libcobvc.c -text
 libcob/sysdefines.h -text
 m4/ax_ac_append_to_file.m4 -text
 m4/ax_ac_define_resolved.m4 -text
