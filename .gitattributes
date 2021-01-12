@@ -1,4 +1,5 @@
 * text=auto !eol
+/.indent.pro -text
 /CMakeLists.txt -text
 /Makefile.am eol=lf
 /NOTES -text
