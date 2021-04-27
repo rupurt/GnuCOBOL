@@ -6,6 +6,7 @@
 /autogen.sh eol=lf
 bin/Makefile.am eol=lf
 bin/cob-config.in eol=lf
+bin/cobfile.c -text
 bin/gcdiff.c -text
 build_aux/bootstrap eol=lf
 build_aux/cmake/cl-error.awk -text
