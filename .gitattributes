@@ -8,6 +8,7 @@ bin/Makefile.am eol=lf
 bin/cob-config.in eol=lf
 bin/cobfile.c -text
 bin/gcdiff.c -text
+build_aux/ar-lib -text
 build_aux/bootstrap eol=lf
 build_aux/cmake/cl-error.awk -text
 build_aux/cmake/config.cmake.h -text
@@ -161,6 +162,8 @@ m4/ax_check_define.m4 -text
 m4/ax_check_gnu_make.m4 -text
 m4/ax_code_coverage.m4 -text
 m4/ax_file_escapes.m4 -text
+m4/ax_prog_bison.m4 -text
+m4/ax_prog_flex.m4 -text
 m4/codeset.m4 eol=lf
 m4/extern-inline.m4 -text
 m4/fcntl-o.m4 -text
