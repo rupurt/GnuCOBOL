@@ -36,8 +36,12 @@ build_windows/*.sdf
 build_windows/*.suo
 build_windows/*.user
 build_windows/Win32
+build_windows/cjson
 build_windows/dist
 build_windows/ia64
+build_windows/json-c
+build_windows/libxml
+build_windows/lzma
 build_windows/ocide/*.cbr
 build_windows/ocide/*.l
 build_windows/ocide/*.obr
