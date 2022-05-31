@@ -125,6 +125,9 @@ cobc/Makefile.am eol=lf
 cobc/debug.c -text
 cobc/sqlxfdgen.c -text
 config/Makefile.am eol=lf
+config/gcos-strict.conf -text
+config/gcos.conf -text
+config/gcos.words -text
 config/realia-strict.conf -text
 config/realia.conf -text
 config/realia.words -text
