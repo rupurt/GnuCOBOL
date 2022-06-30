@@ -153,6 +153,7 @@ copy/Makefile
 copy/Makefile.in
 copy/atlocal
 doc/*.cps
+doc/*.html
 doc/*.tex
 doc/*.vrs
 doc/.deps
