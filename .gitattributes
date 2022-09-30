@@ -117,6 +117,8 @@ build_windows/vs2019/libcob.vcxproj.filters eol=crlf
 build_windows/vs2019/libsupport.vcxproj eol=crlf
 build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
+cobc/cconv.c -text
+cobc/cconv.h -text
 config/Makefile.am eol=lf
 config/gcos-strict.conf -text
 config/gcos.conf -text
