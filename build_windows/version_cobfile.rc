@@ -44,7 +44,7 @@ VS_VERSION_INFO    VERSIONINFO
       VALUE "FileDescription",  "Comparision program with option to ignore patterns"
       VALUE "FileVersion",      STRINGIZE(__LIBCOB_VERSION)"."STRINGIZE(__LIBCOB_VERSION_MINOR)"."STRINGIZE(__LIBCOB_VERSION_PATCHLEVEL)"."STRINGIZE(VCS_REF)
       VALUE "InternalName",     "gcdiff"
-      VALUE "LegalCopyright",   "Copyright (C) 2017, 2020 Free Software Foundation, Inc."
+      VALUE "LegalCopyright",   "Copyright (C) 2021-2022 Free Software Foundation, Inc."
       VALUE "LegalTrademarks",  "Comparision program: GNU General Public License v3 - see COPYING,\x0ADocumentation: GNU Free Documentation License."
       VALUE "OriginalFilename", "gcdiff.exe"
       VALUE "ProductName",      PACKAGE_NAME " Comparision Program"
