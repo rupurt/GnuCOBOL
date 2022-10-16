@@ -49,6 +49,7 @@ build_windows/set_env_vs_x86.cmd eol=crlf
 build_windows/set_env_vs_x86.dist.tmpl.cmd eol=crlf
 build_windows/version_cobc.rc eol=crlf
 build_windows/version_cobcrun.rc eol=crlf
+build_windows/version_cobfile.rc -text
 build_windows/version_gcdiff.rc -text
 build_windows/version_libcob.rc eol=crlf
 build_windows/vs2008/GnuCOBOL.sln eol=crlf
