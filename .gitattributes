@@ -118,6 +118,11 @@ build_windows/vs2019/libsupport.vcxproj eol=crlf
 build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 cobc/Makefile.am eol=lf
 config/Makefile.am eol=lf
+config/alternate.ttbl -text
+config/default.ttbl -text
+config/ebcdic500_ascii7bit.ttbl -text
+config/ebcdic500_ascii8bit.ttbl -text
+config/ebcdic500_latin1.ttbl -text
 config/gcos-strict.conf -text
 config/gcos.conf -text
 config/gcos.words -text
