@@ -269,6 +269,7 @@ tests/testsuite.src/syn_copy.at eol=lf
 tests/testsuite.src/syn_definition.at eol=lf
 tests/testsuite.src/syn_file.at eol=lf
 tests/testsuite.src/syn_functions.at eol=lf
+tests/testsuite.src/syn_literals.at eol=lf
 tests/testsuite.src/syn_misc.at eol=lf
 tests/testsuite.src/syn_move.at eol=lf
 tests/testsuite.src/syn_multiply.at eol=lf
