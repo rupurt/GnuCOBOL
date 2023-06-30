@@ -5,6 +5,8 @@
 /*.sig
 /*.xz
 /*.zip
+/*dist*
+/*mingw*
 /.deps
 /Makefile
 /Makefile.in
