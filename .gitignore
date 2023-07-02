@@ -61,6 +61,7 @@ cobc/pplex.c
 cobc/ppparse.c
 cobc/ppparse.h
 cobc/scanner.c
+/compile_commands.json
 /conf*.dir
 /conf*.file
 /confdefs.h
