@@ -147,7 +147,6 @@ extras/Makefile.am eol=lf
 /gnucobol.spec eol=lf
 lib/Makefile.am eol=lf
 libcob/Makefile.am eol=lf
-libcob/exception-io.def -text
 libcob/fileio.h -text
 libcob/flmdb.c -text
 libcob/foci.c -text
