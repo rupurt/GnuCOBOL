@@ -123,6 +123,8 @@ build_windows/vs2019/libsupport.vcxproj eol=crlf
 build_windows/vs2019/libsupport.vcxproj.filters eol=crlf
 /cobc-dev.7 -text
 cobc/Makefile.am eol=lf
+cobc/cconv.c -text
+cobc/cconv.h -text
 cobc/debug.c -text
 cobc/sqlxfdgen.c -text
 config/Makefile.am eol=lf
