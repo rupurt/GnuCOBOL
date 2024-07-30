@@ -231,6 +231,7 @@ po/remove-potcdate.sin -text
 po/sr.po -text
 po/stamp-po -text
 po/sv.po -text
+po/tr.po -text
 po/update_linguas.sh eol=lf
 tests/Makefile.am eol=lf
 tests/atlocal.in eol=lf
