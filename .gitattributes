@@ -126,6 +126,11 @@ cobc/Makefile.am eol=lf
 cobc/debug.c -text
 cobc/sqlxfdgen.c -text
 config/Makefile.am eol=lf
+config/alternate.ttbl -text
+config/default.ttbl -text
+config/ebcdic500_ascii7bit.ttbl -text
+config/ebcdic500_ascii8bit.ttbl -text
+config/ebcdic500_latin1.ttbl -text
 config/gcos-strict.conf -text
 config/gcos.conf -text
 config/gcos.words -text
